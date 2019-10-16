@@ -1,12 +1,30 @@
-# Conditional Engine Prototype
-The conditional engine used to parse the raw condition expressions defined in the JSON scheme file, evaluate the expression in the given application context (answered questions), and provide access to text form of the given expressions.
-> Revision: October 7, 2019
+# illogical
+A micro conditional engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-## Engine Options
+## Installation via NPM or Yarn
+```sh
+npm install -D @briza/illogical
+```
+```sh
+yarn add @briza/illogical -D
+```
+
+## Basic Usage
+```js
+import Engine from '@briza/illogical';
+
+// Create a new instance of the engine
+const engine = new Engine();
+
+// Evaluate the raw expression
+const result = engine.evaluate(['==', 5, 5]);
+```
+
+## Options
 ### Strict Mode
 > Default: false
 
-In non-strict mode the parser can perform some expression reduction to optimize the expression. The string from than does not have to have the same structure as the raw expression.
+In non-strict mode the parser performs expression reduction where ever possible to optimize the evaluation process. If strict mode, these would cause an error thrown. 
 
 ### Parser Options
 Below described, are individual options object properties.
@@ -77,7 +95,7 @@ import {
   OPERATOR_OR,
   OPERATOR_NOR,
   OPERATOR_XOR,
-} from '...'
+} from '@briza/illogical'
 ````
 
 ## Contributing
