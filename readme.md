@@ -145,7 +145,7 @@ engine.statement([
   ['==', '$name', 'peter'],
   ['==', 5, 10]
 ], {name: 'peter'});
-// ({name} == "peter") AND (5 == 10))
+// (({name} == "peter") OR (5 == 10))
 ```
 
 ### Parse
