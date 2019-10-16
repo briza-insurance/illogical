@@ -1,0 +1,65 @@
+{
+  "name": "@briza/illogical",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/illogical.js",
+  "module": "lib/illogical.esm.js",
+  "files": [
+    "/lib",
+    "/types",
+    "changelog.md"
+  ],
+  "author": {
+    "name": "David Horak",
+    "email": "dhorak@briza.io"
+  },
+  "license": "MIT",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "rollup -c",
+    "build": "npm run build:types && npm run build:js",
+    "docs": "typedoc src",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:briza-insurance/illogical.git"
+  },
+  "bugs": {
+    "url": "https://github.com/briza-insurance/illogical/issues"
+  },
+  "homepage": "https://github.com/briza-insurance/illogical",
+  "keywords": [
+    "json",
+    "logic",
+    "comparison",
+    "rules"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-typescript": "^7.6.0",
+    "@types/jest": "^24.0.19",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^24.9.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-eslint": "^7.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "ts-jest": "^24.1.0",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {}
+}
