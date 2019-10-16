@@ -1,3 +1,7 @@
+/**
+ * Parser module.
+ * @module illogical/parser
+ */
 import { Options } from './options';
 import { Evaluable } from '../common/evaluable';
 import { Comparison } from '../expression/comparison';
@@ -7,12 +11,12 @@ export declare type ComparisonRaw = [string, operand, operand];
 export declare type LogicalRaw = [string, ...Array<ComparisonRaw | operand[]>];
 /**
  * Void expression
- * Used in the reduction process to eliminate
+ * Used in the reduction process to eliminate.
  * void redundant expressions.
  */
 export declare class VoidExpression implements Evaluable {
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @return {boolean}
      */
     evaluate(): boolean;
@@ -43,20 +47,20 @@ export declare class Parser {
      */
     readonly options: Options;
     /**
-     * Parse raw expression into evaluable expression
-     * @param {ComparisonRaw | LogicalRaw} raw expression
+     * Parse raw expression into evaluable expression.
+     * @param {ComparisonRaw | LogicalRaw} raw Raw expression.
      * @return {Evaluable}
      */
     parse(raw: ComparisonRaw | LogicalRaw): Evaluable;
     /**
-     * Parse raw logical expression
-     * @param {LogicalRaw} raw expression
+     * Parse raw logical expression.
+     * @param {LogicalRaw} raw Raw expression.
      * @return {Logical|Comparison|null}
      */
     parseLogicalRawExp(raw: LogicalRaw): Logical | Comparison | Evaluable;
     /**
-     * Parse raw comparison expression
-     * @param {ComparisonRaw} raw
+     * Parse raw comparison expression.
+     * @param {ComparisonRaw} raw Raw comparison expression.
      * @return {Comparison}
      */
     parseComparisonRawExp(raw: ComparisonRaw): Comparison;

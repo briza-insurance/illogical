@@ -1,3 +1,7 @@
+/**
+ * Comparison expression module.
+ * @module illogical/expression/comparison
+ */
 import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Operand } from '../../operand';
 /**
@@ -15,12 +19,12 @@ export declare abstract class Comparison implements Evaluable {
      */
     constructor(operator: string, left: Operand, right: Operand);
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @param {Context} ctx
      */
     evaluate(ctx: Context): Result;
     /**
-     * Get the strict representation of the expression
+     * Get the strict representation of the expression.
      * @return {string}
      */
     toString(): string;

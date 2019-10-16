@@ -14,7 +14,7 @@ import {
  */
 export abstract class Operand implements Evaluable {
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    */
   evaluate (ctx: Context): Result {
@@ -22,7 +22,7 @@ export abstract class Operand implements Evaluable {
   }
 
   /**
-   * Get the strict representation
+   * Get the strict representation.
    */
   toString (): string {
     throw new Error('not implemented exception')

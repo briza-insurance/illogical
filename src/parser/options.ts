@@ -57,7 +57,7 @@ export interface Options {
 }
 
 /**
- * Default reference predicate
+ * Default reference predicate.
  * The "$" symbol at the begging of the operand is used
  * to predicate the reference type.
  * E.g. "$State", "$Country"
@@ -69,7 +69,7 @@ export function defaultReferencePredicate (key: string): boolean {
 }
 
 /**
- * Default reference transform
+ * Default reference transform.
  * It removes the "$" symbol at the begging of the operand name.
  * @param {string} key
  * @return {string}

@@ -1,3 +1,7 @@
+/**
+ * Comparison expression module.
+ * @module illogical/expression/comparison
+ */
 import { Context, Result } from '../../common/evaluable';
 import { Operand } from '../../operand';
 import { Comparison } from '../comparison';
@@ -13,7 +17,7 @@ export declare class LessThanOrEqual extends Comparison {
      */
     constructor(left: Operand, right: Operand);
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @param {Context} ctx
      * @return {Result}
      */

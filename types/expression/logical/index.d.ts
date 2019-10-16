@@ -1,3 +1,7 @@
+/**
+ * Logical expression module.
+ * @module illogical/expression/logical
+ */
 import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 /**
@@ -22,12 +26,12 @@ export declare abstract class Logical implements Evaluable {
      */
     add(addon: Operand): void;
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @param {Context} ctx
      */
     evaluate(ctx: Context): Result;
     /**
-     * Get the strict representation of the expression
+     * Get the strict representation of the expression.
      * @return {string}
      */
     toString(): string;

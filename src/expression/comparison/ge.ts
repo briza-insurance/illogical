@@ -32,7 +32,7 @@ export class GreaterThanOrEqual extends Comparison {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {Result}
    */

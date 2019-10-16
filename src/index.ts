@@ -62,9 +62,9 @@ class Engine {
   }
 
   /**
-   * Evaluate the expression
-   * @param {ComparisonRaw | LogicalRaw} exp raw expression
-   * @param {Context} ctx evaluation context
+   * Evaluate the expression.
+   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+   * @param {Context} ctx Evaluation data context.
    * @return {boolean}
    */
   evaluate (exp: ComparisonRaw | LogicalRaw, ctx: Context): boolean {
@@ -73,8 +73,7 @@ class Engine {
 
   /**
    * Get expression statement
-   * @param {ComparisonRaw | LogicalRaw} exp raw expression
-   * @param {Context} ctx evaluation context
+   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
    * @return {string}
    */
   statement (exp: ComparisonRaw | LogicalRaw): string {
@@ -82,8 +81,8 @@ class Engine {
   }
 
   /**
-   * Parse expression
-   * @param {ComparisonRaw | LogicalRaw} exp raw expression
+   * Parse expression.
+   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
    * @return {Evaluable}
    */
   parse (exp: ComparisonRaw | LogicalRaw): Evaluable {

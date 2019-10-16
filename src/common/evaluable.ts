@@ -1,4 +1,9 @@
 /**
+ * Common module.
+ * @module illogical/common
+ */
+
+/**
  * Evaluation Context
  * Holds references used during the evaluation process.
  * Format: key: value.
@@ -24,14 +29,14 @@ export type Result =
  */
 export interface Evaluable {
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {Result}
    */
   evaluate(ctx: Context): Result;
 
   /**
-   * Get the strict representation
+   * Get the strict representation of the evaluable expression.
    */
   toString(): string;
 }

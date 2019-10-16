@@ -20,7 +20,7 @@ export class Reference implements Operand {
 
   /**
    * @constructor
-   * @param {string} key Context key
+   * @param {string} key Context key.
    */
   constructor (key: string) {
     if (key.trim() === '') {
@@ -30,7 +30,7 @@ export class Reference implements Operand {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {boolean}
    */
@@ -42,7 +42,7 @@ export class Reference implements Operand {
   }
 
   /**
-   * Get the strict representation of the operand
+   * Get the strict representation of the operand.
    * @return {string}
    */
   toString (): string {

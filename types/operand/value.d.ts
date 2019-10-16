@@ -1,4 +1,8 @@
-import { Result } from '../common/evaluable';
+/**
+ * Operand module.
+ * @module illogical/operand
+ */
+import { Context, Result } from '../common/evaluable';
 import { Operand } from '.';
 /**
  * Static value operand
@@ -11,13 +15,13 @@ export declare class Value implements Operand {
      */
     constructor(value: Result);
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @param {Context} ctx
      * @return {boolean}
      */
-    evaluate(): Result;
+    evaluate(ctx: Context): Result;
     /**
-     * Get the strict representation of the operand
+     * Get the strict representation of the operand.
      * @return {string}
      */
     toString(): string;

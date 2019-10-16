@@ -44,7 +44,7 @@ export class Value implements Operand {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {boolean}
    */
@@ -53,7 +53,7 @@ export class Value implements Operand {
   }
 
   /**
-   * Get the strict representation of the operand
+   * Get the strict representation of the operand.
    * @return {string}
    */
   toString (): string {

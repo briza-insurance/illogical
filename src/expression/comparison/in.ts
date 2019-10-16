@@ -30,7 +30,7 @@ export class In extends Comparison {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {Result}
    */
@@ -45,10 +45,10 @@ export class In extends Comparison {
     const leftArray = Array.isArray(left)
     const rightArray = Array.isArray(right)
     if (leftArray && rightArray) {
-      throw new Error('invalid in comparison, both operands are array')
+      throw new Error('invalid IN expression, both operands are array')
     }
     if (!leftArray && !rightArray) {
-      throw new Error('invalid in comparison, non of the operands is array')
+      throw new Error('invalid IN expression, non of the operands is array')
     }
     if (leftArray) {
       return (left as (string|number)[])
@@ -59,7 +59,7 @@ export class In extends Comparison {
   }
 
   /**
-   * Get the strict representation of the expression
+   * Get the strict representation of the expression.
    * @return {string}
    */
   toString (): string {

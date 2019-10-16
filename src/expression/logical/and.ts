@@ -29,7 +29,7 @@ export class And extends Logical {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    * @return {Result}
    */

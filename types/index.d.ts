@@ -1,3 +1,7 @@
+/**
+ * Main module.
+ * @module illogical
+ */
 import { ComparisonRaw, LogicalRaw } from './parser';
 import { Options } from './parser/options';
 import { Context, Evaluable } from './common/evaluable';
@@ -29,22 +33,21 @@ declare class Engine {
      */
     constructor(strict?: boolean, options?: Partial<Options>);
     /**
-     * Evaluate the expression
-     * @param {ComparisonRaw | LogicalRaw} exp raw expression
-     * @param {Context} ctx evaluation context
+     * Evaluate the expression.
+     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+     * @param {Context} ctx Evaluation data context.
      * @return {boolean}
      */
     evaluate(exp: ComparisonRaw | LogicalRaw, ctx: Context): boolean;
     /**
      * Get expression statement
-     * @param {ComparisonRaw | LogicalRaw} exp raw expression
-     * @param {Context} ctx evaluation context
+     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
      * @return {string}
      */
     statement(exp: ComparisonRaw | LogicalRaw): string;
     /**
-     * Parse expression
-     * @param {ComparisonRaw | LogicalRaw} exp raw expression
+     * Parse expression.
+     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
      * @return {Evaluable}
      */
     parse(exp: ComparisonRaw | LogicalRaw): Evaluable;

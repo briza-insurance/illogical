@@ -1,3 +1,7 @@
+/**
+ * Logical expression module.
+ * @module illogical/expression/logical
+ */
 import { Context, Result } from '../../common/evaluable';
 import { Logical, Operand } from '../logical';
 export declare const OPERATOR: unique symbol;
@@ -11,7 +15,7 @@ export declare class Nor extends Logical {
      */
     constructor(operands: Operand[]);
     /**
-     * Evaluate in the given context
+     * Evaluate in the given context.
      * @param {Context} ctx
      * @return {Result}
      */

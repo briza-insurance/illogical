@@ -1,3 +1,7 @@
+/**
+ * Parser module.
+ * @module illogical/parser
+ */
 export declare type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
 export interface Options {
     /**
@@ -26,7 +30,7 @@ export interface Options {
     [k: string]: optionValue;
 }
 /**
- * Default reference predicate
+ * Default reference predicate.
  * The "$" symbol at the begging of the operand is used
  * to predicate the reference type.
  * E.g. "$State", "$Country"
@@ -35,7 +39,7 @@ export interface Options {
  */
 export declare function defaultReferencePredicate(key: string): boolean;
 /**
- * Default reference transform
+ * Default reference transform.
  * It removes the "$" symbol at the begging of the operand name.
  * @param {string} key
  * @return {string}

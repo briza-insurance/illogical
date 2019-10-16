@@ -34,7 +34,7 @@ export abstract class Comparison implements Evaluable {
   }
 
   /**
-   * Evaluate in the given context
+   * Evaluate in the given context.
    * @param {Context} ctx
    */
   evaluate (ctx: Context): Result {
@@ -42,7 +42,7 @@ export abstract class Comparison implements Evaluable {
   }
 
   /**
-   * Get the strict representation of the expression
+   * Get the strict representation of the expression.
    * @return {string}
    */
   toString (): string {

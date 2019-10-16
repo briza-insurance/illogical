@@ -6,8 +6,8 @@
 import { Result } from './evaluable'
 
 /**
- * Is Number predicate
- * @param {Result} value tested value
+ * Is number predicate.
+ * @param {Result} value Tested value.
  * @return {boolean}
  */
 export function isNumber (value: Result): boolean {
@@ -15,7 +15,7 @@ export function isNumber (value: Result): boolean {
 }
 
 /**
- * Is string type predicate
+ * Is string type predicate.
  * @param {Result} value
  * @return {boolean}
  */
