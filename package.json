@@ -4,6 +4,7 @@
   "description": "A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.",
   "main": "lib/illogical.js",
   "module": "lib/illogical.esm.js",
+  "typings": "types/index.d.ts",
   "files": [
     "/lib",
     "/types",
@@ -21,7 +22,7 @@
     "build": "npm run build:types && npm run build:js",
     "docs": "typedoc src",
     "test": "jest",
-    "prepublishOnly": "npm run jest && npm run build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "repository": {
     "type": "git",
