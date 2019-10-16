@@ -1,0 +1,21 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  ci:
+    name: Continuous integration
+    runs-on: ubuntu-18.04
+    container:
+      image: node:10.14.1-slim
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install npm modules
+        run: npm i
+      - name: Scan project for vulnerabilities
+        run: npm audit
+      - name: Run test suite
+        run: npm t
+      - name: Run build
+        run: npm run build
