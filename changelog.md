@@ -1,4 +1,4 @@
-# Illogical changelog
+# illogical changelog
 
 ## 1.0.0
 

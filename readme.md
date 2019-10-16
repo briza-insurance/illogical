@@ -6,6 +6,8 @@ A micro conditional javascript engine used to parse the raw logical and comparis
 ## About
 This project have been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
 
+> Code documentation could be found here: https://briza-insurance.github.io/illogical/index.html.
+
 **Table of Content**
 
 ---
@@ -64,6 +66,7 @@ const engine = new Engine();
 const result = engine.evaluate(['==', 5, 5]);
 ```
 
+> The library is being build as **CommonJS** module and **ESM**.  
 > For advanced usage, please [Engine Options](#engine-options).
 
 ### Evaluate
