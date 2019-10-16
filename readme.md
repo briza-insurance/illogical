@@ -208,6 +208,7 @@ The reference operand's value is resolved from the [Evaluation Data Context](#ev
 The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. This might be customized via [Reference Predicated Parser Option](#reference-predicated).
 
 **Example**
+
 | Expression  | Data Context |
 | ------------- | --- |
 | ```['==', '$age', 21]``` | ```{age: 21}``` |
