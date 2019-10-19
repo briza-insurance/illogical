@@ -1,50 +1,14 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: October 16, 2019.
+> Revision: October 19, 2019.
 
 ## About
-This project have been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
+This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
 
 > Code documentation could be found here: https://briza-insurance.github.io/illogical/index.html.
 
-**Table of Content**
-
----
-- [Basic Usage](#basic-usage)
-  - [Evaluate](#evaluate)
-  - [Statement](#statement)
-  - [Parse](#parse)
-    - [Evaluable Function](#evaluable-function)
-- [Working with Expressions](#working-with-expressions)
-  - [Evaluation Data Context](#evaluation-data-context)
-  - [Operand Types](#operand-types)
-    - [Value](#value)
-    - [Reference](#reference)
-  - [Comparison Expressions](#comparison-expressions)
-    - [Equal](#equal)
-    - [Not Equal](#not-equal)
-    - [Greater Than](#greater-than)
-    - [Greater Than or Equal](#greater-than-or-equal)
-    - [Less Than](#less-than)
-    - [Less Than or Equal](#less-than-or-equal)
-    - [In](#in)
-    - [Not In](#not-in)
-  - [Logical Expressions](#logical-expressions)
-    - [And](#and)
-    - [Or](#or)
-    - [Nor](#nor)
-    - [Xor](#xor)
-- [Engine Options](#engine-options)
-  - [Strict Mode](#strict-mode)
-  - [Parser Options](#parser-options)
-    - [Reference Predicated](#reference-predicated)
-    - [Reference Transform](#reference-transform)
-    - [Operator Mapping](#operator-mapping)
-- [Contributing](#contributing)
-  - [Pull Request Process](#pull-request-process)
-- [License](#license)
----
+> The library is being build as **CommonJS** module and **ESM**.  
 
 ## Installation via NPM or Yarn
 ```sh
@@ -53,6 +17,45 @@ npm install -D @briza/illogical
 ```sh
 yarn add @briza/illogical -D
 ```
+
+**Table of Content**
+
+---
+- [illogical](#illogical)
+  - [About](#about)
+  - [Installation via NPM or Yarn](#installation-via-npm-or-yarn)
+  - [- License](#license)
+  - [Basic Usage](#basic-usage)
+    - [Evaluate](#evaluate)
+    - [Parse](#parse)
+    - [Operand Types](#operand-types)
+      - [Value](#value)
+      - [Reference](#reference)
+    - [Comparison Expressions](#comparison-expressions)
+      - [Equal](#equal)
+      - [Not Equal](#not-equal)
+      - [Greater Than](#greater-than)
+      - [Greater Than or Equal](#greater-than-or-equal)
+      - [Less Than](#less-than)
+      - [Less Than or Equal](#less-than-or-equal)
+      - [In](#in)
+      - [Not In](#not-in)
+    - [Logical Expressions](#logical-expressions)
+      - [And](#and)
+      - [Or](#or)
+      - [Nor](#nor)
+      - [Xor](#xor)
+  - [Engine Options](#engine-options)
+    - [Strict Mode](#strict-mode)
+    - [Parser Options](#parser-options)
+      - [Reference Predicated](#reference-predicated)
+      - [Reference Transform](#reference-transform)
+      - [Operator Mapping](#operator-mapping)
+  - [Contributing](#contributing)
+    - [Pull Request Process](#pull-request-process)
+  - [License](#license)
+---
+
 
 ## Basic Usage
 ```js
@@ -66,7 +69,6 @@ const engine = new Engine();
 const result = engine.evaluate(['==', 5, 5]);
 ```
 
-> The library is being build as **CommonJS** module and **ESM**.  
 > For advanced usage, please [Engine Options](#engine-options).
 
 ### Evaluate
@@ -169,9 +171,12 @@ evaluable.toString();
 
 ## Working with Expressions
 ### Evaluation Data Context
-The evaluation data context is used to provide the expression with variable references, i.e. this allows for the dynamic expressions. The data context is flat object with properties used as the references keys, and its values as reference values.
+The evaluation data context is used to provide the expression with variable references, i.e. this allows for the dynamic expressions. The data context is object with properties used as the references keys, and its values as reference values.
 
-> Valid reference values: string, number, boolean, string[], number[].
+> Valid reference values: object, string, number, boolean, string[], number[].
+
+To reference the nested reference, please use "." delimiter, e.g.:
+```$address.city```
 
 **Example**
 ```js
@@ -180,11 +185,18 @@ const ctx = {
   name: 'peter',
   country: 'canada',
   age: 21,
-  options: [1,2,3]
+  options: [1,2,3],
+  address: {
+    city: 'Toronto',
+    country: 'Canada',
+  }
 }
 
 // Evaluate an expression in the given data context
 engine.evaluate(['>', '$age', 20], ctx); // true
+
+// Evaluate an expression in the given data context
+engine.evaluate(['==', '$address.city', 'Toronto'], ctx); // true
 ```
 
 ### Operand Types
