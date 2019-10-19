@@ -22,3 +22,12 @@ export function isNumber (value: Result): boolean {
 export function isString (value: Result): boolean {
   return typeof value === 'string' || value instanceof String
 }
+
+/**
+ * Is Object
+ * @param {mixed} value tested value
+ * @return {boolean} result of the test
+ */
+export function isObject (value: any): boolean {
+  return typeof value === 'object' && value.constructor === Object
+}
