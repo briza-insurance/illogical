@@ -15,3 +15,9 @@ export declare function isNumber(value: Result): boolean;
  * @return {boolean}
  */
 export declare function isString(value: Result): boolean;
+/**
+ * Is Object
+ * @param {mixed} value tested value
+ * @return {boolean} result of the test
+ */
+export declare function isObject(value: any): boolean;

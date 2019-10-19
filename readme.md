@@ -21,39 +21,37 @@ yarn add @briza/illogical -D
 **Table of Content**
 
 ---
-- [illogical](#illogical)
-  - [About](#about)
-  - [Installation via NPM or Yarn](#installation-via-npm-or-yarn)
-  - [- License](#license)
-  - [Basic Usage](#basic-usage)
-    - [Evaluate](#evaluate)
-    - [Parse](#parse)
-    - [Operand Types](#operand-types)
-      - [Value](#value)
-      - [Reference](#reference)
-    - [Comparison Expressions](#comparison-expressions)
-      - [Equal](#equal)
-      - [Not Equal](#not-equal)
-      - [Greater Than](#greater-than)
-      - [Greater Than or Equal](#greater-than-or-equal)
-      - [Less Than](#less-than)
-      - [Less Than or Equal](#less-than-or-equal)
-      - [In](#in)
-      - [Not In](#not-in)
-    - [Logical Expressions](#logical-expressions)
-      - [And](#and)
-      - [Or](#or)
-      - [Nor](#nor)
-      - [Xor](#xor)
-  - [Engine Options](#engine-options)
-    - [Strict Mode](#strict-mode)
-    - [Parser Options](#parser-options)
-      - [Reference Predicated](#reference-predicated)
-      - [Reference Transform](#reference-transform)
-      - [Operator Mapping](#operator-mapping)
-  - [Contributing](#contributing)
-    - [Pull Request Process](#pull-request-process)
-  - [License](#license)
+
+- [Basic Usage](#basic-usage)
+  - [Evaluate](#evaluate)
+  - [Parse](#parse)
+  - [Operand Types](#operand-types)
+    - [Value](#value)
+    - [Reference](#reference)
+  - [Comparison Expressions](#comparison-expressions)
+    - [Equal](#equal)
+    - [Not Equal](#not-equal)
+    - [Greater Than](#greater-than)
+    - [Greater Than or Equal](#greater-than-or-equal)
+    - [Less Than](#less-than)
+    - [Less Than or Equal](#less-than-or-equal)
+    - [In](#in)
+    - [Not In](#not-in)
+  - [Logical Expressions](#logical-expressions)
+    - [And](#and)
+    - [Or](#or)
+    - [Nor](#nor)
+    - [Xor](#xor)
+- [Engine Options](#engine-options)
+  - [Strict Mode](#strict-mode)
+  - [Parser Options](#parser-options)
+    - [Reference Predicated](#reference-predicated)
+    - [Reference Transform](#reference-transform)
+    - [Operator Mapping](#operator-mapping)
+- [Contributing](#contributing)
+  - [Pull Request Process](#pull-request-process)
+- [License](#license)
+
 ---
 
 
@@ -503,6 +501,8 @@ import {
   OPERATOR_XOR,
 } from '@briza/illogical'
 ````
+
+---
 
 ## Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
