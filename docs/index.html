@@ -69,73 +69,77 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: October 16, 2019.</p>
+					<p>Revision: October 19, 2019.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
 				</a>
-				<p>This project have been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. </p>
-				<p><strong>Table of Content</strong></p>
-				<hr>
-				<ul>
-					<li><a href="#basic-usage">Basic Usage</a><ul>
-							<li><a href="#evaluate">Evaluate</a></li>
-							<li><a href="#statement">Statement</a></li>
-							<li><a href="#parse">Parse</a><ul>
-									<li><a href="#evaluable-function">Evaluable Function</a></li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-					<li><a href="#working-with-expressions">Working with Expressions</a><ul>
-							<li><a href="#evaluation-data-context">Evaluation Data Context</a></li>
-							<li><a href="#operand-types">Operand Types</a><ul>
-									<li><a href="#value">Value</a></li>
-									<li><a href="#reference">Reference</a></li>
-								</ul>
-							</li>
-							<li><a href="#comparison-expressions">Comparison Expressions</a><ul>
-									<li><a href="#equal">Equal</a></li>
-									<li><a href="#not-equal">Not Equal</a></li>
-									<li><a href="#greater-than">Greater Than</a></li>
-									<li><a href="#greater-than-or-equal">Greater Than or Equal</a></li>
-									<li><a href="#less-than">Less Than</a></li>
-									<li><a href="#less-than-or-equal">Less Than or Equal</a></li>
-									<li><a href="#in">In</a></li>
-									<li><a href="#not-in">Not In</a></li>
-								</ul>
-							</li>
-							<li><a href="#logical-expressions">Logical Expressions</a><ul>
-									<li><a href="#and">And</a></li>
-									<li><a href="#or">Or</a></li>
-									<li><a href="#nor">Nor</a></li>
-									<li><a href="#xor">Xor</a></li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-					<li><a href="#engine-options">Engine Options</a><ul>
-							<li><a href="#strict-mode">Strict Mode</a></li>
-							<li><a href="#parser-options">Parser Options</a><ul>
-									<li><a href="#reference-predicated">Reference Predicated</a></li>
-									<li><a href="#reference-transform">Reference Transform</a></li>
-									<li><a href="#operator-mapping">Operator Mapping</a></li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-					<li><a href="#contributing">Contributing</a><ul>
-							<li><a href="#pull-request-process">Pull Request Process</a></li>
-						</ul>
-					</li>
-					<li><a href="#license">License</a></li>
-				</ul>
-				<hr>
+				<p>This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. </p>
+				<blockquote>
+					<p>Code documentation could be found here: <a href="https://briza-insurance.github.io/illogical/index.html">https://briza-insurance.github.io/illogical/index.html</a>.</p>
+				</blockquote>
+				<blockquote>
+					<p>The library is being build as <strong>CommonJS</strong> module and <strong>ESM</strong>.  </p>
+				</blockquote>
 				<a href="#installation-via-npm-or-yarn" id="installation-via-npm-or-yarn" style="color: inherit; text-decoration: none;">
 					<h2>Installation via NPM or Yarn</h2>
 				</a>
 				<pre><code class="language-sh">npm install -D @briza/illogical</code></pre>
 				<pre><code class="language-sh">yarn add @briza/illogical -D</code></pre>
+				<p><strong>Table of Content</strong></p>
+				<hr>
+				<ul>
+					<li><a href="#illogical">illogical</a><ul>
+							<li><a href="#about">About</a></li>
+							<li><a href="#installation-via-npm-or-yarn">Installation via NPM or Yarn</a></li>
+							<li><a href="#license">- License</a></li>
+							<li><a href="#basic-usage">Basic Usage</a><ul>
+									<li><a href="#evaluate">Evaluate</a></li>
+									<li><a href="#parse">Parse</a></li>
+									<li><a href="#operand-types">Operand Types</a><ul>
+											<li><a href="#value">Value</a></li>
+											<li><a href="#reference">Reference</a></li>
+										</ul>
+									</li>
+									<li><a href="#comparison-expressions">Comparison Expressions</a><ul>
+											<li><a href="#equal">Equal</a></li>
+											<li><a href="#not-equal">Not Equal</a></li>
+											<li><a href="#greater-than">Greater Than</a></li>
+											<li><a href="#greater-than-or-equal">Greater Than or Equal</a></li>
+											<li><a href="#less-than">Less Than</a></li>
+											<li><a href="#less-than-or-equal">Less Than or Equal</a></li>
+											<li><a href="#in">In</a></li>
+											<li><a href="#not-in">Not In</a></li>
+										</ul>
+									</li>
+									<li><a href="#logical-expressions">Logical Expressions</a><ul>
+											<li><a href="#and">And</a></li>
+											<li><a href="#or">Or</a></li>
+											<li><a href="#nor">Nor</a></li>
+											<li><a href="#xor">Xor</a></li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li><a href="#engine-options">Engine Options</a><ul>
+									<li><a href="#strict-mode">Strict Mode</a></li>
+									<li><a href="#parser-options">Parser Options</a><ul>
+											<li><a href="#reference-predicated">Reference Predicated</a></li>
+											<li><a href="#reference-transform">Reference Transform</a></li>
+											<li><a href="#operator-mapping">Operator Mapping</a></li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li><a href="#contributing">Contributing</a><ul>
+									<li><a href="#pull-request-process">Pull Request Process</a></li>
+								</ul>
+							</li>
+							<li><a href="#license">License</a></li>
+						</ul>
+					</li>
+				</ul>
+				<hr>
 				<a href="#basic-usage" id="basic-usage" style="color: inherit; text-decoration: none;">
 					<h2>Basic Usage</h2>
 				</a>
@@ -223,7 +227,7 @@ engine.statement([
   [<span class="hljs-string">'=='</span>, <span class="hljs-string">'$name'</span>, <span class="hljs-string">'peter'</span>],
   [<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]
 ], {<span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>});
-<span class="hljs-comment">// ({name} == "peter") AND (5 == 10))</span></code></pre>
+<span class="hljs-comment">// (({name} == "peter") OR (5 == 10))</span></code></pre>
 				<a href="#parse" id="parse" style="color: inherit; text-decoration: none;">
 					<h3>Parse</h3>
 				</a>
@@ -249,21 +253,30 @@ evaluable.toString();
 				<a href="#evaluation-data-context" id="evaluation-data-context" style="color: inherit; text-decoration: none;">
 					<h3>Evaluation Data Context</h3>
 				</a>
-				<p>The evaluation data context is used to provide the expression with variable references, i.e. this allows for the dynamic expressions. The data context is flat object with properties used as the references keys, and its values as reference values.</p>
+				<p>The evaluation data context is used to provide the expression with variable references, i.e. this allows for the dynamic expressions. The data context is object with properties used as the references keys, and its values as reference values.</p>
 				<blockquote>
-					<p>Valid reference values: string, number, boolean, string[], number[].</p>
+					<p>Valid reference values: object, string, number, boolean, string[], number[].</p>
 				</blockquote>
+				<p>To reference the nested reference, please use &quot;.&quot; delimiter, e.g.:
+				<code>$address.city</code></p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span class="hljs-comment">// Data context</span>
 <span class="hljs-keyword">const</span> ctx = {
   <span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>,
   <span class="hljs-attr">country</span>: <span class="hljs-string">'canada'</span>,
   <span class="hljs-attr">age</span>: <span class="hljs-number">21</span>,
-  <span class="hljs-attr">options</span>: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]
+  <span class="hljs-attr">options</span>: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>],
+  <span class="hljs-attr">address</span>: {
+    <span class="hljs-attr">city</span>: <span class="hljs-string">'Toronto'</span>,
+    <span class="hljs-attr">country</span>: <span class="hljs-string">'Canada'</span>,
+  }
 }
 
 <span class="hljs-comment">// Evaluate an expression in the given data context</span>
-engine.evaluate([<span class="hljs-string">'&gt;'</span>, <span class="hljs-string">'$age'</span>, <span class="hljs-number">20</span>], ctx); <span class="hljs-comment">// true</span></code></pre>
+engine.evaluate([<span class="hljs-string">'&gt;'</span>, <span class="hljs-string">'$age'</span>, <span class="hljs-number">20</span>], ctx); <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Evaluate an expression in the given data context</span>
+engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string">'$address.city'</span>, <span class="hljs-string">'Toronto'</span>], ctx); <span class="hljs-comment">// true</span></code></pre>
 				<a href="#operand-types" id="operand-types" style="color: inherit; text-decoration: none;">
 					<h3>Operand Types</h3>
 				</a>
@@ -283,14 +296,35 @@ engine.evaluate([<span class="hljs-string">'&gt;'</span>, <span class="hljs-stri
 				</a>
 				<p>The reference operand&#39;s value is resolved from the <a href="#evaluation-data-context">Evaluation Data Context</a>, where the the operands name is used as key in the context.</p>
 				<p>The reference operand must be prefixed with <code>$</code> symbol, e.g.: <code>$name</code>. This might be customized via <a href="#reference-predicated">Reference Predicated Parser Option</a>.</p>
-				<p><strong>Example</strong>
-					| Expression  | Data Context |
-					| ------------- | --- |
-					| <code>[&#39;==&#39;, &#39;$age&#39;, 21]</code> | <code>{age: 21}</code> |
-					| <code>[&#39;==&#39;, &#39;circle&#39;, &#39;$shape&#39;]</code> | <code>{age: &#39;circle&#39;}</code> |
-					| <code>[&#39;==&#39;, &#39;$visible&#39;, true]</code> | <code>{visible: true}</code> |
-					| <code>[&#39;IN&#39;, 2, &#39;$options&#39;]</code> | <code>{options: [1, 2, 3]}</code> |
-				| <code>[&#39;IN&#39;, [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;$selected&#39;]</code> | <code>{selected: &#39;b&#39;}</code> |</p>
+				<p><strong>Example</strong></p>
+				<table>
+					<thead>
+						<tr>
+							<th>Expression</th>
+							<th>Data Context</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>[&#39;==&#39;, &#39;$age&#39;, 21]</code></td>
+							<td><code>{age: 21}</code></td>
+						</tr>
+						<tr>
+							<td><code>[&#39;==&#39;, &#39;circle&#39;, &#39;$shape&#39;]</code></td>
+							<td><code>{age: &#39;circle&#39;}</code></td>
+						</tr>
+						<tr>
+							<td><code>[&#39;==&#39;, &#39;$visible&#39;, true]</code></td>
+							<td><code>{visible: true}</code></td>
+						</tr>
+						<tr>
+							<td><code>[&#39;IN&#39;, 2, &#39;$options&#39;]</code></td>
+							<td><code>{options: [1, 2, 3]}</code></td>
+						</tr>
+						<tr>
+							<td><code>[&#39;IN&#39;, [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;$selected&#39;]</code></td>
+							<td><code>{selected: &#39;b&#39;}</code></td>
+						</tr>
+				</tbody></table>
 				<a href="#comparison-expressions" id="comparison-expressions" style="color: inherit; text-decoration: none;">
 					<h3>Comparison Expressions</h3>
 				</a>
