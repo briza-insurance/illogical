@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: October 19, 2019.
+> Revision: October 21, 2019.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -24,7 +24,11 @@ yarn add @briza/illogical -D
 
 - [Basic Usage](#basic-usage)
   - [Evaluate](#evaluate)
+  - [Statement](#statement)
   - [Parse](#parse)
+    - [Evaluable Function](#evaluable-function)
+- [Working with Expressions](#working-with-expressions)
+  - [Evaluation Data Context](#evaluation-data-context)
   - [Operand Types](#operand-types)
     - [Value](#value)
     - [Reference](#reference)
