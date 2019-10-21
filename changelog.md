@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.0.3
+
+* Update readme.
+
 ## 1.0.2
 
 * Add support for nested data context.

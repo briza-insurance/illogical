@@ -69,7 +69,7 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: October 19, 2019.</p>
+					<p>Revision: October 21, 2019.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -89,55 +89,57 @@
 				<p><strong>Table of Content</strong></p>
 				<hr>
 				<ul>
-					<li><a href="#illogical">illogical</a><ul>
-							<li><a href="#about">About</a></li>
-							<li><a href="#installation-via-npm-or-yarn">Installation via NPM or Yarn</a></li>
-							<li><a href="#license">- License</a></li>
-							<li><a href="#basic-usage">Basic Usage</a><ul>
-									<li><a href="#evaluate">Evaluate</a></li>
-									<li><a href="#parse">Parse</a></li>
-									<li><a href="#operand-types">Operand Types</a><ul>
-											<li><a href="#value">Value</a></li>
-											<li><a href="#reference">Reference</a></li>
-										</ul>
-									</li>
-									<li><a href="#comparison-expressions">Comparison Expressions</a><ul>
-											<li><a href="#equal">Equal</a></li>
-											<li><a href="#not-equal">Not Equal</a></li>
-											<li><a href="#greater-than">Greater Than</a></li>
-											<li><a href="#greater-than-or-equal">Greater Than or Equal</a></li>
-											<li><a href="#less-than">Less Than</a></li>
-											<li><a href="#less-than-or-equal">Less Than or Equal</a></li>
-											<li><a href="#in">In</a></li>
-											<li><a href="#not-in">Not In</a></li>
-										</ul>
-									</li>
-									<li><a href="#logical-expressions">Logical Expressions</a><ul>
-											<li><a href="#and">And</a></li>
-											<li><a href="#or">Or</a></li>
-											<li><a href="#nor">Nor</a></li>
-											<li><a href="#xor">Xor</a></li>
-										</ul>
-									</li>
+					<li><a href="#basic-usage">Basic Usage</a><ul>
+							<li><a href="#evaluate">Evaluate</a></li>
+							<li><a href="#statement">Statement</a></li>
+							<li><a href="#parse">Parse</a><ul>
+									<li><a href="#evaluable-function">Evaluable Function</a></li>
 								</ul>
 							</li>
-							<li><a href="#engine-options">Engine Options</a><ul>
-									<li><a href="#strict-mode">Strict Mode</a></li>
-									<li><a href="#parser-options">Parser Options</a><ul>
-											<li><a href="#reference-predicated">Reference Predicated</a></li>
-											<li><a href="#reference-transform">Reference Transform</a></li>
-											<li><a href="#operator-mapping">Operator Mapping</a></li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li><a href="#contributing">Contributing</a><ul>
-									<li><a href="#pull-request-process">Pull Request Process</a></li>
-								</ul>
-							</li>
-							<li><a href="#license">License</a></li>
 						</ul>
 					</li>
+					<li><a href="#working-with-expressions">Working with Expressions</a><ul>
+							<li><a href="#evaluation-data-context">Evaluation Data Context</a></li>
+							<li><a href="#operand-types">Operand Types</a><ul>
+									<li><a href="#value">Value</a></li>
+									<li><a href="#reference">Reference</a></li>
+								</ul>
+							</li>
+							<li><a href="#comparison-expressions">Comparison Expressions</a><ul>
+									<li><a href="#equal">Equal</a></li>
+									<li><a href="#not-equal">Not Equal</a></li>
+									<li><a href="#greater-than">Greater Than</a></li>
+									<li><a href="#greater-than-or-equal">Greater Than or Equal</a></li>
+									<li><a href="#less-than">Less Than</a></li>
+									<li><a href="#less-than-or-equal">Less Than or Equal</a></li>
+									<li><a href="#in">In</a></li>
+									<li><a href="#not-in">Not In</a></li>
+								</ul>
+							</li>
+							<li><a href="#logical-expressions">Logical Expressions</a><ul>
+									<li><a href="#and">And</a></li>
+									<li><a href="#or">Or</a></li>
+									<li><a href="#nor">Nor</a></li>
+									<li><a href="#xor">Xor</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><a href="#engine-options">Engine Options</a><ul>
+							<li><a href="#strict-mode">Strict Mode</a></li>
+							<li><a href="#parser-options">Parser Options</a><ul>
+									<li><a href="#reference-predicated">Reference Predicated</a></li>
+									<li><a href="#reference-transform">Reference Transform</a></li>
+									<li><a href="#operator-mapping">Operator Mapping</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><a href="#contributing">Contributing</a><ul>
+							<li><a href="#pull-request-process">Pull Request Process</a></li>
+						</ul>
+					</li>
+					<li><a href="#license">License</a></li>
 				</ul>
 				<hr>
 				<a href="#basic-usage" id="basic-usage" style="color: inherit; text-decoration: none;">
@@ -568,6 +570,7 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
   OPERATOR_NOR,
   OPERATOR_XOR,
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@briza/illogical'</span></code></pre>
+				<hr>
 				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
 					<h2>Contributing</h2>
 				</a>
