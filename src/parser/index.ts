@@ -49,6 +49,14 @@ import {
   NotIn,
   OPERATOR as OPERATOR_NOT_IN
 } from '../expression/comparison/not-in'
+import {
+  Prefix,
+  OPERATOR as OPERATOR_PREFIX
+} from '../expression/comparison/prefix'
+import {
+  Suffix,
+  OPERATOR as OPERATOR_SUFFIX
+} from '../expression/comparison/suffix'
 
 // Logical expressions
 import { Logical } from '../expression/logical'
@@ -240,6 +248,10 @@ export class Parser {
         return new In(left, right)
       case this.opts.operatorMapping.get(OPERATOR_NOT_IN):
         return new NotIn(left, right)
+      case this.opts.operatorMapping.get(OPERATOR_PREFIX):
+        return new Prefix(left, right)
+      case this.opts.operatorMapping.get(OPERATOR_SUFFIX):
+        return new Suffix(left, right)
       default:
         throw new Error(`invalid comparison operator: "${raw[0]}"`)
     }

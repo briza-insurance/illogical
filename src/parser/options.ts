@@ -14,6 +14,8 @@ import { OPERATOR as OPERATOR_LT } from '../expression/comparison/lt'
 import { OPERATOR as OPERATOR_LE } from '../expression/comparison/le'
 import { OPERATOR as OPERATOR_IN } from '../expression/comparison/in'
 import { OPERATOR as OPERATOR_NOT_IN } from '../expression/comparison/not-in'
+import { OPERATOR as OPERATOR_PREFIX } from '../expression/comparison/prefix'
+import { OPERATOR as OPERATOR_SUFFIX } from '../expression/comparison/suffix'
 
 // Logical expressions
 import { OPERATOR as OPERATOR_AND } from '../expression/logical/and'
@@ -90,6 +92,8 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   [OPERATOR_LE, '<='],
   [OPERATOR_IN, 'IN'],
   [OPERATOR_NOT_IN, 'NOT IN'],
+  [OPERATOR_PREFIX, 'PREFIX'],
+  [OPERATOR_SUFFIX, 'SUFFIX'],
   // Logical
   [OPERATOR_AND, 'AND'],
   [OPERATOR_OR, 'OR'],

@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: October 21, 2019.
+> Revision: November 7, 2019.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -41,6 +41,8 @@ yarn add @briza/illogical -D
     - [Less Than or Equal](#less-than-or-equal)
     - [In](#in)
     - [Not In](#not-in)
+    - [Prefix](#prefix)
+    - [Suffix](#suffix)
   - [Logical Expressions](#logical-expressions)
     - [And](#and)
     - [Or](#or)
@@ -318,6 +320,36 @@ engine.evaluate(['NOT IN', 10, [1,2,3,4,5]]); // true
 engine.evaluate(['NOT IN', ['circle', 'square', 'triangle'], 'oval']); // true
 ```
 
+#### Prefix
+Expression format: ```["PREFIX", ```[Left Operand](#operand-types), [Right Operand](#operand-types)```]```.
+> Valid operand types: string.
+
+* Left operand is the PREFIX term.
+* Right operand is the tested word.
+
+```json
+["PREFIX", "hemi", "hemisphere"]
+```
+```js
+engine.evaluate(['PREFIX', "hemi", "hemisphere"]); // true
+engine.evaluate(['PREFIX', "hemi", "sphere"]); // false
+```
+
+#### Suffix
+Expression format: ```["SUFFIX", ```[Left Operand](#operand-types), [Right Operand](#operand-types)```]```.
+> Valid operand types: string.
+
+* Left operand is the tested word.
+* Right operand is the SUFFIX term.
+  
+```json
+["SUFFIX", "establishment", "ment"]
+```
+```js
+engine.evaluate(['SUFFIX', "establishment", "ment"]); // true
+engine.evaluate(['SUFFIX', "establish", "ment"]); // false
+```
+
 ### Logical Expressions
 
 #### And
@@ -480,6 +512,8 @@ operatorMapping: Map<symbol, string>
 [OPERATOR_LE, '<=']
 [OPERATOR_IN, 'IN']
 [OPERATOR_NOT_IN, 'NOT IN']
+[OPERATOR_PREFIX, 'PREFIX'],
+[OPERATOR_SUFFIX, 'SUFFIX'],
 
 // Logical
 [OPERATOR_AND, 'AND']
@@ -499,6 +533,8 @@ import {
   OPERATOR_LE,
   OPERATOR_IN,
   OPERATOR_NOT_IN,
+  OPERATOR_PREFIX,
+  OPERATOR_SUFFIX,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,

@@ -38,6 +38,14 @@ import {
   NotIn,
   OPERATOR as OPERATOR_NOT_IN,
 } from '../../../expression/comparison/not-in'
+import {
+  Prefix,
+  OPERATOR as OPERATOR_PREFIX,
+} from '../../../expression/comparison/prefix'
+import {
+  Suffix,
+  OPERATOR as OPERATOR_SUFFIX,
+} from '../../../expression/comparison/suffix'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
@@ -297,6 +305,14 @@ describe('Condition Engine - Parser', () => {
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
         expected: new NotIn(new Value(5), new Value([5]))
+      },
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
+        expected: new Prefix(new Value('a'), new Value('abc'))
+      },
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
+        expected: new Suffix(new Value('abc'), new Value('c'))
       },
       // Reference
       {
