@@ -1,5 +1,10 @@
 # illogical changelog
 
+## 1.1.0
+
+* Add Prefix comparison operator.
+* Add Suffix comparison operator.
+
 ## 1.0.3
 
 * Update readme.
