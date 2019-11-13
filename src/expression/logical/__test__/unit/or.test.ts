@@ -17,5 +17,14 @@ describe('Condition Engine - Expression - Logical - Or', () => {
       expect(new Or(test.operands).evaluate({}))
         .toBe(test.expected)
     }
+
+    let exceptions = [
+      { operands: [] },
+    ]
+    for (const exception of exceptions) {
+      // @ts-ignore
+      expect(() => new Or(exception.operands).evaluate({}))
+        .toThrowError()
+    }
   })
 })

@@ -17,5 +17,14 @@ describe('Condition Engine - Expression - Logical - And', () => {
       expect(new And(test.operands).evaluate({}))
         .toBe(test.expected)
     }
+
+    let exceptions = [
+      { operands: [] },
+    ]
+    for (const exception of exceptions) {
+      // @ts-ignore
+      expect(() => new And(exception.operands).evaluate({}))
+        .toThrowError()
+    }
   })
 })

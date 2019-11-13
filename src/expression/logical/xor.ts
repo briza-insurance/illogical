@@ -45,7 +45,7 @@ export class Xor extends Logical {
    */
   evaluate (ctx: Context): Result {
     if (this.operands.length === 0) {
-      return false
+      throw new Error('logical expression must have at least one operand')
     }
     let res = null
     for (const operand of this.operands) {
