@@ -5,6 +5,17 @@ import { Reference } from '../../../../operand/reference'
 import { Equal } from '../../eq'
 
 describe('Condition Engine - Expression - Comparison - Equal', () => {
+  describe('constructor', () => {
+    // @ts-ignore
+    expect(() => new Equal())
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new Equal(5))
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new Equal(5, 5, 5))
+      .toThrowError()
+  })
   describe('evaluate', () => {
 
     // Test value types against value types

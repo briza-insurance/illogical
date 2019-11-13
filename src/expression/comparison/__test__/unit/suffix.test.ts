@@ -3,6 +3,17 @@ import { Reference } from '../../../../operand/reference'
 import { Suffix } from '../../suffix'
 
 describe('Condition Engine - Expression - Comparison - Suffix', () => {
+  describe('constructor', () => {
+    // @ts-ignore
+    expect(() => new Suffix())
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new Suffix(5))
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new Suffix(5, 5, 5))
+      .toThrowError()
+  })
   describe('evaluate', () => {
 
     // Test value types against value types

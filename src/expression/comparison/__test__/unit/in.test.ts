@@ -3,6 +3,17 @@ import { Reference } from '../../../../operand/reference'
 import { In } from '../../in'
 
 describe('Condition Engine - Expression - Comparison - In', () => {
+  describe('constructor', () => {
+    // @ts-ignore
+    expect(() => new In())
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new In(5))
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new In(5, 5, 5))
+      .toThrowError()
+  })
   describe('evaluate', () => {
 
     // Test value types against value types

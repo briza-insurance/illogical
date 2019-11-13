@@ -26,6 +26,9 @@ export class NotEqual extends Comparison {
    * @param {Operand} right Right operand.
    */
   constructor (left: Operand, right: Operand) {
+    if (arguments.length !== 2) {
+      throw new Error('comparison expression must have at left and right operands')
+    }
     super('!=', left, right)
   }
 

@@ -10,13 +10,21 @@ describe('Condition Engine - Expression - Logical - Xor', () => {
       // Falsy
       { operands: [new Value(false), new Value(false)], expected: false },
       { operands: [new Value(true), new Value(true)], expected: false },
-      { operands: [], expected: false },
     ]
 
     for (const test of tests) {
       // @ts-ignore
       expect(new Xor(test.operands).evaluate({}))
         .toBe(test.expected)
+    }
+
+    let exceptions = [
+      { operands: [] },
+    ]
+    for (const exception of exceptions) {
+      // @ts-ignore
+      expect(() => new Xor(exception.operands).evaluate({}))
+        .toThrowError()
     }
   })
 })

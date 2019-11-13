@@ -34,6 +34,9 @@ export class And extends Logical {
    * @return {Result}
    */
   evaluate (ctx: Context): Result {
+    if (this.operands.length === 0) {
+      throw new Error('logical expression must have at least one operand')
+    }
     for (const operand of this.operands) {
       if (operand.evaluate(ctx) === false) {
         return false

@@ -3,6 +3,17 @@ import { Reference } from '../../../../operand/reference'
 import { LessThanOrEqual } from '../../le'
 
 describe('Condition Engine - Expression - Comparison - Less Than or Equal', () => {
+  describe('constructor', () => {
+    // @ts-ignore
+    expect(() => new LessThanOrEqual())
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new LessThanOrEqual(5))
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new LessThanOrEqual(5, 5, 5))
+      .toThrowError()
+  })
   describe('evaluate', () => {
 
     // Test value types against value types

@@ -3,6 +3,17 @@ import { Reference } from '../../../../operand/reference'
 import { NotIn } from '../../not-in'
 
 describe('Condition Engine - Expression - Comparison - Not In', () => {
+  describe('constructor', () => {
+    // @ts-ignore
+    expect(() => new NotIn())
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new NotIn(5))
+      .toThrowError()
+    // @ts-ignore
+    expect(() => new NotIn(5, 5, 5))
+      .toThrowError()
+  })
   describe('evaluate', () => {
 
     // Test value types against value types

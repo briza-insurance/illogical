@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.1.1
+* Invalid logical/comparison expression throw exception.
+
 ## 1.1.0
 
 * Add Prefix comparison operator.

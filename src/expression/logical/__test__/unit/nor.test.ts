@@ -17,5 +17,14 @@ describe('Condition Engine - Expression - Logical - Nor', () => {
       expect(new Nor(test.operands).evaluate({}))
         .toBe(test.expected)
     }
+
+    let exceptions = [
+      { operands: [] },
+    ]
+    for (const exception of exceptions) {
+      // @ts-ignore
+      expect(() => new Nor(exception.operands).evaluate({}))
+        .toThrowError()
+    }
   })
 })
