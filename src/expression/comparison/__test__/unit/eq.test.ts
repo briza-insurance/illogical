@@ -20,7 +20,7 @@ describe('Condition Engine - Expression - Comparison - Equal', () => {
 
     // Test value types against value types
     test('value type', () => {
-      let validTypes = [1, '1', true, false]
+      let validTypes = [1, '1', true, false, undefined, null]
       let validTypePermutations = permutation(validTypes)
 
       let tests = []
@@ -75,6 +75,7 @@ describe('Condition Engine - Expression - Comparison - Equal', () => {
         { left: new Reference('RefB'), right: new Reference('RefB'), expected: true },
         { left: new Reference('RefC'), right: new Reference('RefC'), expected: true },
         { left: new Reference('RefD'), right: new Reference('RefD'), expected: true },
+        { left: new Reference('RefE'), right: new Reference('RefE'), expected: true },
         // Falsy
         { left: new Reference('RefA'), right: new Reference('RefB'), expected: false },
         { left: new Reference('RefA'), right: new Reference('RefC'), expected: false },
@@ -108,6 +109,8 @@ describe('Condition Engine - Expression - Comparison - Equal', () => {
         { left: new Reference('RefB'), right: new Value('1'), expected: true },
         { left: new Reference('RefC'), right: new Value(true), expected: true },
         { left: new Reference('RefD'), right: new Value(false), expected: true },
+        { left: new Reference('RefE'), right: new Value(undefined), expected: true },
+        { left: new Reference('RefH'), right: new Value(null), expected: true },
         // Falsy
         { left: new Reference('RefA'), right: new Value('10'), expected: false },
         { left: new Reference('RefB'), right: new Value(10), expected: false },
@@ -128,6 +131,7 @@ describe('Condition Engine - Expression - Comparison - Equal', () => {
           // RefE = undefined
           RefF: [1],
           RefG: ['1'],
+          RefH: null,
         }))
           .toBe(test.expected)
       }
