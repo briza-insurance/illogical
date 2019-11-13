@@ -37,9 +37,6 @@ export class Value implements Operand {
    * @param {Result} value Constant value.
    */
   constructor (value: Result) {
-    if (value === undefined || value === null) {
-      throw new Error('invalid value operand')
-    }
     this.value = value
   }
 

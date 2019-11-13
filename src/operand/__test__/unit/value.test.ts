@@ -1,19 +1,6 @@
 import { Value } from '../../value'
 
 describe('Condition Engine - Operand - Value', () => {
-  test('constructor', () => {
-    let exceptions = [
-      { value: undefined },
-      { value: null },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => new Value(exception.value).evaluate())
-        .toThrowError()
-    }
-  })
-
   test('evaluate', () => {
     let tests = [
       { value: 1, expected: 1 },
@@ -21,6 +8,8 @@ describe('Condition Engine - Operand - Value', () => {
       { value: true, expected: true },
       { value: [1, 2], expected: [1, 2] },
       { value: ['1', '2'], expected: ['1', '2'] },
+      { value: undefined, expected: undefined },
+      { value: null, expected: null },
     ]
 
     for (const test of tests) {
@@ -37,6 +26,8 @@ describe('Condition Engine - Operand - Value', () => {
       { value: true, expected: 'true' },
       { value: [1, 2], expected: '[1, 2]' },
       { value: ['1', '2'], expected: '["1", "2"]' },
+      { value: undefined, expected: 'undefined' },
+      { value: null, expected: 'null' },
     ]
 
     for (const test of tests) {

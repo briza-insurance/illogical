@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.1.2
+* Value operand supports null and undefined as values.
+
 ## 1.1.1
 * Invalid logical/comparison expression throw exception.
 
