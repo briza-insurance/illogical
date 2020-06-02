@@ -58,6 +58,13 @@ import {
   OPERATOR as OPERATOR_SUFFIX
 } from '../expression/comparison/suffix'
 
+// Predicate expressions
+import { Predicate } from '../expression/predicate'
+import {
+  Undefined,
+  OPERATOR as OPERATOR_UNDEF
+} from '../expression/predicate/undefined'
+
 // Logical expressions
 import { Logical } from '../expression/logical'
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
@@ -68,11 +75,10 @@ import { Xor, OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 // Comparison expression operand
 type operand = string | number | boolean | null | string[] | number[]
 
-// Raw form of the comparison expression
+export type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw
 export type ComparisonRaw = [string, operand, operand]
-
-// Raw form of the logical expression
-export type LogicalRaw = [string, ...Array<ComparisonRaw | operand[]>]
+export type PredicateRaw = [string, operand]
+export type LogicalRaw = [string, ...Array<ComparisonRaw | PredicateRaw | operand[]>]
 
 /**
  * Void expression
@@ -141,17 +147,27 @@ export class Parser {
 
   /**
    * Parse raw expression into evaluable expression.
-   * @param {ComparisonRaw | LogicalRaw} raw Raw expression.
+   * @param {ExpressionRaw} raw Raw expression.
    * @return {Evaluable}
    */
-  parse (raw: ComparisonRaw | LogicalRaw): Evaluable {
+  parse (raw: ExpressionRaw): Evaluable {
     if (raw === undefined || raw === null ||
       Array.isArray(raw) === false || raw.length === 0 ||
       isString(raw[0] as string) === false) {
       throw new Error('invalid expression')
     }
+    return this.parseRawExp(raw)
+  }
+
+  /**
+   * Parse raw expression
+   * @param raw
+   */
+  parseRawExp (raw: ExpressionRaw): Evaluable {
     if (this.logicalOperator.includes(raw[0] as string)) {
       return this.parseLogicalRawExp(raw as LogicalRaw)
+    } else if (raw.length === 2) {
+      return this.parsePredicateRawExp(raw as PredicateRaw)
     }
     return this.parseComparisonRawExp(raw as ComparisonRaw)
   }
@@ -161,7 +177,7 @@ export class Parser {
    * @param {LogicalRaw} raw Raw expression.
    * @return {Logical|Comparison|null}
    */
-  parseLogicalRawExp (raw: LogicalRaw): Logical | Comparison | Evaluable {
+  parseLogicalRawExp (raw: LogicalRaw): Evaluable {
     if (raw.length === 0) {
       if (this.strict) {
         throw new Error('invalid logical expression')
@@ -173,11 +189,7 @@ export class Parser {
         throw new Error('invalid logical expression, ' +
           'there must be the operator and at least two operands.')
       }
-      if (this.logicalOperator.includes(raw[1][0] as string)) {
-        return this.parseLogicalRawExp(raw[1] as LogicalRaw)
-      } else {
-        return this.parseComparisonRawExp(raw[1] as ComparisonRaw)
-      }
+      return this.parseRawExp(raw[1] as ExpressionRaw)
     }
 
     let logical: Logical
@@ -199,16 +211,36 @@ export class Parser {
     }
 
     for (const section of raw.filter((_, index) => index > 0)) {
-      if (this.logicalOperator.includes(section[0] as string)) {
-        logical.add(
-          this.parseLogicalRawExp(section as LogicalRaw) as Logical | Comparison
-        )
-      } else {
-        logical.add(this.parseComparisonRawExp(section as ComparisonRaw))
-      }
+      logical.add(
+        this.parseRawExp(section as ExpressionRaw) as Comparison | Predicate | Logical
+      )
     }
 
     return logical
+  }
+
+  /**
+   * Parse raw predicate expression.
+   * @param {PredicateRaw} raw Raw predicate expression.
+   * @return {Comparison}
+   */
+  parsePredicateRawExp (raw: PredicateRaw): Predicate {
+    if (raw.length !== 2) {
+      throw new Error(`invalid predicate expression: "${raw}"`)
+    }
+
+    // Get value or reference of the operand
+    const operand = this.opts.referencePredicate(raw[1] as string)
+      ? new Reference(this.opts.referenceTransform(raw[1] as string))
+      : new Value(raw[1])
+
+    // Create the expression based on the operator mapping
+    switch (raw[0]) {
+      case this.opts.operatorMapping.get(OPERATOR_UNDEF):
+        return new Undefined(operand)
+      default:
+        throw new Error(`invalid predicate operator: "${raw[0]}"`)
+    }
   }
 
   /**

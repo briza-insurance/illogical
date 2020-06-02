@@ -46,6 +46,7 @@ import {
   Suffix,
   OPERATOR as OPERATOR_SUFFIX,
 } from '../../../expression/comparison/suffix'
+import { Undefined, OPERATOR as OPERATOR_UNDEF } from '../../../expression/predicate/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
@@ -109,16 +110,23 @@ describe('Condition Engine - Parser', () => {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         expected: new Equal(new Value(5), new Value(5))
       },
+      // Predicate expression
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
+        expected: new Undefined(new Reference('RefA'))
+      },
       // Logical expression
       {
         rawExpression: [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+          [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
         ],
         expected: new And([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(new Value(10), new Value(10)),
+          new Undefined(new Reference('RefA')),
         ])
       },
     ]
@@ -341,6 +349,37 @@ describe('Condition Engine - Parser', () => {
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => parser.parseComparisonRawExp(exception.rawExpression))
+        .toThrowError()
+    }
+  })
+
+  test('parsePredicateRawExp', () => {
+    const parser = new Parser()
+
+    const tests = [
+      // All predicate expressions
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
+        expected: new Undefined(new Reference('RefA'))
+      }
+    ]
+
+    for (const test of tests) {
+      // @ts-ignore
+      expect(parser.parsePredicateRawExp(test.rawExpression))
+        .toEqual(test.expected)
+    }
+
+    const exceptions = [
+      // Invalid form
+      { rawExpression: [] },
+      // Invalid operator
+      { rawExpression: ['__', 5] },
+    ]
+  
+    for (const exception of exceptions) {
+      // @ts-ignore
+      expect(() => parser.parsePredicateRawExp(exception.rawExpression))
         .toThrowError()
     }
   })

@@ -5,10 +5,12 @@
 import { Options } from './options';
 import { Evaluable } from '../common/evaluable';
 import { Comparison } from '../expression/comparison';
-import { Logical } from '../expression/logical';
+import { Predicate } from '../expression/predicate';
 declare type operand = string | number | boolean | null | string[] | number[];
+export declare type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw;
 export declare type ComparisonRaw = [string, operand, operand];
-export declare type LogicalRaw = [string, ...Array<ComparisonRaw | operand[]>];
+export declare type PredicateRaw = [string, operand];
+export declare type LogicalRaw = [string, ...Array<ComparisonRaw | PredicateRaw | operand[]>];
 /**
  * Void expression
  * Used in the reduction process to eliminate.
@@ -45,19 +47,30 @@ export declare class Parser {
      * Parser options
      * @type {Options}
      */
-    readonly options: Options;
+    get options(): Options;
     /**
      * Parse raw expression into evaluable expression.
-     * @param {ComparisonRaw | LogicalRaw} raw Raw expression.
+     * @param {ExpressionRaw} raw Raw expression.
      * @return {Evaluable}
      */
-    parse(raw: ComparisonRaw | LogicalRaw): Evaluable;
+    parse(raw: ExpressionRaw): Evaluable;
+    /**
+     * Parse raw expression
+     * @param raw
+     */
+    parseRawExp(raw: ExpressionRaw): Evaluable;
     /**
      * Parse raw logical expression.
      * @param {LogicalRaw} raw Raw expression.
      * @return {Logical|Comparison|null}
      */
-    parseLogicalRawExp(raw: LogicalRaw): Logical | Comparison | Evaluable;
+    parseLogicalRawExp(raw: LogicalRaw): Evaluable;
+    /**
+     * Parse raw predicate expression.
+     * @param {PredicateRaw} raw Raw predicate expression.
+     * @return {Comparison}
+     */
+    parsePredicateRawExp(raw: PredicateRaw): Predicate;
     /**
      * Parse raw comparison expression.
      * @param {ComparisonRaw} raw Raw comparison expression.

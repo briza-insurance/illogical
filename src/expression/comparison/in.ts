@@ -27,7 +27,7 @@ export class In extends Comparison {
    */
   constructor (left: Operand, right: Operand) {
     if (arguments.length !== 2) {
-      throw new Error('comparison expression must have at left and right operands')
+      throw new Error('comparison expression expects left and right operands')
     }
     super('in', left, right)
   }

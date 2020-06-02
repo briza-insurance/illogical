@@ -1,21 +1,20 @@
 /**
- * Comparison expression module.
+ * Undefined expression module.
  * @module illogical/expression/comparison
  */
 import { Context, Result } from '../../common/evaluable';
 import { Operand } from '../../operand';
-import { Comparison } from '../comparison';
+import { Predicate } from '.';
 export declare const OPERATOR: unique symbol;
 /**
- * Not equal comparison expression
+ * Undefined predicate expression
  */
-export declare class NotEqual extends Comparison {
+export declare class Undefined extends Predicate {
     /**
      * @constructor
-     * @param {Operand} left Left operand.
-     * @param {Operand} right Right operand.
+     * @param {Operand} operand
      */
-    constructor(left: Operand, right: Operand);
+    constructor(operand: Operand);
     /**
      * Evaluate in the given context.
      * @param {Context} ctx

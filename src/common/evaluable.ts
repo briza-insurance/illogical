@@ -9,7 +9,7 @@
  * Format: key: value.
  */
 export interface Context {
-  [k: string]: object | string | number | boolean | null | string[] | number[];
+  [k: string]: object | string | number | boolean | null | string[] | number[] | undefined;
 }
 
 /**

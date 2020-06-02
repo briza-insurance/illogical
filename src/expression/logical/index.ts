@@ -10,11 +10,12 @@ import {
 } from '../../common/evaluable'
 
 import { Comparison } from '../comparison'
+import { Predicate } from '../predicate'
 
 /**
  * Operand collection
  */
-export type Operand = Comparison | Logical
+export type Operand = Comparison | Predicate | Logical
 
 /**
  * Abstract logical expression

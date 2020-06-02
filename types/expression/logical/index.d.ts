@@ -4,10 +4,11 @@
  */
 import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Comparison } from '../comparison';
+import { Predicate } from '../predicate';
 /**
  * Operand collection
  */
-export declare type Operand = Comparison | Logical;
+export declare type Operand = Comparison | Predicate | Logical;
 /**
  * Abstract logical expression
  */
