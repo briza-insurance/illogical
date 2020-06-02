@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Parser | @briza/illogical</title>
-	<meta name="description" content="">
+	<meta name="description" content="Documentation for @briza/illogical">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -13,7 +13,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -112,8 +112,10 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_parser_index_.parser.html#parse" class="tsd-kind-icon">parse</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_parser_index_.parser.html#parsecomparisonrawexp" class="tsd-kind-icon">parse<wbr>Comparison<wbr>Raw<wbr>Exp</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_parser_index_.parser.html#parselogicalrawexp" class="tsd-kind-icon">parse<wbr>Logical<wbr>Raw<wbr>Exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_parser_index_.parser.html#parsecomparisonrawexp" class="tsd-kind-icon">parse<wbr>Comparison<wbr>Raw<wbr>Exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_parser_index_.parser.html#parselogicalrawexp" class="tsd-kind-icon">parse<wbr>Logical<wbr>Raw<wbr>Exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_parser_index_.parser.html#parsepredicaterawexp" class="tsd-kind-icon">parse<wbr>Predicate<wbr>Raw<wbr>Exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_parser_index_.parser.html#parserawexp" class="tsd-kind-icon">parse<wbr>Raw<wbr>Exp</a></li>
 							</ul>
 						</section>
 					</div>
@@ -131,19 +133,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L104">parser/index.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L110">parser/index.ts:110</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>constructor</dt>
-									<dd></dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> strict: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> strict: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>In non-strict mode the parser
@@ -171,21 +169,21 @@
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="logicaloperator" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> logical<wbr>Operator</h3>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> logical<wbr>Operator</h3>
 					<div class="tsd-signature tsd-kind-icon">logical<wbr>Operator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L104">parser/index.ts:104</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L110">parser/index.ts:110</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="opts" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> opts</h3>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> opts</h3>
 					<div class="tsd-signature tsd-kind-icon">opts<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_parser_options_.options.html" class="tsd-signature-type">Options</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L103">parser/index.ts:103</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L109">parser/index.ts:109</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">strict<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L114">parser/index.ts:114</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L120">parser/index.ts:120</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -220,18 +218,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L138">parser/index.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L144">parser/index.ts:144</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Parser options</p>
 								</div>
-								<dl class="tsd-comment-tags">
-									<dt>type</dt>
-									<dd><p>{Options}</p>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_parser_options_.options.html" class="tsd-signature-type">Options</a></h4>
 						</li>
@@ -244,13 +237,13 @@
 					<a name="parse" class="tsd-anchor"></a>
 					<h3>parse</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
+						<li class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressionraw" class="tsd-signature-type">ExpressionRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L147">parser/index.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L153">parser/index.ts:153</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -261,7 +254,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>raw: <a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a></h5>
+									<h5>raw: <a href="../modules/_parser_index_.html#expressionraw" class="tsd-signature-type">ExpressionRaw</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Raw expression.</p>
 									</div>
@@ -271,17 +264,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="parsecomparisonrawexp" class="tsd-anchor"></a>
-					<h3>parse<wbr>Comparison<wbr>Raw<wbr>Exp</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> parse<wbr>Comparison<wbr>Raw<wbr>Exp</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
 						<li class="tsd-signature tsd-kind-icon">parse<wbr>Comparison<wbr>Raw<wbr>Exp<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_expression_comparison_index_.comparison.html" class="tsd-signature-type">Comparison</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L219">parser/index.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L251">parser/index.ts:251</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -302,17 +295,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="parselogicalrawexp" class="tsd-anchor"></a>
-					<h3>parse<wbr>Logical<wbr>Raw<wbr>Exp</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">parse<wbr>Logical<wbr>Raw<wbr>Exp<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_expression_logical_index_.logical.html" class="tsd-signature-type">Logical</a><span class="tsd-signature-symbol"> | </span><a href="_expression_comparison_index_.comparison.html" class="tsd-signature-type">Comparison</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> parse<wbr>Logical<wbr>Raw<wbr>Exp</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Logical<wbr>Raw<wbr>Exp<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/fc914c2/src/parser/index.ts#L164">parser/index.ts:164</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L180">parser/index.ts:180</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -329,12 +322,68 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_expression_logical_index_.logical.html" class="tsd-signature-type">Logical</a>
-								<span class="tsd-signature-symbol"> | </span>
-								<a href="_expression_comparison_index_.comparison.html" class="tsd-signature-type">Comparison</a>
-								<span class="tsd-signature-symbol"> | </span>
-								<a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a>
-							</h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="parsepredicaterawexp" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> parse<wbr>Predicate<wbr>Raw<wbr>Exp</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Predicate<wbr>Raw<wbr>Exp<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#predicateraw" class="tsd-signature-type">PredicateRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_expression_predicate_index_.predicate.html" class="tsd-signature-type">Predicate</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L227">parser/index.ts:227</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Parse raw predicate expression.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>raw: <a href="../modules/_parser_index_.html#predicateraw" class="tsd-signature-type">PredicateRaw</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Raw predicate expression.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_expression_predicate_index_.predicate.html" class="tsd-signature-type">Predicate</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="parserawexp" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> parse<wbr>Raw<wbr>Exp</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Raw<wbr>Exp<span class="tsd-signature-symbol">(</span>raw<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressionraw" class="tsd-signature-type">ExpressionRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/a517700/src/parser/index.ts#L166">parser/index.ts:166</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Parse raw expression based on the expression type.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>raw: <a href="../modules/_parser_index_.html#expressionraw" class="tsd-signature-type">ExpressionRaw</a></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -346,77 +395,8 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_common_evaluable_.html">"common/evaluable"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_common_type_check_.html">"common/type-<wbr>check"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_eq_.html">"expression/comparison/eq"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_ge_.html">"expression/comparison/ge"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_gt_.html">"expression/comparison/gt"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_in_.html">"expression/comparison/in"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_index_.html">"expression/comparison/index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_le_.html">"expression/comparison/le"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_lt_.html">"expression/comparison/lt"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_ne_.html">"expression/comparison/ne"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_not_in_.html">"expression/comparison/not-<wbr>in"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_prefix_.html">"expression/comparison/prefix"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_comparison_suffix_.html">"expression/comparison/suffix"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_logical_and_.html">"expression/logical/and"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_logical_index_.html">"expression/logical/index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_logical_nor_.html">"expression/logical/nor"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_logical_or_.html">"expression/logical/or"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_expression_logical_xor_.html">"expression/logical/xor"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_index_.html">"index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_operand_index_.html">"operand/index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_operand_reference_.html">"operand/reference"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_operand_value_.html">"operand/value"</a>
-					</li>
-					<li class="current tsd-kind-external-module">
-						<a href="../modules/_parser_index_.html">"parser/index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="../modules/_parser_options_.html">"parser/options"</a>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_parser_index_.html">&quot;parser/index&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -424,7 +404,7 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
 						<a href="_parser_index_.parser.html" class="tsd-kind-icon">Parser</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
@@ -445,26 +425,38 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_parser_index_.parser.html#parse" class="tsd-kind-icon">parse</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="_parser_index_.parser.html#parsecomparisonrawexp" class="tsd-kind-icon">parse<wbr>Comparison<wbr>Raw<wbr>Exp</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="_parser_index_.parser.html#parselogicalrawexp" class="tsd-kind-icon">parse<wbr>Logical<wbr>Raw<wbr>Exp</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_parser_index_.parser.html#parsepredicaterawexp" class="tsd-kind-icon">parse<wbr>Predicate<wbr>Raw<wbr>Exp</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_parser_index_.parser.html#parserawexp" class="tsd-kind-icon">parse<wbr>Raw<wbr>Exp</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="_parser_index_.voidexpression.html" class="tsd-kind-icon">Void<wbr>Expression</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_parser_index_.html#comparisonraw" class="tsd-kind-icon">Comparison<wbr>Raw</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_parser_index_.html#expressionraw" class="tsd-kind-icon">Expression<wbr>Raw</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_parser_index_.html#logicalraw" class="tsd-kind-icon">Logical<wbr>Raw</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_parser_index_.html#predicateraw" class="tsd-kind-icon">Predicate<wbr>Raw</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 						<a href="../modules/_parser_index_.html#operand" class="tsd-kind-icon">operand</a>
 					</li>
 				</ul>
@@ -477,57 +469,22 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
 				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 			</ul>
 		</div>
 	</div>

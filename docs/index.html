@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>@briza/illogical</title>
-	<meta name="description" content="">
+	<meta name="description" content="Documentation for @briza/illogical">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -13,7 +13,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> @briza/illogical</h1>
+			<h1>@briza/illogical</h1>
 		</div>
 	</div>
 </header>
@@ -67,9 +67,9 @@
 				<a href="#illogical" id="illogical" style="color: inherit; text-decoration: none;">
 					<h1>illogical</h1>
 				</a>
-				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
+				<p>A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: November 13, 2019.</p>
+					<p>Revision: June 2, 2020.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -118,6 +118,10 @@
 									<li><a href="#suffix">Suffix</a></li>
 								</ul>
 							</li>
+							<li><a href="#predicate-expressions">Predicate Expressions</a><ul>
+									<li><a href="#undefined">Undefined</a></li>
+								</ul>
+							</li>
 							<li><a href="#logical-expressions">Logical Expressions</a><ul>
 									<li><a href="#and">And</a></li>
 									<li><a href="#or">Or</a></li>
@@ -161,8 +165,8 @@
 				<a href="#evaluate" id="evaluate" style="color: inherit; text-decoration: none;">
 					<h3>Evaluate</h3>
 				</a>
-				<p>Evaluate comparison or logical expression as TRUE or FALSE result:</p>
-				<p><code>engine.evaluate(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a>, <a href="#evaluation-data-context">Evaluation Data Context</a><code>)</code> =&gt; <code>boolean</code></p>
+				<p>Evaluate comparison, predicate or logical expression as TRUE or FALSE result:</p>
+				<p><code>engine.evaluate(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a>, <a href="#evaluation-data-context">Evaluation Data Context</a><code>)</code> =&gt; <code>boolean</code></p>
 				<blockquote>
 					<p>Data context is optional.</p>
 				</blockquote>
@@ -172,6 +176,9 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-number
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string">'circle'</span>, <span class="hljs-string">'circle'</span>]);
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]);
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string">'$name'</span>, <span class="hljs-string">'peter'</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>});
+
+<span class="hljs-comment">// Predicate expression</span>
+engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'$RefA'</span>], {});
 
 <span class="hljs-comment">// Logical expression</span>
 engine.evaluate([
@@ -193,7 +200,7 @@ engine.evaluate([
 					<h3>Statement</h3>
 				</a>
 				<p>Get expression string representation:</p>
-				<p><code>engine.statement(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>string</code></p>
+				<p><code>engine.statement(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>string</code></p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span class="hljs-comment">/* Comparison expression */</span>
 
@@ -209,6 +216,10 @@ engine.statement([<span class="hljs-string">'=='</span>, <span class="hljs-liter
 engine.statement([<span class="hljs-string">'=='</span>, <span class="hljs-string">'$name'</span>, <span class="hljs-string">'peter'</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>});
 <span class="hljs-comment">// ({name} == "peter")</span>
 
+<span class="hljs-comment">/* Predicate expression */</span>
+
+engine.statement([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'$RefA'</span>]);
+<span class="hljs-comment">// ({RefA} is UNDEFINED)</span>
 
 <span class="hljs-comment">/* Logical expression */</span>
 
@@ -236,9 +247,9 @@ engine.statement([
 					<h3>Parse</h3>
 				</a>
 				<p>Parse the expression into a evaluable object, i.e. it returns the parsed self-evaluable condition expression.</p>
-				<p><code>engine.parse(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>evaluable</code></p>
-				<a href="#evaluable-function" id="evaluable-function" style="color: inherit; text-decoration: none;">
-					<h4>Evaluable Function</h4>
+				<p><code>engine.parse(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>evaluable</code></p>
+				<a href="#evaluate-function" id="evaluate-function" style="color: inherit; text-decoration: none;">
+					<h4>Evaluate Function</h4>
 				</a>
 				<ul>
 					<li><code>evaluable.evaluate(context)</code> please see <a href="#evaluation-data-context">Evaluation Data Context</a>.</li>
@@ -436,6 +447,17 @@ engine.evaluate([<span class="hljs-string">'PREFIX'</span>, <span class="hljs-st
 				<pre><code class="language-json">[<span class="hljs-string">"SUFFIX"</span>, <span class="hljs-string">"establishment"</span>, <span class="hljs-string">"ment"</span>]</code></pre>
 				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-string">"establishment"</span>, <span class="hljs-string">"ment"</span>]); <span class="hljs-comment">// true</span>
 engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-string">"establish"</span>, <span class="hljs-string">"ment"</span>]); <span class="hljs-comment">// false</span></code></pre>
+				<a href="#predicate-expressions" id="predicate-expressions" style="color: inherit; text-decoration: none;">
+					<h3>Predicate Expressions</h3>
+				</a>
+				<a href="#undefined" id="undefined" style="color: inherit; text-decoration: none;">
+					<h4>Undefined</h4>
+				</a>
+				<p>Expression format: <code>[&quot;UNDEFINED&quot;,</code><a href="#reference">Reference Operand</a><code>]</code>.</p>
+				<pre><code class="language-json">[<span class="hljs-string">"UNDEFINED"</span>, <span class="hljs-string">"$RefA"</span>]</code></pre>
+				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'RefA'</span>], {}); <span class="hljs-comment">// true</span>
+engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'RefA'</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-literal">undefined</span> }); <span class="hljs-comment">// true</span>
+engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'RefA'</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-number">10</span> }); <span class="hljs-comment">// false</span></code></pre>
 				<a href="#logical-expressions" id="logical-expressions" style="color: inherit; text-decoration: none;">
 					<h3>Logical Expressions</h3>
 				</a>
@@ -445,7 +467,7 @@ engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-st
 				<p>The logical AND operator (&amp;&amp;) returns the boolean value TRUE if both operands are TRUE and returns FALSE otherwise.</p>
 				<p>Expression format: <code>[&quot;AND&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code>.</p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"AND"</span>,
@@ -459,7 +481,7 @@ engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-st
 				<p>The logical OR operator (||) returns the boolean value TRUE if either or both operands is TRUE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;OR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code>.</p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"OR"</span>,
@@ -473,7 +495,7 @@ engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-st
 				<p>The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;NOR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code></p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"NOR"</span>,
@@ -487,7 +509,7 @@ engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-st
 				<p>The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;XOR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code></p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"XOR"</span>,
@@ -580,6 +602,9 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 [OPERATOR_PREFIX, <span class="hljs-string">'PREFIX'</span>],
 [OPERATOR_SUFFIX, <span class="hljs-string">'SUFFIX'</span>],
 
+<span class="hljs-comment">// Predicate</span>
+[OPERATOR_UNDEF, <span class="hljs-string">'UNDEFINED'</span>]
+
 <span class="hljs-comment">// Logical</span>
 [OPERATOR_AND, <span class="hljs-string">'AND'</span>]
 [OPERATOR_OR, <span class="hljs-string">'OR'</span>]
@@ -634,77 +659,83 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_common_evaluable_.html">"common/evaluable"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_common_evaluable_.html">&quot;common/evaluable&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_common_type_check_.html">"common/type-<wbr>check"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_common_type_check_.html">&quot;common/type-<wbr>check&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_eq_.html">"expression/comparison/eq"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_eq_.html">&quot;expression/comparison/eq&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_ge_.html">"expression/comparison/ge"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_ge_.html">&quot;expression/comparison/ge&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_gt_.html">"expression/comparison/gt"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_gt_.html">&quot;expression/comparison/gt&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_in_.html">"expression/comparison/in"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_in_.html">&quot;expression/comparison/in&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_index_.html">"expression/comparison/index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_index_.html">&quot;expression/comparison/index&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_le_.html">"expression/comparison/le"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_le_.html">&quot;expression/comparison/le&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_lt_.html">"expression/comparison/lt"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_lt_.html">&quot;expression/comparison/lt&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_ne_.html">"expression/comparison/ne"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_ne_.html">&quot;expression/comparison/ne&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_not_in_.html">"expression/comparison/not-<wbr>in"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_not_in_.html">&quot;expression/comparison/not-<wbr>in&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_prefix_.html">"expression/comparison/prefix"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_prefix_.html">&quot;expression/comparison/prefix&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_comparison_suffix_.html">"expression/comparison/suffix"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_suffix_.html">&quot;expression/comparison/suffix&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_logical_and_.html">"expression/logical/and"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_and_.html">&quot;expression/logical/and&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_logical_index_.html">"expression/logical/index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_index_.html">&quot;expression/logical/index&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_logical_nor_.html">"expression/logical/nor"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_nor_.html">&quot;expression/logical/nor&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_logical_or_.html">"expression/logical/or"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_or_.html">&quot;expression/logical/or&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_expression_logical_xor_.html">"expression/logical/xor"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_xor_.html">&quot;expression/logical/xor&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_index_.html">"index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_predicate_index_.html">&quot;expression/predicate/index&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_operand_index_.html">"operand/index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_predicate_undefined_.html">&quot;expression/predicate/undefined&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_operand_reference_.html">"operand/reference"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_operand_value_.html">"operand/value"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_operand_index_.html">&quot;operand/index&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_parser_index_.html">"parser/index"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_operand_reference_.html">&quot;operand/reference&quot;</a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_parser_options_.html">"parser/options"</a>
+					<li class=" tsd-kind-module">
+						<a href="modules/_operand_value_.html">&quot;operand/value&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_parser_index_.html">&quot;parser/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_parser_options_.html">&quot;parser/options&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -720,57 +751,16 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
 				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>

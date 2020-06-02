@@ -160,10 +160,10 @@ export class Parser {
   }
 
   /**
-   * Parse raw expression
+   * Parse raw expression based on the expression type.
    * @param raw
    */
-  parseRawExp (raw: ExpressionRaw): Evaluable {
+  private parseRawExp (raw: ExpressionRaw): Evaluable {
     if (this.logicalOperator.includes(raw[0] as string)) {
       return this.parseLogicalRawExp(raw as LogicalRaw)
     } else if (raw.length === 2) {
@@ -177,7 +177,7 @@ export class Parser {
    * @param {LogicalRaw} raw Raw expression.
    * @return {Logical|Comparison|null}
    */
-  parseLogicalRawExp (raw: LogicalRaw): Evaluable {
+  private parseLogicalRawExp (raw: LogicalRaw): Evaluable {
     if (raw.length === 0) {
       if (this.strict) {
         throw new Error('invalid logical expression')
@@ -224,7 +224,7 @@ export class Parser {
    * @param {PredicateRaw} raw Raw predicate expression.
    * @return {Comparison}
    */
-  parsePredicateRawExp (raw: PredicateRaw): Predicate {
+  private parsePredicateRawExp (raw: PredicateRaw): Predicate {
     if (raw.length !== 2) {
       throw new Error(`invalid predicate expression: "${raw}"`)
     }
@@ -248,7 +248,7 @@ export class Parser {
    * @param {ComparisonRaw} raw Raw comparison expression.
    * @return {Comparison}
    */
-  parseComparisonRawExp (raw: ComparisonRaw): Comparison {
+  private parseComparisonRawExp (raw: ComparisonRaw): Comparison {
     if (raw.length !== 3) {
       throw new Error(`invalid comparison expression: "${raw}"`)
     }

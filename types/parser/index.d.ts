@@ -4,8 +4,6 @@
  */
 import { Options } from './options';
 import { Evaluable } from '../common/evaluable';
-import { Comparison } from '../expression/comparison';
-import { Predicate } from '../expression/predicate';
 declare type operand = string | number | boolean | null | string[] | number[];
 export declare type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw;
 export declare type ComparisonRaw = [string, operand, operand];
@@ -55,27 +53,27 @@ export declare class Parser {
      */
     parse(raw: ExpressionRaw): Evaluable;
     /**
-     * Parse raw expression
+     * Parse raw expression based on the expression type.
      * @param raw
      */
-    parseRawExp(raw: ExpressionRaw): Evaluable;
+    private parseRawExp;
     /**
      * Parse raw logical expression.
      * @param {LogicalRaw} raw Raw expression.
      * @return {Logical|Comparison|null}
      */
-    parseLogicalRawExp(raw: LogicalRaw): Evaluable;
+    private parseLogicalRawExp;
     /**
      * Parse raw predicate expression.
      * @param {PredicateRaw} raw Raw predicate expression.
      * @return {Comparison}
      */
-    parsePredicateRawExp(raw: PredicateRaw): Predicate;
+    private parsePredicateRawExp;
     /**
      * Parse raw comparison expression.
      * @param {ComparisonRaw} raw Raw comparison expression.
      * @return {Comparison}
      */
-    parseComparisonRawExp(raw: ComparisonRaw): Comparison;
+    private parseComparisonRawExp;
 }
 export {};

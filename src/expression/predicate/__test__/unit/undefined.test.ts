@@ -22,7 +22,7 @@ describe('Condition Engine - Expression - Predicate - Undefined', () => {
         { operand: new Value('1'), expected: false },
         { operand: new Value(true), expected: false },
         { operand: new Value([1]), expected: false },
-        { operand: new Value(['1']), right:undefined, expected: false },
+        { operand: new Value(['1']), expected: false },
         { operand: new Value(true), expected: false },
         { operand: new Value(false), expected: false }
       ]
