@@ -1,23 +1,21 @@
 /**
- * Comparison expression module.
- * @module illogical/expression/comparison
+ * Predicate expression module.
+ * @module illogical/expression/predicate
  */
 import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Operand } from '../../operand';
 /**
- * Abstract comparison expression
+ * Abstract predicate expression
  */
-export declare abstract class Comparison implements Evaluable {
+export declare abstract class Predicate implements Evaluable {
     protected operator: string;
-    protected left: Operand;
-    protected right: Operand;
+    protected operand: Operand;
     /**
      * @constructor
      * @param {string} operator String representation of the operator.
-     * @param {Operand} left Left operand.
-     * @param {Operand} right Right operand.
+     * @param {Operand} operand
      */
-    constructor(operator: string, left: Operand, right: Operand);
+    constructor(operator: string, operand: Operand);
     /**
      * Evaluate in the given context.
      * @param {Context} ctx
