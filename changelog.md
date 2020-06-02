@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.1.3
+* Add predicate expression types.
+* Add UNDEFINED predicate expression.
+
 ## 1.1.2
 * Value operand supports null and undefined as values.
 

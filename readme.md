@@ -44,7 +44,7 @@ yarn add @briza/illogical -D
     - [Prefix](#prefix)
     - [Suffix](#suffix)
   - [Predicate Expressions](#predicate-expressions)
-    - [Undefined] (#undefined)
+    - [Undefined](#undefined)
   - [Logical Expressions](#logical-expressions)
     - [And](#and)
     - [Or](#or)
