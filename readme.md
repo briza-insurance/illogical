@@ -43,6 +43,7 @@ yarn add @briza/illogical -D
     - [Not In](#not-in)
     - [Prefix](#prefix)
     - [Suffix](#suffix)
+    - [Overlap](#overlap)
   - [Predicate Expressions](#predicate-expressions)
     - [Undefined](#undefined)
   - [Logical Expressions](#logical-expressions)
