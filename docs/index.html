@@ -69,7 +69,7 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: June 2, 2020.</p>
+					<p>Revision: June 10, 2020.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -447,6 +447,17 @@ engine.evaluate([<span class="hljs-string">'PREFIX'</span>, <span class="hljs-st
 				<pre><code class="language-json">[<span class="hljs-string">"SUFFIX"</span>, <span class="hljs-string">"establishment"</span>, <span class="hljs-string">"ment"</span>]</code></pre>
 				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-string">"establishment"</span>, <span class="hljs-string">"ment"</span>]); <span class="hljs-comment">// true</span>
 engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-string">"establish"</span>, <span class="hljs-string">"ment"</span>]); <span class="hljs-comment">// false</span></code></pre>
+				<a href="#overlap" id="overlap" style="color: inherit; text-decoration: none;">
+					<h4>Overlap</h4>
+				</a>
+				<p>Expression format: <code>[&quot;OVERLAP&quot;,</code><a href="#operand-types">Left Operand</a>, <a href="#operand-types">Right Operand</a><code>]</code>.</p>
+				<blockquote>
+					<p>Valid operand types number[] or string[].</p>
+				</blockquote>
+				<pre><code class="language-json">[<span class="hljs-string">"OVERLAP"</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]]
+[<span class="hljs-string">"OVERLAP"</span>, [<span class="hljs-string">"circle"</span>, <span class="hljs-string">"square"</span>, <span class="hljs-string">"triangle"</span>], [<span class="hljs-string">"square"</span>]]</code></pre>
+				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'OVERLAP'</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span>
+engine.evaluate([<span class="hljs-string">'OVERLAP'</span>, [<span class="hljs-string">'circle'</span>, <span class="hljs-string">'square'</span>, <span class="hljs-string">'triangle'</span>], [<span class="hljs-string">'square'</span>, <span class="hljs-string">'oval'</span>]]); <span class="hljs-comment">// true</span></code></pre>
 				<a href="#predicate-expressions" id="predicate-expressions" style="color: inherit; text-decoration: none;">
 					<h3>Predicate Expressions</h3>
 				</a>
@@ -599,8 +610,9 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 [OPERATOR_LE, <span class="hljs-string">'&lt;='</span>]
 [OPERATOR_IN, <span class="hljs-string">'IN'</span>]
 [OPERATOR_NOT_IN, <span class="hljs-string">'NOT IN'</span>]
-[OPERATOR_PREFIX, <span class="hljs-string">'PREFIX'</span>],
-[OPERATOR_SUFFIX, <span class="hljs-string">'SUFFIX'</span>],
+[OPERATOR_PREFIX, <span class="hljs-string">'PREFIX'</span>]
+[OPERATOR_SUFFIX, <span class="hljs-string">'SUFFIX'</span>]
+[OPERATOR_OVERLAP, <span class="hljs-string">'OVERLAP'</span>]
 
 <span class="hljs-comment">// Predicate</span>
 [OPERATOR_UNDEF, <span class="hljs-string">'UNDEFINED'</span>]
@@ -624,6 +636,8 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
   OPERATOR_NOT_IN,
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
+  OPERATOR_OVERLAP,
+  OPERATOR_UNDEFINED,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
@@ -691,6 +705,9 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/_expression_comparison_not_in_.html">&quot;expression/comparison/not-<wbr>in&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_overlap_.html">&quot;expression/comparison/overlap&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/_expression_comparison_prefix_.html">&quot;expression/comparison/prefix&quot;</a>
