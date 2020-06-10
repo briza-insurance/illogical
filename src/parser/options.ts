@@ -16,6 +16,7 @@ import { OPERATOR as OPERATOR_IN } from '../expression/comparison/in'
 import { OPERATOR as OPERATOR_NOT_IN } from '../expression/comparison/not-in'
 import { OPERATOR as OPERATOR_PREFIX } from '../expression/comparison/prefix'
 import { OPERATOR as OPERATOR_SUFFIX } from '../expression/comparison/suffix'
+import { OPERATOR as OPERATOR_OVERLAP } from '../expression/comparison/overlap'
 
 // Predicate expressions
 import { OPERATOR as OPERATOR_UNDEF } from '../expression/predicate/undefined'
@@ -97,6 +98,7 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   [OPERATOR_NOT_IN, 'NOT IN'],
   [OPERATOR_PREFIX, 'PREFIX'],
   [OPERATOR_SUFFIX, 'SUFFIX'],
+  [OPERATOR_OVERLAP, 'OVERLAP'],
   // Predicate
   [OPERATOR_UNDEF, 'UNDEFINED'],
   // Logical

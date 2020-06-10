@@ -15,11 +15,13 @@ import { OPERATOR as OPERATOR_IN } from './expression/comparison/in';
 import { OPERATOR as OPERATOR_NOT_IN } from './expression/comparison/not-in';
 import { OPERATOR as OPERATOR_PREFIX } from './expression/comparison/prefix';
 import { OPERATOR as OPERATOR_SUFFIX } from './expression/comparison/suffix';
+import { OPERATOR as OPERATOR_OVERLAP } from './expression/comparison/overlap';
+import { OPERATOR as OPERATOR_UNDEFINED } from './expression/predicate/undefined';
 import { OPERATOR as OPERATOR_AND } from './expression/logical/and';
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or';
 import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor';
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor';
-export { OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR };
+export { OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR };
 /**
  * Condition engine
  */

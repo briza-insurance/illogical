@@ -57,6 +57,10 @@ import {
   Suffix,
   OPERATOR as OPERATOR_SUFFIX
 } from '../expression/comparison/suffix'
+import {
+  Overlap,
+  OPERATOR as OPERATOR_OVERLAP
+} from '../expression/comparison/overlap'
 
 // Predicate expressions
 import { Predicate } from '../expression/predicate'
@@ -284,6 +288,8 @@ export class Parser {
         return new Prefix(left, right)
       case this.opts.operatorMapping.get(OPERATOR_SUFFIX):
         return new Suffix(left, right)
+      case this.opts.operatorMapping.get(OPERATOR_OVERLAP):
+        return new Overlap(left, right)
       default:
         throw new Error(`invalid comparison operator: "${raw[0]}"`)
     }
