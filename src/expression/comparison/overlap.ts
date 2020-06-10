@@ -52,7 +52,7 @@ export class Overlap extends Comparison {
     const leftArray = left as (string|number)[]
     const rightArray = right as (string|number)[]
     if (leftArray.length < rightArray.length) {
-      return leftArray.filter((element) => rightArray.includes(element)).length === left.length
+      return leftArray.filter((element) => rightArray.includes(element)).length === leftArray.length
     }
 
     return rightArray.filter((element) => leftArray.includes(element)).length === rightArray.length
