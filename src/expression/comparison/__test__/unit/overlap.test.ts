@@ -22,9 +22,9 @@ describe('Condition Engine - Expression - Comparison - Overlap', () => {
         // Truthy
         { left: new Value([1]), right: new Value([1, 2]), expected: true },
         { left: new Value([1, 2]), right: new Value([1, 2]), expected: true },
-        { left: new Value(['1']), right: new Value(['1', '2']), expected: true },
+        { left: new Value(['1', '3']), right: new Value(['1', '2']), expected: true },
         // Truthy - Bi-directional
-        { left: new Value([1, 2]), right: new Value([1]), expected: true },
+        { left: new Value([1, 2, 5]), right: new Value([1, 3]), expected: true },
         // Falsy - explicit
         { left: new Value([0]), right: new Value([1, 2]), expected: false },
         { left: new Value(['0']), right: new Value(['1', '2']), expected: false },
@@ -69,8 +69,8 @@ describe('Condition Engine - Expression - Comparison - Overlap', () => {
       for (const test of tests) {
         // @ts-ignore
         expect(new Overlap(test.left, test.right).evaluate({
-          RefA: [1],
-          RefB: [1, 2],
+          RefA: [1, 3],
+          RefB: [1, 2, 5],
           RefC: ['1'],
           RefD: ['1', '2'],
           RefE: [0],
@@ -139,7 +139,7 @@ describe('Condition Engine - Expression - Comparison - Overlap', () => {
   test('toString', () => {
     let tests = [
       { left: new Value([0]), right: new Value([1, 2]), expected: '([0] overlap [1, 2])' },
-      { left: new Value([1, 2]), right: new Value([0]), expected: '([0] overlap [1, 2])' },
+      { left: new Value([1, 2]), right: new Value([0]), expected: '([1, 2] overlap [0])' },
     ]
 
     for (const test of tests) {

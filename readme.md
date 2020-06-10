@@ -368,10 +368,8 @@ Expression format: ```["OVERLAP", ```[Left Operand](#operand-types), [Right Oper
 ["OVERLAP", ["circle", "square", "triangle"], ["square"]]
 ```
 ```js
-engine.evaluate(['OVERLAP', [1, 2], [1, 2, 3, 4, 5]]); // true
-engine.evaluate(['OVERLAP', [1, 2, 6], [1, 2, 3, 4, 5]]); // false
-engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['square']]); // true
-engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['oval']]); // false
+engine.evaluate(['OVERLAP', [1, 2, 6], [1, 2, 3, 4, 5]]); // true
+engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['square', 'oval']]); // true
 ```
 
 ### Predicate Expressions
