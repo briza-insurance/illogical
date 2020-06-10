@@ -46,6 +46,10 @@ import {
   Suffix,
   OPERATOR as OPERATOR_SUFFIX,
 } from '../../../expression/comparison/suffix'
+import {
+  Overlap,
+  OPERATOR as OPERATOR_OVERLAP,
+} from '../../../expression/comparison/overlap'
 import { Undefined, OPERATOR as OPERATOR_UNDEF } from '../../../expression/predicate/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
@@ -321,6 +325,10 @@ describe('Condition Engine - Parser', () => {
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
         expected: new Suffix(new Value('abc'), new Value('c'))
+      },
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a','b'], ['a']],
+        expected: new Overlap(new Value(['a','b']), new Value(['a']))
       },
       // Reference
       {
