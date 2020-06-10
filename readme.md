@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: June 2, 2020.
+> Revision: June 10, 2020.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -359,6 +359,21 @@ engine.evaluate(['SUFFIX', "establishment", "ment"]); // true
 engine.evaluate(['SUFFIX', "establish", "ment"]); // false
 ```
 
+#### Overlap
+Expression format: ```["OVERLAP", ```[Left Operand](#operand-types), [Right Operand](#operand-types)```]```.
+> Valid operand types number[] or string[].
+
+```json
+["OVERLAP", [1, 2], [1, 2, 3, 4, 5]]
+["OVERLAP", ["circle", "square", "triangle"], ["square"]]
+```
+```js
+engine.evaluate(['OVERLAP', [1, 2], [1, 2, 3, 4, 5]]); // true
+engine.evaluate(['OVERLAP', [1, 2, 6], [1, 2, 3, 4, 5]]); // false
+engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['square']]); // true
+engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['oval']]); // false
+```
+
 ### Predicate Expressions
 
 #### Undefined
@@ -534,8 +549,9 @@ operatorMapping: Map<symbol, string>
 [OPERATOR_LE, '<=']
 [OPERATOR_IN, 'IN']
 [OPERATOR_NOT_IN, 'NOT IN']
-[OPERATOR_PREFIX, 'PREFIX'],
-[OPERATOR_SUFFIX, 'SUFFIX'],
+[OPERATOR_PREFIX, 'PREFIX']
+[OPERATOR_SUFFIX, 'SUFFIX']
+[OPERATOR_OVERLAP, 'OVERLAP']
 
 // Predicate
 [OPERATOR_UNDEF, 'UNDEFINED']
@@ -560,6 +576,8 @@ import {
   OPERATOR_NOT_IN,
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
+  OPERATOR_OVERLAP,
+  OPERATOR_UNDEFINED,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
