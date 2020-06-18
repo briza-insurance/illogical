@@ -3,6 +3,7 @@ import {permutation} from '../../../../__test__/helpers'
 import {Value} from '../../../../operand/value'
 import {Reference} from '../../../../operand/reference'
 import {NotEqual} from '../../ne'
+import { Collection } from '../../../../operand/collection'
 
 describe('Condition Engine - Expression - Comparison - Not Equal', () => {
   describe('constructor', () => {
@@ -54,19 +55,19 @@ describe('Condition Engine - Expression - Comparison - Not Equal', () => {
         {left: new Value('1'), right: new Value('10'), expected: true},
         {left: new Value(true), right: new Value(false), expected: true},
         // Array types, truthy in any case
-        {left: new Value([1]), right: new Value([1]), expected: true},
-        {left: new Value(['1']), right: new Value(['1']), expected: true},
-        {left: new Value(1), right: new Value([1]), expected: true},
-        {left: new Value('1'), right: new Value(['1']), expected: true},
+        {left: new Collection([new Value(1)]), right: new Collection([new Value(1)]), expected: true},
+        {left: new Collection([new Value('1')]), right: new Collection([new Value('1')]), expected: true},
+        {left: new Value(1), right: new Collection([new Value(1)]), expected: true},
+        {left: new Value('1'), right: new Collection([new Value('1')]), expected: true},
       ]
-      
+
       for (const test of tests) {
         // @ts-ignore
         expect(new NotEqual(test.left, test.right).evaluate({}))
           .toBe(test.expected)
       }
     })
-  
+
     // Test reference types against reference types
     test('reference type', () => {
       let tests = [
@@ -84,7 +85,7 @@ describe('Condition Engine - Expression - Comparison - Not Equal', () => {
         {left: new Reference('RefC'), right: new Reference('RefC'), expected: false},
         {left: new Reference('RefD'), right: new Reference('RefD'), expected: false},
       ]
-      
+
       for (const test of tests) {
         // @ts-ignore
         expect(new NotEqual(test.left, test.right).evaluate({
@@ -117,7 +118,7 @@ describe('Condition Engine - Expression - Comparison - Not Equal', () => {
         {left: new Reference('RefC'), right: new Value(true), expected: false},
         {left: new Reference('RefD'), right: new Value(false), expected: false},
       ]
-      
+
       for (const test of tests) {
         // @ts-ignore
         expect(new NotEqual(test.left, test.right).evaluate({
