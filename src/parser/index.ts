@@ -14,6 +14,7 @@ import { Evaluable } from '../common/evaluable'
 // Operand
 import { Value } from '../operand/value'
 import { Reference } from '../operand/reference'
+import { Collection } from '../operand/collection'
 
 // Comparison expressions
 import { Comparison } from '../expression/comparison'
@@ -75,9 +76,10 @@ import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
+import { Operand } from '../operand'
 
 // Comparison expression operand
-type operand = string | number | boolean | null | string[] | number[]
+type operand = string | number | boolean | null | Array<string | number | boolean>
 
 export type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw
 export type ComparisonRaw = [string, operand, operand]
@@ -234,9 +236,7 @@ export class Parser {
     }
 
     // Get value or reference of the operand
-    const operand = this.opts.referencePredicate(raw[1] as string)
-      ? new Reference(this.opts.referenceTransform(raw[1] as string))
-      : new Value(raw[1])
+    const operand = this.getOperand(raw[1])
 
     // Create the expression based on the operator mapping
     switch (raw[0]) {
@@ -258,13 +258,8 @@ export class Parser {
     }
 
     // Get value or reference for left and right side of the expression
-    const left = this.opts.referencePredicate(raw[1] as string)
-      ? new Reference(this.opts.referenceTransform(raw[1] as string))
-      : new Value(raw[1])
-
-    const right = this.opts.referencePredicate(raw[2] as string)
-      ? new Reference(this.opts.referenceTransform(raw[2] as string))
-      : new Value(raw[2])
+    const left = this.getOperand(raw[1])
+    const right = this.getOperand(raw[2])
 
     // Create the expression based on the operator mapping
     switch (raw[0]) {
@@ -293,5 +288,21 @@ export class Parser {
       default:
         throw new Error(`invalid comparison operator: "${raw[0]}"`)
     }
+  }
+
+  /**
+   * Get resolved operand
+   * @param raw Raw data
+   */
+  private getOperand (raw: operand): Operand {
+    const resolve = (raw: operand): Value | Reference =>
+      this.opts.referencePredicate(raw as string)
+        ? new Reference(this.opts.referenceTransform(raw as string))
+        : new Value(raw)
+
+    if (Array.isArray(raw)) {
+      return new Collection(raw.map((item) => resolve(item)))
+    }
+    return resolve(raw)
   }
 }

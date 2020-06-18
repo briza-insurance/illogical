@@ -55,6 +55,7 @@ import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../../../expression/logical/xor'
+import { Collection } from '../../../operand/collection'
 
 describe('Condition Engine - Parser', () => {
   test('options', () => {
@@ -312,11 +313,11 @@ describe('Condition Engine - Parser', () => {
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
-        expected: new In(new Value(5), new Value([5]))
+        expected: new In(new Value(5), new Collection([new Value(5)]))
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
-        expected: new NotIn(new Value(5), new Value([5]))
+        expected: new NotIn(new Value(5), new Collection([new Value(5)]))
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
@@ -328,7 +329,7 @@ describe('Condition Engine - Parser', () => {
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a','b'], ['a']],
-        expected: new Overlap(new Value(['a','b']), new Value(['a']))
+        expected: new Overlap(new Collection([new Value('a'), new Value('b')]), new Collection([new Value('a')]))
       },
       // Reference
       {
