@@ -37,6 +37,9 @@ export class Value implements Operand {
    * @param {Result} value Constant value.
    */
   constructor (value: Result) {
+    if (Array.isArray(value)) {
+      throw new Error('deprecated direct usage of array, please use Collection operand')
+    }
     this.value = value
   }
 
@@ -54,11 +57,6 @@ export class Value implements Operand {
    * @return {string}
    */
   toString (): string {
-    if (Array.isArray(this.value)) {
-      return '[' + (this.value as (number|string)[]).map(
-        (v) => printValue(v)).join(', ') +
-      ']'
-    }
     return printValue(this.value)
   }
 }
