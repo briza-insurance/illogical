@@ -1,6 +1,7 @@
 import { Value } from '../../../../operand/value'
 import { Reference } from '../../../../operand/reference'
 import { LessThan } from '../../lt'
+import { Collection } from '../../../../operand/collection'
 
 describe('Condition Engine - Expression - Comparison - Less Than', () => {
   describe('constructor', () => {
@@ -27,8 +28,8 @@ describe('Condition Engine - Expression - Comparison - Less Than', () => {
         { left: new Value(0), right: new Value('1'), expected: false },
         { left: new Value(0), right: new Value(true), expected: false },
         { left: new Value(0), right: new Value(false), expected: false },
-        { left: new Value(0), right: new Value([1]), expected: false },
-        { left: new Value(0), right: new Value(['1']), expected: false },
+        { left: new Value(0), right: new Collection([new Value(1)]), expected: false },
+        { left: new Value(0), right: new Collection([new Value('1')]), expected: false },
       ]
 
       for (const test of tests) {
@@ -82,8 +83,8 @@ describe('Condition Engine - Expression - Comparison - Less Than', () => {
         { left: new Reference('RefA'), right: new Value(true), expected: false },
         { left: new Reference('RefA'), right: new Value(false), expected: false },
         { left: new Reference('RefC'), right: new Value(1), expected: false },
-        { left: new Reference('RefA'), right: new Value([1]), expected: false },
-        { left: new Reference('RefA'), right: new Value(['1']), expected: false },
+        { left: new Reference('RefA'), right: new Collection([new Value(1)]), expected: false },
+        { left: new Reference('RefA'), right: new Collection([new Value('1')]), expected: false },
       ]
 
       for (const test of tests) {
