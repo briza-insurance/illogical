@@ -13,6 +13,7 @@ import { OPERATOR as OPERATOR_AND } from '../../expression/logical/and'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor'
+import { ExpressionInput } from '../../parser'
 
 
 describe('Condition Engine', () => {
@@ -144,7 +145,7 @@ describe('Condition Engine', () => {
     for (const testCase of testCases) {
       test(testCase.name, () => {
         for (const input of testCase.inputs) {
-          expect(engine.evaluate(testCase.condition as any, input.data)).toEqual(input.expected)
+          expect(engine.evaluate(testCase.condition as ExpressionInput, input.data)).toEqual(input.expected)
         }
       })
     }
