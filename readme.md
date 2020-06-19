@@ -53,7 +53,6 @@ yarn add @briza/illogical -D
     - [Xor](#xor)
     - [Not](#not)
 - [Engine Options](#engine-options)
-  - [Strict Mode](#strict-mode)
   - [Parser Options](#parser-options)
     - [Reference Predicate](#reference-predicate)
     - [Reference Transform](#reference-transform)
@@ -480,17 +479,6 @@ engine.evaluate(['NOT', ['==', 5, 5]]); // true
 ```
 
 ## Engine Options
-### Strict Mode
-> Default: false
-
-In non-strict mode the parser performs expression reduction where ever possible to optimize the evaluation process. If strict mode, these would cause an error thrown. 
-
-**Usage**
-```js
-// Import the illogical engine
-import Engine from '@briza/illogical';
-const engine = new Engine();
-```
 
 ### Parser Options
 Below described, are individual options object properties which could be used individually. Any missing options will be substituted with the default options.
@@ -553,7 +541,7 @@ operatorMapping: Map<symbol, string>
 [OPERATOR_PREFIX, 'PREFIX']
 [OPERATOR_SUFFIX, 'SUFFIX']
 [OPERATOR_OVERLAP, 'OVERLAP']
-[OPERATOR_UNDEF, 'UNDEFINED']
+[OPERATOR_UNDEFINED, 'UNDEFINED']
 
 // Logical
 [OPERATOR_AND, 'AND']
@@ -577,7 +565,7 @@ import {
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
   OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINED,
+  OPERATOR_UNDEFINEDINED,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
