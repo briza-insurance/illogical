@@ -140,6 +140,28 @@ describe('Condition Engine', () => {
         },
         expected: false
       }]
+    }, {
+      name: 'UNDEFINED',
+      condition: [
+        'UNDEFINED',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: undefined
+        },
+        expected: true
+      }, {
+        data: {
+          Name: 'David'
+        },
+        expected: false
+      }, {
+        data: {
+          Name: null
+        },
+        expected: false
+      }]
     }]
 
     for (const testCase of testCases) {
