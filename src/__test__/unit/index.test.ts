@@ -162,12 +162,58 @@ describe('Condition Engine', () => {
         },
         expected: false
       }]
+    }, {
+      name: 'NOT',
+      condition: [
+        'NOT',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: undefined
+        },
+        expected: true
+      }, {
+        data: {
+          Name: 'David'
+        },
+        expected: false
+      }, {
+        data: {
+          Name: null
+        },
+        expected: true
+      }]
     }]
 
     for (const testCase of testCases) {
       test(testCase.name, () => {
         for (const input of testCase.inputs) {
           expect(engine.evaluate(testCase.condition as ExpressionInput, input.data)).toEqual(input.expected)
+        }
+      })
+    }
+  })
+
+  describe('failure evaluate', () => {
+    const testCases = [{
+      name: 'NOT',
+      condition: [
+        'NOT',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: 0
+        },
+        expected: true
+      }]
+    }]
+
+    for (const testCase of testCases) {
+      test(testCase.name, () => {
+        for (const input of testCase.inputs) {
+          expect(() => engine.evaluate(testCase.condition as ExpressionInput, input.data)).toThrow()
         }
       })
     }
