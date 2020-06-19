@@ -21,8 +21,7 @@ export type Result =
   string |
   number |
   boolean |
-  number[] |
-  string []
+  Array<string | number | boolean>
 
 /**
  * Evaluable

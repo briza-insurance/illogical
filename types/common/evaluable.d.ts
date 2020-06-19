@@ -13,7 +13,7 @@ export interface Context {
 /**
  * Evaluation result
  */
-export declare type Result = undefined | null | string | number | boolean | number[] | string[];
+export declare type Result = undefined | null | string | number | boolean | Array<string | number | boolean>;
 /**
  * Evaluable
  */

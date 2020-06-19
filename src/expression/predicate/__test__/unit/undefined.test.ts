@@ -1,6 +1,7 @@
 import { Value } from '../../../../operand/value'
 import { Reference } from '../../../../operand/reference'
 import { Undefined } from '../../../predicate/undefined'
+import { Collection } from '../../../../operand/collection'
 
 describe('Condition Engine - Expression - Predicate - Undefined', () => {
   describe('constructor', () => {
@@ -21,8 +22,8 @@ describe('Condition Engine - Expression - Predicate - Undefined', () => {
         { operand: new Value(1), expected: false },
         { operand: new Value('1'), expected: false },
         { operand: new Value(true), expected: false },
-        { operand: new Value([1]), expected: false },
-        { operand: new Value(['1']), expected: false },
+        { operand: new Collection([new Value(1)]), expected: false },
+        { operand: new Collection([new Value('1')]), expected: false },
         { operand: new Value(true), expected: false },
         { operand: new Value(false), expected: false }
       ]

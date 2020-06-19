@@ -4,7 +4,7 @@
  */
 import { Options } from './options';
 import { Evaluable } from '../common/evaluable';
-declare type operand = string | number | boolean | null | string[] | number[];
+declare type operand = string | number | boolean | null | Array<string | number | boolean>;
 export declare type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw;
 export declare type ComparisonRaw = [string, operand, operand];
 export declare type PredicateRaw = [string, operand];
@@ -75,5 +75,10 @@ export declare class Parser {
      * @return {Comparison}
      */
     private parseComparisonRawExp;
+    /**
+     * Get resolved operand
+     * @param raw Raw data
+     */
+    private getOperand;
 }
 export {};

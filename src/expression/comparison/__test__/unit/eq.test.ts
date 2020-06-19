@@ -3,6 +3,7 @@ import { permutation } from '../../../../__test__/helpers'
 import { Value } from '../../../../operand/value'
 import { Reference } from '../../../../operand/reference'
 import { Equal } from '../../eq'
+import { Collection } from '../../../../operand/collection'
 
 describe('Condition Engine - Expression - Comparison - Equal', () => {
   describe('constructor', () => {
@@ -54,10 +55,10 @@ describe('Condition Engine - Expression - Comparison - Equal', () => {
       { left: new Value('1'), right: new Value('10'), expected: false },
       { left: new Value(true), right: new Value(false), expected: false },
       // Array types, falsy in any case
-      { left: new Value([1]), right: new Value([1]), expected: false },
-      { left: new Value(['1']), right: new Value(['1']), expected: false },
-      { left: new Value(1), right: new Value([1]), expected: false },
-      { left: new Value('1'), right: new Value(['1']), expected: false },
+      { left: new Collection([new Value(1)]), right: new Collection([new Value(1)]), expected: false },
+      { left: new Collection([new Value('1')]), right: new Collection([new Value('1')]), expected: false },
+      { left: new Value(1), right: new Collection([new Value(1)]), expected: false },
+      { left: new Value('1'), right: new Collection([new Value('1')]), expected: false },
       ]
 
       for (const test of tests) {

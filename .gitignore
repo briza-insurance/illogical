@@ -11,3 +11,6 @@ npm-debug.log
 # VS Code
 *.vscode
 *.code-workspace
+
+# Webstorm
+.idea

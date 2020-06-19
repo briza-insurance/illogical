@@ -55,6 +55,7 @@ import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../../../expression/logical/xor'
+import { Collection } from '../../../operand/collection'
 
 describe('Condition Engine - Parser', () => {
   test('options', () => {
@@ -75,7 +76,7 @@ describe('Condition Engine - Parser', () => {
     let tests = [
       // Truthy
       { key: '$ref', expected: true },
-      
+
       // Falsy
       { key: 'ref', expected: false },
       { key: '', expected: false },
@@ -107,7 +108,7 @@ describe('Condition Engine - Parser', () => {
 
   test('parse', () => {
     const parser = new Parser()
-  
+
     const tests = [
       // Comparison expression
       {
@@ -152,7 +153,7 @@ describe('Condition Engine - Parser', () => {
       // Invalid operator
       { rawExpression: ['__', ['==', 5, 5]] },
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => parser.parse(exception.rawExpression))
@@ -238,7 +239,7 @@ describe('Condition Engine - Parser', () => {
         rawExpression: [],
         expected: new VoidExpression(),
       },
-      // Nested 
+      // Nested
       {
         rawExpression: [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
@@ -273,7 +274,7 @@ describe('Condition Engine - Parser', () => {
       // Invalid operator
       { rawExpression: ['__', ['==', 5, 5], ['==', 5, 5]] },
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => parserStrict.parseLogicalRawExp(exception.rawExpression))
@@ -312,11 +313,11 @@ describe('Condition Engine - Parser', () => {
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
-        expected: new In(new Value(5), new Value([5]))
+        expected: new In(new Value(5), new Collection([new Value(5)]))
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
-        expected: new NotIn(new Value(5), new Value([5]))
+        expected: new NotIn(new Value(5), new Collection([new Value(5)]))
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
@@ -328,7 +329,7 @@ describe('Condition Engine - Parser', () => {
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a','b'], ['a']],
-        expected: new Overlap(new Value(['a','b']), new Value(['a']))
+        expected: new Overlap(new Collection([new Value('a'), new Value('b')]), new Collection([new Value('a')]))
       },
       // Reference
       {
@@ -338,6 +339,16 @@ describe('Condition Engine - Parser', () => {
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
         expected: new Equal(new Value(5), new Reference('RefA'))
+      },
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA','$RefB'], ['a']],
+        expected: new Overlap(
+          new Collection([
+            new Reference('RefA'),
+            new Reference('RefB'),
+          ]),
+          new Collection([new Value('a')])
+        )
       },
     ]
 
@@ -353,7 +364,7 @@ describe('Condition Engine - Parser', () => {
       // Invalid operator
       { rawExpression: ['__', 5, 5] },
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => parser.parseComparisonRawExp(exception.rawExpression))
@@ -384,7 +395,7 @@ describe('Condition Engine - Parser', () => {
       // Invalid operator
       { rawExpression: ['__', 5] },
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => parser.parsePredicateRawExp(exception.rawExpression))

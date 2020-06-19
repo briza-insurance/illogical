@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.1.5
+* Operand of array value now correctly resolves references.
+
 ## 1.1.4
 * Add Overlap comparison expression.
 
