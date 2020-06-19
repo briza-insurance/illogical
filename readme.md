@@ -217,15 +217,13 @@ engine.evaluate(['==', '$address.city', 'Toronto'], ctx); // true
 The [Comparison Expression](#comparison-expression) expect operands to be one of the below:
 
 #### Value
-Simple value types: string, number, boolean, string[], number[].
+Simple value types: string, number, boolean.
 
 **Example**
 ```js
 ['==', 5, 5]
 ['==', 'circle', 'circle']
 ['==', true, true]
-['IN', 2, [1,2,3]]
-['IN', ['a', 'b', 'c'], 'b']
 ```
 
 #### Reference
@@ -240,9 +238,17 @@ The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. T
 | ```['==', '$age', 21]``` | ```{age: 21}``` |
 | ```['==', 'circle', '$shape'] ``` | ```{age: 'circle'}``` |
 | ```['==', '$visible', true]``` | ```{visible: true}``` |
-| ```['IN', 2, '$options']``` | ```{options: [1, 2, 3]}``` |
-| ```['IN', ['a', 'b', 'c'], '$selected']``` | ```{selected: 'b'}``` |
 
+#### Collections
+The operand could be an array mixed from [Value](#value) and [Reference](#reference).
+
+**Example**
+
+| Expression  | Data Context |
+| ------------- | --- |
+| ```['IN', [1, 2], 1]``` | ```{}``` |
+| ```['IN', 'circle', ['$shapeA', $shapeB] ``` | ```{shapeA: 'circle', shapeB: 'box'}``` |
+| ```['IN', [$number, 5], 5]``` | ```{number: 3}``` |
 
 ### Comparison Expressions
 

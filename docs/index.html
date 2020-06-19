@@ -300,13 +300,11 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string
 				<a href="#value" id="value" style="color: inherit; text-decoration: none;">
 					<h4>Value</h4>
 				</a>
-				<p>Simple value types: string, number, boolean, string[], number[].</p>
+				<p>Simple value types: string, number, boolean.</p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js">[<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]
 [<span class="hljs-string">'=='</span>, <span class="hljs-string">'circle'</span>, <span class="hljs-string">'circle'</span>]
-[<span class="hljs-string">'=='</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]
-[<span class="hljs-string">'IN'</span>, <span class="hljs-number">2</span>, [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]]
-[<span class="hljs-string">'IN'</span>, [<span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>, <span class="hljs-string">'c'</span>], <span class="hljs-string">'b'</span>]</code></pre>
+[<span class="hljs-string">'=='</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]</code></pre>
 				<a href="#reference" id="reference" style="color: inherit; text-decoration: none;">
 					<h4>Reference</h4>
 				</a>
@@ -332,13 +330,30 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string
 							<td><code>[&#39;==&#39;, &#39;$visible&#39;, true]</code></td>
 							<td><code>{visible: true}</code></td>
 						</tr>
+				</tbody></table>
+				<a href="#collections" id="collections" style="color: inherit; text-decoration: none;">
+					<h4>Collections</h4>
+				</a>
+				<p>The operand could be an array mixed from <a href="#value">Value</a> and <a href="#reference">Reference</a>.</p>
+				<p><strong>Example</strong></p>
+				<table>
+					<thead>
 						<tr>
-							<td><code>[&#39;IN&#39;, 2, &#39;$options&#39;]</code></td>
-							<td><code>{options: [1, 2, 3]}</code></td>
+							<th>Expression</th>
+							<th>Data Context</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>[&#39;IN&#39;, [1, 2], 1]</code></td>
+							<td><code>{}</code></td>
 						</tr>
 						<tr>
-							<td><code>[&#39;IN&#39;, [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;$selected&#39;]</code></td>
-							<td><code>{selected: &#39;b&#39;}</code></td>
+							<td><code>[&#39;IN&#39;, &#39;circle&#39;, [&#39;$shapeA&#39;, $shapeB]</code></td>
+							<td><code>{shapeA: &#39;circle&#39;, shapeB: &#39;box&#39;}</code></td>
+						</tr>
+						<tr>
+							<td><code>[&#39;IN&#39;, [$number, 5], 5]</code></td>
+							<td><code>{number: 3}</code></td>
 						</tr>
 				</tbody></table>
 				<a href="#comparison-expressions" id="comparison-expressions" style="color: inherit; text-decoration: none;">
