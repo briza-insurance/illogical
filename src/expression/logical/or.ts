@@ -36,7 +36,7 @@ export class Or extends Logical {
    */
   evaluate (ctx: Context): Result {
     for (const operand of this.operands) {
-      if (operand.evaluate(ctx)) {
+      if (operand.evaluate(ctx) === true) {
         return true
       }
     }

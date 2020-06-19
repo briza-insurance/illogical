@@ -3,9 +3,9 @@
  * @module illogical/expression/logical
  */
 
-import { Nor } from './nor'
 import { Value } from '../../operand/value'
-import { Evaluable } from '../../common/evaluable'
+import { Evaluable, Context, Result } from '../../common/evaluable'
+import { Logical } from '.'
 
 // Operator key
 export const OPERATOR = Symbol('NOT')
@@ -13,7 +13,7 @@ export const OPERATOR = Symbol('NOT')
 /**
  * Not logical expression
  */
-export class Not extends Nor {
+export class Not extends Logical {
   /**
    * @constructor
    * @param {Evaluable} operand
@@ -23,7 +23,20 @@ export class Not extends Nor {
     if (arguments.length !== 1) {
       throw new Error('logical NOT expression must have exactly one operand')
     }
-    super([operand, new Value(false)])
-    this.operator = 'NOT'
+    super('NOT', [operand, new Value(false)])
+  }
+
+  /**
+   * Evaluate in the given context.
+   * @param {Context} ctx
+   * @return {Result}
+   */
+  evaluate (ctx: Context): Result {
+    const result = this.operands[0].evaluate(ctx)
+    if (result !== true && result !== false) {
+      throw new Error('logical NOT expression\'s operand must be evaluated to boolean value')
+    }
+
+    return !result
   }
 }

@@ -18,6 +18,7 @@ import { ExpressionInput } from '../../parser'
 
 describe('Condition Engine', () => {
   const engine = new Engine()
+
   test('evaluate', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -44,6 +45,7 @@ describe('Condition Engine', () => {
         .toThrowError()
     }
   })
+
   test('statement', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -70,6 +72,7 @@ describe('Condition Engine', () => {
         .toThrowError()
     }
   })
+
   test('parse', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -243,8 +246,7 @@ describe('Condition Engine', () => {
       inputs: [{
         data: {
           Name: 0
-        },
-        expected: true
+        }
       }]
     }]
 

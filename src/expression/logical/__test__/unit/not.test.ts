@@ -19,6 +19,7 @@ describe('Condition Engine - Expression - Logical - Not', () => {
     let exceptions = [
       { operands: [] },
       { operands: [new Value(true), new Value(false)] },
+      { operands: [new Value(0)] },
     ]
     for (const exception of exceptions) {
       // @ts-ignore
