@@ -16,7 +16,7 @@ import { Value } from '../../operand/value'
 export const OPERATOR = Symbol('UNDEFINED')
 
 /**
- * Undefined predicate expression
+ * Undefined comparison expression
  */
 export class Undefined extends Comparison {
   /**

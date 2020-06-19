@@ -6,7 +6,7 @@ import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;
 /**
- * Undefined predicate expression
+ * Undefined comparison expression
  */
 export declare class Undefined extends Comparison {
     /**

@@ -1,5 +1,5 @@
 # illogical
-A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
+A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
 > Revision: June 19, 2020.
 
@@ -55,7 +55,7 @@ yarn add @briza/illogical -D
 - [Engine Options](#engine-options)
   - [Strict Mode](#strict-mode)
   - [Parser Options](#parser-options)
-    - [Reference Predicated](#reference-predicated)
+    - [Reference Predicate](#reference-predicate)
     - [Reference Transform](#reference-transform)
     - [Operator Mapping](#operator-mapping)
 - [Breaking Changes](#breaking-changes)
@@ -81,7 +81,7 @@ const result = engine.evaluate(['==', 5, 5]);
 > For advanced usage, please [Engine Options](#engine-options).
 
 ### Evaluate
-Evaluate comparison, predicate or logical expression as TRUE or FALSE result:
+Evaluate comparison or logical expression as TRUE or FALSE result:
 
 ```engine.evaluate(```[Comparison Expression](#comparison-expressions) or [Logical Expression](#logical-expressions), [Evaluation Data Context](#evaluation-data-context)```)``` => ```boolean```
 
@@ -94,8 +94,6 @@ engine.evaluate(['==', 5, 5]);
 engine.evaluate(['==', 'circle', 'circle']);
 engine.evaluate(['==', true, true]);
 engine.evaluate(['==', '$name', 'peter'], {name: 'peter'});
-
-// Predicate expression
 engine.evaluate(['UNDEFINED', '$RefA'], {});
 
 // Logical expression
@@ -136,8 +134,6 @@ engine.statement(['==', true, true]);
 
 engine.statement(['==', '$name', 'peter'], {name: 'peter'});
 // ({name} == "peter")
-
-/* Predicate expression */
 
 engine.statement(['UNDEFINED', '$RefA']);
 // ({RefA} is UNDEFINED)
@@ -231,7 +227,7 @@ Simple value types: string, number, boolean.
 #### Reference
 The reference operand's value is resolved from the [Evaluation Data Context](#evaluation-data-context), where the the operands name is used as key in the context.
 
-The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. This might be customized via [Reference Predicated Parser Option](#reference-predicated).
+The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. This might be customized via [Reference Predicate Parser Option](#reference-predicate).
 
 **Example**
 
@@ -511,7 +507,7 @@ const opts = {
 const engine = new Engine(opts);
 ```
 
-#### Reference Predicated
+#### Reference Predicate
 A function used to determine if the operand is a reference type, otherwise evaluated as a static value.
 
 ```typescript
