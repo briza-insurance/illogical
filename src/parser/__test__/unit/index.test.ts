@@ -282,7 +282,7 @@ describe('Condition Engine - Parser', () => {
 
     for (const exception of exceptions) {
       // @ts-ignore
-      expect(() => parserStrict.parseLogicalRawExp(exception.rawExpression))
+      expect(() => parserStrict.parse(exception.rawExpression))
         .toThrowError()
     }
   })
@@ -375,7 +375,7 @@ describe('Condition Engine - Parser', () => {
 
     for (const exception of exceptions) {
       // @ts-ignore
-      expect(() => parser.parseComparisonRawExp(exception.rawExpression))
+      expect(() => parser.parse(exception.rawExpression))
         .toThrowError()
     }
   })

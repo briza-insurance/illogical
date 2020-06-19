@@ -84,6 +84,7 @@ export type ExpressionInput = [string, ...Input[]]
  */
 export class Parser {
   private readonly opts: Options
+  private readonly expectedOperators: Set<string>
 
   /**
    * @constructor
@@ -99,6 +100,8 @@ export class Parser {
         }
       }
     }
+
+    this.expectedOperators = new Set<string>(this.opts.operatorMapping.values())
   }
 
   /**
@@ -119,7 +122,8 @@ export class Parser {
     ) {
       throw new Error('invalid expression')
     }
-    if ((raw as ArrayInput).length === 0 || isString((raw as ArrayInput)[0] as string) === false
+
+    if ((raw as ArrayInput).length === 0 || !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
       throw new Error('invalid expression')
     }
