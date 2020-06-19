@@ -23,8 +23,8 @@ export class Nor extends Logical {
    * @param {Evaluable[]} operands Collection of operands.
    */
   constructor (operands: Evaluable[]) {
-    if (operands.length === 0) {
-      throw new Error('logical expression must have at least one operand')
+    if (operands.length < 2) {
+      throw new Error('logical expression must have at least two operands')
     }
     super('NOR', operands)
   }

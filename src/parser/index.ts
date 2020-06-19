@@ -161,12 +161,10 @@ export class Parser {
           logicalExpressionReducer(operands) || new Or(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
-        expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Nor(operands)
+        expression = (operands: Evaluable[]): Evaluable => new Nor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
-        expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Xor(operands)
+        expression = (operands: Evaluable[]): Evaluable => new Xor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
         expression = (operands: Evaluable[]): Evaluable => new Not(...operands)
