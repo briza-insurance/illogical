@@ -36,7 +36,7 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.evaluate(exception.expression))
@@ -62,7 +62,7 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.statement(exception.expression))
@@ -88,11 +88,65 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.parse(exception.expression))
         .toThrowError()
+    }
+  })
+
+  describe('successful evaluate', () => {
+    const testCases = [{
+      name: 'OVERLAP',
+      condition: [
+        'OVERLAP',
+        [
+          '$State1',
+          '$State2',
+          '$State3',
+          '$State4'
+        ],
+        [
+          'TX',
+          'CA'
+        ]
+      ],
+      inputs: [{
+        data: {
+          State1: 'TX'
+        },
+        expected: true
+      }, {
+        data: {
+          State1: 'AL'
+        },
+        expected: false
+      }, {
+        data: {
+          State1: 'TX',
+          State2: 'AL',
+          State3: 'CA',
+          State4: 'CO'
+        },
+        expected: true
+      }, {
+        data: {
+          State1: 'MI',
+          State2: 'RI',
+          State3: 'NY',
+          State4: 'NY'
+        },
+        expected: false
+      }]
+    }]
+
+    for (const testCase of testCases) {
+      test(testCase.name, () => {
+        for (const input of testCase.inputs) {
+          expect(engine.evaluate(testCase.condition as any, input.data)).toEqual(input.expected)
+        }
+      })
     }
   })
 })
