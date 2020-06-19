@@ -5,12 +5,10 @@
 
 import {
   Context,
-  Result
+  Result,
+  Evaluable
 } from '../../common/evaluable'
 
-import {
-  Operand
-} from '../../operand'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -22,10 +20,11 @@ export const OPERATOR = Symbol('IN')
 export class In extends Comparison {
   /**
    * @constructor
-   * @param {Operand} left Left operand.
-   * @param {Operand} right Right operand.
+   * @param {Evaluable} left Left operand.
+   * @param {Evaluable} right Right operand.
    */
-  constructor (left: Operand, right: Operand) {
+  constructor (...args: Evaluable[]);
+  constructor (left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }

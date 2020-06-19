@@ -2,7 +2,7 @@
  * Main module.
  * @module illogical
  */
-import { ComparisonRaw, LogicalRaw } from './parser';
+import { ExpressionInput } from './parser';
 import { Options } from './parser/options';
 import { Context, Evaluable } from './common/evaluable';
 import { OPERATOR as OPERATOR_EQ } from './expression/comparison/eq';
@@ -16,12 +16,13 @@ import { OPERATOR as OPERATOR_NOT_IN } from './expression/comparison/not-in';
 import { OPERATOR as OPERATOR_PREFIX } from './expression/comparison/prefix';
 import { OPERATOR as OPERATOR_SUFFIX } from './expression/comparison/suffix';
 import { OPERATOR as OPERATOR_OVERLAP } from './expression/comparison/overlap';
-import { OPERATOR as OPERATOR_UNDEFINED } from './expression/predicate/undefined';
+import { OPERATOR as OPERATOR_UNDEFINED } from './expression/comparison/undefined';
 import { OPERATOR as OPERATOR_AND } from './expression/logical/and';
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or';
 import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor';
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor';
-export { OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR };
+import { OPERATOR as OPERATOR_NOT } from './expression/logical/not';
+export { OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT };
 /**
  * Condition engine
  */
@@ -29,31 +30,27 @@ declare class Engine {
     private readonly parser;
     /**
      * @constructor
-     * @param {boolean} strict In non-strict mode the parser
-     * can perform some expression reduction to optimize the
-     * expression. The string from than does not have to have
-     * the same structure as the raw expression.
      * @param {Options?} options Parser options.
      */
-    constructor(strict?: boolean, options?: Partial<Options>);
+    constructor(options?: Partial<Options>);
     /**
      * Evaluate the expression.
      * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
      * @param {Context} ctx Evaluation data context.
      * @return {boolean}
      */
-    evaluate(exp: ComparisonRaw | LogicalRaw, ctx: Context): boolean;
+    evaluate(exp: ExpressionInput, ctx: Context): boolean;
     /**
      * Get expression statement
      * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
      * @return {string}
      */
-    statement(exp: ComparisonRaw | LogicalRaw): string;
+    statement(exp: ExpressionInput): string;
     /**
      * Parse expression.
      * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
      * @return {Evaluable}
      */
-    parse(exp: ComparisonRaw | LogicalRaw): Evaluable;
+    parse(exp: ExpressionInput): Evaluable;
 }
 export default Engine;

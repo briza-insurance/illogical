@@ -1,4 +1,4 @@
-import { Parser, VoidExpression } from '../../'
+import { Parser } from '../../'
 import {
   defaultOptions,
   defaultReferencePredicate,
@@ -50,11 +50,15 @@ import {
   Overlap,
   OPERATOR as OPERATOR_OVERLAP,
 } from '../../../expression/comparison/overlap'
-import { Undefined, OPERATOR as OPERATOR_UNDEF } from '../../../expression/predicate/undefined'
+import {
+  Undefined,
+  OPERATOR as OPERATOR_UNDEFINED,
+} from '../../../expression/comparison/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../../../expression/logical/xor'
+import { Not, OPERATOR as OPERATOR_NOT } from '../../../expression/logical/not'
 import { Collection } from '../../../operand/collection'
 
 describe('Condition Engine - Parser', () => {
@@ -65,7 +69,7 @@ describe('Condition Engine - Parser', () => {
     }
 
     // @ts-ignore
-    const parser = new Parser(false, customOptions)
+    const parser = new Parser(customOptions)
 
     // @ts-ignore
     expect(parser.options.operatorMapping.get(OPERATOR_EQ)).toEqual('&&')
@@ -117,7 +121,7 @@ describe('Condition Engine - Parser', () => {
       },
       // Predicate expression
       {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
         expected: new Undefined(new Reference('RefA'))
       },
       // Logical expression
@@ -126,7 +130,7 @@ describe('Condition Engine - Parser', () => {
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
-          [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
+          [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
         ],
         expected: new And([
           new Equal(new Value(5), new Value(5)),
@@ -161,9 +165,8 @@ describe('Condition Engine - Parser', () => {
     }
   })
 
-  test('parseLogicalRawExp', () => {
+  test('parse - logical expressions', () => {
     const parser = new Parser()
-    const parserStrict = new Parser(true)
 
     const tests = [
       // Not-nested, 3 items
@@ -211,6 +214,13 @@ describe('Condition Engine - Parser', () => {
           new Equal(new Value(10), new Value(10))
         ])
       },
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_NOT),
+          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5]
+        ],
+        expected: new Not(new Equal(new Value(5), new Value(5)))
+      },
       // Not-nested, 2 items, reduced into comparison
       {
         rawExpression: [
@@ -233,11 +243,6 @@ describe('Condition Engine - Parser', () => {
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
-      // Not-nested, 0 items, reduced into void expression
-      {
-        rawExpression: [],
-        expected: new VoidExpression(),
       },
       // Nested
       {
@@ -262,7 +267,7 @@ describe('Condition Engine - Parser', () => {
 
     for (const test of tests) {
       // @ts-ignore
-      expect(parser.parseLogicalRawExp(test.rawExpression))
+      expect(parser.parse(test.rawExpression))
         .toEqual(test.expected)
     }
 
@@ -282,11 +287,10 @@ describe('Condition Engine - Parser', () => {
     }
   })
 
-  test('parseComparisonRawExp', () => {
+  test('parse - comparison expressions', () => {
     const parser = new Parser()
 
     const tests = [
-      // All comparison expressions
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         expected: new Equal(new Value(5), new Value(5))
@@ -341,6 +345,10 @@ describe('Condition Engine - Parser', () => {
         expected: new Equal(new Value(5), new Reference('RefA'))
       },
       {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+        expected: new Undefined(new Reference('RefA'))
+      },
+      {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA','$RefB'], ['a']],
         expected: new Overlap(
           new Collection([
@@ -349,12 +357,12 @@ describe('Condition Engine - Parser', () => {
           ]),
           new Collection([new Value('a')])
         )
-      },
+      }
     ]
 
     for (const test of tests) {
       // @ts-ignore
-      expect(parser.parseComparisonRawExp(test.rawExpression))
+      expect(parser.parse(test.rawExpression))
         .toEqual(test.expected)
     }
 
@@ -370,45 +378,5 @@ describe('Condition Engine - Parser', () => {
       expect(() => parser.parseComparisonRawExp(exception.rawExpression))
         .toThrowError()
     }
-  })
-
-  test('parsePredicateRawExp', () => {
-    const parser = new Parser()
-
-    const tests = [
-      // All predicate expressions
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEF), '$RefA'],
-        expected: new Undefined(new Reference('RefA'))
-      }
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(parser.parsePredicateRawExp(test.rawExpression))
-        .toEqual(test.expected)
-    }
-
-    const exceptions = [
-      // Invalid form
-      { rawExpression: [] },
-      // Invalid operator
-      { rawExpression: ['__', 5] },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => parser.parsePredicateRawExp(exception.rawExpression))
-        .toThrowError()
-    }
-  })
-
-  describe('VoidExpression', () => {
-    test('evaluate', () => {
-      expect(new VoidExpression().evaluate()).toBe(true)
-    })
-    test('toString', () => {
-      expect(new VoidExpression().toString()).toBe('')
-    })
   })
 })

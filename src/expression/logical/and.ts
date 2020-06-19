@@ -5,13 +5,11 @@
 
 import {
   Context,
-  Result
+  Result,
+  Evaluable
 } from '../../common/evaluable'
 
-import {
-  Logical,
-  Operand
-} from '../logical'
+import { Logical } from '../logical'
 
 // Operator key
 export const OPERATOR = Symbol('AND')
@@ -22,9 +20,12 @@ export const OPERATOR = Symbol('AND')
 export class And extends Logical {
   /**
    * @constructor
-   * @param {Operand[]} operands Collection of operands.
+   * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operands: Operand[]) {
+  constructor (operands: Evaluable[]) {
+    if (operands.length === 0) {
+      throw new Error('logical expression must have at least one operand')
+    }
     super('AND', operands)
   }
 
@@ -34,9 +35,6 @@ export class And extends Logical {
    * @return {Result}
    */
   evaluate (ctx: Context): Result {
-    if (this.operands.length === 0) {
-      throw new Error('logical expression must have at least one operand')
-    }
     for (const operand of this.operands) {
       if (operand.evaluate(ctx) === false) {
         return false

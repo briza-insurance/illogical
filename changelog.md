@@ -1,5 +1,10 @@
 # illogical changelog
 
+## 1.2.0
+* Simplification of the codebase.
+* Add Not logical expression.
+* Breaking change: removed parser strict mode.
+
 ## 1.1.5
 * Operand of array value now correctly resolves references.
 
@@ -17,22 +22,17 @@
 * Invalid logical/comparison expression throw exception.
 
 ## 1.1.0
-
 * Add Prefix comparison operator.
 * Add Suffix comparison operator.
 
 ## 1.0.3
-
 * Update readme.
 
 ## 1.0.2
-
 * Add support for nested data context.
 
 ## 1.0.1
-
 * Add typescript types path into package.json.
 
 ## 1.0.0
-
 * Initial release.

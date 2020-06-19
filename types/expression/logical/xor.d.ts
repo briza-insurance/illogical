@@ -2,8 +2,8 @@
  * Logical expression module.
  * @module illogical/expression/logical
  */
-import { Context, Result } from '../../common/evaluable';
-import { Logical, Operand } from '../logical';
+import { Context, Result, Evaluable } from '../../common/evaluable';
+import { Logical } from '../logical';
 export declare const OPERATOR: unique symbol;
 /**
  * Xor logical expression
@@ -11,9 +11,9 @@ export declare const OPERATOR: unique symbol;
 export declare class Xor extends Logical {
     /**
      * @constructor
-     * @param {Operand[]} operands Collection of operands.
+     * @param {Evaluable[]} operands Collection of operands.
      */
-    constructor(operands: Operand[]);
+    constructor(operands: Evaluable[]);
     /**
      * Evaluate in the given context.
      * @param {Context} ctx

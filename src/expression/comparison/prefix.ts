@@ -5,12 +5,10 @@
 
 import {
   Context,
-  Result
+  Result,
+  Evaluable
 } from '../../common/evaluable'
 
-import {
-  Operand
-} from '../../operand'
 import { Comparison } from '../comparison'
 import { isString } from '../../common/type-check'
 
@@ -23,10 +21,11 @@ export const OPERATOR = Symbol('PREFIX')
 export class Prefix extends Comparison {
   /**
    * @constructor
-   * @param {Operand} left Left operand.
-   * @param {Operand} right Right operand.
+   * @param {Evaluable} left Left operand.
+   * @param {Evaluable} right Right operand.
    */
-  constructor (left: Operand, right: Operand) {
+  constructor (...args: Evaluable[]);
+  constructor (left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
@@ -54,6 +53,6 @@ export class Prefix extends Comparison {
   toString (): string {
     const left = this.left.toString()
     const right = this.right.toString()
-    return `<${left}>${right}`
+    return `(<${left}>${right})`
   }
 }
