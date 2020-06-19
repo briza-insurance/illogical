@@ -187,6 +187,41 @@ describe('Condition Engine', () => {
         },
         expected: true
       }]
+    },{
+      name: 'NOT OVERLAP',
+      condition: [
+        "NOT",
+        [
+          "OVERLAP",
+          [
+            "$region1",
+            "$region2"
+          ],
+          [
+            "FL",
+            "LA",
+            "NY",
+            "RI",
+            "TX"
+          ]
+        ]
+      ],
+      inputs: [
+        {
+          data: {
+            region1: 'FL',
+            region2: 'MI'
+          },
+          expected: false
+        },
+        {
+          data: {
+            region1: 'AL',
+            region2: 'MI'
+          },
+          expected: true
+        }
+      ]
     }]
 
     for (const testCase of testCases) {
