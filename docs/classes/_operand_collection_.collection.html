@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Value | @briza/illogical</title>
+	<title>Collection | @briza/illogical</title>
 	<meta name="description" content="Documentation for @briza/illogical">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_operand_value_.html">&quot;operand/value&quot;</a>
+					<a href="../modules/_operand_collection_.html">&quot;operand/collection&quot;</a>
 				</li>
 				<li>
-					<a href="_operand_value_.value.html">Value</a>
+					<a href="_operand_collection_.collection.html">Collection</a>
 				</li>
 			</ul>
-			<h1>Class Value</h1>
+			<h1>Class Collection</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Static value operand</p>
+						<p>Collection operand resolved containing mixture of value and references.</p>
 					</div>
 				</div>
 			</section>
@@ -80,7 +80,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Value</span>
+						<span class="target">Collection</span>
 					</li>
 				</ul>
 			</section>
@@ -97,20 +97,20 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_operand_value_.value.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_operand_collection_.collection.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_operand_value_.value.html#value" class="tsd-kind-icon">value</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_operand_collection_.collection.html#items" class="tsd-kind-icon">items</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_collection_.collection.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_collection_.collection.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 							</ul>
 						</section>
 					</div>
@@ -122,13 +122,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Value<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_operand_value_.value.html" class="tsd-signature-type">Value</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Collection<span class="tsd-signature-symbol">(</span>items<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_operand_value_.value.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol"> | </span><a href="_operand_reference_.reference.html" class="tsd-signature-type">Reference</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_operand_collection_.collection.html" class="tsd-signature-type">Collection</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/value.ts#L33">operand/value.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/collection.ts#L22">operand/collection.ts:22</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -136,15 +136,15 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></h5>
+									<h5>items: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_operand_value_.value.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol"> | </span><a href="_operand_reference_.reference.html" class="tsd-signature-type">Reference</a><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
-											<p>Constant value.</p>
+											<p>Collection of operands.</p>
 										</div>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_operand_value_.value.html" class="tsd-signature-type">Value</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_operand_collection_.collection.html" class="tsd-signature-type">Collection</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -152,12 +152,12 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="value" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> value</h3>
-					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></div>
+					<a name="items" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> items</h3>
+					<div class="tsd-signature tsd-kind-icon">items<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="_operand_value_.value.html" class="tsd-signature-type">Value</a><span class="tsd-signature-symbol"> | </span><a href="_operand_reference_.reference.html" class="tsd-signature-type">Reference</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/value.ts#L33">operand/value.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/collection.ts#L22">operand/collection.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,7 +174,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/value.ts#L51">operand/value.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/collection.ts#L37">operand/collection.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -202,7 +202,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/value.ts#L59">operand/value.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/acae887/src/operand/collection.ts#L45">operand/collection.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -223,7 +223,7 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="../modules/_operand_value_.html">&quot;operand/value&quot;</a>
+						<a href="../modules/_operand_collection_.html">&quot;operand/collection&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -232,27 +232,24 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_operand_value_.value.html" class="tsd-kind-icon">Value</a>
+						<a href="_operand_collection_.collection.html" class="tsd-kind-icon">Collection</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_operand_value_.value.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_operand_collection_.collection.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_operand_value_.value.html#value" class="tsd-kind-icon">value</a>
+								<a href="_operand_collection_.collection.html#items" class="tsd-kind-icon">items</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a>
+								<a href="_operand_collection_.collection.html#evaluate" class="tsd-kind-icon">evaluate</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
+								<a href="_operand_collection_.collection.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
-						<a href="../modules/_operand_value_.html#printvalue" class="tsd-kind-icon">print<wbr>Value</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
