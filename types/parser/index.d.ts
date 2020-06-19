@@ -12,6 +12,7 @@ export declare type ExpressionInput = [string, ...Input[]];
  */
 export declare class Parser {
     private readonly opts;
+    private readonly expectedOperators;
     /**
      * @constructor
      * @param {Options?} options Parser options.

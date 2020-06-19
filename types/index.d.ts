@@ -35,20 +35,20 @@ declare class Engine {
     constructor(options?: Partial<Options>);
     /**
      * Evaluate the expression.
-     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+     * @param {ExpressionInput} exp Raw expression.
      * @param {Context} ctx Evaluation data context.
      * @return {boolean}
      */
     evaluate(exp: ExpressionInput, ctx: Context): boolean;
     /**
      * Get expression statement
-     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+     * @param {ExpressionInput} exp Raw expression.
      * @return {string}
      */
     statement(exp: ExpressionInput): string;
     /**
      * Parse expression.
-     * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+     * @param {ExpressionInput} exp Raw expression.
      * @return {Evaluable}
      */
     parse(exp: ExpressionInput): Evaluable;
