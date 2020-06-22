@@ -235,27 +235,4 @@ describe('Condition Engine', () => {
       })
     }
   })
-
-  describe('failure evaluate', () => {
-    const testCases = [{
-      name: 'NOT',
-      condition: [
-        'NOT',
-        '$Name'
-      ],
-      inputs: [{
-        data: {
-          Name: 0
-        }
-      }]
-    }]
-
-    for (const testCase of testCases) {
-      test(testCase.name, () => {
-        for (const input of testCase.inputs) {
-          expect(() => engine.evaluate(testCase.condition as ExpressionInput, input.data)).toThrow()
-        }
-      })
-    }
-  })
 })

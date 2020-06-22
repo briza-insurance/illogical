@@ -293,6 +293,17 @@ describe('Condition Engine - Parser', () => {
             new Value(defaultOptions.operatorMapping.get(OPERATOR_AND))
           ])
         )
+      },
+      // Not treated as raw array
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_NOT),
+          5
+        ],
+        expected: new Collection([
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_NOT)),
+          new Value(5)
+        ])
       }
     ]
 
