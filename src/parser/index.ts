@@ -3,8 +3,6 @@
  * @module illogical/parser
  */
 
-import { isString } from '../common/type-check'
-
 // Parser
 import { Options, defaultOptions, optionValue } from './options'
 

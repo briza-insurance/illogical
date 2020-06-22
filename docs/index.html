@@ -67,9 +67,9 @@
 				<a href="#illogical" id="illogical" style="color: inherit; text-decoration: none;">
 					<h1>illogical</h1>
 				</a>
-				<p>A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
+				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: June 18, 2020.</p>
+					<p>Revision: June 19, 2020.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -103,6 +103,7 @@
 							<li><a href="#operand-types">Operand Types</a><ul>
 									<li><a href="#value">Value</a></li>
 									<li><a href="#reference">Reference</a></li>
+									<li><a href="#collection">Collection</a></li>
 								</ul>
 							</li>
 							<li><a href="#comparison-expressions">Comparison Expressions</a><ul>
@@ -117,9 +118,6 @@
 									<li><a href="#prefix">Prefix</a></li>
 									<li><a href="#suffix">Suffix</a></li>
 									<li><a href="#overlap">Overlap</a></li>
-								</ul>
-							</li>
-							<li><a href="#predicate-expressions">Predicate Expressions</a><ul>
 									<li><a href="#undefined">Undefined</a></li>
 								</ul>
 							</li>
@@ -128,18 +126,22 @@
 									<li><a href="#or">Or</a></li>
 									<li><a href="#nor">Nor</a></li>
 									<li><a href="#xor">Xor</a></li>
+									<li><a href="#not">Not</a></li>
 								</ul>
 							</li>
 						</ul>
 					</li>
 					<li><a href="#engine-options">Engine Options</a><ul>
-							<li><a href="#strict-mode">Strict Mode</a></li>
 							<li><a href="#parser-options">Parser Options</a><ul>
-									<li><a href="#reference-predicated">Reference Predicated</a></li>
+									<li><a href="#reference-predicate">Reference Predicate</a></li>
 									<li><a href="#reference-transform">Reference Transform</a></li>
 									<li><a href="#operator-mapping">Operator Mapping</a></li>
 								</ul>
 							</li>
+						</ul>
+					</li>
+					<li><a href="#breaking-changes">Breaking Changes</a><ul>
+							<li><a href="#v120">v1.2.0</a></li>
 						</ul>
 					</li>
 					<li><a href="#contributing">Contributing</a><ul>
@@ -166,8 +168,8 @@
 				<a href="#evaluate" id="evaluate" style="color: inherit; text-decoration: none;">
 					<h3>Evaluate</h3>
 				</a>
-				<p>Evaluate comparison, predicate or logical expression as TRUE or FALSE result:</p>
-				<p><code>engine.evaluate(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a>, <a href="#evaluation-data-context">Evaluation Data Context</a><code>)</code> =&gt; <code>boolean</code></p>
+				<p>Evaluate comparison or logical expression as TRUE or FALSE result:</p>
+				<p><code>engine.evaluate(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a>, <a href="#evaluation-data-context">Evaluation Data Context</a><code>)</code> =&gt; <code>boolean</code></p>
 				<blockquote>
 					<p>Data context is optional.</p>
 				</blockquote>
@@ -177,8 +179,6 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-number
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string">'circle'</span>, <span class="hljs-string">'circle'</span>]);
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]);
 engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string">'$name'</span>, <span class="hljs-string">'peter'</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>});
-
-<span class="hljs-comment">// Predicate expression</span>
 engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'$RefA'</span>], {});
 
 <span class="hljs-comment">// Logical expression</span>
@@ -201,7 +201,7 @@ engine.evaluate([
 					<h3>Statement</h3>
 				</a>
 				<p>Get expression string representation:</p>
-				<p><code>engine.statement(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>string</code></p>
+				<p><code>engine.statement(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>string</code></p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span class="hljs-comment">/* Comparison expression */</span>
 
@@ -216,8 +216,6 @@ engine.statement([<span class="hljs-string">'=='</span>, <span class="hljs-liter
 
 engine.statement([<span class="hljs-string">'=='</span>, <span class="hljs-string">'$name'</span>, <span class="hljs-string">'peter'</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">'peter'</span>});
 <span class="hljs-comment">// ({name} == "peter")</span>
-
-<span class="hljs-comment">/* Predicate expression */</span>
 
 engine.statement([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs-string">'$RefA'</span>]);
 <span class="hljs-comment">// ({RefA} is UNDEFINED)</span>
@@ -248,7 +246,7 @@ engine.statement([
 					<h3>Parse</h3>
 				</a>
 				<p>Parse the expression into a evaluable object, i.e. it returns the parsed self-evaluable condition expression.</p>
-				<p><code>engine.parse(</code><a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>evaluable</code></p>
+				<p><code>engine.parse(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>evaluable</code></p>
 				<a href="#evaluate-function" id="evaluate-function" style="color: inherit; text-decoration: none;">
 					<h4>Evaluate Function</h4>
 				</a>
@@ -309,7 +307,7 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string
 					<h4>Reference</h4>
 				</a>
 				<p>The reference operand&#39;s value is resolved from the <a href="#evaluation-data-context">Evaluation Data Context</a>, where the the operands name is used as key in the context.</p>
-				<p>The reference operand must be prefixed with <code>$</code> symbol, e.g.: <code>$name</code>. This might be customized via <a href="#reference-predicated">Reference Predicated Parser Option</a>.</p>
+				<p>The reference operand must be prefixed with <code>$</code> symbol, e.g.: <code>$name</code>. This might be customized via <a href="#reference-predicate">Reference Predicate Parser Option</a>.</p>
 				<p><strong>Example</strong></p>
 				<table>
 					<thead>
@@ -331,8 +329,8 @@ engine.evaluate([<span class="hljs-string">'=='</span>, <span class="hljs-string
 							<td><code>{visible: true}</code></td>
 						</tr>
 				</tbody></table>
-				<a href="#collections" id="collections" style="color: inherit; text-decoration: none;">
-					<h4>Collections</h4>
+				<a href="#collection" id="collection" style="color: inherit; text-decoration: none;">
+					<h4>Collection</h4>
 				</a>
 				<p>The operand could be an array mixed from <a href="#value">Value</a> and <a href="#reference">Reference</a>.</p>
 				<p><strong>Example</strong></p>
@@ -474,9 +472,6 @@ engine.evaluate([<span class="hljs-string">'SUFFIX'</span>, <span class="hljs-st
 [<span class="hljs-string">"OVERLAP"</span>, [<span class="hljs-string">"circle"</span>, <span class="hljs-string">"square"</span>, <span class="hljs-string">"triangle"</span>], [<span class="hljs-string">"square"</span>]]</code></pre>
 				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'OVERLAP'</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span>
 engine.evaluate([<span class="hljs-string">'OVERLAP'</span>, [<span class="hljs-string">'circle'</span>, <span class="hljs-string">'square'</span>, <span class="hljs-string">'triangle'</span>], [<span class="hljs-string">'square'</span>, <span class="hljs-string">'oval'</span>]]); <span class="hljs-comment">// true</span></code></pre>
-				<a href="#predicate-expressions" id="predicate-expressions" style="color: inherit; text-decoration: none;">
-					<h3>Predicate Expressions</h3>
-				</a>
 				<a href="#undefined" id="undefined" style="color: inherit; text-decoration: none;">
 					<h4>Undefined</h4>
 				</a>
@@ -494,7 +489,7 @@ engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs
 				<p>The logical AND operator (&amp;&amp;) returns the boolean value TRUE if both operands are TRUE and returns FALSE otherwise.</p>
 				<p>Expression format: <code>[&quot;AND&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code>.</p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"AND"</span>,
@@ -508,7 +503,7 @@ engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs
 				<p>The logical OR operator (||) returns the boolean value TRUE if either or both operands is TRUE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;OR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code>.</p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"OR"</span>,
@@ -522,7 +517,7 @@ engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs
 				<p>The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;NOR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code></p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"NOR"</span>,
@@ -536,7 +531,7 @@ engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs
 				<p>The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. </p>
 				<p>Expression format: <code>[&quot;XOR&quot;, Left Operand 1, Right Operand 2, ... , Right Operand N]</code></p>
 				<blockquote>
-					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a>, <a href="#predicate-expressions">Predicate Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
 				<pre><code class="language-json">[
   <span class="hljs-string">"XOR"</span>,
@@ -550,31 +545,22 @@ engine.evaluate([<span class="hljs-string">'UNDEFINED'</span>, <span class="hljs
   [<span class="hljs-string">"=="</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>],
 ]</code></pre>
 				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'XOR'</span>, [<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">'=='</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]]); <span class="hljs-comment">// false</span></code></pre>
+				<a href="#not" id="not" style="color: inherit; text-decoration: none;">
+					<h4>Not</h4>
+				</a>
+				<p>The logical NOT operator returns the boolean value TRUE if the operand is FALSE, TRUE otherwise. </p>
+				<p>Expression format: <code>[&quot;NOT&quot;, Operand]</code></p>
+				<blockquote>
+					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
+				</blockquote>
+				<pre><code class="language-json">[
+  <span class="hljs-string">"NOT"</span>,
+  [<span class="hljs-string">"=="</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
+]</code></pre>
+				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">'NOT'</span>, [<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span></code></pre>
 				<a href="#engine-options" id="engine-options" style="color: inherit; text-decoration: none;">
 					<h2>Engine Options</h2>
 				</a>
-				<a href="#strict-mode" id="strict-mode" style="color: inherit; text-decoration: none;">
-					<h3>Strict Mode</h3>
-				</a>
-				<blockquote>
-					<p>Default: false</p>
-				</blockquote>
-				<p>In non-strict mode the parser performs expression reduction where ever possible to optimize the evaluation process. If strict mode, these would cause an error thrown. </p>
-				<p><strong>Usage</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">// Import the illogical engine</span>
-<span class="hljs-keyword">import</span> Engine <span class="hljs-keyword">from</span> <span class="hljs-string">'@briza/illogical'</span>;
-
-<span class="hljs-comment">// Create a new instance of the engine</span>
-<span class="hljs-keyword">const</span> strictMode = <span class="hljs-literal">true</span>;
-<span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> Engine(strictMode);</code></pre>
-				<p><strong>Example</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">// Non-strict mode (default)</span>
-engine.statement([<span class="hljs-string">'OR'</span>, [<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]]);
-<span class="hljs-comment">// (5 === 5)</span>
-
-<span class="hljs-comment">// Strict mode</span>
-engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-string">'=='</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]]);
-<span class="hljs-comment">// thrown error - 'invalid logical expression, there must be the operator and at least two operands.'</span></code></pre>
 				<a href="#parser-options" id="parser-options" style="color: inherit; text-decoration: none;">
 					<h3>Parser Options</h3>
 				</a>
@@ -584,13 +570,12 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 <span class="hljs-keyword">import</span> Engine <span class="hljs-keyword">from</span> <span class="hljs-string">'@briza/illogical'</span>;
 
 <span class="hljs-comment">// Create a new instance of the engine</span>
-<span class="hljs-keyword">const</span> strictMode = <span class="hljs-literal">true</span>;
 <span class="hljs-keyword">const</span> opts = {
   <span class="hljs-attr">referencePredicate</span>: <span class="hljs-function">(<span class="hljs-params">operand</span>) =&gt;</span> operand.startsWith(<span class="hljs-string">'$'</span>),
 };
-<span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> Engine(strictMode, opts);</code></pre>
-				<a href="#reference-predicated" id="reference-predicated" style="color: inherit; text-decoration: none;">
-					<h4>Reference Predicated</h4>
+<span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> Engine(opts);</code></pre>
+				<a href="#reference-predicate" id="reference-predicate" style="color: inherit; text-decoration: none;">
+					<h4>Reference Predicate</h4>
 				</a>
 				<p>A function used to determine if the operand is a reference type, otherwise evaluated as a static value.</p>
 				<pre><code class="language-typescript">referencePredicate: <span class="hljs-function">(<span class="hljs-params">operand: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">boolean</span></code></pre>
@@ -629,15 +614,14 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 [OPERATOR_PREFIX, <span class="hljs-string">'PREFIX'</span>]
 [OPERATOR_SUFFIX, <span class="hljs-string">'SUFFIX'</span>]
 [OPERATOR_OVERLAP, <span class="hljs-string">'OVERLAP'</span>]
-
-<span class="hljs-comment">// Predicate</span>
-[OPERATOR_UNDEF, <span class="hljs-string">'UNDEFINED'</span>]
+[OPERATOR_UNDEFINED, <span class="hljs-string">'UNDEFINED'</span>]
 
 <span class="hljs-comment">// Logical</span>
 [OPERATOR_AND, <span class="hljs-string">'AND'</span>]
 [OPERATOR_OR, <span class="hljs-string">'OR'</span>]
 [OPERATOR_NOR, <span class="hljs-string">'NOR'</span>]
-[OPERATOR_XOR, <span class="hljs-string">'XOR'</span>]</code></pre>
+[OPERATOR_XOR, <span class="hljs-string">'XOR'</span>]
+[OPERATOR_NOT, <span class="hljs-string">'NOT'</span>]</code></pre>
 				<blockquote>
 					<p>The operator keys are unique symbols which could be imported from the engine package:</p>
 				</blockquote>
@@ -653,12 +637,23 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
   OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINED,
+  OPERATOR_UNDEFINEDINED,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
   OPERATOR_XOR,
+  OPERATOR_NOT
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@briza/illogical'</span></code></pre>
+				<a href="#breaking-changes" id="breaking-changes" style="color: inherit; text-decoration: none;">
+					<h2>Breaking Changes</h2>
+				</a>
+				<a href="#v120" id="v120" style="color: inherit; text-decoration: none;">
+					<h3>v1.2.0</h3>
+				</a>
+				<ul>
+					<li>Removed <strong>strict</strong> mode from the Engine constructor options.
+					<code>const engine = new Engine(strictMode, opts);</code> -&gt; <code>const engine = new Engine(opts);</code></li>
+				</ul>
 				<hr>
 				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
 					<h2>Contributing</h2>
@@ -732,6 +727,9 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 						<a href="modules/_expression_comparison_suffix_.html">&quot;expression/comparison/suffix&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="modules/_expression_comparison_undefined_.html">&quot;expression/comparison/undefined&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="modules/_expression_logical_and_.html">&quot;expression/logical/and&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -741,16 +739,13 @@ engine.evaluate([<span class="hljs-string">'OR'</span>, [<span class="hljs-strin
 						<a href="modules/_expression_logical_nor_.html">&quot;expression/logical/nor&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="modules/_expression_logical_not_.html">&quot;expression/logical/not&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="modules/_expression_logical_or_.html">&quot;expression/logical/or&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/_expression_logical_xor_.html">&quot;expression/logical/xor&quot;</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_expression_predicate_index_.html">&quot;expression/predicate/index&quot;</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_expression_predicate_undefined_.html">&quot;expression/predicate/undefined&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/_index_.html">&quot;index&quot;</a>

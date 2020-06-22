@@ -117,30 +117,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Engine<span class="tsd-signature-symbol">(</span>strict<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_parser_options_.options.html" class="tsd-signature-type">Options</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_index_.engine.html" class="tsd-signature-type">Engine</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Engine<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_parser_options_.options.html" class="tsd-signature-type">Options</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_index_.engine.html" class="tsd-signature-type">Engine</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/c20d437/src/index.ts#L58">index.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/index.ts#L59">index.ts:59</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> strict: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<div class="lead">
-											<p>In non-strict mode the parser
-												can perform some expression reduction to optimize the
-												expression. The string from than does not have to have
-											the same structure as the raw expression.</p>
-										</div>
-									</div>
-								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_parser_options_.options.html" class="tsd-signature-type">Options</a><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -163,7 +152,7 @@
 					<div class="tsd-signature tsd-kind-icon">parser<span class="tsd-signature-symbol">:</span> <a href="_parser_index_.parser.html" class="tsd-signature-type">Parser</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/c20d437/src/index.ts#L58">index.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/index.ts#L59">index.ts:59</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,13 +163,13 @@
 					<a name="evaluate" class="tsd-anchor"></a>
 					<h3>evaluate</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">evaluate<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a>, ctx<span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">evaluate<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a>, ctx<span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/c20d437/src/index.ts#L78">index.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/index.ts#L75">index.ts:75</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -191,7 +180,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>exp: <a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a></h5>
+									<h5>exp: <a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Raw expression.</p>
 									</div>
@@ -211,13 +200,13 @@
 					<a name="parse" class="tsd-anchor"></a>
 					<h3>parse</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
+						<li class="tsd-signature tsd-kind-icon">parse<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/c20d437/src/index.ts#L96">index.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/index.ts#L93">index.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -228,7 +217,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>exp: <a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a></h5>
+									<h5>exp: <a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Raw expression.</p>
 									</div>
@@ -242,13 +231,13 @@
 					<a name="statement" class="tsd-anchor"></a>
 					<h3>statement</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">statement<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">statement<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/c20d437/src/index.ts#L87">index.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/index.ts#L84">index.ts:84</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -259,7 +248,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>exp: <a href="../modules/_parser_index_.html#comparisonraw" class="tsd-signature-type">ComparisonRaw</a><span class="tsd-signature-symbol"> | </span><a href="../modules/_parser_index_.html#logicalraw" class="tsd-signature-type">LogicalRaw</a></h5>
+									<h5>exp: <a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Raw expression.</p>
 									</div>
