@@ -145,14 +145,16 @@ export class Parser {
 
     /**
      * Simplify the logical expression if possible.
-     * - AND, OR with one operand is collapsed.
+     * - AND, OR with one operand is collapsed, i.e. reduced to inner expression
+     *   as the outer logical expression does not change the outcome, e.g.:
+     *   [AND, [==, 1, 1]] === [==, 1, 1]
      * - Logical expressions without operands are treated as collection.
-     * @param collapsible
      * @param operands
+     * @param collapsible
      */
     const logicalExpressionReducer = (
-      collapsible: boolean,
-      operands: Evaluable[]
+      operands: Evaluable[],
+      collapsible = false
     ): Evaluable | undefined => {
       if (operands.length === 0) {
         return this.getOperand(raw)
@@ -168,23 +170,23 @@ export class Parser {
        */
       case this.opts.operatorMapping.get(OPERATOR_AND):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(true, operands) || new And(operands)
+          logicalExpressionReducer(operands, true) || new And(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(true, operands) || new Or(operands)
+          logicalExpressionReducer(operands, true) || new Or(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(false, operands) || new Nor(operands)
+          logicalExpressionReducer(operands) || new Nor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(false, operands) || new Xor(operands)
+          logicalExpressionReducer(operands) || new Xor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(false, operands) || new Not(...operands)
+          logicalExpressionReducer(operands) || new Not(...operands)
         break
       /**
        * Comparison
