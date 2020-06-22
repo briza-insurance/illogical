@@ -1,18 +1,17 @@
 /**
- * Comparison expression module.
+ * Undefined expression module.
  * @module illogical/expression/comparison
  */
 import { Context, Result, Evaluable } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;
 /**
- * In comparison expression
+ * Undefined comparison expression
  */
-export declare class In extends Comparison {
+export declare class Undefined extends Comparison {
     /**
      * @constructor
-     * @param {Evaluable} left Left operand.
-     * @param {Evaluable} right Right operand.
+     * @param {Evaluable} operand
      */
     constructor(...args: Evaluable[]);
     /**

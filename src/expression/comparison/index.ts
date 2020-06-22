@@ -37,7 +37,7 @@ export abstract class Comparison implements Evaluable {
    * Evaluate in the given context.
    * @param {Context} ctx
    */
-  evaluate (ctx: Context): Result {
+  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
     throw new Error('not implemented exception')
   }
 

@@ -1,7 +1,7 @@
 # illogical
-A micro conditional javascript engine used to parse the raw logical, predicate and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
+A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: June 18, 2020.
+> Revision: June 19, 2020.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -32,6 +32,7 @@ yarn add @briza/illogical -D
   - [Operand Types](#operand-types)
     - [Value](#value)
     - [Reference](#reference)
+    - [Collection](#collection)
   - [Comparison Expressions](#comparison-expressions)
     - [Equal](#equal)
     - [Not Equal](#not-equal)
@@ -44,23 +45,23 @@ yarn add @briza/illogical -D
     - [Prefix](#prefix)
     - [Suffix](#suffix)
     - [Overlap](#overlap)
-  - [Predicate Expressions](#predicate-expressions)
     - [Undefined](#undefined)
   - [Logical Expressions](#logical-expressions)
     - [And](#and)
     - [Or](#or)
     - [Nor](#nor)
     - [Xor](#xor)
+    - [Not](#not)
 - [Engine Options](#engine-options)
-  - [Strict Mode](#strict-mode)
   - [Parser Options](#parser-options)
-    - [Reference Predicated](#reference-predicated)
+    - [Reference Predicate](#reference-predicate)
     - [Reference Transform](#reference-transform)
     - [Operator Mapping](#operator-mapping)
+- [Breaking Changes](#breaking-changes)
+  - [v1.2.0](#v120)
 - [Contributing](#contributing)
   - [Pull Request Process](#pull-request-process)
 - [License](#license)
-
 ---
 
 
@@ -79,9 +80,9 @@ const result = engine.evaluate(['==', 5, 5]);
 > For advanced usage, please [Engine Options](#engine-options).
 
 ### Evaluate
-Evaluate comparison, predicate or logical expression as TRUE or FALSE result:
+Evaluate comparison or logical expression as TRUE or FALSE result:
 
-```engine.evaluate(```[Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Logical Expression](#logical-expressions), [Evaluation Data Context](#evaluation-data-context)```)``` => ```boolean```
+```engine.evaluate(```[Comparison Expression](#comparison-expressions) or [Logical Expression](#logical-expressions), [Evaluation Data Context](#evaluation-data-context)```)``` => ```boolean```
 
 > Data context is optional.
 
@@ -92,8 +93,6 @@ engine.evaluate(['==', 5, 5]);
 engine.evaluate(['==', 'circle', 'circle']);
 engine.evaluate(['==', true, true]);
 engine.evaluate(['==', '$name', 'peter'], {name: 'peter'});
-
-// Predicate expression
 engine.evaluate(['UNDEFINED', '$RefA'], {});
 
 // Logical expression
@@ -117,7 +116,7 @@ engine.evaluate([
 ### Statement
 Get expression string representation:
 
-```engine.statement(```[Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Logical Expression](#logical-expressions)```)```  => ```string```
+```engine.statement(```[Comparison Expression](#comparison-expressions) or [Logical Expression](#logical-expressions)```)```  => ```string```
 
 **Example**
 ```js
@@ -134,8 +133,6 @@ engine.statement(['==', true, true]);
 
 engine.statement(['==', '$name', 'peter'], {name: 'peter'});
 // ({name} == "peter")
-
-/* Predicate expression */
 
 engine.statement(['UNDEFINED', '$RefA']);
 // ({RefA} is UNDEFINED)
@@ -167,7 +164,7 @@ engine.statement([
 ### Parse
 Parse the expression into a evaluable object, i.e. it returns the parsed self-evaluable condition expression.
 
-```engine.parse(```[Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Logical Expression](#logical-expressions)```)```  => ```evaluable```
+```engine.parse(```[Comparison Expression](#comparison-expressions) or [Logical Expression](#logical-expressions)```)```  => ```evaluable```
 
 #### Evaluate Function
 - ```evaluable.evaluate(context)``` please see [Evaluation Data Context](#evaluation-data-context).
@@ -229,7 +226,7 @@ Simple value types: string, number, boolean.
 #### Reference
 The reference operand's value is resolved from the [Evaluation Data Context](#evaluation-data-context), where the the operands name is used as key in the context.
 
-The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. This might be customized via [Reference Predicated Parser Option](#reference-predicated).
+The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. This might be customized via [Reference Predicate Parser Option](#reference-predicate).
 
 **Example**
 
@@ -239,7 +236,7 @@ The reference operand must be prefixed with ```$``` symbol, e.g.: ```$name```. T
 | ```['==', 'circle', '$shape'] ``` | ```{age: 'circle'}``` |
 | ```['==', '$visible', true]``` | ```{visible: true}``` |
 
-#### Collections
+#### Collection
 The operand could be an array mixed from [Value](#value) and [Reference](#reference).
 
 **Example**
@@ -379,8 +376,6 @@ engine.evaluate(['OVERLAP', [1, 2, 6], [1, 2, 3, 4, 5]]); // true
 engine.evaluate(['OVERLAP', ['circle', 'square', 'triangle'], ['square', 'oval']]); // true
 ```
 
-### Predicate Expressions
-
 #### Undefined
 Expression format: ```["UNDEFINED", ```[Reference Operand](#reference)```]```.
 ```json
@@ -398,7 +393,7 @@ engine.evaluate(['UNDEFINED', 'RefA'], { RefA: 10 }); // false
 The logical AND operator (&&) returns the boolean value TRUE if both operands are TRUE and returns FALSE otherwise.
 
 Expression format: ```["AND", Left Operand 1, Right Operand 2, ... , Right Operand N]```.
-> Valid operand types: [Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Nested Logical Expression](#logical-expressions).
+> Valid operand types: [Comparison Expression](#comparison-expressions) or [Nested Logical Expression](#logical-expressions).
 ```json
 [
   "AND",
@@ -414,7 +409,7 @@ engine.evaluate(['AND', ['==', 5, 5], ['==', 10, 10]]); // true
 The logical OR operator (||) returns the boolean value TRUE if either or both operands is TRUE and returns FALSE otherwise. 
 
 Expression format: ```["OR", Left Operand 1, Right Operand 2, ... , Right Operand N]```.
-> Valid operand types: [Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Nested Logical Expression](#logical-expressions).
+> Valid operand types: [Comparison Expression](#comparison-expressions) or [Nested Logical Expression](#logical-expressions).
 ```json
 [
   "OR",
@@ -430,7 +425,7 @@ engine.evaluate(['OR', ['==', 5, 5], ['==', 10, 5]]); // true
 The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. 
 
 Expression format: ```["NOR", Left Operand 1, Right Operand 2, ... , Right Operand N]```
-> Valid operand types: [Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Nested Logical Expression](#logical-expressions).
+> Valid operand types: [Comparison Expression](#comparison-expressions) or [Nested Logical Expression](#logical-expressions).
 ```json
 [
   "NOR",
@@ -446,7 +441,7 @@ engine.evaluate(['NOR', ['==', 5, 1], ['==', 10, 5]]); // true
 The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise. 
 
 Expression format: ```["XOR", Left Operand 1, Right Operand 2, ... , Right Operand N]```
-> Valid operand types: [Comparison Expression](#comparison-expressions), [Predicate Expression](#predicate-expressions) or [Nested Logical Expression](#logical-expressions).
+> Valid operand types: [Comparison Expression](#comparison-expressions) or [Nested Logical Expression](#logical-expressions).
 ```json
 [
   "XOR",
@@ -468,32 +463,22 @@ engine.evaluate(['XOR', ['==', 5, 5], ['==', 10, 5]]); // true
 engine.evaluate(['XOR', ['==', 5, 5], ['==', 10, 10]]); // false
 ```
 
+#### Not
+The logical NOT operator returns the boolean value TRUE if the operand is FALSE, TRUE otherwise. 
+
+Expression format: ```["NOT", Operand]```
+> Valid operand types: [Comparison Expression](#comparison-expressions) or [Nested Logical Expression](#logical-expressions).
+```json
+[
+  "NOT",
+  ["==", 5, 5],
+]
+```
+```js
+engine.evaluate(['NOT', ['==', 5, 5]]); // true
+```
+
 ## Engine Options
-### Strict Mode
-> Default: false
-
-In non-strict mode the parser performs expression reduction where ever possible to optimize the evaluation process. If strict mode, these would cause an error thrown. 
-
-**Usage**
-```js
-// Import the illogical engine
-import Engine from '@briza/illogical';
-
-// Create a new instance of the engine
-const strictMode = true;
-const engine = new Engine(strictMode);
-```
-
-**Example**
-```js
-// Non-strict mode (default)
-engine.statement(['OR', ['==', 5, 5]]);
-// (5 === 5)
-
-// Strict mode
-engine.evaluate(['OR', ['==', 5, 5]]);
-// thrown error - 'invalid logical expression, there must be the operator and at least two operands.'
-```
 
 ### Parser Options
 Below described, are individual options object properties which could be used individually. Any missing options will be substituted with the default options.
@@ -504,14 +489,13 @@ Below described, are individual options object properties which could be used in
 import Engine from '@briza/illogical';
 
 // Create a new instance of the engine
-const strictMode = true;
 const opts = {
   referencePredicate: (operand) => operand.startsWith('$'),
 };
-const engine = new Engine(strictMode, opts);
+const engine = new Engine(opts);
 ```
 
-#### Reference Predicated
+#### Reference Predicate
 A function used to determine if the operand is a reference type, otherwise evaluated as a static value.
 
 ```typescript
@@ -557,15 +541,14 @@ operatorMapping: Map<symbol, string>
 [OPERATOR_PREFIX, 'PREFIX']
 [OPERATOR_SUFFIX, 'SUFFIX']
 [OPERATOR_OVERLAP, 'OVERLAP']
-
-// Predicate
-[OPERATOR_UNDEF, 'UNDEFINED']
+[OPERATOR_UNDEFINED, 'UNDEFINED']
 
 // Logical
 [OPERATOR_AND, 'AND']
 [OPERATOR_OR, 'OR']
 [OPERATOR_NOR, 'NOR']
 [OPERATOR_XOR, 'XOR']
+[OPERATOR_NOT, 'NOT']
 ```
 
 > The operator keys are unique symbols which could be imported from the engine package:
@@ -582,13 +565,20 @@ import {
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
   OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINED,
+  OPERATOR_UNDEFINEDINED,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
   OPERATOR_XOR,
+  OPERATOR_NOT
 } from '@briza/illogical'
-````
+```
+
+## Breaking Changes
+
+### v1.2.0
+* Removed **strict** mode from the Engine constructor options.
+```const engine = new Engine(strictMode, opts);``` -> ```const engine = new Engine(opts);```
 
 ---
 

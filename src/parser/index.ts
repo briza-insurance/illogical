@@ -17,7 +17,6 @@ import { Reference } from '../operand/reference'
 import { Collection } from '../operand/collection'
 
 // Comparison expressions
-import { Comparison } from '../expression/comparison'
 import {
   Equal,
   OPERATOR as OPERATOR_EQ
@@ -62,68 +61,36 @@ import {
   Overlap,
   OPERATOR as OPERATOR_OVERLAP
 } from '../expression/comparison/overlap'
-
-// Predicate expressions
-import { Predicate } from '../expression/predicate'
 import {
   Undefined,
-  OPERATOR as OPERATOR_UNDEF
-} from '../expression/predicate/undefined'
+  OPERATOR as OPERATOR_UNDEFINED
+} from '../expression/comparison/undefined'
 
 // Logical expressions
-import { Logical } from '../expression/logical'
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
+import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
 import { Operand } from '../operand'
 
-// Comparison expression operand
-type operand = string | number | boolean | null | Array<string | number | boolean>
-
-export type ExpressionRaw = ComparisonRaw | PredicateRaw | LogicalRaw
-export type ComparisonRaw = [string, operand, operand]
-export type PredicateRaw = [string, operand]
-export type LogicalRaw = [string, ...Array<ComparisonRaw | PredicateRaw | operand[]>]
-
-/**
- * Void expression
- * Used in the reduction process to eliminate.
- * void redundant expressions.
- */
-export class VoidExpression implements Evaluable {
-  /**
-   * Evaluate in the given context.
-   * @return {boolean}
-   */
-  evaluate (): boolean {
-    return true
-  }
-
-  /**
-   * @return {string}
-   */
-  toString (): string {
-    return ''
-  }
-}
+// Input types
+export type ArrayInput = Array<string | number | boolean | null>
+export type Input = string | number | boolean | null | ArrayInput
+export type ExpressionInput = [string, ...Input[]]
 
 /**
  * Parser of raw expressions into Evaluable expression
  */
 export class Parser {
   private readonly opts: Options
-  private readonly logicalOperator: string[]
+  private readonly expectedOperators: Set<string>
 
   /**
    * @constructor
-   * @param {boolean} strict In non-strict mode the parser
-   * can perform some expression reduction to optimize the
-   * expression. The string from than does not have to have
-   * the same structure as the raw expression.
    * @param {Options?} options Parser options.
    */
-  constructor (private strict: boolean = false, options?: Partial<Options>) {
+  constructor (options?: Partial<Options>) {
     this.opts = { ...defaultOptions }
     // Apply exclusive options overrides
     if (options) {
@@ -134,13 +101,7 @@ export class Parser {
       }
     }
 
-    // Logical operands map
-    this.logicalOperator = [
-      this.opts.operatorMapping.get(OPERATOR_AND) as string,
-      this.opts.operatorMapping.get(OPERATOR_OR) as string,
-      this.opts.operatorMapping.get(OPERATOR_NOR) as string,
-      this.opts.operatorMapping.get(OPERATOR_XOR) as string
-    ]
+    this.expectedOperators = new Set<string>(this.opts.operatorMapping.values())
   }
 
   /**
@@ -153,149 +114,120 @@ export class Parser {
 
   /**
    * Parse raw expression into evaluable expression.
-   * @param {ExpressionRaw} raw Raw expression.
+   * @param {ExpressionInput} raw Raw expression.
    * @return {Evaluable}
    */
-  parse (raw: ExpressionRaw): Evaluable {
-    if (raw === undefined || raw === null ||
-      Array.isArray(raw) === false || raw.length === 0 ||
-      isString(raw[0] as string) === false) {
+  parse (raw: ExpressionInput): Evaluable {
+    if (raw === undefined || raw === null || Array.isArray(raw) === false
+    ) {
       throw new Error('invalid expression')
     }
-    return this.parseRawExp(raw)
+
+    if ((raw as ArrayInput).length === 0 || !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
+    ) {
+      throw new Error('invalid expression')
+    }
+    return this.parseRawExp(raw as Input)
   }
 
   /**
    * Parse raw expression based on the expression type.
-   * @param raw
+   * @param {Input} raw Raw expression.
+   * @return {Evaluable}
    */
-  private parseRawExp (raw: ExpressionRaw): Evaluable {
-    if (this.logicalOperator.includes(raw[0] as string)) {
-      return this.parseLogicalRawExp(raw as LogicalRaw)
-    } else if (raw.length === 2) {
-      return this.parsePredicateRawExp(raw as PredicateRaw)
-    }
-    return this.parseComparisonRawExp(raw as ComparisonRaw)
-  }
-
-  /**
-   * Parse raw logical expression.
-   * @param {LogicalRaw} raw Raw expression.
-   * @return {Logical|Comparison|null}
-   */
-  private parseLogicalRawExp (raw: LogicalRaw): Evaluable {
-    if (raw.length === 0) {
-      if (this.strict) {
-        throw new Error('invalid logical expression')
-      }
-      return new VoidExpression()
-    }
-    if (raw.length === 2) {
-      if (this.strict || raw[1].length === 0) {
-        throw new Error('invalid logical expression, ' +
-          'there must be the operator and at least two operands.')
-      }
-      return this.parseRawExp(raw[1] as ExpressionRaw)
+  private parseRawExp (raw: Input): Evaluable {
+    // Value / Reference
+    if (!Array.isArray(raw)) {
+      return this.getOperand(raw)
     }
 
-    let logical: Logical
-    switch (raw[0]) {
+    let expression: (operands: Evaluable[]) => Evaluable
+    const operator = (raw as ArrayInput)[0] as string
+    const operands = (raw as ArrayInput).slice(1)
+
+    /**
+     * Simplify the logical expression if possible.
+     * @param operands
+     */
+    const logicalExpressionReducer = (operands: Evaluable[]): Evaluable | undefined =>
+      operands.length === 1 ? operands[0] : undefined
+
+    switch (operator) {
+      /**
+       * Logical
+       */
       case this.opts.operatorMapping.get(OPERATOR_AND):
-        logical = new And([])
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(operands) || new And(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
-        logical = new Or([])
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(operands) || new Or(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
-        logical = new Nor([])
+        expression = (operands: Evaluable[]): Evaluable => new Nor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
-        logical = new Xor([])
+        expression = (operands: Evaluable[]): Evaluable => new Xor(operands)
         break
-      default:
-        throw new Error(`invalid logical operator: "${raw[0]}"`)
-    }
-
-    for (const section of raw.filter((_, index) => index > 0)) {
-      logical.add(
-        this.parseRawExp(section as ExpressionRaw) as Comparison | Predicate | Logical
-      )
-    }
-
-    return logical
-  }
-
-  /**
-   * Parse raw predicate expression.
-   * @param {PredicateRaw} raw Raw predicate expression.
-   * @return {Comparison}
-   */
-  private parsePredicateRawExp (raw: PredicateRaw): Predicate {
-    if (raw.length !== 2) {
-      throw new Error(`invalid predicate expression: "${raw}"`)
-    }
-
-    // Get value or reference of the operand
-    const operand = this.getOperand(raw[1])
-
-    // Create the expression based on the operator mapping
-    switch (raw[0]) {
-      case this.opts.operatorMapping.get(OPERATOR_UNDEF):
-        return new Undefined(operand)
-      default:
-        throw new Error(`invalid predicate operator: "${raw[0]}"`)
-    }
-  }
-
-  /**
-   * Parse raw comparison expression.
-   * @param {ComparisonRaw} raw Raw comparison expression.
-   * @return {Comparison}
-   */
-  private parseComparisonRawExp (raw: ComparisonRaw): Comparison {
-    if (raw.length !== 3) {
-      throw new Error(`invalid comparison expression: "${raw}"`)
-    }
-
-    // Get value or reference for left and right side of the expression
-    const left = this.getOperand(raw[1])
-    const right = this.getOperand(raw[2])
-
-    // Create the expression based on the operator mapping
-    switch (raw[0]) {
+      case this.opts.operatorMapping.get(OPERATOR_NOT):
+        expression = (operands: Evaluable[]): Evaluable => new Not(...operands)
+        break
+      /**
+       * Comparison
+       */
       case this.opts.operatorMapping.get(OPERATOR_EQ):
-        return new Equal(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new Equal(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_NE):
-        return new NotEqual(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new NotEqual(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_GT):
-        return new GreaterThan(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new GreaterThan(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_GE):
-        return new GreaterThanOrEqual(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new GreaterThanOrEqual(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_LT):
-        return new LessThan(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new LessThan(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_LE):
-        return new LessThanOrEqual(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new LessThanOrEqual(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_IN):
-        return new In(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new In(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_NOT_IN):
-        return new NotIn(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new NotIn(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_PREFIX):
-        return new Prefix(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new Prefix(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_SUFFIX):
-        return new Suffix(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new Suffix(...operands)
+        break
       case this.opts.operatorMapping.get(OPERATOR_OVERLAP):
-        return new Overlap(left, right)
+        expression = (operands: Evaluable[]): Evaluable => new Overlap(...operands)
+        break
+      case this.opts.operatorMapping.get(OPERATOR_UNDEFINED):
+        expression = (operands: Evaluable[]): Evaluable => new Undefined(...operands)
+        break
+      // Collection
       default:
-        throw new Error(`invalid comparison operator: "${raw[0]}"`)
+        return this.getOperand(raw)
     }
+
+    return expression(operands.map((operand) => {
+      return this.parseRawExp(operand)
+    }))
   }
 
   /**
    * Get resolved operand
    * @param raw Raw data
    */
-  private getOperand (raw: operand): Operand {
-    const resolve = (raw: operand): Value | Reference =>
+  private getOperand (raw: Input): Operand {
+    const resolve = (raw: Input): Value | Reference =>
       this.opts.referencePredicate(raw as string)
         ? new Reference(this.opts.referenceTransform(raw as string))
         : new Value(raw)

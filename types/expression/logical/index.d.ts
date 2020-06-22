@@ -3,29 +3,18 @@
  * @module illogical/expression/logical
  */
 import { Context, Result, Evaluable } from '../../common/evaluable';
-import { Comparison } from '../comparison';
-import { Predicate } from '../predicate';
-/**
- * Operand collection
- */
-export declare type Operand = Comparison | Predicate | Logical;
 /**
  * Abstract logical expression
  */
 export declare abstract class Logical implements Evaluable {
     protected operator: string;
-    protected operands: Operand[];
+    protected operands: Evaluable[];
     /**
      * @constructor
      * @param {string} operator String representation of the operator.
-     * @param {Operand[]} operands Collection of operands.
+     * @param {Evaluable[]} operands Collection of operands.
      */
-    constructor(operator: string, operands: Operand[]);
-    /**
-     * Add new operand
-     * @param {Operand} addon
-     */
-    add(addon: Operand): void;
+    constructor(operator: string, operands: Evaluable[]);
     /**
      * Evaluate in the given context.
      * @param {Context} ctx

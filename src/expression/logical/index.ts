@@ -9,44 +9,28 @@ import {
   Evaluable
 } from '../../common/evaluable'
 
-import { Comparison } from '../comparison'
-import { Predicate } from '../predicate'
-
-/**
- * Operand collection
- */
-export type Operand = Comparison | Predicate | Logical
-
 /**
  * Abstract logical expression
  */
 export abstract class Logical implements Evaluable {
   protected operator: string
-  protected operands: Operand[]
+  protected operands: Evaluable[]
 
   /**
    * @constructor
    * @param {string} operator String representation of the operator.
-   * @param {Operand[]} operands Collection of operands.
+   * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operator: string, operands: Operand[]) {
+  constructor (operator: string, operands: Evaluable[]) {
     this.operator = operator
     this.operands = operands
-  }
-
-  /**
-   * Add new operand
-   * @param {Operand} addon
-   */
-  add (addon: Operand): void {
-    this.operands.push(addon)
   }
 
   /**
    * Evaluate in the given context.
    * @param {Context} ctx
    */
-  evaluate (ctx: Context): Result {
+  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
     throw new Error('not implemented exception')
   }
 

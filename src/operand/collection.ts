@@ -35,6 +35,7 @@ export class Collection implements Operand {
    * @return {boolean}
    */
   evaluate (ctx: Context): Result {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.items.map((item) => item.evaluate(ctx)) as Array<any>
   }
 

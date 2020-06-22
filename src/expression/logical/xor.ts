@@ -5,13 +5,11 @@
 
 import {
   Context,
-  Result
+  Result,
+  Evaluable
 } from '../../common/evaluable'
 
-import {
-  Logical,
-  Operand
-} from '../logical'
+import { Logical } from '../logical'
 
 // Operator key
 export const OPERATOR = Symbol('XOR')
@@ -32,9 +30,12 @@ function xor (a: boolean, b: boolean): boolean {
 export class Xor extends Logical {
   /**
    * @constructor
-   * @param {Operand[]} operands Collection of operands.
+   * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operands: Operand[]) {
+  constructor (operands: Evaluable[]) {
+    if (operands.length < 2) {
+      throw new Error('logical expression must have at least two operands')
+    }
     super('XOR', operands)
   }
 
@@ -44,9 +45,6 @@ export class Xor extends Logical {
    * @return {Result}
    */
   evaluate (ctx: Context): Result {
-    if (this.operands.length === 0) {
-      throw new Error('logical expression must have at least one operand')
-    }
     let res = null
     for (const operand of this.operands) {
       if (res === null) {

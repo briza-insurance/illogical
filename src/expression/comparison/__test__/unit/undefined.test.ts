@@ -1,9 +1,9 @@
 import { Value } from '../../../../operand/value'
 import { Reference } from '../../../../operand/reference'
-import { Undefined } from '../../../predicate/undefined'
+import { Undefined } from '../../undefined'
 import { Collection } from '../../../../operand/collection'
 
-describe('Condition Engine - Expression - Predicate - Undefined', () => {
+describe('Condition Engine - Expression - Comparison - Undefined', () => {
   describe('constructor', () => {
     // @ts-ignore
     expect(() => new Undefined())

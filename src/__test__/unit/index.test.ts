@@ -13,10 +13,12 @@ import { OPERATOR as OPERATOR_AND } from '../../expression/logical/and'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor'
+import { ExpressionInput } from '../../parser'
 
 
 describe('Condition Engine', () => {
   const engine = new Engine()
+
   test('evaluate', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -36,13 +38,14 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.evaluate(exception.expression))
         .toThrowError()
     }
   })
+
   test('statement', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -62,13 +65,14 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.statement(exception.expression))
         .toThrowError()
     }
   })
+
   test('parse', () => {
     const exceptions = [
       { expression: [OPERATOR_EQ]},
@@ -88,11 +92,170 @@ describe('Condition Engine', () => {
       { expression: [OPERATOR_NOR]},
       { expression: [OPERATOR_XOR]},
     ]
-  
+
     for (const exception of exceptions) {
       // @ts-ignore
       expect(() => engine.parse(exception.expression))
         .toThrowError()
+    }
+  })
+
+  describe('successful evaluate', () => {
+    const testCases = [{
+      name: 'OVERLAP',
+      condition: [
+        'OVERLAP',
+        [
+          '$State1',
+          '$State2',
+          '$State3',
+          '$State4'
+        ],
+        [
+          'TX',
+          'CA'
+        ]
+      ],
+      inputs: [{
+        data: {
+          State1: 'TX'
+        },
+        expected: true
+      }, {
+        data: {
+          State1: 'AL'
+        },
+        expected: false
+      }, {
+        data: {
+          State1: 'TX',
+          State2: 'AL',
+          State3: 'CA',
+          State4: 'CO'
+        },
+        expected: true
+      }, {
+        data: {
+          State1: 'MI',
+          State2: 'RI',
+          State3: 'NY',
+          State4: 'NY'
+        },
+        expected: false
+      }]
+    }, {
+      name: 'UNDEFINED',
+      condition: [
+        'UNDEFINED',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: undefined
+        },
+        expected: true
+      }, {
+        data: {
+          Name: 'David'
+        },
+        expected: false
+      }, {
+        data: {
+          Name: null
+        },
+        expected: false
+      }]
+    }, {
+      name: 'NOT UNDEFINED',
+      condition: [
+        'NOT',
+        [
+          'UNDEFINED',
+          '$Name'
+        ]
+      ],
+      inputs: [{
+        data: {
+          Name: undefined
+        },
+        expected: false
+      }, {
+        data: {
+          Name: 'David'
+        },
+        expected: true
+      }, {
+        data: {
+          Name: null
+        },
+        expected: true
+      }]
+    },{
+      name: 'NOT OVERLAP',
+      condition: [
+        "NOT",
+        [
+          "OVERLAP",
+          [
+            "$region1",
+            "$region2"
+          ],
+          [
+            "FL",
+            "LA",
+            "NY",
+            "RI",
+            "TX"
+          ]
+        ]
+      ],
+      inputs: [
+        {
+          data: {
+            region1: 'FL',
+            region2: 'MI'
+          },
+          expected: false
+        },
+        {
+          data: {
+            region1: 'AL',
+            region2: 'MI'
+          },
+          expected: true
+        }
+      ]
+    }]
+
+    for (const testCase of testCases) {
+      test(testCase.name, () => {
+        for (const input of testCase.inputs) {
+          expect(engine.evaluate(testCase.condition as ExpressionInput, input.data)).toEqual(input.expected)
+        }
+      })
+    }
+  })
+
+  describe('failure evaluate', () => {
+    const testCases = [{
+      name: 'NOT',
+      condition: [
+        'NOT',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: 0
+        }
+      }]
+    }]
+
+    for (const testCase of testCases) {
+      test(testCase.name, () => {
+        for (const input of testCase.inputs) {
+          expect(() => engine.evaluate(testCase.condition as ExpressionInput, input.data)).toThrow()
+        }
+      })
     }
   })
 })

@@ -19,4 +19,9 @@ module.exports = {
     'standard',
     'plugin:@typescript-eslint/recommended'
   ],
+  rules: {
+    "no-dupe-class-members": "off",
+    "no-useless-constructor": "off",
+    "@typescript-eslint/no-useless-constructor": "off"
+  }
 };

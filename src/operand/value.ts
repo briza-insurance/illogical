@@ -48,7 +48,7 @@ export class Value implements Operand {
    * @param {Context} ctx
    * @return {boolean}
    */
-  evaluate (ctx: Context): Result {
+  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
     return this.value
   }
 

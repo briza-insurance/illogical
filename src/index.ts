@@ -5,8 +5,7 @@
 
 import {
   Parser,
-  ComparisonRaw,
-  LogicalRaw
+  ExpressionInput
 } from './parser'
 import { Options } from './parser/options'
 import {
@@ -26,11 +25,12 @@ import { OPERATOR as OPERATOR_NOT_IN } from './expression/comparison/not-in'
 import { OPERATOR as OPERATOR_PREFIX } from './expression/comparison/prefix'
 import { OPERATOR as OPERATOR_SUFFIX } from './expression/comparison/suffix'
 import { OPERATOR as OPERATOR_OVERLAP } from './expression/comparison/overlap'
-import { OPERATOR as OPERATOR_UNDEFINED } from './expression/predicate/undefined'
+import { OPERATOR as OPERATOR_UNDEFINED } from './expression/comparison/undefined'
 import { OPERATOR as OPERATOR_AND } from './expression/logical/and'
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor'
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
+import { OPERATOR as OPERATOR_NOT } from './expression/logical/not'
 
 export {
   OPERATOR_EQ,
@@ -48,7 +48,8 @@ export {
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,
-  OPERATOR_XOR
+  OPERATOR_XOR,
+  OPERATOR_NOT
 }
 
 /**
@@ -59,41 +60,37 @@ class Engine {
 
   /**
    * @constructor
-   * @param {boolean} strict In non-strict mode the parser
-   * can perform some expression reduction to optimize the
-   * expression. The string from than does not have to have
-   * the same structure as the raw expression.
    * @param {Options?} options Parser options.
    */
-  constructor (strict = false, options?: Partial<Options>) {
-    this.parser = new Parser(strict, options)
+  constructor (options?: Partial<Options>) {
+    this.parser = new Parser(options)
   }
 
   /**
    * Evaluate the expression.
-   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+   * @param {ExpressionInput} exp Raw expression.
    * @param {Context} ctx Evaluation data context.
    * @return {boolean}
    */
-  evaluate (exp: ComparisonRaw | LogicalRaw, ctx: Context): boolean {
+  evaluate (exp: ExpressionInput, ctx: Context): boolean {
     return this.parse(exp).evaluate(ctx) as boolean
   }
 
   /**
    * Get expression statement
-   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+   * @param {ExpressionInput} exp Raw expression.
    * @return {string}
    */
-  statement (exp: ComparisonRaw | LogicalRaw): string {
+  statement (exp: ExpressionInput): string {
     return this.parse(exp).toString()
   }
 
   /**
    * Parse expression.
-   * @param {ComparisonRaw | LogicalRaw} exp Raw expression.
+   * @param {ExpressionInput} exp Raw expression.
    * @return {Evaluable}
    */
-  parse (exp: ComparisonRaw | LogicalRaw): Evaluable {
+  parse (exp: ExpressionInput): Evaluable {
     return this.parser.parse(exp)
   }
 }
