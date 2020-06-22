@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.2.1
+* Allow zero argument logical expressions not be treated as collection.
+
 ## 1.2.0
 * Simplification of the codebase.
 * Add Not logical expression.

@@ -262,6 +262,20 @@ describe('Condition Engine - Parser', () => {
           ]),
           new Equal(new Value(15), new Value(15))
         ])
+      },
+      // Zero argument logical expression treated as collection
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          "OR",
+          [
+            defaultOptions.operatorMapping.get(OPERATOR_OR)
+          ]
+        ],
+        expected: new In(
+          new Value('OR'),
+          new Collection([new Value(defaultOptions.operatorMapping.get(OPERATOR_OR))])
+        )
       }
     ]
 
@@ -282,7 +296,7 @@ describe('Condition Engine - Parser', () => {
 
     for (const exception of exceptions) {
       // @ts-ignore
-      expect(() => parserStrict.parse(exception.rawExpression))
+      expect(() => parserStrict.parseLogicalRawExp(exception.rawExpression))
         .toThrowError()
     }
   })

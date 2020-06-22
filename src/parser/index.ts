@@ -145,10 +145,22 @@ export class Parser {
 
     /**
      * Simplify the logical expression if possible.
+     * - AND, OR with one operand is collapsed.
+     * - Logical expressions without operands are treated as collection.
+     * @param collapsible
      * @param operands
      */
-    const logicalExpressionReducer = (operands: Evaluable[]): Evaluable | undefined =>
-      operands.length === 1 ? operands[0] : undefined
+    const logicalExpressionReducer = (
+      collapsible: boolean,
+      operands: Evaluable[]
+    ): Evaluable | undefined => {
+      if (operands.length === 0) {
+        return this.getOperand(raw)
+      }
+      return collapsible && operands.length === 1
+        ? operands[0]
+        : undefined
+    }
 
     switch (operator) {
       /**
@@ -156,20 +168,23 @@ export class Parser {
        */
       case this.opts.operatorMapping.get(OPERATOR_AND):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new And(operands)
+          logicalExpressionReducer(true, operands) || new And(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Or(operands)
+          logicalExpressionReducer(true, operands) || new Or(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
-        expression = (operands: Evaluable[]): Evaluable => new Nor(operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(false, operands) || new Nor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
-        expression = (operands: Evaluable[]): Evaluable => new Xor(operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(false, operands) || new Xor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
-        expression = (operands: Evaluable[]): Evaluable => new Not(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(false, operands) || new Not(...operands)
         break
       /**
        * Comparison
