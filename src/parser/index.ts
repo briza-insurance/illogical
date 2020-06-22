@@ -7,7 +7,7 @@
 import { Options, defaultOptions, optionValue } from './options'
 
 // Base
-import { Evaluable } from '../common/evaluable'
+import { Evaluable, EvaluableType } from '../common/evaluable'
 
 // Operand
 import { Value } from '../operand/value'
@@ -149,6 +149,8 @@ export class Parser {
      *   as the outer logical expression does not change the outcome, e.g.:
      *   [AND, [==, 1, 1]] === [==, 1, 1]
      * - Logical expressions without operands are treated as collection.
+     * - Logical expressions with all operands of non array type are treated as
+     *   collection, as logical expressions expect inner expressions - array.
      * @param operands
      * @param collapsible
      */
@@ -156,7 +158,9 @@ export class Parser {
       operands: Evaluable[],
       collapsible = false
     ): Evaluable | undefined => {
-      if (operands.length === 0) {
+      if (operands.length === 0 ||
+        operands.filter((operand) => operand.type === EvaluableType.Expression).length === 0
+      ) {
         return this.getOperand(raw)
       }
       return collapsible && operands.length === 1

@@ -6,13 +6,15 @@
 import {
   Context,
   Result,
-  Evaluable
+  Evaluable,
+  EvaluableType
 } from '../../common/evaluable'
 
 /**
  * Abstract logical expression
  */
 export abstract class Logical implements Evaluable {
+  type: EvaluableType = EvaluableType.Expression
   protected operator: string
   protected operands: Evaluable[]
 

@@ -23,10 +23,17 @@ export type Result =
   boolean |
   Array<string | number | boolean | null>
 
+export enum EvaluableType {
+  Operand = 'Operand',
+  Expression = 'Expression'
+}
+
 /**
  * Evaluable
  */
 export interface Evaluable {
+  type: EvaluableType;
+
   /**
    * Evaluate in the given context.
    * @param {Context} ctx

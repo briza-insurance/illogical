@@ -6,7 +6,8 @@
 import {
   Context,
   Result,
-  Evaluable
+  Evaluable,
+  EvaluableType
 } from '../../common/evaluable'
 
 import {
@@ -17,6 +18,7 @@ import {
  * Abstract comparison expression
  */
 export abstract class Comparison implements Evaluable {
+  type: EvaluableType = EvaluableType.Expression
   protected operator: string
   protected left: Operand
   protected right: Operand

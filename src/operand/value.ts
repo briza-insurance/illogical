@@ -29,7 +29,7 @@ function printValue (value: Result): string {
 /**
  * Static value operand
  */
-export class Value implements Operand {
+export class Value extends Operand {
   private readonly value: Result
 
   /**
@@ -40,6 +40,7 @@ export class Value implements Operand {
     if (Array.isArray(value)) {
       throw new Error('deprecated direct usage of array, please use Collection operand')
     }
+    super()
     this.value = value
   }
 

@@ -18,7 +18,7 @@ import { Reference } from './reference'
 /**
  * Collection operand resolved containing mixture of value and references.
  */
-export class Collection implements Operand {
+export class Collection extends Operand {
   private readonly items: Array<Value | Reference>
 
   /**
@@ -26,6 +26,7 @@ export class Collection implements Operand {
    * @param {Operand[]} items Collection of operands.
    */
   constructor (items: Array<Value | Reference>) {
+    super()
     this.items = items
   }
 
