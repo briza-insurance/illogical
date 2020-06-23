@@ -294,6 +294,25 @@ describe('Condition Engine - Parser', () => {
           ])
         )
       },
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          defaultOptions.operatorMapping.get(OPERATOR_OR),
+          [
+            defaultOptions.operatorMapping.get(OPERATOR_OR),
+            'AK',
+            'MN'
+          ]
+        ],
+        expected: new In(
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Collection([
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value('AK'),
+            new Value('MN')
+          ])
+        )
+      },
       // Not treated as raw array
       {
         rawExpression: [
