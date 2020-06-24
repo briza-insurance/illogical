@@ -262,6 +262,67 @@ describe('Condition Engine - Parser', () => {
           ]),
           new Equal(new Value(15), new Value(15))
         ])
+      },
+      // Zero argument logical expression treated as collection
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          defaultOptions.operatorMapping.get(OPERATOR_OR),
+          [
+            defaultOptions.operatorMapping.get(OPERATOR_OR)
+          ]
+        ],
+        expected: new In(
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Collection([new Value(defaultOptions.operatorMapping.get(OPERATOR_OR))])
+        )
+      },
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          defaultOptions.operatorMapping.get(OPERATOR_OR),
+          [
+            defaultOptions.operatorMapping.get(OPERATOR_OR),
+            defaultOptions.operatorMapping.get(OPERATOR_AND)
+          ]
+        ],
+        expected: new In(
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Collection([
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_AND))
+          ])
+        )
+      },
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          defaultOptions.operatorMapping.get(OPERATOR_OR),
+          [
+            defaultOptions.operatorMapping.get(OPERATOR_OR),
+            'AK',
+            'MN'
+          ]
+        ],
+        expected: new In(
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Collection([
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value('AK'),
+            new Value('MN')
+          ])
+        )
+      },
+      // Not treated as raw array
+      {
+        rawExpression: [
+          defaultOptions.operatorMapping.get(OPERATOR_NOT),
+          5
+        ],
+        expected: new Collection([
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_NOT)),
+          new Value(5)
+        ])
       }
     ]
 
@@ -278,11 +339,13 @@ describe('Condition Engine - Parser', () => {
       { rawExpression: ['__', ['==', 5, 5]] },
       // Invalid operator
       { rawExpression: ['__', ['==', 5, 5], ['==', 5, 5]] },
+      // Invalid logical inner expression
+      { rawExpression: ['IN', 'OR', ['OR', 'AND', [5, 5]]] },
     ]
 
     for (const exception of exceptions) {
       // @ts-ignore
-      expect(() => parserStrict.parse(exception.rawExpression))
+      expect(() => parserStrict.parseLogicalRawExp(exception.rawExpression))
         .toThrowError()
     }
   })

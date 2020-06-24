@@ -7,7 +7,7 @@
 import { Options, defaultOptions, optionValue } from './options'
 
 // Base
-import { Evaluable } from '../common/evaluable'
+import { Evaluable, EvaluableType } from '../common/evaluable'
 
 // Operand
 import { Value } from '../operand/value'
@@ -145,10 +145,28 @@ export class Parser {
 
     /**
      * Simplify the logical expression if possible.
+     * - AND, OR with one operand is collapsed, i.e. reduced to inner expression
+     *   as the outer logical expression does not change the outcome, e.g.:
+     *   [AND, [==, 1, 1]] === [==, 1, 1]
+     * - Logical expressions without operands are treated as collection.
+     * - Logical expressions with all operands of non array type are treated as
+     *   collection, as logical expressions expect inner expressions - array.
      * @param operands
+     * @param collapsible
      */
-    const logicalExpressionReducer = (operands: Evaluable[]): Evaluable | undefined =>
-      operands.length === 1 ? operands[0] : undefined
+    const logicalExpressionReducer = (
+      operands: Evaluable[],
+      collapsible = false
+    ): Evaluable | undefined => {
+      if (operands.length === 0 ||
+        operands.filter((operand) => operand.type === EvaluableType.Expression).length === 0
+      ) {
+        return this.getOperand(raw)
+      }
+      return collapsible && operands.length === 1
+        ? operands[0]
+        : undefined
+    }
 
     switch (operator) {
       /**
@@ -156,20 +174,23 @@ export class Parser {
        */
       case this.opts.operatorMapping.get(OPERATOR_AND):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new And(operands)
+          logicalExpressionReducer(operands, true) || new And(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Or(operands)
+          logicalExpressionReducer(operands, true) || new Or(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
-        expression = (operands: Evaluable[]): Evaluable => new Nor(operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(operands) || new Nor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
-        expression = (operands: Evaluable[]): Evaluable => new Xor(operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(operands) || new Xor(operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
-        expression = (operands: Evaluable[]): Evaluable => new Not(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          logicalExpressionReducer(operands) || new Not(...operands)
         break
       /**
        * Comparison

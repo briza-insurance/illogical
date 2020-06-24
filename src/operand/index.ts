@@ -6,18 +6,21 @@
 import {
   Evaluable,
   Context,
-  Result
+  Result,
+  EvaluableType
 } from '../common/evaluable'
 
 /**
  * Abstract operand
  */
 export abstract class Operand implements Evaluable {
+  type: EvaluableType = EvaluableType.Operand
+
   /**
    * Evaluate in the given context.
    * @param {Context} ctx
    */
-  evaluate (ctx: Context): Result {
+  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
     throw new Error('not implemented exception')
   }
 

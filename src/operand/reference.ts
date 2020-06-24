@@ -54,7 +54,7 @@ function contextValueLookup (ctx: Context, key: string): Result {
 /**
  * Reference operand resolved within the context
  */
-export class Reference implements Operand {
+export class Reference extends Operand {
   private readonly key: string
 
   /**
@@ -65,6 +65,7 @@ export class Reference implements Operand {
     if (key.trim() === '') {
       throw new Error('invalid reference key')
     }
+    super()
     this.key = key
   }
 
