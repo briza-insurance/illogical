@@ -7,7 +7,7 @@ import { Operand } from '.';
 /**
  * Reference operand resolved within the context
  */
-export declare class Reference implements Operand {
+export declare class Reference extends Operand {
     private readonly key;
     /**
      * @constructor

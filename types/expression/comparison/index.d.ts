@@ -2,12 +2,13 @@
  * Comparison expression module.
  * @module illogical/expression/comparison
  */
-import { Context, Result, Evaluable } from '../../common/evaluable';
+import { Context, Result, Evaluable, EvaluableType } from '../../common/evaluable';
 import { Operand } from '../../operand';
 /**
  * Abstract comparison expression
  */
 export declare abstract class Comparison implements Evaluable {
+    type: EvaluableType;
     protected operator: string;
     protected left: Operand;
     protected right: Operand;

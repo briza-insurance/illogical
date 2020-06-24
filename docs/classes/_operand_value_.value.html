@@ -80,14 +80,19 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Value</span>
+						<a href="_operand_index_.operand.html" class="tsd-signature-type">Operand</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">Value</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="_operand_index_.operand.html" class="tsd-signature-type">Operand</a></li>
+					<li><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -100,17 +105,18 @@
 								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_operand_value_.value.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_operand_value_.value.html#type" class="tsd-kind-icon">type</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_operand_value_.value.html#value" class="tsd-kind-icon">value</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 							</ul>
 						</section>
 					</div>
@@ -128,7 +134,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/operand/value.ts#L33">operand/value.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/operand/value.ts#L33">operand/value.ts:33</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -149,32 +155,46 @@
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_common_evaluable_.evaluabletype.html" class="tsd-signature-type">EvaluableType</a><span class="tsd-signature-symbol"> = EvaluableType.Operand</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#type">type</a></p>
+						<p>Inherited from <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#type">type</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/operand/index.ts#L17">operand/index.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="value" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> value</h3>
 					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/operand/value.ts#L33">operand/value.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/operand/value.ts#L33">operand/value.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 					<a name="evaluate" class="tsd-anchor"></a>
 					<h3>evaluate</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 						<li class="tsd-signature tsd-kind-icon">evaluate<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#evaluate">evaluate</a></p>
+								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#evaluate">evaluate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/operand/value.ts#L51">operand/value.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/operand/value.ts#L52">operand/value.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -192,17 +212,19 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 					<a name="tostring" class="tsd-anchor"></a>
 					<h3>to<wbr>String</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 						<li class="tsd-signature tsd-kind-icon">to<wbr>String<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#tostring">toString</a></p>
+								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#tostring">toString</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/operand/value.ts#L59">operand/value.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/operand/value.ts#L60">operand/value.ts:60</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -237,13 +259,16 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="_operand_value_.value.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_operand_value_.value.html#type" class="tsd-kind-icon">type</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_operand_value_.value.html#value" class="tsd-kind-icon">value</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
 							</li>
 						</ul>
@@ -274,7 +299,13 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>

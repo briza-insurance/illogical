@@ -7,7 +7,7 @@ import { Operand } from '.';
 /**
  * Static value operand
  */
-export declare class Value implements Operand {
+export declare class Value extends Operand {
     private readonly value;
     /**
      * @constructor

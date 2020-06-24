@@ -88,6 +88,7 @@
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
 					<li><a href="../classes/_expression_logical_and_.and.html" class="tsd-signature-type">And</a></li>
+					<li><a href="../classes/_operand_collection_.collection.html" class="tsd-signature-type">Collection</a></li>
 					<li><a href="../classes/_expression_comparison_index_.comparison.html" class="tsd-signature-type">Comparison</a></li>
 					<li><a href="../classes/_expression_comparison_eq_.equal.html" class="tsd-signature-type">Equal</a></li>
 					<li><a href="../classes/_expression_comparison_gt_.greaterthan.html" class="tsd-signature-type">GreaterThan</a></li>
@@ -104,8 +105,10 @@
 					<li><a href="../classes/_expression_logical_or_.or.html" class="tsd-signature-type">Or</a></li>
 					<li><a href="../classes/_expression_comparison_overlap_.overlap.html" class="tsd-signature-type">Overlap</a></li>
 					<li><a href="../classes/_expression_comparison_prefix_.prefix.html" class="tsd-signature-type">Prefix</a></li>
+					<li><a href="../classes/_operand_reference_.reference.html" class="tsd-signature-type">Reference</a></li>
 					<li><a href="../classes/_expression_comparison_suffix_.suffix.html" class="tsd-signature-type">Suffix</a></li>
 					<li><a href="../classes/_expression_comparison_undefined_.undefined.html" class="tsd-signature-type">Undefined</a></li>
+					<li><a href="../classes/_operand_value_.value.html" class="tsd-signature-type">Value</a></li>
 					<li><a href="../classes/_expression_logical_xor_.xor.html" class="tsd-signature-type">Xor</a></li>
 				</ul>
 			</section>
@@ -114,6 +117,12 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#type" class="tsd-kind-icon">type</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
@@ -121,6 +130,19 @@
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_common_evaluable_.evaluabletype.html" class="tsd-signature-type">EvaluableType</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/common/evaluable.ts#L35">common/evaluable.ts:35</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -135,7 +157,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/common/evaluable.ts#L35">common/evaluable.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/common/evaluable.ts#L42">common/evaluable.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -163,7 +185,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/094e806/src/common/evaluable.ts#L40">common/evaluable.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/b51222e/src/common/evaluable.ts#L47">common/evaluable.ts:47</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -190,6 +212,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_common_evaluable_.evaluabletype.html" class="tsd-kind-icon">Evaluable<wbr>Type</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_common_evaluable_.context.html" class="tsd-kind-icon">Context</a>
 					</li>
@@ -198,6 +223,9 @@
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="_common_evaluable_.evaluable.html" class="tsd-kind-icon">Evaluable</a>
 						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_common_evaluable_.evaluable.html#type" class="tsd-kind-icon">type</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_common_evaluable_.evaluable.html#evaluate" class="tsd-kind-icon">evaluate</a>
 							</li>
@@ -228,7 +256,11 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

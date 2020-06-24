@@ -2,11 +2,12 @@
  * Logical expression module.
  * @module illogical/expression/logical
  */
-import { Context, Result, Evaluable } from '../../common/evaluable';
+import { Context, Result, Evaluable, EvaluableType } from '../../common/evaluable';
 /**
  * Abstract logical expression
  */
 export declare abstract class Logical implements Evaluable {
+    type: EvaluableType;
     protected operator: string;
     protected operands: Evaluable[];
     /**

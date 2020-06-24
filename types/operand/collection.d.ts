@@ -9,7 +9,7 @@ import { Reference } from './reference';
 /**
  * Collection operand resolved containing mixture of value and references.
  */
-export declare class Collection implements Operand {
+export declare class Collection extends Operand {
     private readonly items;
     /**
      * @constructor
