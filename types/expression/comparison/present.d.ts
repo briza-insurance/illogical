@@ -1,18 +1,17 @@
 /**
- * Comparison expression module.
+ * Present expression module.
  * @module illogical/expression/comparison
  */
-import { Context, Result, Evaluable } from '../../common/evaluable';
-import { Comparison } from '../comparison';
+import { Comparison } from './index';
+import { Context, Evaluable, Result } from '../../common/evaluable';
 export declare const OPERATOR: unique symbol;
 /**
- * Overlap comparison expression
+ * Present comparison expression
  */
-export declare class Overlap extends Comparison {
+export declare class Present extends Comparison {
     /**
      * @constructor
-     * @param {Evaluable} left Left operand.
-     * @param {Evaluable} right Right operand.
+     * @param {Evaluable} operand
      */
     constructor(...args: Evaluable[]);
     /**
