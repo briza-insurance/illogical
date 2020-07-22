@@ -389,7 +389,7 @@ engine.evaluate(['UNDEFINED', 'RefA'], { RefA: 10 }); // false
 ```
 
 #### Present
-Returns FALSE when the operand is UNDEFINED or NULL.
+Evaluates as FALSE when the operand is UNDEFINED or NULL.
 
 Expression format: ```["PRESENT", ```[Reference Operand](#reference)```]```.
 ```json
