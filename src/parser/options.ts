@@ -18,6 +18,7 @@ import { OPERATOR as OPERATOR_PREFIX } from '../expression/comparison/prefix'
 import { OPERATOR as OPERATOR_SUFFIX } from '../expression/comparison/suffix'
 import { OPERATOR as OPERATOR_OVERLAP } from '../expression/comparison/overlap'
 import { OPERATOR as OPERATOR_UNDEFINED } from '../expression/comparison/undefined'
+import { OPERATOR as OPERATOR_PRESENT } from '../expression/comparison/present'
 
 // Logical expressions
 import { OPERATOR as OPERATOR_AND } from '../expression/logical/and'
@@ -99,6 +100,7 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   [OPERATOR_SUFFIX, 'SUFFIX'],
   [OPERATOR_OVERLAP, 'OVERLAP'],
   [OPERATOR_UNDEFINED, 'UNDEFINED'],
+  [OPERATOR_PRESENT, 'PRESENT'],
   // Logical
   [OPERATOR_AND, 'AND'],
   [OPERATOR_OR, 'OR'],

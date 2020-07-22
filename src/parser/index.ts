@@ -63,6 +63,10 @@ import {
   Undefined,
   OPERATOR as OPERATOR_UNDEFINED
 } from '../expression/comparison/undefined'
+import {
+  Present,
+  OPERATOR as OPERATOR_PRESENT
+} from '../expression/comparison/present'
 
 // Logical expressions
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
@@ -230,6 +234,9 @@ export class Parser {
         break
       case this.opts.operatorMapping.get(OPERATOR_UNDEFINED):
         expression = (operands: Evaluable[]): Evaluable => new Undefined(...operands)
+        break
+      case this.opts.operatorMapping.get(OPERATOR_PRESENT):
+        expression = (operands: Evaluable[]): Evaluable => new Present(...operands)
         break
       // Collection
       default:

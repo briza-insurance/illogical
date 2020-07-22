@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: June 22, 2020.
+> Revision: July 22, 2020.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -46,6 +46,7 @@ yarn add @briza/illogical -D
     - [Suffix](#suffix)
     - [Overlap](#overlap)
     - [Undefined](#undefined)
+    - [Present](#present)
   - [Logical Expressions](#logical-expressions)
     - [And](#and)
     - [Or](#or)
@@ -387,6 +388,22 @@ engine.evaluate(['UNDEFINED', 'RefA'], { RefA: undefined }); // true
 engine.evaluate(['UNDEFINED', 'RefA'], { RefA: 10 }); // false
 ```
 
+#### Present
+Evaluates as FALSE when the operand is UNDEFINED or NULL.
+
+Expression format: ```["PRESENT", ```[Reference Operand](#reference)```]```.
+```json
+["PRESENT", "$RefA"]
+```
+```js
+engine.evaluate(['PRESENT', 'RefA'], {}); // false
+engine.evaluate(['PRESENT', 'RefA'], { RefA: undefined }); // false
+engine.evaluate(['PRESENT', 'RefA'], { RefA: null }); // false
+engine.evaluate(['PRESENT', 'RefA'], { RefA: 10 }); // true
+engine.evaluate(['PRESENT', 'RefA'], { RefA: false }); // true
+engine.evaluate(['PRESENT', 'RefA'], { RefA: 0 }); // true
+```
+
 ### Logical Expressions
 
 #### And
@@ -542,6 +559,7 @@ operatorMapping: Map<symbol, string>
 [OPERATOR_SUFFIX, 'SUFFIX']
 [OPERATOR_OVERLAP, 'OVERLAP']
 [OPERATOR_UNDEFINED, 'UNDEFINED']
+[OPERATOR_PRESENT, 'PRESENT']
 
 // Logical
 [OPERATOR_AND, 'AND']
@@ -565,7 +583,8 @@ import {
   OPERATOR_PREFIX,
   OPERATOR_SUFFIX,
   OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINEDINED,
+  OPERATOR_UNDEFINED,
+  OPERATOR_PRESENT,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,

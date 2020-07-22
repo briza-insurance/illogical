@@ -54,6 +54,10 @@ import {
   Undefined,
   OPERATOR as OPERATOR_UNDEFINED,
 } from '../../../expression/comparison/undefined'
+import {
+  Present,
+  OPERATOR as OPERATOR_PRESENT,
+} from '../../../expression/comparison/present'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
 import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
@@ -410,6 +414,10 @@ describe('Condition Engine - Parser', () => {
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
         expected: new Undefined(new Reference('RefA'))
+      },
+      {
+        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA'],
+        expected: new Present(new Reference('RefA'))
       },
       {
         rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA','$RefB'], ['a']],
