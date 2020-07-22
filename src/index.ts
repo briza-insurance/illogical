@@ -26,6 +26,7 @@ import { OPERATOR as OPERATOR_PREFIX } from './expression/comparison/prefix'
 import { OPERATOR as OPERATOR_SUFFIX } from './expression/comparison/suffix'
 import { OPERATOR as OPERATOR_OVERLAP } from './expression/comparison/overlap'
 import { OPERATOR as OPERATOR_UNDEFINED } from './expression/comparison/undefined'
+import { OPERATOR as OPERATOR_PRESENT } from './expression/comparison/present'
 import { OPERATOR as OPERATOR_AND } from './expression/logical/and'
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor'
@@ -45,6 +46,7 @@ export {
   OPERATOR_SUFFIX,
   OPERATOR_OVERLAP,
   OPERATOR_UNDEFINED,
+  OPERATOR_PRESENT,
   OPERATOR_AND,
   OPERATOR_OR,
   OPERATOR_NOR,

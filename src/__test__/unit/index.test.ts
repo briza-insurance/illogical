@@ -166,6 +166,33 @@ describe('Condition Engine', () => {
         expected: false
       }]
     }, {
+      name: 'PRESENT',
+      condition: [
+        'PRESENT',
+        '$Name'
+      ],
+      inputs: [{
+        data: {
+          Name: undefined
+        },
+        expected: false
+      }, {
+        data: {
+          Name: 'David'
+        },
+        expected: true
+      }, {
+        data: {
+          Name: null
+        },
+        expected: false
+      } , {
+        data: {
+          Name: false
+        },
+        expected: true
+      }]
+    },{
       name: 'NOT UNDEFINED',
       condition: [
         'NOT',
