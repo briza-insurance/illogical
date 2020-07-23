@@ -43,18 +43,13 @@ describe('Condition Engine - Common - Type Check', () => {
     }
   })
 
-  test('isObject', () => {
-    let tests = [
-      { value: {}, expected: true },
-      { value: 'hi', expected: false },
-      { value: 1, expected: false },
-      { value: null, expected: false },
-      { value: undefined, expected: false }
-    ]
-
-    for (const test of tests) {
-      expect(isObject(test.value))
-        .toBe(test.expected)
-    }
+  test.each([
+    [{}, true],
+    ['hi', false],
+    [1, false],
+    [null, false],
+    [undefined, false]
+  ])('isObject(%p) should be %p.', (value, expected) => {
+    expect(isObject(value)).toBe(expected)
   })
 })
