@@ -29,6 +29,6 @@ export function isString (value: Result): boolean {
  * @return {boolean} result of the test
  */
 export function isObject (value: unknown): value is Record<string, unknown> {
-  return value !== null && value &&
+  return value !== null && value !== undefined && value &&
       typeof value === 'object' && value.constructor === Object
 }
