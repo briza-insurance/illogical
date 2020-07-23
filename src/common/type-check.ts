@@ -29,5 +29,9 @@ export function isString (value: Result): boolean {
  * @return {boolean} result of the test
  */
 export function isObject (value: unknown): boolean {
+  if (value === null || value === undefined) {
+    return false
+  }
+
   return value && typeof value === 'object' && value.constructor === Object
 }

@@ -1,4 +1,4 @@
-import { isNumber, isString } from '../../type-check'
+import { isNumber, isString, isObject } from '../../type-check'
 
 describe('Condition Engine - Common - Type Check', () => {
   test('isNumber', () => {
@@ -39,6 +39,21 @@ describe('Condition Engine - Common - Type Check', () => {
     for (const test of tests) {
       // @ts-ignore
       expect(isString(test.value))
+        .toBe(test.expected)
+    }
+  })
+
+  test('isObject', () => {
+    let tests = [
+      { value: {}, expected: true },
+      { value: 'hi', expected: false },
+      { value: 1, expected: false },
+      { value: null, expected: false },
+      { value: undefined, expected: false }
+    ]
+
+    for (const test of tests) {
+      expect(isObject(test.value))
         .toBe(test.expected)
     }
   })
