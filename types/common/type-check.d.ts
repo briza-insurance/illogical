@@ -20,4 +20,4 @@ export declare function isString(value: Result): boolean;
  * @param {mixed} value tested value
  * @return {boolean} result of the test
  */
-export declare function isObject(value: any): boolean;
+export declare function isObject(value: unknown): boolean;
