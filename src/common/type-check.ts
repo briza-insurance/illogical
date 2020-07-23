@@ -28,6 +28,6 @@ export function isString (value: Result): boolean {
  * @param {mixed} value tested value
  * @return {boolean} result of the test
  */
-export function isObject (value: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
-  return typeof value === 'object' && value.constructor === Object
+export function isObject (value: unknown): boolean {
+  return value && typeof value === 'object' && value.constructor === Object
 }
