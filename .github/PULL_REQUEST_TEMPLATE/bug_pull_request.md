@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-# Fixture Describe
+# Fixture Description
 A clear and concise description of what caused the bug, and how it was addressed.
 
 ### Test Coverage
