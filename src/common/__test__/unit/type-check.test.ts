@@ -1,45 +1,43 @@
-import { isNumber, isString } from '../../type-check'
+import { isNumber, isString, isObject } from '../../type-check'
 
 describe('Condition Engine - Common - Type Check', () => {
-  test('isNumber', () => {
-    let tests = [
+  test.each([
       // Truthy
-      { value: 1, expected: true },
-      { value: 1.0, expected: true },
+      [1, true],
+      [1.0, true],
       // Falsy
-      { value: Infinity, expected: false },
-      { value: -Infinity, expected: false },
-      { value: '1', expected: false },
-      { value: true, expected: false },
-      { value: false, expected: false },
-      { value: {}, expected: false },
-      { value: () => {}, expected: false },
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(isNumber(test.value))
-        .toBe(test.expected)
-    }
+      [Infinity, false],
+      [-Infinity, false],
+      ['1', false],
+      [true, false],
+      [false, false],
+      [{}, false],
+      [() => {}, false]
+  ])('isNumber(%p) should be %p.', (value, expected) => {
+    // @ts-ignore
+    expect(isNumber(value)).toBe(expected)
   })
 
-  test('isString', () => {
-    let tests = [
-      // Truthy
-      { value: '1', expected: true },
-      { value: new String('1'), expected: true },
-      // Falsy
-      { value: 1, expected: false },
-      { value: true, expected: false },
-      { value: false, expected: false },
-      { value: {}, expected: false },
-      { value: () => {}, expected: false },
-    ]
+  test.each([
+    ['1', true],
+    [new String('1'), true],
+    [1, false],
+    [true, false],
+    [false, false],
+    [{}, false],
+    [() => {}, false]
+  ])('isString(%p) should be %p.', (value, expected) => {
+    // @ts-ignore
+    expect(isString(value)).toBe(expected)
+  })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(isString(test.value))
-        .toBe(test.expected)
-    }
+  test.each([
+    [{}, true],
+    ['hi', false],
+    [1, false],
+    [null, false],
+    [undefined, false]
+  ])('isObject(%p) should be %p.', (value, expected) => {
+    expect(isObject(value)).toBe(expected)
   })
 })

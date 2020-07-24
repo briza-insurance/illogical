@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.2.3
+* Add support for null and undefined in isObject() method
+
 ## 1.2.2
 * Add Present comparison expression.
 
