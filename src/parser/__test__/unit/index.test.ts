@@ -1,4 +1,4 @@
-import { Parser } from '../../'
+import { ExpressionInput, Parser } from '../../'
 import {
   defaultOptions,
   defaultReferencePredicate,
@@ -64,6 +64,7 @@ import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
 import { Xor, OPERATOR as OPERATOR_XOR } from '../../../expression/logical/xor'
 import { Not, OPERATOR as OPERATOR_NOT } from '../../../expression/logical/not'
 import { Collection } from '../../../operand/collection'
+import { Evaluable } from '../../../common/evaluable'
 
 describe('Condition Engine - Parser', () => {
   test('options', () => {
@@ -80,162 +81,150 @@ describe('Condition Engine - Parser', () => {
     expect(parser.options.notExpected).toBeUndefined()
   })
 
-  test('defaultReferencePredicate', () => {
-    let tests = [
+  describe('defaultReferencePredicate', () => {
+    test.each([
       // Truthy
-      { key: '$ref', expected: true },
-
+      ['$ref', true],
       // Falsy
-      { key: 'ref', expected: false },
-      { key: '', expected: false },
-      { key: 5, expected: false },
-      { key: true, expected: false },
-      { key: false, expected: false },
-      { key: [5], expected: false },
-      { key: ['5'], expected: false },
-    ]
-
-    for (const test of tests) {
+      ['ref', false],
+      ['', false],
+      // Falsy other raw types
+      [5, false],
+      [true, false],
+      [false, false],
+      [[5], false],
+      [['5'], false]
+    ])('%p should evaluate as %p', (key, expected) => {
       // @ts-ignore
-      expect(defaultReferencePredicate(test.key))
-        .toBe(test.expected)
-    }
+      expect(defaultReferencePredicate(key)).toBe(expected)
+    })
   })
 
-  test('defaultReferenceTransform', () => {
-    let tests = [
-      { key: '$ref', expected: 'ref' },
-    ]
-
-    for (const test of tests) {
+  describe('defaultReferenceTransform', () => {
+    test.each([
+      ['$ref', 'ref'],
+    ])('%p should evaluate as %p', (key, expected) => {
       // @ts-ignore
-      expect(defaultReferenceTransform(test.key))
-        .toBe(test.expected)
-    }
+      expect(defaultReferenceTransform(key)).toBe(expected)
+    })
   })
 
-  test('parse', () => {
+  describe('parse', () => {
     const parser = new Parser()
 
-    const tests = [
+    test.each([
       // Comparison expression
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        expected: new Equal(new Value(5), new Value(5))
-      },
-      // Predicate expression
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
-        expected: new Undefined(new Reference('RefA'))
-      },
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
+        new Equal(new Value(5), new Value(5))
+      ],
+      // Unary expression
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+        new Undefined(new Reference('RefA'))
+      ],
       // Logical expression
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
           [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
         ],
-        expected: new And([
+        new And([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10)),
           new Undefined(new Reference('RefA')),
         ])
-      },
-    ]
+      ],
+    ] as [ExpressionInput, Evaluable][])
+      ('%p should evaluate as %p', (expression, expected) => {
+        expect(parser.parse(expression)).toEqual(expected)
+      })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(parser.parse(test.rawExpression))
-        .toEqual(test.expected)
-    }
-
-    const exceptions = [
+    test.each([
       // Invalid form
-      { rawExpression: undefined},
-      { rawExpression: null},
-      { rawExpression: {}},
-      { rawExpression: 5},
-      { rawExpression: ''},
-      { rawExpression: ()=>{}},
+      [undefined],
+      [null],
+      [{}],
+      [5],
+      [''],
+      [() => { }],
       // Invalid operator
-      { rawExpression: ['__', ['==', 5, 5]] },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => parser.parse(exception.rawExpression))
-        .toThrowError()
-    }
+      [['__', ['==', 5, 5]]],
+    ] as [ExpressionInput][])
+      ('%p should throw', (expression) => {
+        expect(() => parser.parse(expression)).toThrowError()
+      })
   })
 
-  test('parse - logical expressions', () => {
+  describe('parse - logical expressions', () => {
     const parser = new Parser()
 
-    const tests = [
+    test.each([
       // Not-nested, 3 items
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
-        expected: new And([
+        new And([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_OR),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
-        expected: new Or([
+        new Or([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_NOR),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
-        expected: new Nor([
+        new Nor([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_XOR),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
-        expected: new Xor([
+        new Xor([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_NOT),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5]
         ],
-        expected: new Not(new Equal(new Value(5), new Value(5)))
-      },
+        new Not(new Equal(new Value(5), new Value(5)))
+      ],
       // Not-nested, 2 items, reduced into comparison
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         ],
-        expected: new Equal(new Value(5), new Value(5)),
-      },
+        new Equal(new Value(5), new Value(5)),
+      ],
       // Not-nested, 2 items, reduced into logical
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [
             defaultOptions.operatorMapping.get(OPERATOR_OR),
@@ -243,14 +232,14 @@ describe('Condition Engine - Parser', () => {
             [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
           ],
         ],
-        expected: new Or([
+        new Or([
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10))
         ])
-      },
+      ],
       // Nested
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [
             defaultOptions.operatorMapping.get(OPERATOR_OR),
@@ -259,30 +248,30 @@ describe('Condition Engine - Parser', () => {
           ],
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 15, 15],
         ],
-        expected: new And([
+        new And([
           new Or([
             new Equal(new Value(5), new Value(5)),
             new Equal(new Value(10), new Value(10))
           ]),
           new Equal(new Value(15), new Value(15))
         ])
-      },
+      ],
       // Zero argument logical expression treated as collection
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_IN),
           defaultOptions.operatorMapping.get(OPERATOR_OR),
           [
             defaultOptions.operatorMapping.get(OPERATOR_OR)
           ]
         ],
-        expected: new In(
+        new In(
           new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
           new Collection([new Value(defaultOptions.operatorMapping.get(OPERATOR_OR))])
         )
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_IN),
           defaultOptions.operatorMapping.get(OPERATOR_OR),
           [
@@ -290,16 +279,16 @@ describe('Condition Engine - Parser', () => {
             defaultOptions.operatorMapping.get(OPERATOR_AND)
           ]
         ],
-        expected: new In(
+        new In(
           new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
           new Collection([
             new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
             new Value(defaultOptions.operatorMapping.get(OPERATOR_AND))
           ])
         )
-      },
-      {
-        rawExpression: [
+      ],
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_IN),
           defaultOptions.operatorMapping.get(OPERATOR_OR),
           [
@@ -308,7 +297,7 @@ describe('Condition Engine - Parser', () => {
             'MN'
           ]
         ],
-        expected: new In(
+        new In(
           new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
           new Collection([
             new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
@@ -316,138 +305,126 @@ describe('Condition Engine - Parser', () => {
             new Value('MN')
           ])
         )
-      },
+      ],
       // Not treated as raw array
-      {
-        rawExpression: [
+      [
+        [
           defaultOptions.operatorMapping.get(OPERATOR_NOT),
           5
         ],
-        expected: new Collection([
+        new Collection([
           new Value(defaultOptions.operatorMapping.get(OPERATOR_NOT)),
           new Value(5)
         ])
-      }
-    ]
+      ]
+    ] as [ExpressionInput, Evaluable][])
+      ('%p should evaluate as %p', (expression, expected) => {
+        expect(parser.parse(expression)).toEqual(expected)
+      })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(parser.parse(test.rawExpression))
-        .toEqual(test.expected)
-    }
-
-    const exceptions = [
+    test.each([
       // Invalid form
-      { rawExpression: []},
+      [[]],
       // Invalid operator, reduce-able expression
-      { rawExpression: ['__', ['==', 5, 5]] },
+      [['__', ['==', 5, 5]]],
       // Invalid operator
-      { rawExpression: ['__', ['==', 5, 5], ['==', 5, 5]] },
+      [['__', ['==', 5, 5], ['==', 5, 5]]],
       // Invalid logical inner expression
-      { rawExpression: ['IN', 'OR', ['OR', 'AND', [5, 5]]] },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => parserStrict.parseLogicalRawExp(exception.rawExpression))
-        .toThrowError()
-    }
+      [['IN', 'OR', ['OR', 'AND', [5, 5]]]],
+    ] as [ExpressionInput][])
+      ('%p should throw', (expression) => {
+        expect(() => parser.parse(expression)).toThrowError()
+      })
   })
 
-  test('parse - comparison expressions', () => {
+  describe('parse - comparison expressions', () => {
     const parser = new Parser()
 
-    const tests = [
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        expected: new Equal(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_NE), 5, 5],
-        expected: new NotEqual(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_GT), 5, 5],
-        expected: new GreaterThan(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_GE), 5, 5],
-        expected: new GreaterThanOrEqual(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_LT), 5, 5],
-        expected: new LessThan(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_LE), 5, 5],
-        expected: new LessThanOrEqual(new Value(5), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
-        expected: new In(new Value(5), new Collection([new Value(5)]))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
-        expected: new NotIn(new Value(5), new Collection([new Value(5)]))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
-        expected: new Prefix(new Value('a'), new Value('abc'))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
-        expected: new Suffix(new Value('abc'), new Value('c'))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a','b'], ['a']],
-        expected: new Overlap(new Collection([new Value('a'), new Value('b')]), new Collection([new Value('a')]))
-      },
+    test.each([
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
+        new Equal(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_NE), 5, 5],
+        new NotEqual(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_GT), 5, 5],
+        new GreaterThan(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_GE), 5, 5],
+        new GreaterThanOrEqual(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_LT), 5, 5],
+        new LessThan(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_LE), 5, 5],
+        new LessThanOrEqual(new Value(5), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
+        new In(new Value(5), new Collection([new Value(5)]))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
+        new NotIn(new Value(5), new Collection([new Value(5)]))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
+        new Prefix(new Value('a'), new Value('abc'))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
+        new Suffix(new Value('abc'), new Value('c'))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a', 'b'], ['a']],
+        new Overlap(new Collection([new Value('a'), new Value('b')]), new Collection([new Value('a')]))
+      ],
       // Reference
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), '$RefA', 5],
-        expected: new Equal(new Reference('RefA'), new Value(5))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
-        expected: new Equal(new Value(5), new Reference('RefA'))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
-        expected: new Undefined(new Reference('RefA'))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA'],
-        expected: new Present(new Reference('RefA'))
-      },
-      {
-        rawExpression: [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA','$RefB'], ['a']],
-        expected: new Overlap(
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_EQ), '$RefA', 5],
+        new Equal(new Reference('RefA'), new Value(5))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
+        new Equal(new Value(5), new Reference('RefA'))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+        new Undefined(new Reference('RefA'))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA'],
+        new Present(new Reference('RefA'))
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA', '$RefB'], ['a']],
+        new Overlap(
           new Collection([
             new Reference('RefA'),
             new Reference('RefB'),
           ]),
           new Collection([new Value('a')])
         )
-      }
-    ]
+      ]
+    ] as [ExpressionInput, Evaluable][])
+      ('%p should evaluate as %p', (expression, expected) => {
+        expect(parser.parse(expression)).toEqual(expected)
+      })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(parser.parse(test.rawExpression))
-        .toEqual(test.expected)
-    }
-
-    const exceptions = [
+    test.each([
       // Invalid form
-      { rawExpression: [] },
+      [[]],
       // Invalid operator
-      { rawExpression: ['__', 5, 5] },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => parser.parse(exception.rawExpression))
-        .toThrowError()
-    }
+      [['__', 5, 5]],
+    ] as [ExpressionInput][])
+      ('%p should throw', (expression) => {
+        expect(() => parser.parse(expression)).toThrowError()
+      })
   })
 })
