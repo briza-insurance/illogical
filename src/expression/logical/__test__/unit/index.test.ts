@@ -1,7 +1,8 @@
 import { Value } from '../../../../operand/value'
 import { Logical } from '../../'
+import { And } from '../../and'
 
-describe('Condition Engine - Expression - Logical', () => {
+describe('Expression - Logical', () => {
   describe('evaluate', () => {
 
     // Test value types against value types
@@ -14,8 +15,6 @@ describe('Condition Engine - Expression - Logical', () => {
   })
 
   test('toString', () => {
-      // @ts-ignore
-    expect(new Logical('AND', [new Value(1), new Value(1)]).toString())
-        .toBe('(1 AND 1)')
+    expect(new And([new Value(1), new Value(1)]).toString()).toBe('(1 AND 1)')
   })
 })

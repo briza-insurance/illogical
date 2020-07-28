@@ -1,30 +1,26 @@
-import { Value } from '../../../../operand/value'
+import { Evaluable } from '../../../../common/evaluable'
+import { operand } from '../../../../__test__/helpers'
 import { Not } from '../../not'
 
-describe('Condition Engine - Expression - Logical - Not', () => {
-  test('evaluate', () => {
-    let tests = [
+describe('Expression - Logical - Not', () => {
+  describe('evaluate', () => {
+    test.each([
       // Truthy
-      { operand: new Value(false), expected: true },
+      [operand(false), true],
       // Falsy
-      { operand: new Value(true), expected: false }
-    ]
+      [operand(true), false],
+    ] as [Evaluable, boolean][])
+      ('%p should evaluate as %p', (operand, expected) => {
+        expect(new Not(operand).evaluate({})).toBe(expected)
+      })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new Not(test.operand).evaluate({}))
-        .toBe(test.expected)
-    }
-
-    let exceptions = [
-      { operands: [] },
-      { operands: [new Value(true), new Value(false)] },
-      { operands: [new Value(0)] },
-    ]
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => new Not(...exception.operands).evaluate({}))
-        .toThrowError()
-    }
+    test.each([
+      [[]],
+      [[operand(true), operand(false)] ],
+      [[operand(0)] ], 
+    ] as [Evaluable[]][])
+      ('%p should throw', (operands) => {
+        expect(() => new Not(...operands).evaluate({})).toThrowError()
+      })
   })
 })

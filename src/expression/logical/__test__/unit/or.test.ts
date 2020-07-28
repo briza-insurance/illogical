@@ -1,30 +1,26 @@
-import { Value } from '../../../../operand/value'
+import { Evaluable } from '../../../../common/evaluable'
+import { operand } from '../../../../__test__/helpers'
 import { Or } from '../../or'
 
-describe('Condition Engine - Expression - Logical - Or', () => {
-  test('evaluate', () => {
-    let tests = [
+describe('Expression - Logical - Or', () => {
+  describe('evaluate', () => {
+    test.each([
       // Truthy
-      { operands: [new Value(true), new Value(true)], expected: true },
-      { operands: [new Value(true), new Value(false)], expected: true },
-      { operands: [new Value(false), new Value(true)], expected: true },
+      [[operand(true), operand(false)], true],
+      [[operand(false), operand(true)], true],
+      [[operand(true), operand(true)], true],
       // Falsy
-      { operands: [new Value(false), new Value(false)], expected: false },
-    ]
+      [[operand(false), operand(false)], false]
+    ] as [Evaluable[], boolean][])
+      ('%p should evaluate as %p', (operands, expected) => {
+        expect(new Or(operands).evaluate({})).toBe(expected)
+      })
 
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new Or(test.operands).evaluate({}))
-        .toBe(test.expected)
-    }
-
-    let exceptions = [
-      { operands: [] },
-    ]
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => new Or(exception.operands).evaluate({}))
-        .toThrowError()
-    }
+    test.each([
+      [[]],
+    ] as [Evaluable[]][])
+      ('%p should throw', (operands) => {
+        expect(() => new Or(operands).evaluate({})).toThrowError()
+      })
   })
 })
