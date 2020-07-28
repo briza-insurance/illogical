@@ -67,6 +67,8 @@ import { Collection } from '../../../operand/collection'
 import { Evaluable } from '../../../common/evaluable'
 
 describe('Condition Engine - Parser', () => {
+  const parser = new Parser()
+
   test('options', () => {
     let customOptions = {
       operatorMapping: new Map([[OPERATOR_EQ, '&&']]),
@@ -110,8 +112,6 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse', () => {
-    const parser = new Parser()
-
     test.each([
       // Comparison expression
       [
@@ -159,8 +159,6 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse - logical expressions', () => {
-    const parser = new Parser()
-
     test.each([
       // Not-nested, 3 items
       [
@@ -338,8 +336,6 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse - comparison expressions', () => {
-    const parser = new Parser()
-
     test.each([
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
