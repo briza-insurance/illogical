@@ -1,49 +1,35 @@
 import { Value } from '../../value'
 
-describe('Condition Engine - Operand - Value', () => {
-  test('constructor', () => {
-    let exceptions = [
-      { value: [1, 2] },
-      { value: ['1', '2'] },
-      { value: [true] },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => new Value(exception.value).evaluate())
-        .toThrowError()
-    }
+describe('Operand - Value', () => {
+  describe('constructor', () => {
+    test.each([
+      [[1, '2', true]]
+    ])('arguments %p should throw', (value) => {
+      expect(() => new Value(value)).toThrowError()
+    })
   })
 
-  test('evaluate', () => {
-    let tests = [
-      { value: 1, expected: 1 },
-      { value: '1', expected: '1' },
-      { value: true, expected: true },
-      { value: undefined, expected: undefined },
-      { value: null, expected: null },
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new Value(test.value).evaluate({}))
-        .toEqual(test.expected)
-    }
+  describe('evaluate', () => {
+    test.each([
+      [1, 1],
+      ['1', '1'],
+      [true, true],
+      [undefined, undefined],
+      [null, null]
+    ])('%p should evaluate as %p', (value, expected) => {
+      expect(new Value(value).evaluate({})).toBe(expected)
+    })
   })
 
-  test('toString', () => {
-    let tests = [
-      { value: 1, expected: '1' },
-      { value: '1', expected: '"1"' },
-      { value: true, expected: 'true' },
-      { value: undefined, expected: 'undefined' },
-      { value: null, expected: 'null' },
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new Value(test.value).toString())
-        .toBe(test.expected)
-    }
+  describe('toString', () => {
+    test.each([
+      [1, '1'],
+      ['1', '"1"'],
+      [true, 'true'],
+      [undefined, 'undefined'],
+      [null, 'null'],
+    ])('%p should be %p', (value, expected) => {
+      expect(new Value(value).toString()).toBe(expected)
+    })
   })
 })

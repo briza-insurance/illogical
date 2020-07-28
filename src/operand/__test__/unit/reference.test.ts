@@ -1,35 +1,28 @@
 import { Reference } from '../../reference'
 
-describe('Condition Engine - Operand - Value', () => {
-  test('constructor', () => {
-    let exceptions = [
-      { value: '' },
-    ]
-
-    for (const exception of exceptions) {
-      // @ts-ignore
-      expect(() => new Reference(exception.value).evaluate())
-        .toThrowError()
-    }
+describe('Operand - Value', () => {
+  describe('constructor', () => {
+    test.each([
+      ['']
+    ])('arguments %p should throw', (value) => {
+      expect(() => new Reference(value)).toThrowError()
+    })
   })
 
-  test('evaluate', () => {
-    let tests = [
+  describe('evaluate', () => {
+    test.each([
       // Existing
-      { value: 'RefA', expected: 1 },
+      ['RefA', 1 ], 
       // Nested
-      { value: 'RefC.subA', expected: 2 },
-      { value: 'RefC.subB.subSubA', expected: 3 },
+      ['RefC.subA', 2 ],
+      ['RefC.subB.subSubA', 3 ], 
       // Missing
-      { value: 'RefB', expected: undefined },
-      { value: 'RefC.subC', expected: undefined },
-      { value: 'RefC.subB.subSubB', expected: undefined },
-      { value: 'RefC.subA.subSubA', expected: undefined },
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new Reference(test.value).evaluate({
+      ['RefB', undefined ],
+      ['RefC.subC', undefined ],
+      ['RefC.subB.subSubB', undefined ],
+      ['RefC.subA.subSubA', undefined ],
+    ])('%p should evaluate as %p', (value, expected) => {
+      expect(new Reference(value).evaluate({
         RefA: 1,
         // RefB = undefined
         RefC: {
@@ -38,14 +31,15 @@ describe('Condition Engine - Operand - Value', () => {
             subSubA: 3
           }
         }
-      }))
-        .toEqual(test.expected)
-    }
+      })).toBe(expected)
+    })
   })
 
-  test('toString', () => {
-    // @ts-ignore
-    expect(new Reference('key').toString())
-      .toBe('{key}')
+  describe('toString', () => {
+    test.each([
+      ['key', '{key}'],
+    ])('%p should be %p', (value, expected) => {
+      expect(new Reference(value).toString()).toBe(expected)
+    })
   })
 })
