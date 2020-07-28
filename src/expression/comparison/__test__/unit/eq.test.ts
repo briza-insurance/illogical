@@ -1,141 +1,38 @@
-import { permutation } from '../../../../__test__/helpers'
-
+import { operand, permutation } from '../../../../__test__/helpers'
 import { Value } from '../../../../operand/value'
-import { Reference } from '../../../../operand/reference'
 import { Equal } from '../../eq'
 import { Collection } from '../../../../operand/collection'
+import { Evaluable } from '../../../../common/evaluable'
 
-describe('Condition Engine - Expression - Comparison - Equal', () => {
+describe('Expression - Comparison - Equal', () => {
   describe('constructor', () => {
-    // @ts-ignore
-    expect(() => new Equal())
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new Equal(5))
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new Equal(5, 5, 5))
-      .toThrowError()
+    test.each([
+      [[]],
+      [[operand(5)]],
+      [[operand(5), operand(5), operand(5)]]
+    ])('arguments %p should throw', (args) => {
+      expect(() => new Equal(...(args))).toThrowError()
+    })
   })
+
   describe('evaluate', () => {
-
-    // Test value types against value types
-    test('value type', () => {
-      let validTypes = [1, '1', true, false, undefined, null]
-      let validTypePermutations = permutation(validTypes)
-
-      let tests = []
-
-      // Explicit truthy cases
-      // type A == type A
-      for (const type of validTypes) {
-        tests.push(
-          {
-            left: new Value(type),
-            right: new Value(type),
-            expected: true
-          }
-        )
-      }
-      // Implicit Falsy
-      // Different types - across all permutations
-      for (const permutation of validTypePermutations) {
-        tests.push(
-          {
-            left: new Value(permutation[0]),
-            right: new Value(permutation[1]),
-            expected: false
-          }
-        )
-      }
-
-      tests = [...tests,
+    const primitives = [1, '1', true, false, undefined, null]
+    test.each([
+      // Truthy cases - type A === type A
+      ...primitives.map((value) => [operand(value), operand(value), true]),
+      // Falsy - different types - across all permutations
+      ...permutation(primitives).map(([left, right]) => [operand(left), operand(right), false]),
       // Falsy
-      { left: new Value(1), right: new Value(10), expected: false },
-      { left: new Value('1'), right: new Value('10'), expected: false },
-      { left: new Value(true), right: new Value(false), expected: false },
+      [operand(1), operand(10), false],
+      [operand('1'), operand('10'), false],
       // Array types, falsy in any case
-      { left: new Collection([new Value(1)]), right: new Collection([new Value(1)]), expected: false },
-      { left: new Collection([new Value('1')]), right: new Collection([new Value('1')]), expected: false },
-      { left: new Value(1), right: new Collection([new Value(1)]), expected: false },
-      { left: new Value('1'), right: new Collection([new Value('1')]), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new Equal(test.left, test.right).evaluate({}))
-          .toBe(test.expected)
-      }
-    })
-
-    // Test reference types against reference types
-    test('reference type', () => {
-      let tests = [
-        // Truthy
-        { left: new Reference('RefA'), right: new Reference('RefA'), expected: true },
-        { left: new Reference('RefB'), right: new Reference('RefB'), expected: true },
-        { left: new Reference('RefC'), right: new Reference('RefC'), expected: true },
-        { left: new Reference('RefD'), right: new Reference('RefD'), expected: true },
-        { left: new Reference('RefE'), right: new Reference('RefE'), expected: true },
-        // Falsy
-        { left: new Reference('RefA'), right: new Reference('RefB'), expected: false },
-        { left: new Reference('RefA'), right: new Reference('RefC'), expected: false },
-        { left: new Reference('RefC'), right: new Reference('RefD'), expected: false },
-        { left: new Reference('RefD'), right: new Reference('RefE'), expected: false },
-        // Array types, falsy in any case
-        { left: new Reference('RefF'), right: new Reference('RefA'), expected: false },
-        { left: new Reference('RefG'), right: new Reference('RefB'), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new Equal(test.left, test.right).evaluate({
-          RefA: 1,
-          RefB: '1',
-          RefC: true,
-          RefD: false,
-          // RefE = undefined
-          RefF: [1],
-          RefG: ['1'],
-        }))
-          .toBe(test.expected)
-      }
-    })
-
-    // Test reference types against value types
-    test('reference/value type', () => {
-      let tests = [
-        // Truthy
-        { left: new Reference('RefA'), right: new Value(1), expected: true },
-        { left: new Reference('RefB'), right: new Value('1'), expected: true },
-        { left: new Reference('RefC'), right: new Value(true), expected: true },
-        { left: new Reference('RefD'), right: new Value(false), expected: true },
-        { left: new Reference('RefE'), right: new Value(undefined), expected: true },
-        { left: new Reference('RefH'), right: new Value(null), expected: true },
-        // Falsy
-        { left: new Reference('RefA'), right: new Value('10'), expected: false },
-        { left: new Reference('RefB'), right: new Value(10), expected: false },
-        { left: new Reference('RefC'), right: new Value(false), expected: false },
-        { left: new Reference('RefE'), right: new Value(false), expected: false },
-        // Array types, falsy in any case
-        { left: new Reference('RefF'), right: new Value(1), expected: false },
-        { left: new Reference('RefG'), right: new Value('1'), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new Equal(test.left, test.right).evaluate({
-          RefA: 1,
-          RefB: '1',
-          RefC: true,
-          RefD: false,
-          // RefE = undefined
-          RefF: [1],
-          RefG: ['1'],
-          RefH: null,
-        }))
-          .toBe(test.expected)
-      }
-    })
+      [new Collection([new Value(1)]), new Collection([new Value(1)]), false],
+      [new Collection([new Value('1')]), new Collection([new Value('1')]), false],
+      [operand(1), new Collection([new Value(1)]), false],
+      [operand('1'), new Collection([new Value('1')]), false]
+    ] as [Evaluable, Evaluable, boolean][])
+      ('%p and %p should evaluate as %p', (left, right, expected) => {
+        expect(new Equal(left, right).evaluate({})).toBe(expected)
+      })
   })
 })

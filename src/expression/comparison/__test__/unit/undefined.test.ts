@@ -1,69 +1,34 @@
 import { Value } from '../../../../operand/value'
-import { Reference } from '../../../../operand/reference'
 import { Undefined } from '../../undefined'
 import { Collection } from '../../../../operand/collection'
+import { operand } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../common/evaluable'
 
-describe('Condition Engine - Expression - Comparison - Undefined', () => {
+describe('Expression - Comparison - Undefined', () => {
   describe('constructor', () => {
-    // @ts-ignore
-    expect(() => new Undefined())
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new Undefined(5, 5))
-      .toThrowError()
+    test.each([
+      [[]],
+      [[operand(5), operand(5)]]
+    ])('arguments %p should throw', (args) => {
+      expect(() => new Undefined(...(args))).toThrowError()
+    })
   })
+
   describe('evaluate', () => {
-
-    // Test value types against value types
-    test('value type', () => {
-      // As value cannot be undefined, all tests should be falsy.
-      let tests = [
-        // Falsy
-        { operand: new Value(1), expected: false },
-        { operand: new Value('1'), expected: false },
-        { operand: new Value(true), expected: false },
-        { operand: new Collection([new Value(1)]), expected: false },
-        { operand: new Collection([new Value('1')]), expected: false },
-        { operand: new Value(true), expected: false },
-        { operand: new Value(false), expected: false }
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new Undefined(test.operand).evaluate({}))
-          .toBe(test.expected)
-      }
-    })
-
-    // Test reference types against reference types
-    test('reference type', () => {
-      let tests = [
-        // Falsy
-        { operand: new Reference('RefA'), expected: false },
-        { operand: new Reference('RefB'), expected: false },
-        { operand: new Reference('RefC'), expected: false },
-        { operand: new Reference('RefD'), expected: false },
-        { operand: new Reference('RefF'), expected: false },
-        { operand: new Reference('RefG'), expected: false },
-        // Truthy
-        { operand: new Reference('RefE'), expected: true },
-        { operand: new Reference('RefH'), expected: true }
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new Undefined(test.operand).evaluate({
-          RefA: 1,
-          RefB: '1',
-          RefC: true,
-          RefD: false,
-          // RefE = undefined
-          RefF: [1],
-          RefG: ['1'],
-          RefH: undefined
-        }))
-          .toBe(test.expected)
-      }
-    })
+    test.each([
+      // Truthy
+      [operand(undefined), true],
+      // Falsy 
+      [operand(1), false],
+      [operand('1'), false],
+      [operand(true), false],
+      [operand(false), false],
+      [operand(null), false],
+      [new Collection([new Value(1)]), false],
+      [new Collection([new Value('1')]), false]
+    ] as [Evaluable, boolean][])
+      ('%p should evaluate as %p', (operand, expected) => {
+        expect(new Undefined(operand).evaluate({})).toBe(expected)
+      })
   })
 })

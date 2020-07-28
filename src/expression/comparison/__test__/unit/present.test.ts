@@ -1,65 +1,34 @@
 import { Present } from '../../present'
 import { Value } from '../../../../operand/value'
 import { Collection } from '../../../../operand/collection'
-import { Reference } from '../../../../operand/reference'
+import { operand } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../common/evaluable'
 
-type TestTuple = [Value | Collection | Reference, boolean]
-
-describe('Condition Engine - Expression - Comparison - Undefined', () => {
+describe('Expression - Comparison - Undefined', () => {
   describe('constructor', () => {
-    // @ts-ignore
-    expect(() => new Present())
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new Present(5, 5))
-      .toThrowError()
+    test.each([
+      [[]],
+      [[operand(5), operand(5)]]
+    ])('arguments %p should throw', (args) => {
+      expect(() => new Present(...(args))).toThrowError()
+    })
   })
 
-  it.each<TestTuple>(
-    [
-      // Falsy
-      [new Value(null), false],
+  describe('evaluate', () => {
+    test.each([
       // Truthy
-      [new Value(0), true],
-      [new Value(false), true],
-      [new Value('apples'), true],
-      [new Value(12), true],
+      [operand(1), true],
+      [operand('1'), true],
+      [operand(true), true],
+      [operand(false), true],
       [new Collection([new Value(1)]), true],
-      [new Collection([new Value(null)]), true]
-    ]
-  )('value type', (operand, expected) => {
-    expect(new Present(operand).evaluate({})).toBe(expected)
-  })
-
-  it.each<TestTuple>(
-    [
+      [new Collection([new Value('1')]), true],
       // Falsy
-      [new Reference('RefE'), false],
-      [new Reference('RefH'), false],
-      [new Reference('RefJ'), false],
-      // Truthy
-      [new Reference('RefA'), true],
-      [new Reference('RefB'), true],
-      [new Reference('RefC'), true],
-      [new Reference('RefD'), true],
-      [new Reference('RefF'), true],
-      [new Reference('RefG'), true],
-      [new Reference('RefI'), true],
-    ]
-  )('reference type', (operand, expected) => {
-    const context = {
-      RefA: 1,
-      RefB: '1',
-      RefC: true,
-      RefD: false,
-      // RefE = undefined
-      RefF: [1],
-      RefG: ['1'],
-      RefH: undefined,
-      RefI: 0,
-      RefJ: null,
-    }
-
-    expect(new Present(operand).evaluate(context)).toBe(expected)
+      [operand(undefined), false],
+      [operand(null), false]
+    ] as [Evaluable, boolean][])
+      ('%p should evaluate as %p', (operand, expected) => {
+        expect(new Present(operand).evaluate({})).toBe(expected)
+      })
   })
 })

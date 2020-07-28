@@ -1,158 +1,60 @@
 import { Value } from '../../../../operand/value'
-import { Reference } from '../../../../operand/reference'
 import { In } from '../../in'
 import { Collection } from '../../../../operand/collection'
+import { operand } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../common/evaluable'
 
-describe('Condition Engine - Expression - Comparison - In', () => {
+describe('Expression - Comparison - In', () => {
   describe('constructor', () => {
-    // @ts-ignore
-    expect(() => new In())
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new In(5))
-      .toThrowError()
-    // @ts-ignore
-    expect(() => new In(5, 5, 5))
-      .toThrowError()
+    test.each([
+      [[]],
+      [[operand(5)]],
+      [[operand(5), operand(5), operand(5)]]
+    ])('arguments %p should throw', (args) => {
+      expect(() => new In(...(args))).toThrowError()
+    })
   })
+
   describe('evaluate', () => {
+    test.each([
+      // Truthy
+      [operand(1), new Collection([new Value(1), new Value(2)]), true],
+      [operand('1'), new Collection([new Value('1'), new Value('2')]), true],
+      [operand(true), new Collection([new Value(true), new Value(false)]), true],
+      // Truthy - Bi-directional
+      [new Collection([new Value(1), new Value(2)]), new Value(1), true],
+      [new Collection([new Value('1'), new Value('2')]), new Value('1'), true],
+      [new Collection([new Value(true), new Value(false)]), new Value(true), true],
+      // Falsy
+      [operand(0), new Collection([new Value(1), new Value(2)]), false],
+      [operand('0'), new Collection([new Value('1'), new Value('2')]), false],
+      [operand(true), new Collection([new Value(false), new Value(false)]), false],
+      // Falsy - non-comparable types
+      [operand('0'), new Collection([new Value(0), new Value(1)]), false],
+      [operand(0), new Collection([new Value('0'), new Value('1')]), false],
+    ] as [Evaluable, Evaluable, boolean][])
+      ('%p and %p should evaluate as %p', (left, right, expected) => {
+        expect(new In(left, right).evaluate({})).toBe(expected)
+      })
 
-    // Test value types against value types
-    test('value type', () => {
-      let tests = [
-        // Truthy
-        { left: new Value(1), right: new Collection([new Value(1), new Value(2)]), expected: true },
-        { left: new Value('1'), right: new Collection([new Value('1'), new Value('2')]), expected: true },
-        // Truthy - Bi-directional
-        { left: new Collection([new Value(1), new Value(2)]), right: new Value(1), expected: true },
-        { left: new Collection([new Value('1'), new Value('2')]), right: new Value('1'), expected: true },
-        // Falsy - explicit
-        { left: new Value(0), right: new Collection([new Value(1), new Value(2)]), expected: false },
-        { left: new Value('0'), right: new Collection([new Value('1'), new Value('2')]), expected: false },
-        // Falsy - non-comparable types
-        { left: new Value('0'), right: new Collection([new Value(1), new Value(2)]), expected: false },
-        { left: new Value(0), right: new Collection([new Value('1'), new Value('2')]), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new In(test.left, test.right).evaluate({}))
-          .toBe(test.expected)
-      }
-
-      let exceptions = [
-        // None of array
-        { left: new Value(1), right: new Value(1) },
-        // Both of array
-        { left: new Collection([new Value(1)]), right: new Collection([new Value(1)]) },
-      ]
-
-      for (const exception of exceptions) {
-        // @ts-ignore
-        expect(() => new In(exception.left, exception.right).evaluate({}))
-          .toThrowError()
-      }
-    })
-
-    // Test reference types against reference types
-    test('reference type', () => {
-      let tests = [
-        // Truthy
-        { left: new Reference('RefA'), right: new Reference('RefB'), expected: true },
-        { left: new Reference('RefC'), right: new Reference('RefD'), expected: true },
-        // Falsy - explicit
-        { left: new Reference('RefE'), right: new Reference('RefB'), expected: false },
-        { left: new Reference('RefF'), right: new Reference('RefD'), expected: false },
-        // Falsy - non-comparable types
-        { left: new Reference('RefA'), right: new Reference('RefD'), expected: false },
-        { left: new Reference('RefC'), right: new Reference('RefB'), expected: false },
-        { left: new Reference('RefA'), right: new Reference('RefG'), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new In(test.left, test.right).evaluate({
-          RefA: 1,
-          RefB: [1, 2],
-          RefC: '1',
-          RefD: ['1', '2'],
-          RefE: 0,
-          RefF: '0',
-          // RefG = undefined
-        }))
-          .toBe(test.expected)
-      }
-
-      let exceptions = [
-        // None of array
-        { left: new Reference('RefA'), right: new Reference('RefA') },
-        // Both of array
-        { left: new Reference('RefB'), right: new Reference('RefB') },
-      ]
-
-      for (const exception of exceptions) {
-        // @ts-ignore
-        expect(() => new In(exception.left, exception.right).evaluate({
-          RefA: 1,
-          RefB: [1, 2],
-        }))
-          .toThrowError()
-      }
-    })
-
-    // Test reference types against value types
-    test('reference/value type', () => {
-      let tests = [
-        // Truthy
-        { left: new Reference('RefA'), right: new Collection([new Value(1)]), expected: true },
-        { left: new Reference('RefB'), right: new Collection([new Value('1')]), expected: true },
-        // Falsy - explicit
-        { left: new Reference('RefA'), right: new Collection([new Value(0)]), expected: false },
-        { left: new Reference('RefB'), right: new Collection([new Value('0')]), expected: false },
-        // Falsy - non-comparable types
-        { left: new Reference('RefA'), right: new Collection([new Value('1')]), expected: false },
-        { left: new Reference('RefB'), right: new Collection([new Value(1)]), expected: false },
-        { left: new Reference('RefC'), right: new Collection([new Value(1)]), expected: false },
-      ]
-
-      for (const test of tests) {
-        // @ts-ignore
-        expect(new In(test.left, test.right).evaluate({
-          RefA: 1,
-          RefB: '1',
-          // RefC = undefined
-        }))
-          .toBe(test.expected)
-      }
-
-      let exceptions = [
-        // None of array
-        { left: new Reference('RefA'), right: new Value(1) },
-        // Both of array
-        { left: new Reference('RefB'), right: new Collection([new Value(1)]) },
-      ]
-
-      for (const exception of exceptions) {
-        // @ts-ignore
-        expect(() => new In(exception.left, exception.right).evaluate({
-          RefA: 1,
-          RefB: [1],
-        }))
-          .toThrowError()
-      }
-    })
+    test.each([
+      // Missing haystack
+      [operand(1), operand(1)],
+      // Double haystack
+      [new Collection([new Value(1)]), new Collection([new Value(1)])],
+    ] as [Evaluable, Evaluable][])
+      ('%p and %p should throw', (left, right) => {
+        expect(() => new In(left, right).evaluate({})).toThrowError()
+      })
   })
 
-  test('toString', () => {
-    let tests = [
-      { left: new Value(0), right: new Collection([new Value(1), new Value(2)]), expected: '(0 in [1, 2])' },
-      { left: new Collection([new Value(1), new Value(2)]), right: new Value(0), expected: '(0 in [1, 2])' },
-    ]
-
-    for (const test of tests) {
-      // @ts-ignore
-      expect(new In(test.left, test.right).toString())
-        .toBe(test.expected)
-    }
+  describe('toString', () => {
+    test.each([
+      [new Value(0), new Collection([new Value(1), new Value(2)]), '(0 in [1, 2])'],
+      [new Collection([new Value(1), new Value(2)]), new Value(0), '(0 in [1, 2])'],
+    ] as [Evaluable, Evaluable, string][])
+      ('%p and %p should be %p', (left, right, expected) => {
+        expect(new In(left, right).toString()).toBe(expected)
+      })
   })
 })
