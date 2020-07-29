@@ -3,12 +3,7 @@
  * @module illogical/operand
  */
 
-import {
-  Evaluable,
-  Context,
-  Result,
-  EvaluableType
-} from '../common/evaluable'
+import { Context, Evaluable, EvaluableType, Result } from '../common/evaluable'
 
 /**
  * Abstract operand

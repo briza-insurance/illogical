@@ -3,8 +3,8 @@
  * @module illogical/expression/logical
  */
 
+import { Context, Evaluable, Result } from '../../common/evaluable'
 import { Value } from '../../operand/value'
-import { Evaluable, Context, Result } from '../../common/evaluable'
 import { Logical } from '.'
 
 // Operator key
@@ -18,7 +18,7 @@ export class Not extends Logical {
    * @constructor
    * @param {Evaluable} operand
    */
-  constructor (...args: Evaluable[]);
+  constructor(...args: Evaluable[]);
   constructor (operand: Evaluable) {
     if (arguments.length !== 1) {
       throw new Error('logical NOT expression must have exactly one operand')

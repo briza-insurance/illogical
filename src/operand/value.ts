@@ -3,16 +3,9 @@
  * @module illogical/operand
  */
 
+import { Context, Result } from '../common/evaluable'
 import { isString } from '../common/type-check'
-
-import {
-  Context,
-  Result
-} from '../common/evaluable'
-
-import {
-  Operand
-} from '.'
+import { Operand } from '.'
 
 /**
  * Print value as string

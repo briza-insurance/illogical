@@ -3,12 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import {
-  Context,
-  Result,
-  Evaluable
-} from '../../common/evaluable'
-
+import { Context, Evaluable, Result } from '../../common/evaluable'
 import { Comparison } from '../comparison'
 
 // Operator key

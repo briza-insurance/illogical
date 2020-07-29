@@ -3,15 +3,9 @@
  * @module illogical/operand
  */
 
+import { Context, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
-import {
-  Context,
-  Result
-} from '../common/evaluable'
-
-import {
-  Operand
-} from '.'
+import { Operand } from '.'
 
 /**
  * Lookup for the reference in the context.

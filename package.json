@@ -22,6 +22,8 @@
     "build": "npm run build:types && npm run build:js",
     "docs": "typedoc src",
     "test": "jest",
+    "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
+    "lint:fix": "eslint --max-warnings 0 \"src/**/*.{ts,js}\" --fix",
     "prepublishOnly": "npm run test && npm run build"
   },
   "repository": {
@@ -55,6 +57,7 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
     "eslint-plugin-standard": "^4.0.1",
     "jest": "^26.1.0",
     "rollup": "^2.22.2",

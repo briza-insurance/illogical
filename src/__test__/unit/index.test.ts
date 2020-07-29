@@ -57,14 +57,6 @@ describe('Condition Engine', () => {
         expect(engine.evaluate(expression, context)).toEqual(expected)
       })
 
-    // for (const testCase of testCases) {
-    //   test(testCase.name, () => {
-    //     for (const input of testCase.inputs) {
-    //       expect(engine.evaluate(expression, context)).toEqual(expected)
-    //     }
-    //   })
-    // }
-
     test.each([
       // Operators with invalid operands
       [[OPERATOR_EQ]],

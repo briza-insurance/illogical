@@ -3,12 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import {
-  Context,
-  Result,
-  Evaluable
-} from '../../common/evaluable'
-
+import { Context, Evaluable, Result } from '../../common/evaluable'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -23,7 +18,7 @@ export class NotIn extends Comparison {
    * @param {Evaluable} left Left operand.
    * @param {Evaluable} right Right operand.
    */
-  constructor (...args: Evaluable[]);
+  constructor(...args: Evaluable[]);
   constructor (left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
@@ -53,11 +48,11 @@ export class NotIn extends Comparison {
       throw new Error('invalid NOT IN expression, one operand must be array')
     }
     if (leftArray) {
-      return (left as (string|number)[])
-        .indexOf(right as string|number) === -1
+      return (left as (string | number)[])
+        .indexOf(right as string | number) === -1
     }
-    return (right as (string|number)[])
-      .indexOf(left as string|number) === -1
+    return (right as (string | number)[])
+      .indexOf(left as string | number) === -1
   }
 
   /**

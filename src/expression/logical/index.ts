@@ -3,12 +3,7 @@
  * @module illogical/expression/logical
  */
 
-import {
-  Context,
-  Result,
-  Evaluable,
-  EvaluableType
-} from '../../common/evaluable'
+import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
 
 /**
  * Abstract logical expression
@@ -41,8 +36,6 @@ export abstract class Logical implements Evaluable {
    * @return {string}
    */
   toString (): string {
-    return '(' + this.operands.map(
-      (operand) => operand.toString()).join(` ${this.operator} `) +
-    ')'
+    return '(' + this.operands.map((operand) => operand.toString()).join(` ${this.operator} `) + ')'
   }
 }

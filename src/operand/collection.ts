@@ -3,17 +3,10 @@
  * @module illogical/operand
  */
 
-import {
-  Context,
-  Result
-} from '../common/evaluable'
-
-import {
-  Operand
-} from '.'
-
-import { Value } from './value'
+import { Context, Result } from '../common/evaluable'
+import { Operand } from '.'
 import { Reference } from './reference'
+import { Value } from './value'
 
 /**
  * Collection operand resolved containing mixture of value and references.

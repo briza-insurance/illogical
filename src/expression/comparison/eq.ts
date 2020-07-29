@@ -3,12 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import {
-  Context,
-  Result,
-  Evaluable
-} from '../../common/evaluable'
-
+import { Context, Evaluable, Result } from '../../common/evaluable'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -23,7 +18,7 @@ export class Equal extends Comparison {
    * @param {Evaluable} left Left operand.
    * @param {Evaluable} right Right operand.
    */
-  constructor (...args: Evaluable[]);
+  constructor(...args: Evaluable[]);
   constructor (left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
@@ -37,7 +32,6 @@ export class Equal extends Comparison {
    * @return {Result}
    */
   evaluate (ctx: Context): Result {
-    return this.left.evaluate(ctx) ===
-      this.right.evaluate(ctx)
+    return this.left.evaluate(ctx) === this.right.evaluate(ctx)
   }
 }

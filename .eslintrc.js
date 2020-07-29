@@ -2,26 +2,31 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: [
-    '@typescript-eslint',
+    'simple-import-sort',
+    '@typescript-eslint'
   ],
   settings: {
     'import/parsers': {
-      '@typescript-eslint/parser': ['.ts'],
+      '@typescript-eslint/parser': ['.ts']
     },
     'import/resolver': {
-      typescript: {},
-    },
+      typescript: {}
+    }
   },
   extends: [
-    'standard',
-    'plugin:@typescript-eslint/recommended'
+    'plugin:@typescript-eslint/recommended',
+    'standard'
   ],
   rules: {
-    "no-dupe-class-members": "off",
-    "no-useless-constructor": "off",
-    "@typescript-eslint/no-useless-constructor": "off"
+    curly: 'error',
+    'max-len': ['error', { code: 120 }],
+    'no-dupe-class-members': 'off',
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-useless-constructor': 'off',
+    '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }],
+    'simple-import-sort/sort': ['error']
   }
-};
+}

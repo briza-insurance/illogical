@@ -3,16 +3,8 @@
  * @module illogical/expression/comparison
  */
 
-import {
-  Context,
-  Result,
-  Evaluable,
-  EvaluableType
-} from '../../common/evaluable'
-
-import {
-  Operand
-} from '../../operand'
+import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
+import { Operand } from '../../operand'
 
 /**
  * Abstract comparison expression
@@ -48,7 +40,6 @@ export abstract class Comparison implements Evaluable {
    * @return {string}
    */
   toString (): string {
-    return `(${this.left.toString()}` +
-      ` ${this.operator} ${this.right.toString()})`
+    return `(${this.left.toString()} ${this.operator} ${this.right.toString()})`
   }
 }

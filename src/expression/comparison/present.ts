@@ -3,9 +3,9 @@
  * @module illogical/expression/comparison
  */
 
-import { Comparison } from './index'
 import { Context, Evaluable, Result } from '../../common/evaluable'
 import { Value } from '../../operand/value'
+import { Comparison } from './index'
 
 // Operator key
 export const OPERATOR = Symbol('PRESENT')

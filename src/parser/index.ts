@@ -3,78 +3,30 @@
  * @module illogical/parser
  */
 
-// Parser
-import { Options, defaultOptions, optionValue } from './options'
-
-// Base
 import { Evaluable, EvaluableType } from '../common/evaluable'
-
-// Operand
-import { Value } from '../operand/value'
-import { Reference } from '../operand/reference'
-import { Collection } from '../operand/collection'
-
-// Comparison expressions
-import {
-  Equal,
-  OPERATOR as OPERATOR_EQ
-} from '../expression/comparison/eq'
-import {
-  NotEqual,
-  OPERATOR as OPERATOR_NE
-} from '../expression/comparison/ne'
-import {
-  GreaterThan,
-  OPERATOR as OPERATOR_GT
-} from '../expression/comparison/gt'
-import {
-  GreaterThanOrEqual,
-  OPERATOR as OPERATOR_GE
-} from '../expression/comparison/ge'
-import {
-  LessThan,
-  OPERATOR as OPERATOR_LT
-} from '../expression/comparison/lt'
-import {
-  LessThanOrEqual,
-  OPERATOR as OPERATOR_LE
-} from '../expression/comparison/le'
-import {
-  In,
-  OPERATOR as OPERATOR_IN
-} from '../expression/comparison/in'
-import {
-  NotIn,
-  OPERATOR as OPERATOR_NOT_IN
-} from '../expression/comparison/not-in'
-import {
-  Prefix,
-  OPERATOR as OPERATOR_PREFIX
-} from '../expression/comparison/prefix'
-import {
-  Suffix,
-  OPERATOR as OPERATOR_SUFFIX
-} from '../expression/comparison/suffix'
-import {
-  Overlap,
-  OPERATOR as OPERATOR_OVERLAP
-} from '../expression/comparison/overlap'
-import {
-  Undefined,
-  OPERATOR as OPERATOR_UNDEFINED
-} from '../expression/comparison/undefined'
-import {
-  Present,
-  OPERATOR as OPERATOR_PRESENT
-} from '../expression/comparison/present'
-
-// Logical expressions
+import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
+import { GreaterThanOrEqual, OPERATOR as OPERATOR_GE } from '../expression/comparison/ge'
+import { GreaterThan, OPERATOR as OPERATOR_GT } from '../expression/comparison/gt'
+import { In, OPERATOR as OPERATOR_IN } from '../expression/comparison/in'
+import { LessThanOrEqual, OPERATOR as OPERATOR_LE } from '../expression/comparison/le'
+import { LessThan, OPERATOR as OPERATOR_LT } from '../expression/comparison/lt'
+import { NotEqual, OPERATOR as OPERATOR_NE } from '../expression/comparison/ne'
+import { NotIn, OPERATOR as OPERATOR_NOT_IN } from '../expression/comparison/not-in'
+import { OPERATOR as OPERATOR_OVERLAP, Overlap } from '../expression/comparison/overlap'
+import { OPERATOR as OPERATOR_PREFIX, Prefix } from '../expression/comparison/prefix'
+import { OPERATOR as OPERATOR_PRESENT, Present } from '../expression/comparison/present'
+import { OPERATOR as OPERATOR_SUFFIX, Suffix } from '../expression/comparison/suffix'
+import { OPERATOR as OPERATOR_UNDEFINED, Undefined } from '../expression/comparison/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
-import { Or, OPERATOR as OPERATOR_OR } from '../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
-import { Xor, OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
+import { OPERATOR as OPERATOR_OR, Or } from '../expression/logical/or'
+import { OPERATOR as OPERATOR_XOR, Xor } from '../expression/logical/xor'
 import { Operand } from '../operand'
+import { Collection } from '../operand/collection'
+import { Reference } from '../operand/reference'
+import { Value } from '../operand/value'
+import { defaultOptions, Options, optionValue } from './options'
 
 // Input types
 export type ArrayInput = Array<string | number | boolean | null>

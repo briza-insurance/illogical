@@ -3,14 +3,9 @@
  * @module illogical/expression/suffix
  */
 
-import {
-  Context,
-  Result,
-  Evaluable
-} from '../../common/evaluable'
-
-import { Comparison } from '../comparison'
+import { Context, Evaluable, Result } from '../../common/evaluable'
 import { isString } from '../../common/type-check'
+import { Comparison } from '../comparison'
 
 // Operator key
 export const OPERATOR = Symbol('PREFIX')
@@ -24,7 +19,7 @@ export class Suffix extends Comparison {
    * @param {Evaluable} left Left operand.
    * @param {Evaluable} right Right operand.
    */
-  constructor (...args: Evaluable[]);
+  constructor(...args: Evaluable[]);
   constructor (left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
