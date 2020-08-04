@@ -2,7 +2,7 @@
  * Logical expression module.
  * @module illogical/expression/logical
  */
-import { Context, Result, Evaluable } from '../../common/evaluable';
+import { Context, Evaluable, Result } from '../../common/evaluable';
 import { Logical } from '../logical';
 export declare const OPERATOR: unique symbol;
 /**
