@@ -2,8 +2,8 @@
  * Present expression module.
  * @module illogical/expression/comparison
  */
-import { Comparison } from './index';
 import { Context, Evaluable, Result } from '../../common/evaluable';
+import { Comparison } from './index';
 export declare const OPERATOR: unique symbol;
 /**
  * Present comparison expression

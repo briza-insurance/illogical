@@ -2,7 +2,7 @@
  * Logical expression module.
  * @module illogical/expression/logical
  */
-import { Context, Result, Evaluable, EvaluableType } from '../../common/evaluable';
+import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable';
 /**
  * Abstract logical expression
  */

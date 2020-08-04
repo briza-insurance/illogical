@@ -2,8 +2,8 @@
  * Parser module.
  * @module illogical/parser
  */
-import { Options } from './options';
 import { Evaluable } from '../common/evaluable';
+import { Options } from './options';
 export declare type ArrayInput = Array<string | number | boolean | null>;
 export declare type Input = string | number | boolean | null | ArrayInput;
 export declare type ExpressionInput = [string, ...Input[]];

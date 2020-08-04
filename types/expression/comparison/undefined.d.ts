@@ -2,7 +2,7 @@
  * Undefined expression module.
  * @module illogical/expression/comparison
  */
-import { Context, Result, Evaluable } from '../../common/evaluable';
+import { Context, Evaluable, Result } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;
 /**

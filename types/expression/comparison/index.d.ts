@@ -2,7 +2,7 @@
  * Comparison expression module.
  * @module illogical/expression/comparison
  */
-import { Context, Result, Evaluable, EvaluableType } from '../../common/evaluable';
+import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable';
 import { Operand } from '../../operand';
 /**
  * Abstract comparison expression
