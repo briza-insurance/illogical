@@ -9,7 +9,8 @@
  * Format: key: value.
  */
 export interface Context {
-  [k: string]: Record<string, unknown> | string | number | boolean | null | string[] | number[] | undefined;
+  [k: string]: Record<string, unknown> | string | number | boolean | null |
+    string[] | number[] | Record<string, unknown>[] | undefined;
 }
 
 /**

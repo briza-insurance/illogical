@@ -21,6 +21,13 @@ describe('Operand - Value', () => {
       ['RefC.subC', undefined ],
       ['RefC.subB.subSubB', undefined ],
       ['RefC.subA.subSubA', undefined ],
+      // Complex
+      ['Ref{Ref{RefE}}', 1],
+      ['RefC.{RefF}', 2],
+      ['RefG[{RefC.sub{RefD}}]', 'Fish'],
+      ['RefH[{RefA}].sub{RefD}', 2],
+      ['RefA{RefA}', undefined],
+      ['RefB.{RefA}', undefined]
     ])('%p should evaluate as %p', (value, expected) => {
       expect(new Reference(value).evaluate({
         RefA: 1,
@@ -30,7 +37,23 @@ describe('Operand - Value', () => {
           subB: {
             subSubA: 3
           }
-        }
+        },
+        RefD: 'A',
+        RefE: 'D',
+        RefF: 'subA',
+        RefG: [
+          'Apples',
+          'Oranges',
+          'Fish'
+        ],
+        RefH: [
+          {
+            subA: 1
+          },
+          {
+            subA: 2
+          }
+        ]
       })).toBe(expected)
     })
   })

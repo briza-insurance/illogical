@@ -407,6 +407,10 @@ describe('Condition Engine - Parser', () => {
           ]),
           new Collection([new Value('a')])
         )
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA{RefB}'],
+        new Present(new Reference('RefA{RefB}'))
       ]
     ] as [ExpressionInput, Evaluable][])
       ('%p should evaluate as %p', (expression, expected) => {
