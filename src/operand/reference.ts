@@ -55,7 +55,7 @@ function contextValueLookup (ctx: Context, key: string): Result {
 
     // Last node
     if (i === keys.length - 1) {
-      return currentValue as Result | undefined
+      return currentValue as Result
 
       // Nested path
     } else if (currentValue !== undefined && isObject(currentValue)) {
