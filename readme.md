@@ -190,6 +190,14 @@ The evaluation data context is used to provide the expression with variable refe
 To reference the nested reference, please use "." delimiter, e.g.:
 ```$address.city```
 
+You can also use square brackets to access a specific element of an array:
+```$options[1]```
+
+Complex references are supported using curly brackets. This feature allows you to use a value from the context as part of your reference.
+```$options[{optionIndex}]```
+```$address{selectedAddress}```
+```$address.{child}```
+
 **Example**
 ```js
 // Data context
@@ -198,10 +206,17 @@ const ctx = {
   country: 'canada',
   age: 21,
   options: [1,2,3],
+  optionIndex: [1],
   address: {
     city: 'Toronto',
     country: 'Canada',
-  }
+  },
+  address2: {
+    city: 'Vancouver',
+    country: 'Canada',
+  },
+  selectedAddress: '2',
+  child: 'country'
 }
 
 // Evaluate an expression in the given data context
@@ -209,6 +224,18 @@ engine.evaluate(['>', '$age', 20], ctx); // true
 
 // Evaluate an expression in the given data context
 engine.evaluate(['==', '$address.city', 'Toronto'], ctx); // true
+
+// Evaluate an expression using a reference that includes the array notation
+engine.evaluate(['==', '$options[1]', 2], ctx) // true
+
+// Evaluate an expression using a complex array reference
+engine.evaluate(['==', '$options[{optionIndex}]', 2], ctx) // true
+
+// Evaluate an expression using a complex composite reference
+engine.evaluate(['==', '$address{selectedAddress}.city', 'Vancouver'], ctx) // true
+
+// Evaluate an expression using a complex nested reference
+engine.evaluate(['==', '$address.{child}', 'Canada'], ctx) // true
 ```
 
 ### Operand Types
