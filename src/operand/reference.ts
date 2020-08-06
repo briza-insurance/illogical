@@ -50,10 +50,10 @@ function contextValueLookup (ctx: Context, key: string): Result {
       const arrayIndex = parseInt(match.replace(/[[\]]/g, ''))
 
       if (!Array.isArray(currentValue) || currentValue[arrayIndex] === undefined) {
-        return undefined
+        currentValue = undefined
+      } else {
+        currentValue = currentValue[arrayIndex]
       }
-
-      currentValue = currentValue[arrayIndex]
     })
 
     // Last node

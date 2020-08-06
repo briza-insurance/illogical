@@ -24,6 +24,7 @@ describe('Operand - Value', () => {
       // Array
       ['RefG[1]', 'Oranges'],
       ['RefI[0][1]', 'B'],
+      ['RefI[0][5]', undefined],
       // Complex
       ['Ref{Ref{RefE}}', 1],
       ['RefC.{RefF}', 2],
