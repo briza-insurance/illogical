@@ -42,21 +42,19 @@ function contextValueLookup (ctx: Context, key: string): Result {
   let pointer = ctx
 
   for (let i = 0; i < keys.length; i++) {
-    let currentValue = pointer[keys[i]]
+    const currentKey = keys[i].replace(/\[.+$/, '')
+    let currentValue = pointer[currentKey]
 
     // Resolve array notation
-    const matchesArrayNotation = /^(.+)\[(\d+)\]$/.exec(keys[i])
+    keys[i].match(/\[\d+\]/g)?.forEach(match => {
+      const arrayIndex = parseInt(match.replace(/[[\]]/g, ''))
 
-    if (matchesArrayNotation) {
-      const value = pointer[matchesArrayNotation[1]]
-      const arrayIndex = parseInt(matchesArrayNotation[2])
-
-      if (!Array.isArray(value) || value[arrayIndex] === undefined) {
+      if (!Array.isArray(currentValue) || currentValue[arrayIndex] === undefined) {
         return undefined
       }
 
-      currentValue = value[arrayIndex]
-    }
+      currentValue = currentValue[arrayIndex]
+    })
 
     // Last node
     if (i === keys.length - 1) {

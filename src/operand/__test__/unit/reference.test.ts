@@ -21,6 +21,9 @@ describe('Operand - Value', () => {
       ['RefC.subC', undefined ],
       ['RefC.subB.subSubB', undefined ],
       ['RefC.subA.subSubA', undefined ],
+      // Array
+      ['RefG[1]', 'Oranges'],
+      ['RefI[0][1]', 'B'],
       // Complex
       ['Ref{Ref{RefE}}', 1],
       ['RefC.{RefF}', 2],
@@ -54,6 +57,10 @@ describe('Operand - Value', () => {
           {
             subA: 2
           }
+        ],
+        RefI: [
+          ['A', 'B'],
+          ['C', 'D']
         ],
         Refundefined: 'A'
       })).toBe(expected)

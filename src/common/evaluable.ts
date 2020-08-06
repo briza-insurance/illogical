@@ -4,13 +4,17 @@
  */
 
 /**
+ * Valid types for context members
+ */
+type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[]
+
+/**
  * Evaluation Context
  * Holds references used during the evaluation process.
  * Format: key: value.
  */
 export interface Context {
-  [k: string]: Record<string, unknown> | string | number | boolean | null |
-    string[] | number[] | Record<string, unknown>[] | undefined;
+  [k: string]: ContextValue;
 }
 
 /**
