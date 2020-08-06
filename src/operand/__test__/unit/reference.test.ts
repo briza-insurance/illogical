@@ -27,7 +27,8 @@ describe('Operand - Value', () => {
       ['RefG[{RefC.sub{RefD}}]', 'Fish'],
       ['RefH[{RefA}].sub{RefD}', 2],
       ['RefA{RefA}', undefined],
-      ['RefB.{RefA}', undefined]
+      ['RefB.{RefA}', undefined],
+      ['Ref{RefB}', undefined]
     ])('%p should evaluate as %p', (value, expected) => {
       expect(new Reference(value).evaluate({
         RefA: 1,
@@ -53,7 +54,8 @@ describe('Operand - Value', () => {
           {
             subA: 2
           }
-        ]
+        ],
+        Refundefined: 'A'
       })).toBe(expected)
     })
   })

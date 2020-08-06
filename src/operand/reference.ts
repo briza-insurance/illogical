@@ -22,6 +22,11 @@ function contextValueLookup (ctx: Context, key: string): Result {
 
   while (complexKeyMatches) {
     const resolvedValue = contextValueLookup(ctx, complexKeyMatches[1])
+
+    if (resolvedValue === undefined) {
+      return undefined
+    }
+
     key = key.replace(complexKeyExpression, `${resolvedValue}`)
     complexKeyMatches = complexKeyExpression.exec(key)
   }
