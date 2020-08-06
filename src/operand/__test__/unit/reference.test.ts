@@ -63,6 +63,12 @@ describe('Operand - Value', () => {
           ['A', 'B'],
           ['C', 'D']
         ],
+        // This is to make sure the code returns undefined when it can't resolve a complex reference.
+        // It applies to this test case: ['Ref{RefB}', undefined].
+        // When RefB can't be resolved, it should return undefined right away instead of transforming
+        // Ref{RefB} into `Refundefined`. To make sure this works as expected `Refundefined` is added
+        // to the context here so for that test case it would resolve to 'A' instead of undefined if
+        // the implementation was incorrect, and the test would fail.
         Refundefined: 'A'
       })).toBe(expected)
     })
