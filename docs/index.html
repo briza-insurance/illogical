@@ -69,7 +69,7 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: July 22, 2020.</p>
+					<p>Revision: August 6, 2020.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -274,6 +274,33 @@ evaluable.toString();
 				</blockquote>
 				<p>To reference the nested reference, please use &quot;.&quot; delimiter, e.g.:
 				<code>$address.city</code></p>
+				<a href="#accessing-array-element" id="accessing-array-element" style="color: inherit; text-decoration: none;">
+					<h4>Accessing Array Element:</h4>
+				</a>
+				<p><code>$options[1]</code></p>
+				<a href="#accessing-array-element-via-reference" id="accessing-array-element-via-reference" style="color: inherit; text-decoration: none;">
+					<h4>Accessing Array Element via Reference:</h4>
+				</a>
+				<p><code>$options[{index}]</code></p>
+				<ul>
+					<li>The <strong>index</strong> reference is resolved within the data context as an array index.</li>
+				</ul>
+				<a href="#nested-referencing" id="nested-referencing" style="color: inherit; text-decoration: none;">
+					<h4>Nested Referencing</h4>
+				</a>
+				<p><code>$address.{segment}</code></p>
+				<ul>
+					<li>The <strong>segment</strong> reference is resolved within the data context as a property key.</li>
+				</ul>
+				<a href="#composite-reference-key" id="composite-reference-key" style="color: inherit; text-decoration: none;">
+					<h4>Composite Reference Key</h4>
+				</a>
+				<p><code>$shape{shapeType}</code></p>
+				<ul>
+					<li>The <strong>shapeType</strong> reference is resolved within the data context, and inserted into the outer reference key.</li>
+					<li>E.g. <strong>shapeType</strong> is resolved as &quot;<strong>B</strong>&quot; and would compose the <strong>$shapeB</strong> outer reference.</li>
+					<li>This resolution could be n-nested.</li>
+				</ul>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span class="hljs-comment">// Data context</span>
 <span class="hljs-keyword">const</span> ctx = {
@@ -284,14 +311,31 @@ evaluable.toString();
   <span class="hljs-attr">address</span>: {
     <span class="hljs-attr">city</span>: <span class="hljs-string">&#x27;Toronto&#x27;</span>,
     <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;Canada&#x27;</span>,
-  }
+  },
+  <span class="hljs-attr">index</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">segment</span>: <span class="hljs-string">&#x27;city&#x27;</span>,
+  <span class="hljs-attr">shapeA</span>: <span class="hljs-string">&#x27;box&#x27;</span>,
+  <span class="hljs-attr">shapeB</span>: <span class="hljs-string">&#x27;circle&#x27;</span>,
+  <span class="hljs-attr">shapeType</span>: <span class="hljs-string">&#x27;B&#x27;</span>
 }
 
 <span class="hljs-comment">// Evaluate an expression in the given data context</span>
 engine.evaluate([<span class="hljs-string">&#x27;&gt;&#x27;</span>, <span class="hljs-string">&#x27;$age&#x27;</span>, <span class="hljs-number">20</span>], ctx); <span class="hljs-comment">// true</span>
 
 <span class="hljs-comment">// Evaluate an expression in the given data context</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$address.city&#x27;</span>, <span class="hljs-string">&#x27;Toronto&#x27;</span>], ctx); <span class="hljs-comment">// true</span></code></pre>
+engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$address.city&#x27;</span>, <span class="hljs-string">&#x27;Toronto&#x27;</span>], ctx); <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Accessing Array Element</span>
+engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$options[1]&#x27;</span>, <span class="hljs-number">2</span>], ctx) <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Accessing Array Element via Reference</span>
+engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$options[{index}]&#x27;</span>, <span class="hljs-number">3</span>], ctx) <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Nested Referencing</span>
+engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$address.{segment}&#x27;</span>, <span class="hljs-string">&#x27;Toronto&#x27;</span>], ctx) <span class="hljs-comment">// true</span>
+
+<span class="hljs-comment">// Composite Reference Key</span>
+engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$shape{shapeType}&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>], ctx) <span class="hljs-comment">// true</span></code></pre>
 				<a href="#operand-types" id="operand-types" style="color: inherit; text-decoration: none;">
 					<h3>Operand Types</h3>
 				</a>

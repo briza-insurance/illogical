@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.2.4
+* Add support for complex references
+
 ## 1.2.3
 * Add support for null and undefined in isObject() method
 

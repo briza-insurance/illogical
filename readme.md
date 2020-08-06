@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: July 22, 2020.
+> Revision: August 6, 2020.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
