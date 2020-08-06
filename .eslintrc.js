@@ -27,6 +27,8 @@ module.exports = {
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': 'off',
     '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }],
-    'simple-import-sort/sort': ['error']
+    'simple-import-sort/sort': ['error'],
+    'no-unused-expressions': 'off',
+    '@typescript-eslint/no-unused-expressions': 'error'
   }
 }
