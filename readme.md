@@ -190,16 +190,25 @@ The evaluation data context is used to provide the expression with variable refe
 To reference the nested reference, please use "." delimiter, e.g.:
 ```$address.city```
 
-You can also use square brackets to access a specific element of an array:
+#### Accessing Array Element:
 ```$options[1]```
 
-Complex references are supported using curly brackets. This feature allows you to use a value from the context as part of your reference:
+#### Accessing Array Element via Reference:
+```$options[{index}]```
 
-```
-$options[{optionIndex}]
-$address{selectedAddress}
-$address.{child}
-```
+* The **index** reference is resolved within the data context as an array index.
+
+#### Nested Referencing
+```$address.{segment}```
+
+* The **segment** reference is resolved within the data context as a property key.
+
+#### Composite Reference Key
+```$shape{shapeType}```
+
+* The **shapeType** reference is resolved within the data context, and inserted into the outer reference key.
+* E.g. **shapeType** is resolved as "**B**" and would compose the **$shapeB** outer reference.
+* This resolution could be n-nested.
 
 **Example**
 ```js
@@ -209,17 +218,15 @@ const ctx = {
   country: 'canada',
   age: 21,
   options: [1,2,3],
-  optionIndex: [1],
   address: {
     city: 'Toronto',
     country: 'Canada',
   },
-  address2: {
-    city: 'Vancouver',
-    country: 'Canada',
-  },
-  selectedAddress: '2',
-  child: 'country'
+  index: 2,
+  segment: 'city',
+  shapeA: 'box',
+  shapeB: 'circle',
+  shapeType: 'B'
 }
 
 // Evaluate an expression in the given data context
@@ -228,17 +235,17 @@ engine.evaluate(['>', '$age', 20], ctx); // true
 // Evaluate an expression in the given data context
 engine.evaluate(['==', '$address.city', 'Toronto'], ctx); // true
 
-// Evaluate an expression using a reference that includes the array notation
+// Accessing Array Element
 engine.evaluate(['==', '$options[1]', 2], ctx) // true
 
-// Evaluate an expression using a complex array reference
-engine.evaluate(['==', '$options[{optionIndex}]', 2], ctx) // true
+// Accessing Array Element via Reference
+engine.evaluate(['==', '$options[{index}]', 3], ctx) // true
 
-// Evaluate an expression using a complex composite reference
-engine.evaluate(['==', '$address{selectedAddress}.city', 'Vancouver'], ctx) // true
+// Nested Referencing
+engine.evaluate(['==', '$address.{segment}', 'Toronto'], ctx) // true
 
-// Evaluate an expression using a complex nested reference
-engine.evaluate(['==', '$address.{child}', 'Canada'], ctx) // true
+// Composite Reference Key
+engine.evaluate(['==', '$shape{shapeType}', 'circle'], ctx) // true
 ```
 
 ### Operand Types

@@ -40,7 +40,7 @@ function contextValueLookup (ctx: Context, key: string): Result {
     let currentValue = pointer[keys[i]]
 
     // Resolve array notation
-    const matchesArrayNotation = /^(.+)\[(\d+)]$/.exec(keys[i])
+    const matchesArrayNotation = /^(.+)\[(\d+)\]$/.exec(keys[i])
 
     if (matchesArrayNotation) {
       const value = pointer[matchesArrayNotation[1]]
