@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 1.2.4
+* Add support for array element targeting within reference operand key
+* Add support for array element targeting via reference within reference operand key
+* Add support for nested key resolution within reference operand key
+* Add support for composite key resolution within reference operand key
+
 ## 1.2.3
 * Add support for null and undefined in isObject() method
 

@@ -16,6 +16,21 @@ import { Operand } from '.'
  * @return {Result}
  */
 function contextValueLookup (ctx: Context, key: string): Result {
+  // Resolve complex keys
+  const complexKeyExpression = /{([^{}]+)}/
+  let complexKeyMatches = complexKeyExpression.exec(key)
+
+  while (complexKeyMatches) {
+    const resolvedValue = contextValueLookup(ctx, complexKeyMatches[1])
+
+    if (resolvedValue === undefined) {
+      return undefined
+    }
+
+    key = key.replace(complexKeyExpression, `${resolvedValue}`)
+    complexKeyMatches = complexKeyExpression.exec(key)
+  }
+
   let keys = [key]
 
   // Nested reference
@@ -27,14 +42,27 @@ function contextValueLookup (ctx: Context, key: string): Result {
   let pointer = ctx
 
   for (let i = 0; i < keys.length; i++) {
+    const currentKey = keys[i].replace(/\[.+$/, '')
+    let currentValue = pointer[currentKey]
+
+    // Resolve array notation
+    keys[i].match(/\[\d+\]/g)?.forEach(match => {
+      const arrayIndex = parseInt(match.replace(/[[\]]/g, ''))
+
+      if (!Array.isArray(currentValue) || currentValue[arrayIndex] === undefined) {
+        currentValue = undefined
+      } else {
+        currentValue = currentValue[arrayIndex]
+      }
+    })
+
     // Last node
     if (i === keys.length - 1) {
-      if (keys[i] in pointer) {
-        return pointer[keys[i]] as Result
-      }
+      return currentValue as Result
+
       // Nested path
-    } else if (keys[i] in pointer && isObject(pointer[keys[i]])) {
-      pointer = pointer[keys[i]] as Context
+    } else if (currentValue !== undefined && isObject(currentValue)) {
+      pointer = currentValue as Context
 
       // Invalid nested reference path
     } else {

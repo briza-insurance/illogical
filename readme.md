@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: July 22, 2020.
+> Revision: August 6, 2020.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -190,6 +190,26 @@ The evaluation data context is used to provide the expression with variable refe
 To reference the nested reference, please use "." delimiter, e.g.:
 ```$address.city```
 
+#### Accessing Array Element:
+```$options[1]```
+
+#### Accessing Array Element via Reference:
+```$options[{index}]```
+
+* The **index** reference is resolved within the data context as an array index.
+
+#### Nested Referencing
+```$address.{segment}```
+
+* The **segment** reference is resolved within the data context as a property key.
+
+#### Composite Reference Key
+```$shape{shapeType}```
+
+* The **shapeType** reference is resolved within the data context, and inserted into the outer reference key.
+* E.g. **shapeType** is resolved as "**B**" and would compose the **$shapeB** outer reference.
+* This resolution could be n-nested.
+
 **Example**
 ```js
 // Data context
@@ -201,7 +221,12 @@ const ctx = {
   address: {
     city: 'Toronto',
     country: 'Canada',
-  }
+  },
+  index: 2,
+  segment: 'city',
+  shapeA: 'box',
+  shapeB: 'circle',
+  shapeType: 'B'
 }
 
 // Evaluate an expression in the given data context
@@ -209,6 +234,18 @@ engine.evaluate(['>', '$age', 20], ctx); // true
 
 // Evaluate an expression in the given data context
 engine.evaluate(['==', '$address.city', 'Toronto'], ctx); // true
+
+// Accessing Array Element
+engine.evaluate(['==', '$options[1]', 2], ctx) // true
+
+// Accessing Array Element via Reference
+engine.evaluate(['==', '$options[{index}]', 3], ctx) // true
+
+// Nested Referencing
+engine.evaluate(['==', '$address.{segment}', 'Toronto'], ctx) // true
+
+// Composite Reference Key
+engine.evaluate(['==', '$shape{shapeType}', 'circle'], ctx) // true
 ```
 
 ### Operand Types
