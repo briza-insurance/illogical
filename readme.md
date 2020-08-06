@@ -193,10 +193,13 @@ To reference the nested reference, please use "." delimiter, e.g.:
 You can also use square brackets to access a specific element of an array:
 ```$options[1]```
 
-Complex references are supported using curly brackets. This feature allows you to use a value from the context as part of your reference.
-```$options[{optionIndex}]```
-```$address{selectedAddress}```
-```$address.{child}```
+Complex references are supported using curly brackets. This feature allows you to use a value from the context as part of your reference:
+
+```
+$options[{optionIndex}]
+$address{selectedAddress}
+$address.{child}
+```
 
 **Example**
 ```js
