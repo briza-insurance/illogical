@@ -6,11 +6,11 @@ on:
 jobs:
   ci:
     name: Continuous integration
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container:
-      image: node:12.14.1-slim
+      image: node:12-slim
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install npm modules
         run: npm i
       - name: Scan project for vulnerabilities
