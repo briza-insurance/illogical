@@ -5,6 +5,7 @@
 
 import { Context, Evaluable, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
+import { Options } from '../parser/options'
 import { Operand } from '.'
 
 /**
@@ -103,9 +104,13 @@ export class Reference extends Operand {
   simplify (ctx: Context): Result | Evaluable {
     const key = this.key.split(/\./)[0]
     if (ctx[key] !== undefined) { // TODO excluded ids
-      this.evaluate(ctx)
+      return this.evaluate(ctx)
     }
     return this
+  }
+
+  serialize ({ referenceSerialization }: Options): string {
+    return referenceSerialization(this.key)
   }
 
   /**

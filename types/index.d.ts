@@ -21,7 +21,7 @@ import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor';
 import { OPERATOR as OPERATOR_NOT } from './expression/logical/not';
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or';
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor';
-import { ExpressionInput } from './parser';
+import { ExpressionInput, Input } from './parser';
 import { Options } from './parser/options';
 export { OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT };
 /**
@@ -53,5 +53,6 @@ declare class Engine {
      * @return {Evaluable}
      */
     parse(exp: ExpressionInput): Evaluable;
+    simplify(exp: ExpressionInput, context: Context): Input | boolean;
 }
 export default Engine;

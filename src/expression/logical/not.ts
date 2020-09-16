@@ -23,7 +23,7 @@ export class Not extends Logical {
     if (arguments.length !== 1) {
       throw new Error('logical NOT expression must have exactly one operand')
     }
-    super('NOT', [operand])
+    super('NOT', OPERATOR, [operand])
   }
 
   /**

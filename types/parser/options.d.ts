@@ -22,6 +22,7 @@ export interface Options {
      * @return {string}
      */
     referenceTransform: (operand: string) => string;
+    referenceSerialization: (operand: string) => string;
     /**
      * Mapping of the operators. The key is unique operator key, and the value
      * is the key used to represent the  given operator in the raw expression.
@@ -45,6 +46,7 @@ export declare function defaultReferencePredicate(key: string): boolean;
  * @return {string}
  */
 export declare function defaultReferenceTransform(key: string): string;
+export declare function defaultReferenceSerialization(key: string): string;
 export declare const defaultOperatorMapping: Map<symbol, string>;
 /**
  * Default parser options

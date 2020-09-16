@@ -2,7 +2,7 @@
  * Operand module.
  * @module illogical/operand
  */
-import { Context, Result } from '../common/evaluable';
+import { Result } from '../common/evaluable';
 import { Operand } from '.';
 /**
  * Static value operand
@@ -19,7 +19,8 @@ export declare class Value extends Operand {
      * @param {Context} ctx
      * @return {boolean}
      */
-    evaluate(ctx: Context): Result;
+    evaluate(): Result;
+    simplify(): Result;
     /**
      * Get the strict representation of the operand.
      * @return {string}

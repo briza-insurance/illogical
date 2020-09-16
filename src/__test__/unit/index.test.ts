@@ -13,7 +13,7 @@ import { OPERATOR as OPERATOR_AND } from '../../expression/logical/and'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor'
-import { ExpressionInput } from '../../parser'
+import { ExpressionInput, Input } from '../../parser'
 import { Context } from '../../common/evaluable'
 
 describe('Condition Engine', () => {
@@ -128,6 +128,24 @@ describe('Condition Engine', () => {
       [[OPERATOR_XOR]],
     ])('%p should throw', (expression) => {
       expect(() => engine.parse(expression as ExpressionInput)).toThrowError()
+    })
+  })
+
+  describe('simplify', () => {
+    test.each<[ExpressionInput, Context, boolean | Input]>([
+      [['==', '$a', '$b'], { a: 10, b: 20 }, false],
+      [['==', '$a', '$b'], { a: 10 }, ['==', '$a', '$b']],
+      [['==', '$a', '$b'], { a: 10, b: 10 }, true],
+      [['AND', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, ['==', '$c', '$d']],
+      [
+        ['AND', ['==', '$a', '$e'], ['==', '$c', '$d']],
+        { a: 10, b: 10 },
+        ['AND', ['==', '$a', '$e'], ['==', '$c', '$d']]
+      ],
+      [['OR', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, true],
+    ])('%p with context %p should be simplified to %p', (exp, ctx, expected) => {
+      const engine = new Engine()
+      expect(engine.simplify(exp, ctx)).toEqual(expected)
     })
   })
 })

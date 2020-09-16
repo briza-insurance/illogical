@@ -23,7 +23,7 @@ export class Overlap extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('overlap', left, right)
+    super('overlap', OPERATOR, left, right)
   }
 
   comparison (left: Result, right: Result): boolean {

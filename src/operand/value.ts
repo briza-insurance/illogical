@@ -5,6 +5,7 @@
 
 import { Result } from '../common/evaluable'
 import { isString } from '../common/type-check'
+import { Input } from '../parser'
 import { Operand } from '.'
 
 /**
@@ -48,6 +49,10 @@ export class Value extends Operand {
 
   simplify (): Result {
     return this.value
+  }
+
+  serialize (): Input {
+    return this.value as Input
   }
 
   /**

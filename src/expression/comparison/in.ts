@@ -23,7 +23,7 @@ export class In extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('in', left, right)
+    super('in', OPERATOR, left, right)
   }
 
   comparison (left: Result, right: Result): boolean {

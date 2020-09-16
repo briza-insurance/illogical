@@ -47,6 +47,7 @@ export interface Options {
    * @return {string}
    */
   referenceTransform: (operand: string) => string;
+  referenceSerialization: (operand: string) => string;
 
   /**
    * Mapping of the operators. The key is unique operator key, and the value
@@ -80,6 +81,10 @@ export function defaultReferenceTransform (key: string): string {
   return key.slice(1)
 }
 
+export function defaultReferenceSerialization (key:string): string {
+  return `$${key}`
+}
+
 // Default operator mapping
 // Unique operator key <-> raw expression key
 export const defaultOperatorMapping = new Map<symbol, string>([
@@ -111,5 +116,6 @@ export const defaultOperatorMapping = new Map<symbol, string>([
 export const defaultOptions: Options = {
   referencePredicate: defaultReferencePredicate,
   referenceTransform: defaultReferenceTransform,
+  referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping
 }

@@ -4,6 +4,8 @@
  */
 
 import { Context, Evaluable, EvaluableType, Result } from '../common/evaluable'
+import { Input } from '../parser'
+import { Options } from '../parser/options'
 
 /**
  * Abstract operand
@@ -14,6 +16,8 @@ export abstract class Operand implements Evaluable {
   abstract evaluate (ctx: Context): Result
 
   abstract simplify(ctx: Context): Result | Evaluable
+
+  abstract serialize(options: Options): Input
 
   /**
    * Get the strict representation.

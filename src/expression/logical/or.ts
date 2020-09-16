@@ -22,7 +22,7 @@ export class Or extends Logical {
     if (operands.length < 2) {
       throw new Error('logical expression must have at least two operands')
     }
-    super('OR', operands)
+    super('OR', OPERATOR, operands)
   }
 
   /**

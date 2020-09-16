@@ -34,7 +34,7 @@ export class Xor extends Logical {
     if (operands.length < 2) {
       throw new Error('logical expression must have at least two operands')
     }
-    super('XOR', operands)
+    super('XOR', OPERATOR, operands)
   }
 
   /**

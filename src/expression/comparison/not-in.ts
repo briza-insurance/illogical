@@ -23,7 +23,7 @@ export class NotIn extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('not in', left, right)
+    super('not in', OPERATOR, left, right)
   }
 
   comparison (left: Result, right: Result): boolean {

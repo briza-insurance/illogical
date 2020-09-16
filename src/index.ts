@@ -4,6 +4,7 @@
  */
 
 import { Context, Evaluable } from './common/evaluable'
+import { isBoolean, isEvaluable } from './common/type-check'
 import { OPERATOR as OPERATOR_EQ } from './expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from './expression/comparison/ge'
 import { OPERATOR as OPERATOR_GT } from './expression/comparison/gt'
@@ -22,7 +23,7 @@ import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor'
 import { OPERATOR as OPERATOR_NOT } from './expression/logical/not'
 import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
-import { ExpressionInput, Parser } from './parser'
+import { ExpressionInput, Input, Parser } from './parser'
 import { Options } from './parser/options'
 
 export {
@@ -86,6 +87,17 @@ class Engine {
    */
   parse (exp: ExpressionInput): Evaluable {
     return this.parser.parse(exp)
+  }
+
+  simplify (exp: ExpressionInput, context: Context): Input | boolean {
+    const result = this.parse(exp).simplify(context)
+    if (isEvaluable(result)) {
+      return result.serialize(this.parser.options)
+    }
+    if (isBoolean(result)) {
+      return result
+    }
+    throw new Error('non expression or boolean result should be returned')
   }
 }
 

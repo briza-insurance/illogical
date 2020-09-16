@@ -3,6 +3,9 @@
  * @module illogical/common
  */
 
+import { Input } from '../parser'
+import { Options } from '../parser/options'
+
 /**
  * Valid types for context members
  */
@@ -47,6 +50,8 @@ export interface Evaluable {
   evaluate(ctx: Context): Result;
 
   simplify(ctx: Context): Result | Evaluable
+
+  serialize(options: Options): Input;
 
   /**
    * Get the strict representation of the evaluable expression.

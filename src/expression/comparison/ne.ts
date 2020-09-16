@@ -23,7 +23,7 @@ export class NotEqual extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('!=', left, right)
+    super('!=', OPERATOR, left, right)
   }
 
   comparison (left: Result, right: Result): boolean {

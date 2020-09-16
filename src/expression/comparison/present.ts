@@ -5,6 +5,8 @@
 
 import { Evaluable, Result } from '../../common/evaluable'
 import { Value } from '../../operand/value'
+import { ExpressionInput } from '../../parser'
+import { Options } from '../../parser/options'
 import { Comparison } from './index'
 
 // Operator key
@@ -23,7 +25,7 @@ export class Present extends Comparison {
     if (arguments.length !== 1) {
       throw new Error('comparison expression PRESENT expects exactly one operand')
     }
-    super('PRESENT', operand, new Value(true))
+    super('PRESENT', OPERATOR, operand, new Value(true))
   }
 
   comparison (left: Result): boolean {
@@ -36,5 +38,14 @@ export class Present extends Comparison {
    */
   toString (): string {
     return `(${this.left.toString()} is ${this.operator})`
+  }
+
+  serialize (options: Options): ExpressionInput {
+    const { operatorMapping } = options
+    const operator = operatorMapping.get(this.operatorSymbol)
+    if (operator === undefined) {
+      throw new Error(`missing operator ${this.operatorSymbol.toString()}`)
+    }
+    return [operator, this.left.serialize(options)]
   }
 }

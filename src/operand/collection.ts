@@ -5,6 +5,8 @@
 
 import { Context, Evaluable, Result } from '../common/evaluable'
 import { isEvaluable } from '../common/type-check'
+import { Input } from '../parser'
+import { Options } from '../parser/options'
 import { Operand } from '.'
 import { Reference } from './reference'
 import { Value } from './value'
@@ -43,6 +45,10 @@ export class Collection extends Operand {
       values.push(simplifiedItem)
     }
     return values
+  }
+
+  serialize (options: Options): Input {
+    return this.items.map(item => isEvaluable(item) ? item.serialize(options) : item)
   }
 
   /**

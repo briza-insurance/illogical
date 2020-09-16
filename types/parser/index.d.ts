@@ -4,8 +4,8 @@
  */
 import { Evaluable } from '../common/evaluable';
 import { Options } from './options';
-export declare type ArrayInput = Array<string | number | boolean | null>;
-export declare type Input = string | number | boolean | null | ArrayInput;
+export declare type Input = string | number | boolean | null | Input[] | [string, ...Input[]];
+export declare type ArrayInput = Input[];
 export declare type ExpressionInput = [string, ...Input[]];
 /**
  * Parser of raw expressions into Evaluable expression

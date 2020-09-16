@@ -24,7 +24,7 @@ export class Suffix extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('suffix', left, right)
+    super('suffix', OPERATOR, left, right)
   }
 
   comparison (left: Result, right: Result): boolean {

@@ -20,4 +20,5 @@ export declare class Xor extends Logical {
      * @return {Result}
      */
     evaluate(ctx: Context): Result;
+    simplify(...args: [Context]): boolean | Evaluable;
 }

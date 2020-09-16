@@ -4,24 +4,25 @@
  */
 
 import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
+import { ExpressionInput } from '../../parser'
+import { Options } from '../../parser/options'
 
 /**
  * Abstract logical expression
  */
 export abstract class Logical implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
-  protected operator: string
-  protected operands: Evaluable[]
 
   /**
    * @constructor
    * @param {string} operator String representation of the operator.
    * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operator: string, operands: Evaluable[]) {
-    this.operator = operator
-    this.operands = operands
-  }
+  constructor (
+    protected readonly operator: string,
+    protected readonly operatorSymbol: symbol,
+    protected readonly operands: Evaluable[]
+  ) { }
 
   abstract evaluate (ctx: Context): Result
 
@@ -33,5 +34,14 @@ export abstract class Logical implements Evaluable {
    */
   toString (): string {
     return '(' + this.operands.map((operand) => operand.toString()).join(` ${this.operator} `) + ')'
+  }
+
+  serialize (options: Options): ExpressionInput {
+    const { operatorMapping } = options
+    const operator = operatorMapping.get(this.operatorSymbol)
+    if (operator === undefined) {
+      throw new Error(`missing operator ${this.operatorSymbol.toString()}`)
+    }
+    return [operator, ...this.operands.map(operand => operand.serialize(options))]
   }
 }

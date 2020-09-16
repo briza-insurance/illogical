@@ -2,7 +2,7 @@
  * Suffix expression module.
  * @module illogical/expression/suffix
  */
-import { Context, Evaluable, Result } from '../../common/evaluable';
+import { Evaluable, Result } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;
 /**
@@ -15,12 +15,7 @@ export declare class Suffix extends Comparison {
      * @param {Evaluable} right Right operand.
      */
     constructor(...args: Evaluable[]);
-    /**
-     * Evaluate in the given context.
-     * @param {Context} ctx
-     * @return {Result}
-     */
-    evaluate(ctx: Context): Result;
+    comparison(left: Result, right: Result): boolean;
     /**
      * Get the strict representation of the expression.
      * @return {string}

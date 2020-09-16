@@ -22,7 +22,7 @@ export class And extends Logical {
     if (operands.length < 2) {
       throw new Error('logical expression must have at least two operands')
     }
-    super('AND', operands)
+    super('AND', OPERATOR, operands)
   }
 
   /**
