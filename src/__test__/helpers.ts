@@ -5,6 +5,7 @@
 
 import { EvaluableType } from '../common/evaluable'
 import { Operand } from '../operand'
+import { Input } from '../parser'
 
 /**
  * Get input permutations
@@ -35,6 +36,7 @@ export const operand = (value: any): Operand => new class extends Operand {
   constructor(private readonly value: any) { super() }
   evaluate() { return this.value }
   simplify() { return this.value }
+  serialize(): Input { throw new Error('not implemented') }
 }(value)
 
 export const notSimplified = (): Operand => new class extends Operand {
@@ -42,4 +44,5 @@ export const notSimplified = (): Operand => new class extends Operand {
   constructor() { super() }
   evaluate() { return undefined }
   simplify() { return this }
+  serialize(): Input { throw new Error('not implemented') }
 }()
