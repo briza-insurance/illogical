@@ -3,7 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import { Evaluable, Result } from '../../common/evaluable'
 import { isNumber } from '../../common/type-check'
 import { Comparison } from '../comparison'
 
@@ -27,14 +27,7 @@ export class LessThan extends Comparison {
     super('<', left, right)
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate (ctx: Context): Result {
-    const left = this.left.evaluate(ctx)
-    const right = this.right.evaluate(ctx)
+  comparison (left: Result, right: Result): boolean {
     if (isNumber(left) && isNumber(right)) {
       return (left as number) < (right as number)
     }

@@ -26,7 +26,7 @@ export type Result =
   string |
   number |
   boolean |
-  Array<string | number | boolean | null>
+  Array<Result>
 
 export enum EvaluableType {
   Operand = 'Operand',
@@ -45,6 +45,8 @@ export interface Evaluable {
    * @return {Result}
    */
   evaluate(ctx: Context): Result;
+
+  simplify(ctx: Context): Result | Evaluable
 
   /**
    * Get the strict representation of the evaluable expression.

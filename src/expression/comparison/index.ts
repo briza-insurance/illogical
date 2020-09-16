@@ -4,6 +4,7 @@
  */
 
 import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
+import { isEvaluable } from '../../common/type-check'
 import { Operand } from '../../operand'
 
 /**
@@ -31,8 +32,8 @@ export abstract class Comparison implements Evaluable {
    * Evaluate in the given context.
    * @param {Context} ctx
    */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
-    throw new Error('not implemented exception')
+  evaluate (ctx: Context): Result {
+    return this.comparison(this.left.evaluate(ctx), this.right.evaluate(ctx))
   }
 
   /**
@@ -41,5 +42,16 @@ export abstract class Comparison implements Evaluable {
    */
   toString (): string {
     return `(${this.left.toString()} ${this.operator} ${this.right.toString()})`
+  }
+
+  abstract comparison (left: Result, right: Result): boolean
+
+  simplify (...args: [Context]): Result | Evaluable {
+    const left = this.left.simplify(...args)
+    const right = this.right.simplify(...args)
+    if (!isEvaluable(left) && !isEvaluable(right)) {
+      return this.comparison(left, right)
+    }
+    return this
   }
 }

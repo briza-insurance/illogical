@@ -17,7 +17,7 @@ describe('Operand - Value', () => {
       [undefined, undefined],
       [null, null]
     ])('%p should evaluate as %p', (value, expected) => {
-      expect(new Value(value).evaluate({})).toBe(expected)
+      expect(new Value(value).evaluate()).toBe(expected)
     })
   })
 

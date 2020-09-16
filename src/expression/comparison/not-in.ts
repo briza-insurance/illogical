@@ -3,7 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import { Evaluable, Result } from '../../common/evaluable'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -26,14 +26,7 @@ export class NotIn extends Comparison {
     super('not in', left, right)
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate (ctx: Context): Result {
-    const left = this.left.evaluate(ctx)
-    const right = this.right.evaluate(ctx)
+  comparison (left: Result, right: Result): boolean {
     if (left === undefined || left === null ||
       right === undefined || right === null) {
       return true

@@ -1,5 +1,5 @@
 import { Evaluable } from '../../../../common/evaluable'
-import { operand } from '../../../../__test__/helpers'
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { And } from '../../and'
 
 describe('Expression - Logical - And', () => {
@@ -22,5 +22,16 @@ describe('Expression - Logical - And', () => {
       ('%p should throw', (operands) => {
         expect(() => new And(operands).evaluate({})).toThrowError()
       })
+  })
+
+  describe('simplify', () => {
+    it.each<[And, Evaluable | boolean]>([
+      [new And([notSimplified(), operand(true)]), notSimplified()],
+      [new And([notSimplified(), operand(false), notSimplified()]), false],
+      [new And([operand(true), operand(true)]), true],
+      [new And([notSimplified(), operand(true), notSimplified()]), new And([notSimplified(), notSimplified()])]
+    ])('%p should simplify to %p', (and, expected) => {
+      expect(and.simplify({})).toEqual(expected)
+    })
   })
 })

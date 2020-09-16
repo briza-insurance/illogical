@@ -2,8 +2,9 @@ import { Value } from '../../../../operand/value'
 import { Reference } from '../../../../operand/reference'
 import { Suffix } from '../../suffix'
 import { Collection } from '../../../../operand/collection'
-import { operand } from '../../../../__test__/helpers'
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
+import { Operand } from '../../../../operand'
 
 describe('Expression - Comparison - Suffix', () => {
   describe('constructor', () => {
@@ -16,26 +17,45 @@ describe('Expression - Comparison - Suffix', () => {
     })
   })
 
+  const testCases: [Operand, Operand, boolean][] = [
+    // Truthy
+    [operand('abc'), operand('c'), true],
+    [operand('a'), operand('a'), true],
+    // Falsy
+    [operand('abc'), operand('a'), false],
+    [operand(''), operand('a'), false],
+    // Falsy - non-comparable types
+    [operand('a'), operand(1), false],
+    [operand('a'), operand(true), false],
+    [operand('a'), operand(false), false],
+    [operand('a'), operand(null), false],
+    [operand('a'), operand(undefined), false],
+    [operand('a'), new Collection([new Value(0)]), false],
+    [operand('a'), new Collection([new Value('0')]), false],
+    [operand(1), operand('a'), false],
+  ]
+
   describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [operand('abc'), operand('c'), true],
-      [operand('a'), operand('a'), true],
-      // Falsy
-      [operand('abc'), operand('a'), false],
-      [operand(''), operand('a'), false],
-      // Falsy - non-comparable types
-      [operand('a'), operand(1), false],
-      [operand('a'), operand(true), false],
-      [operand('a'), operand(false), false],
-      [operand('a'), operand(null), false],
-      [operand('a'), operand(undefined), false],
-      [operand('a'), new Collection([new Value(0)]), false],
-      [operand('a'), new Collection([new Value('0')]), false],
-      [operand(1), operand('a'), false],
-    ] as [Evaluable, Evaluable, boolean][])
+    test.each(testCases)
       ('%p and %p should evaluate as %p', (left, right, expected) => {
         expect(new Suffix(left, right).evaluate({})).toBe(expected)
       })
+  })
+
+  describe('simplify', () => {
+    test.each<[Operand, Operand, boolean | 'self']>([
+      [operand(10), notSimplified(), 'self'],
+      [notSimplified(), operand(10), 'self'],
+      [notSimplified(), notSimplified(), 'self'],
+      ...testCases
+    ])('%p should be simplified to $p', (left, right, expected) => {
+      const equal = new Suffix(left, right)
+      const result = equal.simplify({})
+      if (expected === 'self') {
+        expect(result).toBe(equal)
+      } else {
+        expect(result).toEqual(expected)
+      }
+    })
   })
 })

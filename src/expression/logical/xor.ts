@@ -4,7 +4,10 @@
  */
 
 import { Context, Evaluable, Result } from '../../common/evaluable'
+import { isBoolean } from '../../common/type-check'
 import { Logical } from '../logical'
+import { Nor } from './nor'
+import { Not } from './not'
 
 // Operator key
 export const OPERATOR = Symbol('XOR')
@@ -49,5 +52,38 @@ export class Xor extends Logical {
       }
     }
     return res
+  }
+
+  simplify (...args: [Context]): boolean | Evaluable {
+    const [evaluablesLeft, trueCount] = this.operands.reduce<[Evaluable[], number]>(
+      ([notSimplifiedConditions, trueCount], child) => {
+        if (trueCount > 1) {
+          return [notSimplifiedConditions, trueCount]
+        }
+        const childResult = child.simplify(...args)
+        if (!isBoolean(childResult)) {
+          return [[...notSimplifiedConditions, child], trueCount]
+        }
+        if (childResult) {
+          return [notSimplifiedConditions, trueCount + 1]
+        }
+        return [notSimplifiedConditions, trueCount]
+      }, [[], 0])
+    if (trueCount > 1) {
+      return false
+    }
+    if (evaluablesLeft.length === 0) {
+      return trueCount === 1
+    }
+    if (evaluablesLeft.length === 1) {
+      if (trueCount === 1) {
+        return new Not(...evaluablesLeft)
+      }
+      return evaluablesLeft[0]
+    }
+    if (trueCount === 1) {
+      return new Nor(evaluablesLeft)
+    }
+    return new Xor(evaluablesLeft)
   }
 }

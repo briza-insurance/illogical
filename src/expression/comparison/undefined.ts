@@ -3,7 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import { Evaluable, Result } from '../../common/evaluable'
 import { Value } from '../../operand/value'
 import { Comparison } from '../comparison'
 
@@ -26,13 +26,8 @@ export class Undefined extends Comparison {
     super('UNDEFINED', operand, new Value(true))
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate (ctx: Context): Result {
-    return this.left.evaluate(ctx) === undefined
+  comparison (left: Result): boolean {
+    return left === undefined
   }
 
   /**

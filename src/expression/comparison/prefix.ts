@@ -3,7 +3,7 @@
  * @module illogical/expression/prefix
  */
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import { Evaluable, Result } from '../../common/evaluable'
 import { isString } from '../../common/type-check'
 import { Comparison } from '../comparison'
 
@@ -27,14 +27,7 @@ export class Prefix extends Comparison {
     super('prefix', left, right)
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate (ctx: Context): Result {
-    const left = this.left.evaluate(ctx)
-    const right = this.right.evaluate(ctx)
+  comparison (left: Result, right: Result): boolean {
     if (isString(left) === false || isString(right) === false) {
       return false
     }

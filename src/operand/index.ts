@@ -11,13 +11,9 @@ import { Context, Evaluable, EvaluableType, Result } from '../common/evaluable'
 export abstract class Operand implements Evaluable {
   type: EvaluableType = EvaluableType.Operand
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
-    throw new Error('not implemented exception')
-  }
+  abstract evaluate (ctx: Context): Result
+
+  abstract simplify(ctx: Context): Result | Evaluable
 
   /**
    * Get the strict representation.

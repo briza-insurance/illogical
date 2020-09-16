@@ -3,7 +3,7 @@
  * @module illogical/operand
  */
 
-import { Context, Result } from '../common/evaluable'
+import { Context, Evaluable, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
 import { Operand } from '.'
 
@@ -98,6 +98,14 @@ export class Reference extends Operand {
    */
   evaluate (ctx: Context): Result {
     return contextValueLookup(ctx, this.key)
+  }
+
+  simplify (ctx: Context): Result | Evaluable {
+    const key = this.key.split(/\./)[0]
+    if (ctx[key] !== undefined) { // TODO excluded ids
+      this.evaluate(ctx)
+    }
+    return this
   }
 
   /**

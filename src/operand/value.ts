@@ -3,7 +3,7 @@
  * @module illogical/operand
  */
 
-import { Context, Result } from '../common/evaluable'
+import { Result } from '../common/evaluable'
 import { isString } from '../common/type-check'
 import { Operand } from '.'
 
@@ -42,7 +42,11 @@ export class Value extends Operand {
    * @param {Context} ctx
    * @return {boolean}
    */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
+  evaluate (): Result {
+    return this.value
+  }
+
+  simplify (): Result {
     return this.value
   }
 

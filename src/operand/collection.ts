@@ -3,7 +3,8 @@
  * @module illogical/operand
  */
 
-import { Context, Result } from '../common/evaluable'
+import { Context, Evaluable, Result } from '../common/evaluable'
+import { isEvaluable } from '../common/type-check'
 import { Operand } from '.'
 import { Reference } from './reference'
 import { Value } from './value'
@@ -30,6 +31,18 @@ export class Collection extends Operand {
    */
   evaluate (ctx: Context): Result {
     return this.items.map((item) => item.evaluate(ctx)) as []
+  }
+
+  simplify (...args: [Context]): Result | Evaluable {
+    const values: Result[] = []
+    for (const item of this.items) {
+      const simplifiedItem = item.simplify(...args)
+      if (isEvaluable(simplifiedItem)) {
+        return this
+      }
+      values.push(simplifiedItem)
+    }
+    return values
   }
 
   /**

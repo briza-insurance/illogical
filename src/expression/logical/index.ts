@@ -23,13 +23,9 @@ export abstract class Logical implements Evaluable {
     this.operands = operands
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
-    throw new Error('not implemented exception')
-  }
+  abstract evaluate (ctx: Context): Result
+
+  abstract simplify (ctx: Context): Result | Evaluable
 
   /**
    * Get the strict representation of the expression.

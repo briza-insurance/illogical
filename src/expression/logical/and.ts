@@ -4,6 +4,7 @@
  */
 
 import { Context, Evaluable, Result } from '../../common/evaluable'
+import { isBoolean } from '../../common/type-check'
 import { Logical } from '../logical'
 
 // Operator key
@@ -36,5 +37,30 @@ export class And extends Logical {
       }
     }
     return true
+  }
+
+  simplify (ctx: Context): boolean | Evaluable {
+    const simplified = this.operands.reduce<boolean | Evaluable[]>((result, child) => {
+      if (result !== false) {
+        const childResult = child.simplify(ctx)
+        if (!isBoolean(childResult)) {
+          if (isBoolean(result)) {
+            return [child]
+          }
+          return [...result, child]
+        }
+        if (!childResult) {
+          return false
+        }
+      }
+      return result
+    }, true)
+    if (Array.isArray(simplified)) {
+      if (simplified.length === 1) {
+        return simplified[0]
+      }
+      return new And(simplified)
+    }
+    return simplified
   }
 }
