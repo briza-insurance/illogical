@@ -96,6 +96,7 @@
 									<li><a href="#evaluable-function">Evaluable Function</a></li>
 								</ul>
 							</li>
+							<li><a href="#simplify">Simplify</a></li>
 						</ul>
 					</li>
 					<li><a href="#working-with-expressions">Working with Expressions</a><ul>
@@ -262,6 +263,26 @@ evaluable.evaluate({<span class="hljs-attr">name</span>: <span class="hljs-strin
 
 evaluable.toString();
 <span class="hljs-comment">// ({name} == &quot;peter&quot;)</span></code></pre>
+				<a href="#simplify" id="simplify" style="color: inherit; text-decoration: none;">
+					<h3>Simplify</h3>
+				</a>
+				<p>Simplifies an expression with a given context. This is useful when you already have some of
+				the properties of context and wants to try to eveluate the expression.</p>
+				<p><strong>Example</strong></p>
+				<pre><code class="language-js">engine.simplify([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]], { <span class="hljs-attr">a</span>: <span class="hljs-number">10</span> }) <span class="hljs-comment">// [&#x27;==&#x27;, &#x27;$b&#x27;, 20]</span>
+
+engine.simplify([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]], { <span class="hljs-attr">a</span>: <span class="hljs-number">20</span> }) <span class="hljs-comment">// false</span></code></pre>
+				<p>Values not found in the context will cause the parent operand not to be evaluated and returned
+				as part of the simplified expression.</p>
+				<p>In some situations we might want to evaluate the expression even if referred value is not
+					present. You can provide a list of keys that will be evaluated even if they are not present
+				in the context.</p>
+				<p><strong>Example</strong></p>
+				<pre><code class="language-js">engine.simplify(
+  [<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]],
+  { <span class="hljs-attr">a</span>: <span class="hljs-number">10</span> },
+  [<span class="hljs-string">&#x27;b&#x27;</span>] <span class="hljs-comment">// &#x27;$b&#x27; will be evaluted to undefined.</span>
+) <span class="hljs-comment">// false</span></code></pre>
 				<a href="#working-with-expressions" id="working-with-expressions" style="color: inherit; text-decoration: none;">
 					<h2>Working with Expressions</h2>
 				</a>
