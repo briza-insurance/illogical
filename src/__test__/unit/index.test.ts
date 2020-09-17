@@ -132,20 +132,22 @@ describe('Condition Engine', () => {
   })
 
   describe('simplify', () => {
-    test.each<[ExpressionInput, Context, boolean | Input]>([
-      [['==', '$a', '$b'], { a: 10, b: 20 }, false],
-      [['==', '$a', '$b'], { a: 10 }, ['==', '$a', '$b']],
-      [['==', '$a', '$b'], { a: 10, b: 10 }, true],
-      [['AND', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, ['==', '$c', '$d']],
+    test.each<[ExpressionInput, Context, boolean | Input, string[]]>([
+      [['==', '$a', '$b'], { a: 10, b: 20 }, false, []],
+      [['==', '$a', '$b'], { a: 10 }, ['==', '$a', '$b'], []],
+      [['==', '$a', '$b'], { a: 10, b: 10 }, true, []],
+      [['AND', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, ['==', '$c', '$d'], []],
       [
         ['AND', ['==', '$a', '$e'], ['==', '$c', '$d']],
         { a: 10, b: 10 },
-        ['AND', ['==', '$a', '$e'], ['==', '$c', '$d']]
+        ['AND', ['==', '$a', '$e'], ['==', '$c', '$d']],
+        []
       ],
-      [['OR', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, true],
-    ])('%p with context %p should be simplified to %p', (exp, ctx, expected) => {
+      [['AND', ['==', '$a', '$e'], ['==', '$c', '$d']], { a: 10, b: 10 }, false, ['e']],
+      [['OR', ['==', '$a', '$b'], ['==', '$c', '$d']], { a: 10, b: 10 }, true, []],
+    ])('%p with context %p should be simplified to %p', (exp, ctx, expected, ignoredKeys) => {
       const engine = new Engine()
-      expect(engine.simplify(exp, ctx)).toEqual(expected)
+      expect(engine.simplify(exp, ctx, ignoredKeys)).toEqual(expected)
     })
   })
 })

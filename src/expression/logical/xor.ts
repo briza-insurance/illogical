@@ -54,7 +54,7 @@ export class Xor extends Logical {
     return res
   }
 
-  simplify (...args: [Context]): boolean | Evaluable {
+  simplify (...args: [Context, string[]]): boolean | Evaluable {
     const [evaluablesLeft, trueCount] = this.operands.reduce<[Evaluable[], number]>(
       ([notSimplifiedConditions, trueCount], child) => {
         if (trueCount > 1) {

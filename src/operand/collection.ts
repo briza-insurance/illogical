@@ -35,7 +35,7 @@ export class Collection extends Operand {
     return this.items.map((item) => item.evaluate(ctx)) as []
   }
 
-  simplify (...args: [Context]): Result | Evaluable {
+  simplify (...args: [Context, string[]]): Result | Evaluable {
     const values: Result[] = []
     for (const item of this.items) {
       const simplifiedItem = item.simplify(...args)

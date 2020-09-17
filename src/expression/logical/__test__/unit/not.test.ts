@@ -35,7 +35,7 @@ describe('Expression - Logical - Not', () => {
       [new Not(operand(false)), true ],
       [new Not(operand(true)), false ],
     ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({})).toEqual(expected)
+      expect(and.simplify({}, [])).toEqual(expected)
     })
   })
 

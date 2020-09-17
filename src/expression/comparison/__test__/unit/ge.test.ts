@@ -48,7 +48,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
       const equal = new GreaterThanOrEqual(left, right)
-      const result = equal.simplify({})
+      const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
       } else {

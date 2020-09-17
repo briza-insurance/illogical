@@ -26,7 +26,7 @@ export abstract class Logical implements Evaluable {
 
   abstract evaluate (ctx: Context): Result
 
-  abstract simplify (ctx: Context): Result | Evaluable
+  abstract simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable
 
   /**
    * Get the strict representation of the expression.

@@ -37,7 +37,7 @@ describe('Expression - Logical - Nor', () => {
       [new Nor([operand(false), operand(false)]), true ],
       [new Nor([notSimplified(), operand(false), notSimplified()]), new Nor([notSimplified(), notSimplified()])]
     ])('%p should simplify to %p', (nor, expected) => {
-      expect(nor.simplify({})).toEqual(expected)
+      expect(nor.simplify({}, [])).toEqual(expected)
     })
   })
 

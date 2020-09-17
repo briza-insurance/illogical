@@ -46,7 +46,7 @@ export abstract class Comparison implements Evaluable {
 
   abstract comparison (left: Result, right: Result): boolean
 
-  simplify (...args: [Context]): Result | Evaluable {
+  simplify (...args: [Context, string[]]): Result | Evaluable {
     const left = this.left.simplify(...args)
     const right = this.right.simplify(...args)
     if (!isEvaluable(left) && !isEvaluable(right)) {

@@ -49,7 +49,7 @@ export interface Evaluable {
    */
   evaluate(ctx: Context): Result;
 
-  simplify(ctx: Context): Result | Evaluable
+  simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable
 
   serialize(options: Options): Input;
 

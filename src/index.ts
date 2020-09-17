@@ -89,8 +89,8 @@ class Engine {
     return this.parser.parse(exp)
   }
 
-  simplify (exp: ExpressionInput, context: Context): Input | boolean {
-    const result = this.parse(exp).simplify(context)
+  simplify (exp: ExpressionInput, context: Context, ignoreKeys: string[] = []): Input | boolean {
+    const result = this.parse(exp).simplify(context, ignoreKeys)
     if (isEvaluable(result)) {
       return result.serialize(this.parser.options)
     }

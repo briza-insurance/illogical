@@ -110,7 +110,7 @@ export class Reference extends Operand {
     return contextValueLookup(ctx, this.key)
   }
 
-  simplify (ctx: Context): Result | Evaluable {
+  simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable {
     const keys = extractKeys(ctx, this.key)
 
     if (!keys) {
@@ -118,7 +118,7 @@ export class Reference extends Operand {
     }
 
     const key = keys[0].replace(/\[.+$/, '')
-    if (ctx[key] !== undefined) { // TODO excluded ids
+    if (ctx[key] !== undefined || ignoreKeys.includes(key)) {
       return this.evaluate(ctx)
     }
     return this

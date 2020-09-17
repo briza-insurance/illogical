@@ -80,29 +80,31 @@ describe('Operand - Value', () => {
   describe('simplify', () => {
     test.each([
       // Existing
-      ['RefA', 1 ], 
+      ['RefA', 1, []], 
       // Nested
-      ['RefC.subA', 2 ],
-      ['RefC.subB.subSubA', 3 ], 
+      ['RefC.subA', 2, []],
+      ['RefC.subB.subSubA', 3, []], 
       // Missing
-      ['RefB', new Reference('RefB') ],
+      ['RefB', new Reference('RefB'), []],
       ['RefC.subC', undefined ],
-      ['RefC.subB.subSubB', undefined ],
-      ['RefC.subA.subSubA', undefined ],
+      ['RefC.subB.subSubB', undefined, []],
+      ['RefC.subA.subSubA', undefined, []],
       // Array
-      ['RefG[1]', 'Oranges'],
-      ['RefI[0][1]', 'B'],
-      ['RefI[0][5]', undefined],
+      ['RefG[1]', 'Oranges', []],
+      ['RefI[0][1]', 'B', []],
+      ['RefI[0][5]', undefined, []],
       // Complex
-      ['Ref{Ref{RefE}}', 1],
-      ['RefC.{RefF}', 2],
-      ['RefG[{RefC.sub{RefD}}]', 'Fish'],
-      ['RefH[{RefA}].sub{RefD}', 2],
-      ['RefA{RefA}', new Reference('RefA{RefA}')],
-      ['RefB.{RefA}', new Reference('RefB.{RefA}')],
-      ['Ref{RefB}', new Reference('Ref{RefB}')]
-    ])('%p should simplify to %p', (value, expected) => {
-      expect(new Reference(value).simplify(context)).toEqual(expected)
+      ['Ref{Ref{RefE}}', 1, []],
+      ['RefC.{RefF}', 2, []],
+      ['RefG[{RefC.sub{RefD}}]', 'Fish', []],
+      ['RefH[{RefA}].sub{RefD}', 2, []],
+      ['RefA{RefA}', new Reference('RefA{RefA}'), []],
+      ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
+      ['Ref{RefB}', new Reference('Ref{RefB}'), []],
+      // Ignore keys
+      ['RefB', undefined, ['RefB']],
+    ])('%p should simplify to %p', (value, expected, ignoredKeys = []) => {
+      expect(new Reference(value).simplify(context, ignoredKeys)).toEqual(expected)
     })
   })
 

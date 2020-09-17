@@ -15,7 +15,7 @@ export abstract class Operand implements Evaluable {
 
   abstract evaluate (ctx: Context): Result
 
-  abstract simplify(ctx: Context): Result | Evaluable
+  abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable
 
   abstract serialize(options: Options): Input
 

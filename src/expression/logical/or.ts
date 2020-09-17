@@ -39,7 +39,7 @@ export class Or extends Logical {
     return false
   }
 
-  simplify (...args: [Context]): boolean | Evaluable {
+  simplify (...args: [Context, string[]]): boolean | Evaluable {
     const simplified = this.operands.reduce<Evaluable[] | boolean>((result, child) => {
       if (result !== true) {
         const childResult = child.simplify(...args)

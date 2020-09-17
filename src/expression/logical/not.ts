@@ -40,7 +40,7 @@ export class Not extends Logical {
     return !result
   }
 
-  simplify (...args: [Context]): boolean | Evaluable {
+  simplify (...args: [Context, string[]]): boolean | Evaluable {
     const simplified = this.operands[0].simplify(...args)
     if (isBoolean(simplified)) {
       return !simplified
