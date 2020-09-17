@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * Common module.
  * @module illogical/common
