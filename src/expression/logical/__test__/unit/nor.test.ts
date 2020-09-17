@@ -1,4 +1,9 @@
 import { Evaluable } from '../../../../common/evaluable'
+import { Operand } from '../../../../operand'
+import { Reference } from '../../../../operand/reference'
+import { Value } from '../../../../operand/value'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Nor } from '../../nor'
 import { Not } from '../../not'
@@ -33,6 +38,14 @@ describe('Expression - Logical - Nor', () => {
       [new Nor([notSimplified(), operand(false), notSimplified()]), new Nor([notSimplified(), notSimplified()])]
     ])('%p should simplify to %p', (nor, expected) => {
       expect(nor.simplify({})).toEqual(expected)
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[[Operand, Operand], [Input, Input]]>([
+      [[new Value(10), new Reference('test')], [10, '$test']]
+    ])('%p should serialize to %p', (operands, expected) => {
+      expect(new Nor(operands).serialize(defaultOptions)).toEqual(['NOR', ...expected])
     })
   })
 })
