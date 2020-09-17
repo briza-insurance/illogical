@@ -8,15 +8,7 @@ import { isObject } from '../common/type-check'
 import { Options } from '../parser/options'
 import { Operand } from '.'
 
-/**
- * Lookup for the reference in the context.
- * The nested context value is annotated with "." delimiter.
- * @example address.city
- * @param {Context} ctx
- * @param {string} key Context lookup key.
- * @return {Result}
- */
-function contextValueLookup (ctx: Context, key: string): Result {
+function extractKeys (ctx: Context, key: string): string[] | undefined {
   // Resolve complex keys
   const complexKeyExpression = /{([^{}]+)}/
   let complexKeyMatches = complexKeyExpression.exec(key)
@@ -37,6 +29,23 @@ function contextValueLookup (ctx: Context, key: string): Result {
   // Nested reference
   if (key.includes('.')) {
     keys = key.split('.')
+  }
+  return keys
+}
+
+/**
+ * Lookup for the reference in the context.
+ * The nested context value is annotated with "." delimiter.
+ * @example address.city
+ * @param {Context} ctx
+ * @param {string} key Context lookup key.
+ * @return {Result}
+ */
+function contextValueLookup (ctx: Context, key: string): Result {
+  const keys = extractKeys(ctx, key)
+
+  if (!keys) {
+    return undefined
   }
 
   // Context pointer
@@ -102,7 +111,13 @@ export class Reference extends Operand {
   }
 
   simplify (ctx: Context): Result | Evaluable {
-    const key = this.key.split(/\./)[0]
+    const keys = extractKeys(ctx, this.key)
+
+    if (!keys) {
+      return this
+    }
+
+    const key = keys[0].replace(/\[.+$/, '')
     if (ctx[key] !== undefined) { // TODO excluded ids
       return this.evaluate(ctx)
     }

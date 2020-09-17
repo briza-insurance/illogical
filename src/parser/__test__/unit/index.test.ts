@@ -106,7 +106,6 @@ describe('Condition Engine - Parser', () => {
     test.each([
       ['$ref', 'ref'],
     ])('%p should evaluate as %p', (key, expected) => {
-      // @ts-ignore
       expect(defaultReferenceTransform(key)).toBe(expected)
     })
   })
