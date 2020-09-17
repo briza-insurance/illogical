@@ -4,6 +4,8 @@ import { Collection } from '../../../../operand/collection'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
+import { defaultOptions } from '../../../../parser/options'
+import { Input } from '../../../../parser'
 
 describe('Expression - Comparison - Overlap', () => {
   describe('constructor', () => {
@@ -72,6 +74,14 @@ describe('Expression - Comparison - Overlap', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new Overlap(left, right).serialize(defaultOptions)).toEqual(['OVERLAP', ...serialized])
     })
   })
 })

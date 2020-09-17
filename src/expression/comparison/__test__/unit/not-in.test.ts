@@ -2,6 +2,8 @@ import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
 import { Collection } from '../../../../operand/collection'
 import { Value } from '../../../../operand/value'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { NotIn } from '../../not-in'
 
@@ -75,6 +77,14 @@ describe('Expression - Comparison - Not In', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new NotIn(left, right).serialize(defaultOptions)).toEqual(['NOT IN', ...serialized])
     })
   })
 })

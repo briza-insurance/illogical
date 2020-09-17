@@ -1,6 +1,9 @@
+import { Result } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
 import { Collection } from '../../../../operand/collection'
 import { Value } from '../../../../operand/value'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 import { notSimplified, operand, permutation } from '../../../../__test__/helpers'
 import { Equal } from '../../eq'
 
@@ -53,6 +56,14 @@ describe('Expression - Comparison - Equal', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new Equal(left, right).serialize(defaultOptions)).toEqual(['==', ...serialized])
     })
   })
 })

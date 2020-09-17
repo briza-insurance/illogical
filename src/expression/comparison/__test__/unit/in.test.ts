@@ -4,6 +4,8 @@ import { Collection } from '../../../../operand/collection'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 
 describe('Expression - Comparison - In', () => {
   describe('constructor', () => {
@@ -75,6 +77,14 @@ describe('Expression - Comparison - In', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new In(left, right).serialize(defaultOptions)).toEqual(['IN', ...serialized])
     })
   })
 })

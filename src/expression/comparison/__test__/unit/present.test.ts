@@ -1,6 +1,8 @@
 import { Operand } from '../../../../operand'
 import { Collection } from '../../../../operand/collection'
 import { Value } from '../../../../operand/value'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Present } from '../../present'
 
@@ -46,6 +48,14 @@ describe('Expression - Comparison - Undefined', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, [Input]]>([
+      [new Value(10), [10]]
+    ])('%p and %p should be serialized to %p', (left, serialized) => {
+      expect(new Present(left).serialize(defaultOptions)).toEqual(['PRESENT', ...serialized])
     })
   })
 })

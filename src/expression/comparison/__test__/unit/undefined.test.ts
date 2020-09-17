@@ -4,6 +4,8 @@ import { Collection } from '../../../../operand/collection'
 import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 
 describe('Expression - Comparison - Undefined', () => {
   describe('constructor', () => {
@@ -47,6 +49,14 @@ describe('Expression - Comparison - Undefined', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, [Input]]>([
+      [new Value(10), [10]]
+    ])('%p and %p should be serialized to %p', (left, serialized) => {
+      expect(new Undefined(left).serialize(defaultOptions)).toEqual(['UNDEFINED', ...serialized])
     })
   })
 })

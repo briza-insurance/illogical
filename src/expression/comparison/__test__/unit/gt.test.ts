@@ -1,9 +1,10 @@
-import { Value } from '../../../../operand/value'
-import { GreaterThan } from '../../gt'
-import { Collection } from '../../../../operand/collection'
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
+import { Collection } from '../../../../operand/collection'
+import { Value } from '../../../../operand/value'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
+import { notSimplified, operand } from '../../../../__test__/helpers'
+import { GreaterThan } from '../../gt'
 
 describe('Expression - Comparison - Greater Than', () => {
   describe('constructor', () => {
@@ -53,6 +54,14 @@ describe('Expression - Comparison - Greater Than', () => {
       } else {
         expect(result).toEqual(expected)
       }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new GreaterThan(left, right).serialize(defaultOptions)).toEqual(['>', ...serialized])
     })
   })
 })
