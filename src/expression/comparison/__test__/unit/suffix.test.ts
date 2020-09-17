@@ -52,7 +52,7 @@ describe('Expression - Comparison - Suffix', () => {
       ...testCases
     ])('%p should be simplified to $p', (left, right, expected) => {
       const equal = new Suffix(left, right)
-      const result = equal.simplify({})
+      const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
       } else {

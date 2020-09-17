@@ -36,7 +36,7 @@ describe('Expression - Logical - And', () => {
       [new And([operand(true), operand(true)]), true],
       [new And([notSimplified(), operand(true), notSimplified()]), new And([notSimplified(), notSimplified()])]
     ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({})).toEqual(expected)
+      expect(and.simplify({}, [])).toEqual(expected)
     })
   })
 

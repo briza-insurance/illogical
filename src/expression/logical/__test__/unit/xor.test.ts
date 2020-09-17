@@ -42,7 +42,7 @@ describe('Expression - Logical - Xor', () => {
       [new Xor([operand(true), notSimplified(), operand(true)]), false],
       [new Xor([notSimplified(), operand(false), notSimplified()]), new Xor([notSimplified(), notSimplified()])]
     ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({})).toEqual(expected)
+      expect(and.simplify({}, [])).toEqual(expected)
     })
   })
 
