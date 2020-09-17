@@ -23,8 +23,7 @@ export declare abstract class Comparison implements Evaluable {
      */
     constructor(operator: string, operatorSymbol: symbol, left: Operand, right: Operand);
     /**
-     * Evaluate in the given context.
-     * @param {Context} ctx
+     * {@link Evaluable.evaluate}
      */
     evaluate(ctx: Context): Result;
     /**
@@ -32,7 +31,19 @@ export declare abstract class Comparison implements Evaluable {
      * @return {string}
      */
     toString(): string;
+    /**
+     * Compares left and right operands evaluated values.
+     * @param {Result} left left operand result value
+     * @param {Result} right right operand result value
+     * @returns {boolean}
+     */
     abstract comparison(left: Result, right: Result): boolean;
-    simplify(...args: [Context]): Result | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(...args: [Context, string[]]): Result | Evaluable;
+    /**
+     * {@link Evaluable.serialize}
+     */
     serialize(options: Options): ExpressionInput;
 }

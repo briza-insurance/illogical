@@ -35,7 +35,19 @@ export interface Evaluable {
      * @return {Result}
      */
     evaluate(ctx: Context): Result;
-    simplify(ctx: Context): Result | Evaluable;
+    /**
+     * Simplifies this Evaluable when possible.
+     *
+     * @param {Context} ctx context for the evaluation
+     * @param {string[]} ignoreKeys keys to be considered present even if their not present in the context
+     * @returns {Result | Evaluable} simplified value or itself
+     */
+    simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    /**
+     * Serializes the Evaluable to its input format.
+     *
+     * @param {Options} options parser options
+     */
     serialize(options: Options): Input;
     /**
      * Get the strict representation of the evaluable expression.

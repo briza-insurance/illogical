@@ -24,4 +24,9 @@ export declare function isObject(value: unknown): value is Record<string, unknow
  * @return result of the test
  */
 export declare function isBoolean(value: unknown): value is boolean;
+/**
+ * Check if a value is a an Evaluable
+ * @param {Result | Evaluable} value value to check if is Evaluable
+ * @returns {Evaluable}
+ */
 export declare function isEvaluable(value: Result | Evaluable): value is Evaluable;

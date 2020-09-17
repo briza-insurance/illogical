@@ -20,5 +20,8 @@ export declare class Nor extends Logical {
      * @return {Result}
      */
     evaluate(ctx: Context): Result;
-    simplify(...args: [Context]): boolean | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(...args: [Context, string[]]): boolean | Evaluable;
 }

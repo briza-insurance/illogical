@@ -22,6 +22,17 @@ export interface Options {
      * @return {string}
      */
     referenceTransform: (operand: string) => string;
+    /**
+     * A function used to tranform ths stripped form of a reference into an
+     * annoteted version of the reference. This function should be the inverse
+     * function of referenceTranform.
+     *
+     * referenceSerialization(referenceTransform("$Reference")) === '$Reference'
+     *
+     * E.g. "Reference" => "$Reference"
+     * @param {string} operand
+     * @return {string}
+     */
     referenceSerialization: (operand: string) => string;
     /**
      * Mapping of the operators. The key is unique operator key, and the value

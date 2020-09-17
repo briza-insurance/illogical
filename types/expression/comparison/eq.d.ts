@@ -15,5 +15,8 @@ export declare class Equal extends Comparison {
      * @param {Evaluable} right Right operand.
      */
     constructor(...args: Evaluable[]);
+    /**
+     * {@link Comparison.comparison}
+     */
     comparison(left: Result, right: Result): boolean;
 }

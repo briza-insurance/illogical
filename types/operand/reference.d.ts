@@ -21,7 +21,13 @@ export declare class Reference extends Operand {
      * @return {boolean}
      */
     evaluate(ctx: Context): Result;
-    simplify(ctx: Context): Result | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    /**
+     * {@link Evaluable.serialize}
+     */
     serialize({ referenceSerialization }: Options): string;
     /**
      * Get the strict representation of the operand.

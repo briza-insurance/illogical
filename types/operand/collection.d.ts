@@ -24,7 +24,13 @@ export declare class Collection extends Operand {
      * @return {boolean}
      */
     evaluate(ctx: Context): Result;
-    simplify(...args: [Context]): Result | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(...args: [Context, string[]]): Result | Evaluable;
+    /**
+     * {@link Evaluable.serialize}
+     */
     serialize(options: Options): Input;
     /**
      * Get the strict representation of the operand.

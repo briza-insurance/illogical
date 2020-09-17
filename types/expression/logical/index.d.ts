@@ -19,8 +19,14 @@ export declare abstract class Logical implements Evaluable {
      * @param {Evaluable[]} operands Collection of operands.
      */
     constructor(operator: string, operatorSymbol: symbol, operands: Evaluable[]);
+    /**
+     * {@link Evaluable.evaluate}
+     */
     abstract evaluate(ctx: Context): Result;
-    abstract simplify(ctx: Context): Result | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
     /**
      * Get the strict representation of the expression.
      * @return {string}

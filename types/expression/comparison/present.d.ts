@@ -16,6 +16,9 @@ export declare class Present extends Comparison {
      * @param {Evaluable} operand
      */
     constructor(...args: Evaluable[]);
+    /**
+     * {@link Comparison.comparison}
+     */
     comparison(left: Result): boolean;
     /**
      * Get the strict representation of the expression.

@@ -10,8 +10,17 @@ import { Options } from '../parser/options';
  */
 export declare abstract class Operand implements Evaluable {
     type: EvaluableType;
+    /**
+     * {@link Evaluable.evaluate}
+     */
     abstract evaluate(ctx: Context): Result;
-    abstract simplify(ctx: Context): Result | Evaluable;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    /**
+     * {@link Evaluable.serialize}
+     */
     abstract serialize(options: Options): Input;
     /**
      * Get the strict representation.
