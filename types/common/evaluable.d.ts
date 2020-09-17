@@ -2,6 +2,8 @@
  * Common module.
  * @module illogical/common
  */
+import { Input } from '../parser';
+import { Options } from '../parser/options';
 /**
  * Valid types for context members
  */
@@ -17,7 +19,7 @@ export interface Context {
 /**
  * Evaluation result
  */
-export declare type Result = undefined | null | string | number | boolean | Array<string | number | boolean | null>;
+export declare type Result = undefined | null | string | number | boolean | Array<Result>;
 export declare enum EvaluableType {
     Operand = "Operand",
     Expression = "Expression"
@@ -33,6 +35,20 @@ export interface Evaluable {
      * @return {Result}
      */
     evaluate(ctx: Context): Result;
+    /**
+     * Simplifies this Evaluable when possible.
+     *
+     * @param {Context} ctx context for the evaluation
+     * @param {string[]} ignoreKeys keys to be considered present even if their not present in the context
+     * @returns {Result | Evaluable} simplified value or itself
+     */
+    simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    /**
+     * Serializes the Evaluable to its input format.
+     *
+     * @param {Options} options parser options
+     */
+    serialize(options: Options): Input;
     /**
      * Get the strict representation of the evaluable expression.
      */

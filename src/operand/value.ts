@@ -3,8 +3,9 @@
  * @module illogical/operand
  */
 
-import { Context, Result } from '../common/evaluable'
+import { Result } from '../common/evaluable'
 import { isString } from '../common/type-check'
+import { Input } from '../parser'
 import { Operand } from '.'
 
 /**
@@ -38,12 +39,24 @@ export class Value extends Operand {
   }
 
   /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {boolean}
+   * {@link Evaluable.evaluate}
    */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
+  evaluate (): Result {
     return this.value
+  }
+
+  /**
+   * {@link Evaluable.simplify}
+   */
+  simplify (): Result {
+    return this.value
+  }
+
+  /**
+   * {@link Evaluable.serialize}
+   */
+  serialize (): Input {
+    return this.value as Input
   }
 
   /**

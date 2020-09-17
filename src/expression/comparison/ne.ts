@@ -3,7 +3,7 @@
  * @module illogical/expression/comparison
  */
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import { Evaluable, Result } from '../../common/evaluable'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -23,15 +23,13 @@ export class NotEqual extends Comparison {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
-    super('!=', left, right)
+    super('!=', OPERATOR, left, right)
   }
 
   /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
+   * {@link Comparison.comparison}
    */
-  evaluate (ctx: Context): Result {
-    return this.left.evaluate(ctx) !== this.right.evaluate(ctx)
+  comparison (left: Result, right: Result): boolean {
+    return left !== right
   }
 }

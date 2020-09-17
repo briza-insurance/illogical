@@ -1,5 +1,8 @@
 # illogical changelog
 
+## 1.3.0
+* Add simplify method in the engine to simplify expressions
+
 ## 1.2.4
 * Add support for array element targeting within reference operand key
 * Add support for array element targeting via reference within reference operand key

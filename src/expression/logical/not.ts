@@ -4,7 +4,7 @@
  */
 
 import { Context, Evaluable, Result } from '../../common/evaluable'
-import { Value } from '../../operand/value'
+import { isBoolean, isEvaluable } from '../../common/type-check'
 import { Logical } from '.'
 
 // Operator key
@@ -23,7 +23,7 @@ export class Not extends Logical {
     if (arguments.length !== 1) {
       throw new Error('logical NOT expression must have exactly one operand')
     }
-    super('NOT', [operand, new Value(false)])
+    super('NOT', OPERATOR, [operand])
   }
 
   /**
@@ -38,5 +38,19 @@ export class Not extends Logical {
     }
 
     return !result
+  }
+
+  /**
+   * {@link Evaluable.simplify}
+   */
+  simplify (...args: [Context, string[]]): boolean | Evaluable {
+    const simplified = this.operands[0].simplify(...args)
+    if (isBoolean(simplified)) {
+      return !simplified
+    }
+    if (isEvaluable(simplified)) {
+      return new Not(simplified)
+    }
+    throw new Error('logical NOT expression\'s operand must be evaluated to boolean value')
   }
 }

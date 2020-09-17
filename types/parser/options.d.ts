@@ -23,6 +23,18 @@ export interface Options {
      */
     referenceTransform: (operand: string) => string;
     /**
+     * A function used to tranform ths stripped form of a reference into an
+     * annoteted version of the reference. This function should be the inverse
+     * function of referenceTranform.
+     *
+     * referenceSerialization(referenceTransform("$Reference")) === '$Reference'
+     *
+     * E.g. "Reference" => "$Reference"
+     * @param {string} operand
+     * @return {string}
+     */
+    referenceSerialization: (operand: string) => string;
+    /**
      * Mapping of the operators. The key is unique operator key, and the value
      * is the key used to represent the  given operator in the raw expression.
      */
@@ -45,6 +57,7 @@ export declare function defaultReferencePredicate(key: string): boolean;
  * @return {string}
  */
 export declare function defaultReferenceTransform(key: string): string;
+export declare function defaultReferenceSerialization(key: string): string;
 export declare const defaultOperatorMapping: Map<symbol, string>;
 /**
  * Default parser options

@@ -90,6 +90,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_parser_options_.options.html#operatormapping" class="tsd-kind-icon">operator<wbr>Mapping</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_parser_options_.options.html#referencepredicate" class="tsd-kind-icon">reference<wbr>Predicate</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_parser_options_.options.html#referenceserialization" class="tsd-kind-icon">reference<wbr>Serialization</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_parser_options_.options.html#referencetransform" class="tsd-kind-icon">reference<wbr>Transform</a></li>
 							</ul>
 						</section>
@@ -104,7 +105,7 @@
 					<div class="tsd-signature tsd-kind-icon">operator<wbr>Mapping<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/parser/options.ts#L55">parser/options.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/parser/options.ts#L68">parser/options.ts:68</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -120,7 +121,7 @@
 					<div class="tsd-signature tsd-kind-icon">reference<wbr>Predicate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>operand<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/parser/options.ts#L39">parser/options.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/parser/options.ts#L39">parser/options.ts:39</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -162,12 +163,58 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="referenceserialization" class="tsd-anchor"></a>
+					<h3>reference<wbr>Serialization</h3>
+					<div class="tsd-signature tsd-kind-icon">reference<wbr>Serialization<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>operand<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/parser/options.ts#L62">parser/options.ts:62</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A function used to tranform ths stripped form of a reference into an
+								annoteted version of the reference. This function should be the inverse
+							function of referenceTranform.</p>
+						</div>
+						<p>referenceSerialization(referenceTransform(&quot;$Reference&quot;)) === &#39;$Reference&#39;</p>
+						<p>E.g. &quot;Reference&quot; =&gt; &quot;$Reference&quot;</p>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd></dd>
+							<dt>returns</dt>
+							<dd></dd>
+						</dl>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>operand<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>operand: <span class="tsd-signature-type">string</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="referencetransform" class="tsd-anchor"></a>
 					<h3>reference<wbr>Transform</h3>
 					<div class="tsd-signature tsd-kind-icon">reference<wbr>Transform<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>operand<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/parser/options.ts#L49">parser/options.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/parser/options.ts#L49">parser/options.ts:49</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -233,6 +280,9 @@
 								<a href="_parser_options_.options.html#referencepredicate" class="tsd-kind-icon">reference<wbr>Predicate</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_parser_options_.options.html#referenceserialization" class="tsd-kind-icon">reference<wbr>Serialization</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_parser_options_.options.html#referencetransform" class="tsd-kind-icon">reference<wbr>Transform</a>
 							</li>
 						</ul>
@@ -247,6 +297,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_parser_options_.html#defaultreferencepredicate" class="tsd-kind-icon">default<wbr>Reference<wbr>Predicate</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_parser_options_.html#defaultreferenceserialization" class="tsd-kind-icon">default<wbr>Reference<wbr>Serialization</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_parser_options_.html#defaultreferencetransform" class="tsd-kind-icon">default<wbr>Reference<wbr>Transform</a>

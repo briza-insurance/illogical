@@ -5,6 +5,7 @@
 
 import { EvaluableType } from '../common/evaluable'
 import { Operand } from '../operand'
+import { Input } from '../parser'
 
 /**
  * Get input permutations
@@ -30,10 +31,22 @@ export function permutation(inputs: any[]): [any, any][] {
  * Create a primitive operand, evaluating as the passed value.
  * @param value 
  */
-export const operand = (value: any): Operand => new class {
-  type: EvaluableType
-  constructor(private readonly value: any) {
-    this.type = EvaluableType.Operand
-  }
+export const operand = (value: any): Operand => new class extends Operand {
+  type: EvaluableType = EvaluableType.Operand
+  constructor(private readonly value: any) { super() }
   evaluate() { return this.value }
+  simplify() { return this.value }
+  serialize(): Input { throw new Error('not implemented') }
 }(value)
+
+/**
+ * Create a primitive operand that cannot be simplified.
+ * @param value 
+ */
+export const notSimplified = (): Operand => new class extends Operand {
+  type: EvaluableType = EvaluableType.Operand
+  constructor() { super() }
+  evaluate() { return undefined }
+  simplify() { return this }
+  serialize(): Input { throw new Error('not implemented') }
+}()

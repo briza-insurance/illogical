@@ -73,6 +73,8 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_common_type_check_.html#isboolean" class="tsd-kind-icon">is<wbr>Boolean</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_common_type_check_.html#isevaluable" class="tsd-kind-icon">is<wbr>Evaluable</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_common_type_check_.html#isnumber" class="tsd-kind-icon">is<wbr>Number</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_common_type_check_.html#isobject" class="tsd-kind-icon">is<wbr>Object</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_common_type_check_.html#isstring" class="tsd-kind-icon">is<wbr>String</a></li>
@@ -84,16 +86,79 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="isnumber" class="tsd-anchor"></a>
-					<h3>is<wbr>Number</h3>
+					<a name="isboolean" class="tsd-anchor"></a>
+					<h3>is<wbr>Boolean</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Number<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Boolean<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/type-check.ts#L13">common/type-check.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/common/type-check.ts#L44">common/type-check.ts:44</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Is Boolean predicate.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>tested value.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">boolean</span></h4>
+							<p>result of the test</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isevaluable" class="tsd-anchor"></a>
+					<h3>is<wbr>Evaluable</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Evaluable<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">Evaluable</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/common/type-check.ts#L53">common/type-check.ts:53</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check if a value is a an Evaluable</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>value to check if is Evaluable</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">Evaluable</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isnumber" class="tsd-anchor"></a>
+					<h3>is<wbr>Number</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Number<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/common/type-check.ts#L13">common/type-check.ts:13</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -110,7 +175,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -124,7 +189,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/type-check.ts#L31">common/type-check.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/common/type-check.ts#L29">common/type-check.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -137,12 +202,11 @@
 								<li>
 									<h5>value: <span class="tsd-signature-type">unknown</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>tested value</p>
+										<p>tested value result of the test</p>
 									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
-							<p>result of the test</p>
 						</li>
 					</ul>
 				</section>
@@ -150,13 +214,13 @@
 					<a name="isstring" class="tsd-anchor"></a>
 					<h3>is<wbr>String</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>String<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>String<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/type-check.ts#L22">common/type-check.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/common/type-check.ts#L21">common/type-check.ts:21</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -168,9 +232,12 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>value: <a href="_common_evaluable_.html#result" class="tsd-signature-type">Result</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Tested value.</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">value</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -189,6 +256,12 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_common_type_check_.html#isboolean" class="tsd-kind-icon">is<wbr>Boolean</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_common_type_check_.html#isevaluable" class="tsd-kind-icon">is<wbr>Evaluable</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_common_type_check_.html#isnumber" class="tsd-kind-icon">is<wbr>Number</a>
 					</li>

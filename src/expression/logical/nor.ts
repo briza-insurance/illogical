@@ -4,7 +4,9 @@
  */
 
 import { Context, Evaluable, Result } from '../../common/evaluable'
+import { isBoolean, isEvaluable } from '../../common/type-check'
 import { Logical } from '../logical'
+import { Not } from './not'
 
 // Operator key
 export const OPERATOR = Symbol('NOR')
@@ -21,7 +23,7 @@ export class Nor extends Logical {
     if (operands.length < 2) {
       throw new Error('logical expression must have at least two operands')
     }
-    super('NOR', operands)
+    super('NOR', OPERATOR, operands)
   }
 
   /**
@@ -36,5 +38,34 @@ export class Nor extends Logical {
       }
     }
     return true
+  }
+
+  /**
+   * {@link Evaluable.simplify}
+   */
+  simplify (...args: [Context, string[]]): boolean | Evaluable {
+    const simplified = this.operands.reduce<Evaluable[] | boolean>((result, child) => {
+      if (result !== false) {
+        const childResult = child.simplify(...args)
+        if (isEvaluable(childResult)) {
+          if (isBoolean(result)) {
+            return [child]
+          }
+          return [...result, child]
+        }
+        if (childResult) {
+          return false
+        }
+      }
+      return result
+    }, true)
+
+    if (Array.isArray(simplified)) {
+      if (simplified.length === 1) {
+        return new Not(...simplified)
+      }
+      return new Nor(simplified)
+    }
+    return simplified
   }
 }

@@ -4,32 +4,35 @@
  */
 
 import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
+import { ExpressionInput } from '../../parser'
+import { Options } from '../../parser/options'
 
 /**
  * Abstract logical expression
  */
 export abstract class Logical implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
-  protected operator: string
-  protected operands: Evaluable[]
 
   /**
    * @constructor
    * @param {string} operator String representation of the operator.
    * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operator: string, operands: Evaluable[]) {
-    this.operator = operator
-    this.operands = operands
-  }
+  constructor (
+    protected readonly operator: string,
+    protected readonly operatorSymbol: symbol,
+    protected readonly operands: Evaluable[]
+  ) { }
 
   /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
+   * {@link Evaluable.evaluate}
    */
-  evaluate (ctx: Context): Result { // eslint-disable-line @typescript-eslint/no-unused-vars
-    throw new Error('not implemented exception')
-  }
+  abstract evaluate (ctx: Context): Result
+
+  /**
+   * {@link Evaluable.simplify}
+   */
+  abstract simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable
 
   /**
    * Get the strict representation of the expression.
@@ -37,5 +40,14 @@ export abstract class Logical implements Evaluable {
    */
   toString (): string {
     return '(' + this.operands.map((operand) => operand.toString()).join(` ${this.operator} `) + ')'
+  }
+
+  serialize (options: Options): ExpressionInput {
+    const { operatorMapping } = options
+    const operator = operatorMapping.get(this.operatorSymbol)
+    if (operator === undefined) {
+      throw new Error(`missing operator ${this.operatorSymbol.toString()}`)
+    }
+    return [operator, ...this.operands.map(operand => operand.serialize(options))]
   }
 }

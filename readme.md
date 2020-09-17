@@ -27,6 +27,7 @@ yarn add @briza/illogical -D
   - [Statement](#statement)
   - [Parse](#parse)
     - [Evaluable Function](#evaluable-function)
+  - [Simplify](#simplify)
 - [Working with Expressions](#working-with-expressions)
   - [Evaluation Data Context](#evaluation-data-context)
   - [Operand Types](#operand-types)
@@ -180,6 +181,35 @@ evaluable.evaluate({name: 'peter'}); // true
 evaluable.toString();
 // ({name} == "peter")
 ```
+
+### Simplify
+
+Simplifies an expression with a given context. This is useful when you already have some of
+the properties of context and wants to try to eveluate the expression.
+
+**Example**
+```js
+engine.simplify(['AND', ['==', '$a', 10], ['==', '$b', 20]], { a: 10 }) // ['==', '$b', 20]
+
+engine.simplify(['AND', ['==', '$a', 10], ['==', '$b', 20]], { a: 20 }) // false
+```
+
+Values not found in the context will cause the parent operand not to be evaluated and returned
+as part of the simplified expression.
+
+In some situations we might want to evaluate the expression even if referred value is not
+present. You can provide a list of keys that will be evaluated even if they are not present
+in the context.
+
+**Example**
+```js
+engine.simplify(
+  ['AND', ['==', '$a', 10], ['==', '$b', 20]],
+  { a: 10 },
+  ['b'] // '$b' will be evaluted to undefined.
+) // false
+```
+
 
 ## Working with Expressions
 ### Evaluation Data Context

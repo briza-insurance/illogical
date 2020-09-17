@@ -2,7 +2,9 @@
  * Operand module.
  * @module illogical/operand
  */
-import { Context, Result } from '../common/evaluable';
+import { Context, Evaluable, Result } from '../common/evaluable';
+import { Input } from '../parser';
+import { Options } from '../parser/options';
 import { Operand } from '.';
 import { Reference } from './reference';
 import { Value } from './value';
@@ -22,6 +24,14 @@ export declare class Collection extends Operand {
      * @return {boolean}
      */
     evaluate(ctx: Context): Result;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(...args: [Context, string[]]): Result | Evaluable;
+    /**
+     * {@link Evaluable.serialize}
+     */
+    serialize(options: Options): Input;
     /**
      * Get the strict representation of the operand.
      * @return {string}

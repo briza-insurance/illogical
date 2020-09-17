@@ -1,8 +1,11 @@
 import { Value } from '../../../../operand/value'
 import { Undefined } from '../../undefined'
 import { Collection } from '../../../../operand/collection'
-import { operand } from '../../../../__test__/helpers'
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
+import { Operand } from '../../../../operand'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 
 describe('Expression - Comparison - Undefined', () => {
   describe('constructor', () => {
@@ -14,21 +17,46 @@ describe('Expression - Comparison - Undefined', () => {
     })
   })
 
+  const testCases: [Operand, boolean][] = [
+    // Truthy
+    [operand(undefined), true],
+    // Falsy 
+    [operand(1), false],
+    [operand('1'), false],
+    [operand(true), false],
+    [operand(false), false],
+    [operand(null), false],
+    [new Collection([new Value(1)]), false],
+    [new Collection([new Value('1')]), false]
+  ]
+
   describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [operand(undefined), true],
-      // Falsy 
-      [operand(1), false],
-      [operand('1'), false],
-      [operand(true), false],
-      [operand(false), false],
-      [operand(null), false],
-      [new Collection([new Value(1)]), false],
-      [new Collection([new Value('1')]), false]
-    ] as [Evaluable, boolean][])
+    test.each(testCases)
       ('%p should evaluate as %p', (operand, expected) => {
         expect(new Undefined(operand).evaluate({})).toBe(expected)
       })
+  })
+
+  describe('simplify', () => {
+    test.each<[Operand, boolean | 'self']>([
+      [notSimplified(), 'self'],
+      ...testCases
+    ])('%p should be simplified to $p', (left, expected) => {
+      const equal = new Undefined(left)
+      const result = equal.simplify({}, [])
+      if (expected === 'self') {
+        expect(result).toBe(equal)
+      } else {
+        expect(result).toEqual(expected)
+      }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, [Input]]>([
+      [new Value(10), [10]]
+    ])('%p and %p should be serialized to %p', (left, serialized) => {
+      expect(new Undefined(left).serialize(defaultOptions)).toEqual(['UNDEFINED', ...serialized])
+    })
   })
 })

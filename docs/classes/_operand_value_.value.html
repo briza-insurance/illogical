@@ -116,6 +116,8 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#serialize" class="tsd-kind-icon">serialize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#simplify" class="tsd-kind-icon">simplify</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 							</ul>
 						</section>
@@ -134,7 +136,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/operand/value.ts#L26">operand/value.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L27">operand/value.ts:27</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -163,9 +165,9 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_common_evaluable_.evaluabletype.html" class="tsd-signature-type">EvaluableType</a><span class="tsd-signature-symbol"> = EvaluableType.Operand</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#type">type</a></p>
-						<p>Inherited from <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#type">type</a></p>
+						<p>Inherited from <a href="_operand_value_.value.html">Value</a>.<a href="_operand_value_.value.html#type">type</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/operand/index.ts#L12">operand/index.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/index.ts#L14">operand/index.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,7 +177,7 @@
 					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/operand/value.ts#L26">operand/value.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L27">operand/value.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -186,28 +188,67 @@
 					<a name="evaluate" class="tsd-anchor"></a>
 					<h3>evaluate</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">evaluate<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></li>
+						<li class="tsd-signature tsd-kind-icon">evaluate<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#evaluate">evaluate</a></p>
 								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#evaluate">evaluate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/operand/value.ts#L45">operand/value.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L44">operand/value.ts:44</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Evaluate in the given context.</p>
+									<p><a href="../interfaces/_common_evaluable_.evaluable.html#evaluate">Evaluable.evaluate</a></p>
 								</div>
 							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>ctx: <a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a></h5>
-								</li>
-							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="serialize" class="tsd-anchor"></a>
+					<h3>serialize</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">serialize<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#serialize">serialize</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L58">operand/value.ts:58</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p><a href="../interfaces/_common_evaluable_.evaluable.html#serialize">Evaluable.serialize</a></p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="simplify" class="tsd-anchor"></a>
+					<h3>simplify</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#simplify">simplify</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L51">operand/value.ts:51</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p><a href="../interfaces/_common_evaluable_.evaluable.html#simplify">Evaluable.simplify</a></p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a></h4>
 						</li>
 					</ul>
@@ -224,7 +265,7 @@
 								<p>Implementation of <a href="../interfaces/_common_evaluable_.evaluable.html">Evaluable</a>.<a href="../interfaces/_common_evaluable_.evaluable.html#tostring">toString</a></p>
 								<p>Overrides <a href="_operand_index_.operand.html">Operand</a>.<a href="_operand_index_.operand.html#tostring">toString</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/operand/value.ts#L53">operand/value.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/4ae86be/src/operand/value.ts#L66">operand/value.ts:66</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -267,6 +308,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_operand_value_.value.html#evaluate" class="tsd-kind-icon">evaluate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_operand_value_.value.html#serialize" class="tsd-kind-icon">serialize</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_operand_value_.value.html#simplify" class="tsd-kind-icon">simplify</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_operand_value_.value.html#tostring" class="tsd-kind-icon">to<wbr>String</a>

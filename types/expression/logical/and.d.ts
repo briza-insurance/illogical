@@ -20,4 +20,8 @@ export declare class And extends Logical {
      * @return {Result}
      */
     evaluate(ctx: Context): Result;
+    /**
+     * {@link Evaluable.simplify}
+     */
+    simplify(...args: [Context, string[]]): boolean | Evaluable;
 }

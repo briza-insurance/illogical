@@ -29,8 +29,8 @@ import { Value } from '../operand/value'
 import { defaultOptions, Options, optionValue } from './options'
 
 // Input types
-export type ArrayInput = Array<string | number | boolean | null>
-export type Input = string | number | boolean | null | ArrayInput
+export type Input = string | number | boolean | null | Input[] | [string, ...Input[]]
+export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
 /**

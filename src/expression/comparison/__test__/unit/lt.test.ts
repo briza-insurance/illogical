@@ -1,8 +1,11 @@
 import { Value } from '../../../../operand/value'
 import { LessThan } from '../../lt'
 import { Collection } from '../../../../operand/collection'
-import { operand } from '../../../../__test__/helpers'
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
+import { Operand } from '../../../../operand'
+import { Input } from '../../../../parser'
+import { defaultOptions } from '../../../../parser/options'
 
 describe('Expression - Comparison - Less Than', () => {
   describe('constructor', () => {
@@ -15,24 +18,51 @@ describe('Expression - Comparison - Less Than', () => {
     })
   })
 
+  const testCases: [Operand, Operand, boolean][] = [
+    // Truthy
+    [operand(0), operand(1), true],
+    // Falsy 
+    [operand(1), operand(1), false],
+    [operand(1), operand(0), false],
+    // Falsy - non-comparable types
+    [operand(0), operand('1'), false],
+    [operand(0), operand(true), false],
+    [operand(0), operand(false), false],
+    [operand(0), operand(null), false],
+    [operand(0), operand(undefined), false],
+    [operand(0), new Collection([new Value(0)]), false],
+    [operand(0), new Collection([new Value('0')]), false],
+  ]
+
   describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [operand(0), operand(1), true],
-      // Falsy 
-      [operand(1), operand(1), false],
-      [operand(1), operand(0), false],
-      // Falsy - non-comparable types
-      [operand(0), operand('1'), false],
-      [operand(0), operand(true), false],
-      [operand(0), operand(false), false],
-      [operand(0), operand(null), false],
-      [operand(0), operand(undefined), false],
-      [operand(0), new Collection([new Value(0)]), false],
-      [operand(0), new Collection([new Value('0')]), false],
-    ] as [Evaluable, Evaluable, boolean][])
+    test.each(testCases)
       ('%p and %p should evaluate as %p', (left, right, expected) => {
         expect(new LessThan(left, right).evaluate({})).toBe(expected)
       })
+  })
+
+  describe('simplify', () => {
+    test.each<[Operand, Operand, boolean | 'self']>([
+      [operand(10), notSimplified(), 'self'],
+      [notSimplified(), operand(10), 'self'],
+      [notSimplified(), notSimplified(), 'self'],
+      ...testCases
+    ])('%p and %p should be simplified to $p', (left, right, expected) => {
+      const equal = new LessThan(left, right)
+      const result = equal.simplify({}, [])
+      if (expected === 'self') {
+        expect(result).toBe(equal)
+      } else {
+        expect(result).toEqual(expected)
+      }
+    })
+  })
+
+  describe('serialize', () => {
+    it.each<[Operand, Operand, [Input, Input]]>([
+      [new Value(10), new Value(20), [10, 20]]
+    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
+      expect(new LessThan(left, right).serialize(defaultOptions)).toEqual(['<', ...serialized])
+    })
   })
 })
