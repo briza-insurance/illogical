@@ -45,6 +45,11 @@ export function isBoolean (value: unknown): value is boolean {
   return typeof value === 'boolean'
 }
 
+/**
+ * Check if a value is a an Evaluable
+ * @param {Result | Evaluable} value value to check if is Evaluable
+ * @returns {Evaluable}
+ */
 export function isEvaluable (value: Result | Evaluable): value is Evaluable {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

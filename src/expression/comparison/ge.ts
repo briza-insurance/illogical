@@ -27,6 +27,9 @@ export class GreaterThanOrEqual extends Comparison {
     super('>=', OPERATOR, left, right)
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result, right: Result): boolean {
     if (isNumber(left) && isNumber(right)) {
       return (left as number) >= (right as number)

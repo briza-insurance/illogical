@@ -28,6 +28,9 @@ export class Present extends Comparison {
     super('PRESENT', OPERATOR, operand, new Value(true))
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result): boolean {
     return left !== undefined && left !== null
   }

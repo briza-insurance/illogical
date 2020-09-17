@@ -27,6 +27,9 @@ export class Suffix extends Comparison {
     super('suffix', OPERATOR, left, right)
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result, right: Result): boolean {
     if (isString(left) === false || isString(right) === false) {
       return false

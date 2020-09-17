@@ -40,6 +40,9 @@ export class Nor extends Logical {
     return true
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (...args: [Context, string[]]): boolean | Evaluable {
     const simplified = this.operands.reduce<Evaluable[] | boolean>((result, child) => {
       if (result !== false) {

@@ -54,6 +54,9 @@ export class Xor extends Logical {
     return res
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (...args: [Context, string[]]): boolean | Evaluable {
     const [evaluablesLeft, trueCount] = this.operands.reduce<[Evaluable[], number]>(
       ([notSimplifiedConditions, trueCount], child) => {

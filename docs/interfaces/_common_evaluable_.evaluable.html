@@ -127,6 +127,8 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#serialize" class="tsd-kind-icon">serialize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#simplify" class="tsd-kind-icon">simplify</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_common_evaluable_.evaluable.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 							</ul>
 						</section>
@@ -141,7 +143,7 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_common_evaluable_.evaluabletype.html" class="tsd-signature-type">EvaluableType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/evaluable.ts#L40">common/evaluable.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/common/evaluable.ts#L43">common/evaluable.ts:43</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -158,7 +160,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/evaluable.ts#L47">common/evaluable.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/common/evaluable.ts#L50">common/evaluable.ts:50</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -177,6 +179,75 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="serialize" class="tsd-anchor"></a>
+					<h3>serialize</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">serialize<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="_parser_options_.options.html" class="tsd-signature-type">Options</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/common/evaluable.ts#L66">common/evaluable.ts:66</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Serializes the Evaluable to its input format.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <a href="_parser_options_.options.html" class="tsd-signature-type">Options</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>parser options</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="simplify" class="tsd-anchor"></a>
+					<h3>simplify</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><a href="_common_evaluable_.context.html" class="tsd-signature-type">Context</a>, ignoreKeys<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol"> | </span><a href="_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/common/evaluable.ts#L59">common/evaluable.ts:59</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Simplifies this Evaluable when possible.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>ctx: <a href="_common_evaluable_.context.html" class="tsd-signature-type">Context</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>context for the evaluation</p>
+									</div>
+								</li>
+								<li>
+									<h5>ignoreKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>keys to be considered present even if their not present in the context</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_common_evaluable_.html#result" class="tsd-signature-type">Result</a><span class="tsd-signature-symbol"> | </span><a href="_common_evaluable_.evaluable.html" class="tsd-signature-type">Evaluable</a></h4>
+							<p>simplified value or itself</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="tostring" class="tsd-anchor"></a>
 					<h3>to<wbr>String</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
@@ -186,7 +257,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/common/evaluable.ts#L52">common/evaluable.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/common/evaluable.ts#L71">common/evaluable.ts:71</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -229,6 +300,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_common_evaluable_.evaluable.html#evaluate" class="tsd-kind-icon">evaluate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_common_evaluable_.evaluable.html#serialize" class="tsd-kind-icon">serialize</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_common_evaluable_.evaluable.html#simplify" class="tsd-kind-icon">simplify</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_common_evaluable_.evaluable.html#tostring" class="tsd-kind-icon">to<wbr>String</a>

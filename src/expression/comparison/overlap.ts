@@ -26,6 +26,9 @@ export class Overlap extends Comparison {
     super('overlap', OPERATOR, left, right)
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result, right: Result): boolean {
     if (left === undefined || left === null ||
       right === undefined || right === null) {

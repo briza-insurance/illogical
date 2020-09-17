@@ -35,6 +35,9 @@ export class Collection extends Operand {
     return this.items.map((item) => item.evaluate(ctx)) as []
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (...args: [Context, string[]]): Result | Evaluable {
     const values: Result[] = []
     for (const item of this.items) {
@@ -47,6 +50,9 @@ export class Collection extends Operand {
     return values
   }
 
+  /**
+   * {@link Evaluable.serialize}
+   */
   serialize (options: Options): Input {
     return this.items.map(item => isEvaluable(item) ? item.serialize(options) : item)
   }

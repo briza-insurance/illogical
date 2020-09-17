@@ -89,6 +89,19 @@ class Engine {
     return this.parser.parse(exp)
   }
 
+  /**
+   * Simplifies an expression with values in context.
+   *
+   * This method tries to evaluate all the expressions and reduce them to its corresponding boolean value.
+   * If a value required for the expression is not present in the context, the minimal corresponding expression
+   * will be returned.
+   *
+   * @param {ExpressionInput} exp  Raw expression.
+   * @param {Context} context Evaluation data context.
+   * @param {string[]} ignoreKeys keys to be considered present even if their not present in the context.
+   *  Default to empty array
+   * @returns {Inpunt | boolean}
+   */
   simplify (exp: ExpressionInput, context: Context, ignoreKeys: string[] = []): Input | boolean {
     const result = this.parse(exp).simplify(context, ignoreKeys)
     if (isEvaluable(result)) {

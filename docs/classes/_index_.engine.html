@@ -105,6 +105,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.engine.html#evaluate" class="tsd-kind-icon">evaluate</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.engine.html#parse" class="tsd-kind-icon">parse</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.engine.html#simplify" class="tsd-kind-icon">simplify</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_index_.engine.html#statement" class="tsd-kind-icon">statement</a></li>
 							</ul>
 						</section>
@@ -123,7 +124,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/index.ts#L53">index.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L54">index.ts:54</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -152,7 +153,7 @@
 					<div class="tsd-signature tsd-kind-icon">parser<span class="tsd-signature-symbol">:</span> <a href="_parser_index_.parser.html" class="tsd-signature-type">Parser</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/index.ts#L53">index.ts:53</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L54">index.ts:54</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -169,7 +170,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/index.ts#L69">index.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L70">index.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -206,7 +207,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/index.ts#L87">index.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L88">index.ts:88</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -228,6 +229,53 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="simplify" class="tsd-anchor"></a>
+					<h3>simplify</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a>, context<span class="tsd-signature-symbol">: </span><a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a>, ignoreKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L105">index.ts:105</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Simplifies an expression with values in context.</p>
+								</div>
+								<p>This method tries to evaluate all the expressions and reduce them to its corresponding boolean value.
+									If a value required for the expression is not present in the context, the minimal corresponding expression
+								will be returned.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>exp: <a href="../modules/_parser_index_.html#expressioninput" class="tsd-signature-type">ExpressionInput</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Raw expression.</p>
+									</div>
+								</li>
+								<li>
+									<h5>context: <a href="../interfaces/_common_evaluable_.context.html" class="tsd-signature-type">Context</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Evaluation data context.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> ignoreKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>keys to be considered present even if their not present in the context.
+										Default to empty array</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_parser_index_.html#input" class="tsd-signature-type">Input</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="statement" class="tsd-anchor"></a>
 					<h3>statement</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -237,7 +285,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/03f6ece/src/index.ts#L78">index.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/6c39fc5/src/index.ts#L79">index.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -289,6 +337,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_index_.engine.html#parse" class="tsd-kind-icon">parse</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_index_.engine.html#simplify" class="tsd-kind-icon">simplify</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_index_.engine.html#statement" class="tsd-kind-icon">statement</a>

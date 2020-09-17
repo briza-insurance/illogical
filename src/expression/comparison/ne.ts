@@ -26,6 +26,9 @@ export class NotEqual extends Comparison {
     super('!=', OPERATOR, left, right)
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result, right: Result): boolean {
     return left !== right
   }

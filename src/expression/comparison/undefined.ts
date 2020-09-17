@@ -28,6 +28,9 @@ export class Undefined extends Comparison {
     super('UNDEFINED', OPERATOR, operand, new Value(true))
   }
 
+  /**
+   * {@link Comparison.comparison}
+   */
   comparison (left: Result): boolean {
     return left === undefined
   }
@@ -40,6 +43,9 @@ export class Undefined extends Comparison {
     return `(${this.left.toString()} is ${this.operator})`
   }
 
+  /**
+   * {@link Evaluable.serialize}
+   */
   serialize (options: Options): ExpressionInput {
     const { operatorMapping } = options
     const operator = operatorMapping.get(this.operatorSymbol)

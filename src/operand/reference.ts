@@ -110,6 +110,9 @@ export class Reference extends Operand {
     return contextValueLookup(ctx, this.key)
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable {
     const keys = extractKeys(ctx, this.key)
 
@@ -124,6 +127,9 @@ export class Reference extends Operand {
     return this
   }
 
+  /**
+   * {@link Evaluable.serialize}
+   */
   serialize ({ referenceSerialization }: Options): string {
     return referenceSerialization(this.key)
   }

@@ -39,6 +39,10 @@ export const operand = (value: any): Operand => new class extends Operand {
   serialize(): Input { throw new Error('not implemented') }
 }(value)
 
+/**
+ * Create a primitive operand that cannot be simplified.
+ * @param value 
+ */
 export const notSimplified = (): Operand => new class extends Operand {
   type: EvaluableType = EvaluableType.Operand
   constructor() { super() }

@@ -39,18 +39,22 @@ export class Value extends Operand {
   }
 
   /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {boolean}
+   * {@link Evaluable.evaluate}
    */
   evaluate (): Result {
     return this.value
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (): Result {
     return this.value
   }
 
+  /**
+   * {@link Evaluable.serialize}
+   */
   serialize (): Input {
     return this.value as Input
   }

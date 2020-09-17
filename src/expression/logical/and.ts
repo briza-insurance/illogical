@@ -39,6 +39,9 @@ export class And extends Logical {
     return true
   }
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (...args: [Context, string[]]): boolean | Evaluable {
     const simplified = this.operands.reduce<boolean | Evaluable[]>((result, child) => {
       if (result !== false) {

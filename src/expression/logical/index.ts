@@ -24,8 +24,14 @@ export abstract class Logical implements Evaluable {
     protected readonly operands: Evaluable[]
   ) { }
 
+  /**
+   * {@link Evaluable.evaluate}
+   */
   abstract evaluate (ctx: Context): Result
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   abstract simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable
 
   /**

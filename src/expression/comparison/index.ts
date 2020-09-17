@@ -29,8 +29,7 @@ export abstract class Comparison implements Evaluable {
   }
 
   /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
+   * {@link Evaluable.evaluate}
    */
   evaluate (ctx: Context): Result {
     return this.comparison(this.left.evaluate(ctx), this.right.evaluate(ctx))
@@ -44,8 +43,17 @@ export abstract class Comparison implements Evaluable {
     return `(${this.left.toString()} ${this.operator} ${this.right.toString()})`
   }
 
+  /**
+   * Compares left and right operands evaluated values.
+   * @param {Result} left left operand result value
+   * @param {Result} right right operand result value
+   * @returns {boolean}
+   */
   abstract comparison (left: Result, right: Result): boolean
 
+  /**
+   * {@link Evaluable.simplify}
+   */
   simplify (...args: [Context, string[]]): Result | Evaluable {
     const left = this.left.simplify(...args)
     const right = this.right.simplify(...args)
@@ -55,6 +63,9 @@ export abstract class Comparison implements Evaluable {
     return this
   }
 
+  /**
+   * {@link Evaluable.serialize}
+   */
   serialize (options: Options): ExpressionInput {
     const { operatorMapping } = options
     const operator = operatorMapping.get(this.operatorSymbol)
