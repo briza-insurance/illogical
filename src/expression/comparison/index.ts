@@ -92,6 +92,10 @@ export abstract class Comparison implements Evaluable {
     ]
   }
 
+  /**
+   * Convert a value to number if possible, otherwise return the value untouched
+   * @param value value to be converted to number
+   */
   protected toNumber (value: Result): Result {
     const isValueNumber = isNumber(value)
     if (isValueNumber) {
