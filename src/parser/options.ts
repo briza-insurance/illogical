@@ -138,5 +138,5 @@ export const defaultOptions: Options = {
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping,
-  strictTypeComparison: false
+  strictTypeComparison: true
 }
