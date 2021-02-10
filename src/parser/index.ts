@@ -161,13 +161,16 @@ export class Parser {
       return collapsible && operands.length === 1 ? operands[0] : undefined
     }
 
-    const getComparisonOperator = <T extends Comparison>(
-      Operator: new (...o: Evaluable[]) => T,
+    /**
+     * Creates an T instance of a comparison expression and ensures that strict option is configured
+     */
+    const getComparisonExpression = <T extends Comparison>(
+      Expression: new (...o: Evaluable[]) => T,
       operands: Evaluable[]
     ) => {
-      const operator = new Operator(...operands)
-      operator.strict = this.opts.strictTypeComparison
-      return operator
+      const expression = new Expression(...operands)
+      expression.strict = this.opts.strictTypeComparison
+      return expression
     }
 
     switch (operator) {
@@ -199,28 +202,28 @@ export class Parser {
        */
       case this.opts.operatorMapping.get(OPERATOR_EQ):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(Equal, operands)
+          getComparisonExpression(Equal, operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NE):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(NotEqual, operands)
+          getComparisonExpression(NotEqual, operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GT):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(GreaterThan, operands)
+          getComparisonExpression(GreaterThan, operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GE):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(GreaterThanOrEqual, operands)
+          getComparisonExpression(GreaterThanOrEqual, operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_LT):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(LessThan, operands)
+          getComparisonExpression(LessThan, operands)
 
         break
       case this.opts.operatorMapping.get(OPERATOR_LE):
         expression = (operands: Evaluable[]): Evaluable =>
-          getComparisonOperator(LessThanOrEqual, operands)
+          getComparisonExpression(LessThanOrEqual, operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_IN):
         expression = (operands: Evaluable[]): Evaluable => new In(...operands)
