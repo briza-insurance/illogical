@@ -24,7 +24,10 @@ import { OPERATOR as OPERATOR_OR } from '../expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 
 // Option value whitelist
-export type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>
+export type optionValue =
+  | ((operand: string) => string | boolean)
+  | Map<symbol, string>
+  | boolean;
 
 // Parser options
 export interface Options {
@@ -67,6 +70,8 @@ export interface Options {
    */
   operatorMapping: Map<symbol, string>;
 
+  allowCrossTypeParsing: boolean;
+
   // Object key accessor whitelisting
   [k: string]: optionValue;
 }
@@ -93,7 +98,7 @@ export function defaultReferenceTransform (key: string): string {
   return key.slice(1)
 }
 
-export function defaultReferenceSerialization (key:string): string {
+export function defaultReferenceSerialization (key: string): string {
   return `$${key}`
 }
 
@@ -129,5 +134,6 @@ export const defaultOptions: Options = {
   referencePredicate: defaultReferencePredicate,
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
-  operatorMapping: defaultOperatorMapping
+  operatorMapping: defaultOperatorMapping,
+  allowCrossTypeParsing: false
 }

@@ -5,7 +5,7 @@
 
 import { Evaluable, Result } from '../../common/evaluable'
 import { isNumber } from '../../common/type-check'
-import { Comparison } from '../comparison'
+import { Comparison, ComparisonOptions } from '../comparison'
 
 // Operator key
 export const OPERATOR = Symbol('LT')
@@ -19,12 +19,16 @@ export class LessThan extends Comparison {
    * @param {Evaluable} left Left operand.
    * @param {Evaluable} right Right operand.
    */
-  constructor(...args: Evaluable[]);
-  constructor (left: Evaluable, right: Evaluable) {
-    if (arguments.length !== 2) {
-      throw new Error('comparison expression expects left and right operands')
+  private options: ComparisonOptions;
+  constructor(options: ComparisonOptions, ...args: Evaluable[]);
+  constructor (options: ComparisonOptions, left: Evaluable, right: Evaluable) {
+    if (arguments.length !== 3) {
+      throw new Error(
+        'comparison expression expects options, left and right operands'
+      )
     }
     super('<', OPERATOR, left, right)
+    this.options = options
   }
 
   /**
@@ -32,7 +36,16 @@ export class LessThan extends Comparison {
    */
   comparison (left: Result, right: Result): boolean {
     if (isNumber(left) && isNumber(right)) {
-      return (left as number) < (right as number)
+      return left < right
+    }
+
+    // check if {allowCrossTypeParsing} is allowed
+    if (this.options.allowCrossTypeParsing) {
+      left = this.parseable(left)
+      right = this.parseable(right)
+      if (isNumber(left) && isNumber(right)) {
+        return left < right
+      }
     }
     return false
   }

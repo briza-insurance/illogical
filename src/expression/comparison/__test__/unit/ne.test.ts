@@ -1,31 +1,39 @@
-import { notSimplified, operand, permutation } from '../../../../__test__/helpers'
-import { Value } from '../../../../operand/value'
-import { NotEqual } from '../../ne'
-import { Collection } from '../../../../operand/collection'
-import { Evaluable } from '../../../../common/evaluable'
+import {
+  notSimplified,
+  operand,
+  permutation
+} from '../../../../__test__/helpers'
 import { Operand } from '../../../../operand'
+import { Collection } from '../../../../operand/collection'
+import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
+import { NotEqual } from '../../ne'
+
+const defaultOpt = { allowCrossTypeParsing: false }
 
 describe('Expression - Comparison - Not Equal', () => {
   describe('constructor', () => {
-    test.each([
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]]
-    ])('arguments %p should throw', (args) => {
-      expect(() => new NotEqual(...(args))).toThrowError()
-    })
+    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
+      'arguments %p should throw',
+      (args) => {
+        expect(() => new NotEqual(defaultOpt, ...args)).toThrowError()
+      }
+    )
   })
 
   const primitives = [1, '1', true, false, undefined, null]
   const testCases: [Operand, Operand, boolean][] = [
     // Truthy - different types - across all permutations
-    ...permutation(primitives)
-      .map<[Operand, Operand, boolean]>(([left, right]) => [operand(left), operand(right), true]),
+    ...permutation(primitives).map<[Operand, Operand, boolean]>(
+      ([left, right]) => [operand(left), operand(right), true]
+    ),
     // Falsy cases - type A !== type A
-    ...primitives
-      .map<[Operand, Operand, boolean]>((value) => [operand(value), operand(value), false]),
+    ...primitives.map<[Operand, Operand, boolean]>((value) => [
+      operand(value),
+      operand(value),
+      false
+    ]),
     // Truthy
     [operand(1), operand(10), true],
     [operand('1'), operand('10'), true],
@@ -37,10 +45,14 @@ describe('Expression - Comparison - Not Equal', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)
-      ('%p and %p should evaluate as %p', (left, right, expected) => {
-        expect(new NotEqual(left, right).evaluate({})).toBe(expected)
-      })
+    test.each(testCases)(
+      '%p and %p should evaluate as %p',
+      (left, right, expected) => {
+        expect(new NotEqual(defaultOpt, left, right).evaluate({})).toBe(
+          expected
+        )
+      }
+    )
   })
 
   describe('simplify', () => {
@@ -50,7 +62,7 @@ describe('Expression - Comparison - Not Equal', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new NotEqual(left, right)
+      const equal = new NotEqual(defaultOpt, left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -64,7 +76,9 @@ describe('Expression - Comparison - Not Equal', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new NotEqual(left, right).serialize(defaultOptions)).toEqual(['!=', ...serialized])
+      expect(
+        new NotEqual(defaultOpt, left, right).serialize(defaultOptions)
+      ).toEqual(['!=', ...serialized])
     })
   })
 })

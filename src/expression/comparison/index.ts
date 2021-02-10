@@ -3,17 +3,26 @@
  * @module illogical/expression/comparison
  */
 
-import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable'
-import { isEvaluable } from '../../common/type-check'
+import {
+  Context,
+  Evaluable,
+  EvaluableType,
+  Result
+} from '../../common/evaluable'
+import { isEvaluable, isNumber, isString } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { ExpressionInput } from '../../parser'
 import { Options } from '../../parser/options'
+
+export type ComparisonOptions = {
+  allowCrossTypeParsing: boolean;
+};
 
 /**
  * Abstract comparison expression
  */
 export abstract class Comparison implements Evaluable {
-  type: EvaluableType = EvaluableType.Expression
+  type: EvaluableType = EvaluableType.Expression;
 
   /**
    * @constructor
@@ -25,8 +34,8 @@ export abstract class Comparison implements Evaluable {
     protected readonly operator: string,
     protected readonly operatorSymbol: symbol,
     protected readonly left: Operand,
-    protected readonly right: Operand) {
-  }
+    protected readonly right: Operand
+  ) {}
 
   /**
    * {@link Evaluable.evaluate}
@@ -40,7 +49,9 @@ export abstract class Comparison implements Evaluable {
    * @return {string}
    */
   toString (): string {
-    return `(${this.left.toString()} ${this.operator} ${this.right.toString()})`
+    return `(${this.left.toString()} ${
+      this.operator
+    } ${this.right.toString()})`
   }
 
   /**
@@ -49,7 +60,7 @@ export abstract class Comparison implements Evaluable {
    * @param {Result} right right operand result value
    * @returns {boolean}
    */
-  abstract comparison (left: Result, right: Result): boolean
+  abstract comparison(left: Result, right: Result): boolean;
 
   /**
    * {@link Evaluable.simplify}
@@ -72,6 +83,24 @@ export abstract class Comparison implements Evaluable {
     if (operator === undefined) {
       throw new Error(`missing operator ${this.operatorSymbol.toString()}`)
     }
-    return [operator, this.left.serialize(options), this.right.serialize(options)]
+    return [
+      operator,
+      this.left.serialize(options),
+      this.right.serialize(options)
+    ]
+  }
+
+  protected parseable (value: Result): number | undefined {
+    const isValueNumber = isNumber(value)
+    if (isValueNumber) {
+      return value as number
+    } else if (isString(value)) {
+      if (value.match(/^\d+\.\d+$/)) {
+        return parseFloat(value)
+      } else if (value.match(/^0$|^[1-9]\d*$/)) {
+        return parseInt(value)
+      }
+    }
+    return undefined
   }
 }
