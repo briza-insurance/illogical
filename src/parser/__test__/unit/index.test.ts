@@ -66,6 +66,8 @@ import { Not, OPERATOR as OPERATOR_NOT } from '../../../expression/logical/not'
 import { Collection } from '../../../operand/collection'
 import { Evaluable } from '../../../common/evaluable'
 
+const defaultOpt = { allowCrossTypeParsing: false }
+
 describe('Condition Engine - Parser', () => {
   const parser = new Parser()
 
@@ -115,7 +117,7 @@ describe('Condition Engine - Parser', () => {
       // Comparison expression
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5))
+        new Equal(defaultOpt, new Value(5), new Value(5))
       ],
       // Unary expression
       [
@@ -131,8 +133,8 @@ describe('Condition Engine - Parser', () => {
           [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
         ],
         new And([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10)),
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10)),
           new Undefined(new Reference('RefA')),
         ])
       ],
@@ -167,8 +169,8 @@ describe('Condition Engine - Parser', () => {
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
         new And([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10))
         ])
       ],
       [
@@ -178,8 +180,8 @@ describe('Condition Engine - Parser', () => {
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
         new Or([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10))
         ])
       ],
       [
@@ -189,8 +191,8 @@ describe('Condition Engine - Parser', () => {
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
         new Nor([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10))
         ])
       ],
       [
@@ -200,8 +202,8 @@ describe('Condition Engine - Parser', () => {
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
         ],
         new Xor([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10))
         ])
       ],
       [
@@ -209,7 +211,7 @@ describe('Condition Engine - Parser', () => {
           defaultOptions.operatorMapping.get(OPERATOR_NOT),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5]
         ],
-        new Not(new Equal(new Value(5), new Value(5)))
+        new Not(new Equal(defaultOpt, new Value(5), new Value(5)))
       ],
       // Not-nested, 2 items, reduced into comparison
       [
@@ -217,7 +219,7 @@ describe('Condition Engine - Parser', () => {
           defaultOptions.operatorMapping.get(OPERATOR_AND),
           [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         ],
-        new Equal(new Value(5), new Value(5)),
+        new Equal(defaultOpt, new Value(5), new Value(5)),
       ],
       // Not-nested, 2 items, reduced into logical
       [
@@ -230,8 +232,8 @@ describe('Condition Engine - Parser', () => {
           ],
         ],
         new Or([
-          new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
+          new Equal(defaultOpt, new Value(5), new Value(5)),
+          new Equal(defaultOpt, new Value(10), new Value(10))
         ])
       ],
       // Nested
@@ -247,10 +249,10 @@ describe('Condition Engine - Parser', () => {
         ],
         new And([
           new Or([
-            new Equal(new Value(5), new Value(5)),
-            new Equal(new Value(10), new Value(10))
+            new Equal(defaultOpt, new Value(5), new Value(5)),
+            new Equal(defaultOpt, new Value(10), new Value(10))
           ]),
-          new Equal(new Value(15), new Value(15))
+          new Equal(defaultOpt, new Value(15), new Value(15))
         ])
       ],
       // Zero argument logical expression treated as collection
@@ -338,27 +340,27 @@ describe('Condition Engine - Parser', () => {
     test.each([
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5))
+        new Equal(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_NE), 5, 5],
-        new NotEqual(new Value(5), new Value(5))
+        new NotEqual(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_GT), 5, 5],
-        new GreaterThan(new Value(5), new Value(5))
+        new GreaterThan(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_GE), 5, 5],
-        new GreaterThanOrEqual(new Value(5), new Value(5))
+        new GreaterThanOrEqual(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_LT), 5, 5],
-        new LessThan(new Value(5), new Value(5))
+        new LessThan(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_LE), 5, 5],
-        new LessThanOrEqual(new Value(5), new Value(5))
+        new LessThanOrEqual(defaultOpt, new Value(5), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
@@ -383,11 +385,11 @@ describe('Condition Engine - Parser', () => {
       // Reference
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), '$RefA', 5],
-        new Equal(new Reference('RefA'), new Value(5))
+        new Equal(defaultOpt, new Reference('RefA'), new Value(5))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
-        new Equal(new Value(5), new Reference('RefA'))
+        new Equal(defaultOpt, new Value(5), new Reference('RefA'))
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
