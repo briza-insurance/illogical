@@ -4,7 +4,6 @@
  */
 
 import { Evaluable, Result } from '../../common/evaluable'
-import { isNumber } from '../../common/type-check'
 import { Comparison } from '../comparison'
 
 // Operator key

@@ -31,16 +31,11 @@ export class GreaterThan extends Comparison {
    * {@link Comparison.comparison}
    */
   comparison (left: Result, right: Result): boolean {
-    if (isNumber(left) && isNumber(right)) {
-      return left > right
-    }
+    const operand = (value: Result) =>
+      this.strict ? value : this.toNumber(value)
 
-    if (!this.strict) {
-      left = this.toNumber(left)
-      right = this.toNumber(right)
-      if (isNumber(left) && isNumber(right)) {
-        return left > right
-      }
+    if (isNumber(operand(left)) && isNumber(operand(right))) {
+      return (left as number) > (right as number)
     }
 
     return false

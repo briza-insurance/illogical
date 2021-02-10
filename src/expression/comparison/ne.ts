@@ -31,13 +31,8 @@ export class NotEqual extends Comparison {
    * {@link Comparison.comparison}
    */
   comparison (left: Result, right: Result): boolean {
-    if (!this.strict) {
-      left = this.toNumber(left)
-      right = this.toNumber(right)
-      if (isNumber(left) && isNumber(right)) {
-        return left !== right
-      }
-    }
-    return left !== right
+    const operand = (value: Result) =>
+      this.strict ? value : this.toNumber(value)
+    return operand(left) !== operand(right)
   }
 }
