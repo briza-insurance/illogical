@@ -70,7 +70,10 @@ export interface Options {
    */
   operatorMapping: Map<symbol, string>;
 
-  allowCrossTypeParsing: boolean;
+  /**
+   * Enforce type comparison e.g 1 !== '1'
+   */
+  strictTypeComparison: boolean;
 
   // Object key accessor whitelisting
   [k: string]: optionValue;
@@ -135,5 +138,5 @@ export const defaultOptions: Options = {
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping,
-  allowCrossTypeParsing: false
+  strictTypeComparison: false
 }

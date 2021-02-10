@@ -4,7 +4,6 @@
  */
 
 import { Evaluable, EvaluableType } from '../common/evaluable'
-import { ComparisonOptions } from '../expression/comparison'
 import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import {
   GreaterThanOrEqual,
@@ -161,10 +160,6 @@ export class Parser {
       return collapsible && operands.length === 1 ? operands[0] : undefined
     }
 
-    const comparisonOptions: ComparisonOptions = {
-      allowCrossTypeParsing: this.opts.allowCrossTypeParsing
-    }
-
     switch (operator) {
       /**
        * Logical
@@ -194,27 +189,27 @@ export class Parser {
        */
       case this.opts.operatorMapping.get(OPERATOR_EQ):
         expression = (operands: Evaluable[]): Evaluable =>
-          new Equal(comparisonOptions, ...operands)
+          new Equal(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NE):
         expression = (operands: Evaluable[]): Evaluable =>
-          new NotEqual(comparisonOptions, ...operands)
+          new NotEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GT):
         expression = (operands: Evaluable[]): Evaluable =>
-          new GreaterThan(comparisonOptions, ...operands)
+          new GreaterThan(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GE):
         expression = (operands: Evaluable[]): Evaluable =>
-          new GreaterThanOrEqual(comparisonOptions, ...operands)
+          new GreaterThanOrEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_LT):
         expression = (operands: Evaluable[]): Evaluable =>
-          new LessThan(comparisonOptions, ...operands)
+          new LessThan(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_LE):
         expression = (operands: Evaluable[]): Evaluable =>
-          new LessThanOrEqual(comparisonOptions, ...operands)
+          new LessThanOrEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_IN):
         expression = (operands: Evaluable[]): Evaluable => new In(...operands)

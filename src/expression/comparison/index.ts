@@ -37,6 +37,8 @@ export abstract class Comparison implements Evaluable {
     protected readonly right: Operand
   ) {}
 
+  public strict = true;
+
   /**
    * {@link Evaluable.evaluate}
    */
@@ -90,7 +92,7 @@ export abstract class Comparison implements Evaluable {
     ]
   }
 
-  protected parseable (value: Result): number | undefined {
+  protected toNumber (value: Result): Result {
     const isValueNumber = isNumber(value)
     if (isValueNumber) {
       return value as number
@@ -101,6 +103,6 @@ export abstract class Comparison implements Evaluable {
         return parseInt(value)
       }
     }
-    return undefined
+    return value
   }
 }
