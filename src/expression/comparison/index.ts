@@ -14,10 +14,6 @@ import { Operand } from '../../operand'
 import { ExpressionInput } from '../../parser'
 import { Options } from '../../parser/options'
 
-export type ComparisonOptions = {
-  allowCrossTypeParsing: boolean;
-};
-
 /**
  * Abstract comparison expression
  */
