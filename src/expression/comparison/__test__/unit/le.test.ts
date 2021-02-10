@@ -6,14 +6,12 @@ import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
 import { LessThanOrEqual } from '../../le'
 
-const defaultOpt = { allowCrossTypeParsing: false }
-
 describe('Expression - Comparison - Less Than or Equal', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
       'arguments %p should throw',
       (args) => {
-        expect(() => new LessThanOrEqual(defaultOpt, ...args)).toThrowError()
+        expect(() => new LessThanOrEqual(...args)).toThrowError()
       }
     )
   })
@@ -46,9 +44,7 @@ describe('Expression - Comparison - Less Than or Equal', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(new LessThanOrEqual(defaultOpt, left, right).evaluate({})).toBe(
-          expected
-        )
+        expect(new LessThanOrEqual(left, right).evaluate({})).toBe(expected)
       }
     )
   })
@@ -57,13 +53,9 @@ describe('Expression - Comparison - Less Than or Equal', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(
-          new LessThanOrEqual(
-            { allowCrossTypeParsing: true },
-            left,
-            right
-          ).evaluate({})
-        ).toBe(expected)
+        const comparison = new LessThanOrEqual(left, right)
+        comparison.strict = false
+        expect(comparison.evaluate({})).toBe(expected)
       }
     )
   })
@@ -75,7 +67,7 @@ describe('Expression - Comparison - Less Than or Equal', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new LessThanOrEqual(defaultOpt, left, right)
+      const equal = new LessThanOrEqual(left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -90,7 +82,7 @@ describe('Expression - Comparison - Less Than or Equal', () => {
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
       expect(
-        new LessThanOrEqual(defaultOpt, left, right).serialize(defaultOptions)
+        new LessThanOrEqual(left, right).serialize(defaultOptions)
       ).toEqual(['<=', ...serialized])
     })
   })

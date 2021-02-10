@@ -10,14 +10,12 @@ import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
 import { Equal } from '../../eq'
 
-const defaultOpt = { allowCrossTypeParsing: false }
-
 describe('Expression - Comparison - Equal', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
       'arguments %p should throw',
       (args) => {
-        expect(() => new Equal(defaultOpt, ...args)).toThrowError()
+        expect(() => new Equal(...args)).toThrowError()
       }
     )
   })
@@ -48,7 +46,7 @@ describe('Expression - Comparison - Equal', () => {
     test.each(testCases)(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(new Equal(defaultOpt, left, right).evaluate({})).toBe(expected)
+        expect(new Equal(left, right).evaluate({})).toBe(expected)
       }
     )
   })
@@ -60,7 +58,7 @@ describe('Expression - Comparison - Equal', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new Equal(defaultOpt, left, right)
+      const equal = new Equal(left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -74,9 +72,10 @@ describe('Expression - Comparison - Equal', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(
-        new Equal(defaultOpt, left, right).serialize(defaultOptions)
-      ).toEqual(['==', ...serialized])
+      expect(new Equal(left, right).serialize(defaultOptions)).toEqual([
+        '==',
+        ...serialized
+      ])
     })
   })
 })

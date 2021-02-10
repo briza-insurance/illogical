@@ -6,14 +6,12 @@ import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
 import { GreaterThan } from '../../gt'
 
-const defaultOpt = { allowCrossTypeParsing: false }
-
 describe('Expression - Comparison - Greater Than', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
       'arguments %p should throw',
       (args) => {
-        expect(() => new GreaterThan(defaultOpt, ...args)).toThrowError()
+        expect(() => new GreaterThan(...args)).toThrowError()
       }
     )
   })
@@ -46,9 +44,7 @@ describe('Expression - Comparison - Greater Than', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(new GreaterThan(defaultOpt, left, right).evaluate({})).toBe(
-          expected
-        )
+        expect(new GreaterThan(left, right).evaluate({})).toBe(expected)
       }
     )
   })
@@ -57,13 +53,9 @@ describe('Expression - Comparison - Greater Than', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(
-          new GreaterThan(
-            { allowCrossTypeParsing: true },
-            left,
-            right
-          ).evaluate({})
-        ).toBe(expected)
+        const comparison = new GreaterThan(left, right)
+        comparison.strict = false
+        expect(comparison.evaluate({})).toBe(expected)
       }
     )
   })
@@ -75,7 +67,7 @@ describe('Expression - Comparison - Greater Than', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new GreaterThan(defaultOpt, left, right)
+      const equal = new GreaterThan(left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -89,9 +81,10 @@ describe('Expression - Comparison - Greater Than', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(
-        new GreaterThan(defaultOpt, left, right).serialize(defaultOptions)
-      ).toEqual(['>', ...serialized])
+      expect(new GreaterThan(left, right).serialize(defaultOptions)).toEqual([
+        '>',
+        ...serialized
+      ])
     })
   })
 })

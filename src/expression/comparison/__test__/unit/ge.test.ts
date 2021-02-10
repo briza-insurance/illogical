@@ -6,16 +6,12 @@ import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
 import { GreaterThanOrEqual } from '../../ge'
 
-const defaultOpt = { allowCrossTypeParsing: false }
-
 describe('Expression - Comparison - Greater Than or Equal', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
       'arguments %p should throw',
       (args) => {
-        expect(
-          () => new GreaterThanOrEqual(defaultOpt, ...args)
-        ).toThrowError()
+        expect(() => new GreaterThanOrEqual(...args)).toThrowError()
       }
     )
   })
@@ -48,9 +44,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(
-          new GreaterThanOrEqual(defaultOpt, left, right).evaluate({})
-        ).toBe(expected)
+        expect(new GreaterThanOrEqual(left, right).evaluate({})).toBe(expected)
       }
     )
   })
@@ -59,13 +53,9 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(
-          new GreaterThanOrEqual(
-            { allowCrossTypeParsing: true },
-            left,
-            right
-          ).evaluate({})
-        ).toBe(expected)
+        const comparison = new GreaterThanOrEqual(left, right)
+        comparison.strict = false
+        expect(comparison.evaluate({})).toBe(expected)
       }
     )
   })
@@ -77,7 +67,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new GreaterThanOrEqual(defaultOpt, left, right)
+      const equal = new GreaterThanOrEqual(left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -92,9 +82,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
       expect(
-        new GreaterThanOrEqual(defaultOpt, left, right).serialize(
-          defaultOptions
-        )
+        new GreaterThanOrEqual(left, right).serialize(defaultOptions)
       ).toEqual(['>=', ...serialized])
     })
   })

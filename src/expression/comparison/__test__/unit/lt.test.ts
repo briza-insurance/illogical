@@ -6,14 +6,12 @@ import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
 import { LessThan } from '../../lt'
 
-const defaultOpt = { allowCrossTypeParsing: false }
-
 describe('Expression - Comparison - Less Than', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
       'arguments %p should throw',
       (args) => {
-        expect(() => new LessThan(defaultOpt, ...args)).toThrowError()
+        expect(() => new LessThan(...args)).toThrowError()
       }
     )
   })
@@ -46,9 +44,7 @@ describe('Expression - Comparison - Less Than', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(new LessThan(defaultOpt, left, right).evaluate({})).toBe(
-          expected
-        )
+        expect(new LessThan(left, right).evaluate({})).toBe(expected)
       }
     )
   })
@@ -57,11 +53,9 @@ describe('Expression - Comparison - Less Than', () => {
     test.each([...testCases, ...crossTypeParsingTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
-        expect(
-          new LessThan({ allowCrossTypeParsing: true }, left, right).evaluate(
-            {}
-          )
-        ).toBe(expected)
+        const comparison = new LessThan(left, right)
+        comparison.strict = false
+        expect(comparison.evaluate({})).toBe(expected)
       }
     )
   })
@@ -73,7 +67,7 @@ describe('Expression - Comparison - Less Than', () => {
       [notSimplified(), notSimplified(), 'self'],
       ...testCases
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new LessThan(defaultOpt, left, right)
+      const equal = new LessThan(left, right)
       const result = equal.simplify({}, [])
       if (expected === 'self') {
         expect(result).toBe(equal)
@@ -87,9 +81,10 @@ describe('Expression - Comparison - Less Than', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
       [new Value(10), new Value(20), [10, 20]]
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(
-        new LessThan(defaultOpt, left, right).serialize(defaultOptions)
-      ).toEqual(['<', ...serialized])
+      expect(new LessThan(left, right).serialize(defaultOptions)).toEqual([
+        '<',
+        ...serialized
+      ])
     })
   })
 })
