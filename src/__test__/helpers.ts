@@ -16,7 +16,7 @@ import { Input } from '../parser'
  */
 export function permutation(inputs: any[]): [any, any][] {
   const result: [any, any][] = []
-  for (let i = 0, j = 0; j < inputs.length - 1;) {
+  for (let i = 0, j = 0; j < inputs.length - 1; ) {
     result.push([inputs[j], inputs[i + 1]])
     i++
     if (i === inputs.length - 1) {
@@ -29,24 +29,42 @@ export function permutation(inputs: any[]): [any, any][] {
 
 /**
  * Create a primitive operand, evaluating as the passed value.
- * @param value 
+ * @param value
  */
-export const operand = (value: any): Operand => new class extends Operand {
-  type: EvaluableType = EvaluableType.Operand
-  constructor(private readonly value: any) { super() }
-  evaluate() { return this.value }
-  simplify() { return this.value }
-  serialize(): Input { throw new Error('not implemented') }
-}(value)
+export const operand = (value: any): Operand =>
+  new (class extends Operand {
+    type: EvaluableType = EvaluableType.Operand
+    constructor(private readonly value: any) {
+      super()
+    }
+    evaluate() {
+      return this.value
+    }
+    simplify() {
+      return this.value
+    }
+    serialize(): Input {
+      throw new Error('not implemented')
+    }
+  })(value)
 
 /**
  * Create a primitive operand that cannot be simplified.
- * @param value 
+ * @param value
  */
-export const notSimplified = (): Operand => new class extends Operand {
-  type: EvaluableType = EvaluableType.Operand
-  constructor() { super() }
-  evaluate() { return undefined }
-  simplify() { return this }
-  serialize(): Input { throw new Error('not implemented') }
-}()
+export const notSimplified = (): Operand =>
+  new (class extends Operand {
+    type: EvaluableType = EvaluableType.Operand
+    constructor() {
+      super()
+    }
+    evaluate() {
+      return undefined
+    }
+    simplify() {
+      return this
+    }
+    serialize(): Input {
+      throw new Error('not implemented')
+    }
+  })()

@@ -20,10 +20,12 @@ export class Undefined extends Comparison {
    * @constructor
    * @param {Evaluable} operand
    */
-  constructor(...args: Evaluable[]);
-  constructor (operand: Evaluable) {
+  constructor(...args: Evaluable[])
+  constructor(operand: Evaluable) {
     if (arguments.length !== 1) {
-      throw new Error('comparison expression UNDEFINED expects exactly one operand')
+      throw new Error(
+        'comparison expression UNDEFINED expects exactly one operand'
+      )
     }
     super('UNDEFINED', OPERATOR, operand, new Value(true))
   }
@@ -31,7 +33,7 @@ export class Undefined extends Comparison {
   /**
    * {@link Comparison.comparison}
    */
-  comparison (left: Result): boolean {
+  comparison(left: Result): boolean {
     return left === undefined
   }
 
@@ -39,14 +41,14 @@ export class Undefined extends Comparison {
    * Get the strict representation of the expression.
    * @return {string}
    */
-  toString (): string {
+  toString(): string {
     return `(${this.left.toString()} is ${this.operator})`
   }
 
   /**
    * {@link Evaluable.serialize}
    */
-  serialize (options: Options): ExpressionInput {
+  serialize(options: Options): ExpressionInput {
     const { operatorMapping } = options
     const operator = operatorMapping.get(this.operatorSymbol)
     if (operator === undefined) {

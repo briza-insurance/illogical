@@ -21,7 +21,7 @@ export class Collection extends Operand {
    * @constructor
    * @param {Operand[]} items Collection of operands.
    */
-  constructor (items: Array<Value | Reference>) {
+  constructor(items: Array<Value | Reference>) {
     super()
     this.items = items
   }
@@ -31,14 +31,14 @@ export class Collection extends Operand {
    * @param {Context} ctx
    * @return {boolean}
    */
-  evaluate (ctx: Context): Result {
+  evaluate(ctx: Context): Result {
     return this.items.map((item) => item.evaluate(ctx)) as []
   }
 
   /**
    * {@link Evaluable.simplify}
    */
-  simplify (...args: [Context, string[]]): Result | Evaluable {
+  simplify(...args: [Context, string[]]): Result | Evaluable {
     const values: Result[] = []
     for (const item of this.items) {
       const simplifiedItem = item.simplify(...args)
@@ -53,15 +53,17 @@ export class Collection extends Operand {
   /**
    * {@link Evaluable.serialize}
    */
-  serialize (options: Options): Input {
-    return this.items.map(item => isEvaluable(item) ? item.serialize(options) : item)
+  serialize(options: Options): Input {
+    return this.items.map((item) =>
+      isEvaluable(item) ? item.serialize(options) : item
+    )
   }
 
   /**
    * Get the strict representation of the operand.
    * @return {string}
    */
-  toString (): string {
+  toString(): string {
     return '[' + this.items.map((item) => item.toString()).join(', ') + ']'
   }
 }

@@ -18,7 +18,7 @@ export const OPERATOR = Symbol('XOR')
  * @param {boolean} b
  * @return {boolean}
  */
-function xor (a: boolean, b: boolean): boolean {
+function xor(a: boolean, b: boolean): boolean {
   return (a || b) && !(a && b)
 }
 
@@ -30,7 +30,7 @@ export class Xor extends Logical {
    * @constructor
    * @param {Evaluable[]} operands Collection of operands.
    */
-  constructor (operands: Evaluable[]) {
+  constructor(operands: Evaluable[]) {
     if (operands.length < 2) {
       throw new Error('logical expression must have at least two operands')
     }
@@ -42,7 +42,7 @@ export class Xor extends Logical {
    * @param {Context} ctx
    * @return {Result}
    */
-  evaluate (ctx: Context): Result {
+  evaluate(ctx: Context): Result {
     let res = null
     for (const operand of this.operands) {
       if (res === null) {
@@ -57,8 +57,10 @@ export class Xor extends Logical {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify (...args: [Context, string[]]): boolean | Evaluable {
-    const [evaluablesLeft, trueCount] = this.operands.reduce<[Evaluable[], number]>(
+  simplify(...args: [Context, string[]]): boolean | Evaluable {
+    const [evaluablesLeft, trueCount] = this.operands.reduce<
+      [Evaluable[], number]
+    >(
       ([notSimplifiedConditions, trueCount], child) => {
         if (trueCount > 1) {
           return [notSimplifiedConditions, trueCount]
@@ -71,7 +73,9 @@ export class Xor extends Logical {
           return [notSimplifiedConditions, trueCount + 1]
         }
         return [notSimplifiedConditions, trueCount]
-      }, [[], 0])
+      },
+      [[], 0]
+    )
     if (trueCount > 1) {
       return false
     }

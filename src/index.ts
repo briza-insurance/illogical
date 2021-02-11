@@ -44,7 +44,7 @@ export {
   OPERATOR_OR,
   OPERATOR_NOR,
   OPERATOR_XOR,
-  OPERATOR_NOT
+  OPERATOR_NOT,
 }
 
 /**
@@ -57,7 +57,7 @@ class Engine {
    * @constructor
    * @param {Options?} options Parser options.
    */
-  constructor (options?: Partial<Options>) {
+  constructor(options?: Partial<Options>) {
     this.parser = new Parser(options)
   }
 
@@ -67,7 +67,7 @@ class Engine {
    * @param {Context} ctx Evaluation data context.
    * @return {boolean}
    */
-  evaluate (exp: ExpressionInput, ctx: Context): boolean {
+  evaluate(exp: ExpressionInput, ctx: Context): boolean {
     return this.parse(exp).evaluate(ctx) as boolean
   }
 
@@ -76,7 +76,7 @@ class Engine {
    * @param {ExpressionInput} exp Raw expression.
    * @return {string}
    */
-  statement (exp: ExpressionInput): string {
+  statement(exp: ExpressionInput): string {
     return this.parse(exp).toString()
   }
 
@@ -85,7 +85,7 @@ class Engine {
    * @param {ExpressionInput} exp Raw expression.
    * @return {Evaluable}
    */
-  parse (exp: ExpressionInput): Evaluable {
+  parse(exp: ExpressionInput): Evaluable {
     return this.parser.parse(exp)
   }
 
@@ -102,7 +102,11 @@ class Engine {
    *  Default to empty array
    * @returns {Inpunt | boolean}
    */
-  simplify (exp: ExpressionInput, context: Context, ignoreKeys: string[] = []): Input | boolean {
+  simplify(
+    exp: ExpressionInput,
+    context: Context,
+    ignoreKeys: string[] = []
+  ): Input | boolean {
     const result = this.parse(exp).simplify(context, ignoreKeys)
     if (isEvaluable(result)) {
       return result.serialize(this.parser.options)

@@ -1,76 +1,73 @@
-import { ExpressionInput, Parser } from '../../'
-import {
-  defaultOptions,
-  defaultReferencePredicate,
-  defaultReferenceTransform
-} from '../../options'
-import { Value } from '../../../operand/value'
-import { Reference } from '../../../operand/reference'
+import { Evaluable } from '../../../common/evaluable'
 import {
   Equal,
   OPERATOR as OPERATOR_EQ,
 } from '../../../expression/comparison/eq'
 import {
-  NotEqual,
-  OPERATOR as OPERATOR_NE,
-} from '../../../expression/comparison/ne'
-import {
-  GreaterThan,
-  OPERATOR as OPERATOR_GT,
-} from '../../../expression/comparison/gt'
-import {
   GreaterThanOrEqual,
   OPERATOR as OPERATOR_GE,
 } from '../../../expression/comparison/ge'
 import {
-  LessThan,
-  OPERATOR as OPERATOR_LT,
-} from '../../../expression/comparison/lt'
+  GreaterThan,
+  OPERATOR as OPERATOR_GT,
+} from '../../../expression/comparison/gt'
+import { In, OPERATOR as OPERATOR_IN } from '../../../expression/comparison/in'
 import {
   LessThanOrEqual,
   OPERATOR as OPERATOR_LE,
 } from '../../../expression/comparison/le'
 import {
-  In,
-  OPERATOR as OPERATOR_IN,
-} from '../../../expression/comparison/in'
+  LessThan,
+  OPERATOR as OPERATOR_LT,
+} from '../../../expression/comparison/lt'
+import {
+  NotEqual,
+  OPERATOR as OPERATOR_NE,
+} from '../../../expression/comparison/ne'
 import {
   NotIn,
   OPERATOR as OPERATOR_NOT_IN,
 } from '../../../expression/comparison/not-in'
 import {
-  Prefix,
-  OPERATOR as OPERATOR_PREFIX,
-} from '../../../expression/comparison/prefix'
-import {
-  Suffix,
-  OPERATOR as OPERATOR_SUFFIX,
-} from '../../../expression/comparison/suffix'
-import {
-  Overlap,
   OPERATOR as OPERATOR_OVERLAP,
+  Overlap,
 } from '../../../expression/comparison/overlap'
 import {
-  Undefined,
-  OPERATOR as OPERATOR_UNDEFINED,
-} from '../../../expression/comparison/undefined'
+  OPERATOR as OPERATOR_PREFIX,
+  Prefix,
+} from '../../../expression/comparison/prefix'
 import {
-  Present,
   OPERATOR as OPERATOR_PRESENT,
+  Present,
 } from '../../../expression/comparison/present'
+import {
+  OPERATOR as OPERATOR_SUFFIX,
+  Suffix,
+} from '../../../expression/comparison/suffix'
+import {
+  OPERATOR as OPERATOR_UNDEFINED,
+  Undefined,
+} from '../../../expression/comparison/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../../../expression/logical/and'
-import { Or, OPERATOR as OPERATOR_OR } from '../../../expression/logical/or'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../../../expression/logical/nor'
-import { Xor, OPERATOR as OPERATOR_XOR } from '../../../expression/logical/xor'
 import { Not, OPERATOR as OPERATOR_NOT } from '../../../expression/logical/not'
+import { OPERATOR as OPERATOR_OR, Or } from '../../../expression/logical/or'
+import { OPERATOR as OPERATOR_XOR, Xor } from '../../../expression/logical/xor'
 import { Collection } from '../../../operand/collection'
-import { Evaluable } from '../../../common/evaluable'
+import { Reference } from '../../../operand/reference'
+import { Value } from '../../../operand/value'
+import { ExpressionInput, Parser } from '../../'
+import {
+  defaultOptions,
+  defaultReferencePredicate,
+  defaultReferenceTransform,
+} from '../../options'
 
 describe('Condition Engine - Parser', () => {
   const parser = new Parser()
 
   test('options', () => {
-    let customOptions = {
+    const customOptions = {
       operatorMapping: new Map([[OPERATOR_EQ, '&&']]),
       notExpected: 10,
     }
@@ -95,7 +92,7 @@ describe('Condition Engine - Parser', () => {
       [true, false],
       [false, false],
       [[5], false],
-      [['5'], false]
+      [['5'], false],
     ])('%p should evaluate as %p', (key, expected) => {
       // @ts-ignore
       expect(defaultReferencePredicate(key)).toBe(expected)
@@ -103,11 +100,12 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('defaultReferenceTransform', () => {
-    test.each([
-      ['$ref', 'ref'],
-    ])('%p should evaluate as %p', (key, expected) => {
-      expect(defaultReferenceTransform(key)).toBe(expected)
-    })
+    test.each([['$ref', 'ref']])(
+      '%p should evaluate as %p',
+      (key, expected) => {
+        expect(defaultReferenceTransform(key)).toBe(expected)
+      }
+    )
   })
 
   describe('parse', () => {
@@ -115,12 +113,12 @@ describe('Condition Engine - Parser', () => {
       // Comparison expression
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5))
+        new Equal(new Value(5), new Value(5)),
       ],
       // Unary expression
       [
         [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
-        new Undefined(new Reference('RefA'))
+        new Undefined(new Reference('RefA')),
       ],
       // Logical expression
       [
@@ -134,12 +132,14 @@ describe('Condition Engine - Parser', () => {
           new Equal(new Value(5), new Value(5)),
           new Equal(new Value(10), new Value(10)),
           new Undefined(new Reference('RefA')),
-        ])
+        ]),
       ],
-    ] as [ExpressionInput, Evaluable][])
-      ('%p should evaluate as %p', (expression, expected) => {
+    ] as [ExpressionInput, Evaluable][])(
+      '%p should evaluate as %p',
+      (expression, expected) => {
         expect(parser.parse(expression)).toEqual(expected)
-      })
+      }
+    )
 
     test.each([
       // Invalid form
@@ -148,13 +148,13 @@ describe('Condition Engine - Parser', () => {
       [{}],
       [5],
       [''],
-      [() => { }],
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      [() => {}],
       // Invalid operator
       [['__', ['==', 5, 5]]],
-    ] as [ExpressionInput][])
-      ('%p should throw', (expression) => {
-        expect(() => parser.parse(expression)).toThrowError()
-      })
+    ] as [ExpressionInput][])('%p should throw', (expression) => {
+      expect(() => parser.parse(expression)).toThrowError()
+    })
   })
 
   describe('parse - logical expressions', () => {
@@ -168,8 +168,8 @@ describe('Condition Engine - Parser', () => {
         ],
         new And([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
-        ])
+          new Equal(new Value(10), new Value(10)),
+        ]),
       ],
       [
         [
@@ -179,8 +179,8 @@ describe('Condition Engine - Parser', () => {
         ],
         new Or([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
-        ])
+          new Equal(new Value(10), new Value(10)),
+        ]),
       ],
       [
         [
@@ -190,8 +190,8 @@ describe('Condition Engine - Parser', () => {
         ],
         new Nor([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
-        ])
+          new Equal(new Value(10), new Value(10)),
+        ]),
       ],
       [
         [
@@ -201,15 +201,15 @@ describe('Condition Engine - Parser', () => {
         ],
         new Xor([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
-        ])
+          new Equal(new Value(10), new Value(10)),
+        ]),
       ],
       [
         [
           defaultOptions.operatorMapping.get(OPERATOR_NOT),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5]
+          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         ],
-        new Not(new Equal(new Value(5), new Value(5)))
+        new Not(new Equal(new Value(5), new Value(5))),
       ],
       // Not-nested, 2 items, reduced into comparison
       [
@@ -231,8 +231,8 @@ describe('Condition Engine - Parser', () => {
         ],
         new Or([
           new Equal(new Value(5), new Value(5)),
-          new Equal(new Value(10), new Value(10))
-        ])
+          new Equal(new Value(10), new Value(10)),
+        ]),
       ],
       // Nested
       [
@@ -248,41 +248,24 @@ describe('Condition Engine - Parser', () => {
         new And([
           new Or([
             new Equal(new Value(5), new Value(5)),
-            new Equal(new Value(10), new Value(10))
+            new Equal(new Value(10), new Value(10)),
           ]),
-          new Equal(new Value(15), new Value(15))
-        ])
+          new Equal(new Value(15), new Value(15)),
+        ]),
       ],
       // Zero argument logical expression treated as collection
       [
         [
           defaultOptions.operatorMapping.get(OPERATOR_IN),
           defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [
-            defaultOptions.operatorMapping.get(OPERATOR_OR)
-          ]
-        ],
-        new In(
-          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
-          new Collection([new Value(defaultOptions.operatorMapping.get(OPERATOR_OR))])
-        )
-      ],
-      [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_IN),
-          defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [
-            defaultOptions.operatorMapping.get(OPERATOR_OR),
-            defaultOptions.operatorMapping.get(OPERATOR_AND)
-          ]
+          [defaultOptions.operatorMapping.get(OPERATOR_OR)],
         ],
         new In(
           new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
           new Collection([
             new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_AND))
           ])
-        )
+        ),
       ],
       [
         [
@@ -290,34 +273,46 @@ describe('Condition Engine - Parser', () => {
           defaultOptions.operatorMapping.get(OPERATOR_OR),
           [
             defaultOptions.operatorMapping.get(OPERATOR_OR),
-            'AK',
-            'MN'
-          ]
+            defaultOptions.operatorMapping.get(OPERATOR_AND),
+          ],
+        ],
+        new In(
+          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Collection([
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_AND)),
+          ])
+        ),
+      ],
+      [
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          defaultOptions.operatorMapping.get(OPERATOR_OR),
+          [defaultOptions.operatorMapping.get(OPERATOR_OR), 'AK', 'MN'],
         ],
         new In(
           new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
           new Collection([
             new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
             new Value('AK'),
-            new Value('MN')
+            new Value('MN'),
           ])
-        )
+        ),
       ],
       // Not treated as raw array
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_NOT),
-          5
-        ],
+        [defaultOptions.operatorMapping.get(OPERATOR_NOT), 5],
         new Collection([
           new Value(defaultOptions.operatorMapping.get(OPERATOR_NOT)),
-          new Value(5)
-        ])
-      ]
-    ] as [ExpressionInput, Evaluable][])
-      ('%p should evaluate as %p', (expression, expected) => {
+          new Value(5),
+        ]),
+      ],
+    ] as [ExpressionInput, Evaluable][])(
+      '%p should evaluate as %p',
+      (expression, expected) => {
         expect(parser.parse(expression)).toEqual(expected)
-      })
+      }
+    )
 
     test.each([
       // Invalid form
@@ -328,102 +323,110 @@ describe('Condition Engine - Parser', () => {
       [['__', ['==', 5, 5], ['==', 5, 5]]],
       // Invalid logical inner expression
       [['IN', 'OR', ['OR', 'AND', [5, 5]]]],
-    ] as [ExpressionInput][])
-      ('%p should throw', (expression) => {
-        expect(() => parser.parse(expression)).toThrowError()
-      })
+    ] as [ExpressionInput][])('%p should throw', (expression) => {
+      expect(() => parser.parse(expression)).toThrowError()
+    })
   })
 
   describe('parse - comparison expressions', () => {
     test.each([
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5))
+        new Equal(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_NE), 5, 5],
-        new NotEqual(new Value(5), new Value(5))
+        new NotEqual(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_GT), 5, 5],
-        new GreaterThan(new Value(5), new Value(5))
+        new GreaterThan(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_GE), 5, 5],
-        new GreaterThanOrEqual(new Value(5), new Value(5))
+        new GreaterThanOrEqual(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_LT), 5, 5],
-        new LessThan(new Value(5), new Value(5))
+        new LessThan(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_LE), 5, 5],
-        new LessThanOrEqual(new Value(5), new Value(5))
+        new LessThanOrEqual(new Value(5), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
-        new In(new Value(5), new Collection([new Value(5)]))
+        new In(new Value(5), new Collection([new Value(5)])),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
-        new NotIn(new Value(5), new Collection([new Value(5)]))
+        new NotIn(new Value(5), new Collection([new Value(5)])),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
-        new Prefix(new Value('a'), new Value('abc'))
+        new Prefix(new Value('a'), new Value('abc')),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
-        new Suffix(new Value('abc'), new Value('c'))
+        new Suffix(new Value('abc'), new Value('c')),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['a', 'b'], ['a']],
-        new Overlap(new Collection([new Value('a'), new Value('b')]), new Collection([new Value('a')]))
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
+          ['a', 'b'],
+          ['a'],
+        ],
+        new Overlap(
+          new Collection([new Value('a'), new Value('b')]),
+          new Collection([new Value('a')])
+        ),
       ],
       // Reference
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), '$RefA', 5],
-        new Equal(new Reference('RefA'), new Value(5))
+        new Equal(new Reference('RefA'), new Value(5)),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
-        new Equal(new Value(5), new Reference('RefA'))
+        new Equal(new Value(5), new Reference('RefA')),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
-        new Undefined(new Reference('RefA'))
+        new Undefined(new Reference('RefA')),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA'],
-        new Present(new Reference('RefA'))
+        new Present(new Reference('RefA')),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_OVERLAP), ['$RefA', '$RefB'], ['a']],
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
+          ['$RefA', '$RefB'],
+          ['a'],
+        ],
         new Overlap(
-          new Collection([
-            new Reference('RefA'),
-            new Reference('RefB'),
-          ]),
+          new Collection([new Reference('RefA'), new Reference('RefB')]),
           new Collection([new Value('a')])
-        )
+        ),
       ],
       [
         [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA{RefB}'],
-        new Present(new Reference('RefA{RefB}'))
-      ]
-    ] as [ExpressionInput, Evaluable][])
-      ('%p should evaluate as %p', (expression, expected) => {
+        new Present(new Reference('RefA{RefB}')),
+      ],
+    ] as [ExpressionInput, Evaluable][])(
+      '%p should evaluate as %p',
+      (expression, expected) => {
         expect(parser.parse(expression)).toEqual(expected)
-      })
+      }
+    )
 
     test.each([
       // Invalid form
       [[]],
       // Invalid operator
       [['__', 5, 5]],
-    ] as [ExpressionInput][])
-      ('%p should throw', (expression) => {
-        expect(() => parser.parse(expression)).toThrowError()
-      })
+    ] as [ExpressionInput][])('%p should throw', (expression) => {
+      expect(() => parser.parse(expression)).toThrowError()
+    })
   })
 })

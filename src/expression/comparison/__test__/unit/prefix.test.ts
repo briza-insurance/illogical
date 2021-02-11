@@ -1,20 +1,19 @@
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Operand } from '../../../../operand'
 import { Collection } from '../../../../operand/collection'
 import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
-import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Prefix } from '../../prefix'
 
 describe('Expression - Comparison - Prefix', () => {
   describe('constructor', () => {
-    test.each([
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]]
-    ])('arguments %p should throw', (args) => {
-      expect(() => new Prefix(...(args))).toThrowError()
-    })
+    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
+      'arguments %p should throw',
+      (args) => {
+        expect(() => new Prefix(...args)).toThrowError()
+      }
+    )
   })
 
   const testCases: [Operand, Operand, boolean][] = [
@@ -36,10 +35,12 @@ describe('Expression - Comparison - Prefix', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)
-      ('%p and %p should evaluate as %p', (left, right, expected) => {
+    test.each(testCases)(
+      '%p and %p should evaluate as %p',
+      (left, right, expected) => {
         expect(new Prefix(left, right).evaluate({})).toBe(expected)
-      })
+      }
+    )
   })
 
   describe('simplify', () => {
@@ -47,7 +48,7 @@ describe('Expression - Comparison - Prefix', () => {
       [operand(10), notSimplified(), 'self'],
       [notSimplified(), operand(10), 'self'],
       [notSimplified(), notSimplified(), 'self'],
-      ...testCases
+      ...testCases,
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
       const equal = new Prefix(left, right)
       const result = equal.simplify({}, [])
@@ -61,9 +62,12 @@ describe('Expression - Comparison - Prefix', () => {
 
   describe('serialize', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
-      [new Value(10), new Value(20), [10, 20]]
+      [new Value(10), new Value(20), [10, 20]],
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new Prefix(left, right).serialize(defaultOptions)).toEqual(['PREFIX', ...serialized])
+      expect(new Prefix(left, right).serialize(defaultOptions)).toEqual([
+        'PREFIX',
+        ...serialized,
+      ])
     })
   })
 })

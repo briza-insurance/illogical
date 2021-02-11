@@ -8,7 +8,7 @@ import { isObject } from '../common/type-check'
 import { Options } from '../parser/options'
 import { Operand } from '.'
 
-function extractKeys (ctx: Context, key: string): string[] | undefined {
+function extractKeys(ctx: Context, key: string): string[] | undefined {
   // Resolve complex keys
   const complexKeyExpression = /{([^{}]+)}/
   let complexKeyMatches = complexKeyExpression.exec(key)
@@ -41,7 +41,7 @@ function extractKeys (ctx: Context, key: string): string[] | undefined {
  * @param {string} key Context lookup key.
  * @return {Result}
  */
-function contextValueLookup (ctx: Context, key: string): Result {
+function contextValueLookup(ctx: Context, key: string): Result {
   const keys = extractKeys(ctx, key)
 
   if (!keys) {
@@ -56,10 +56,13 @@ function contextValueLookup (ctx: Context, key: string): Result {
     let currentValue = pointer[currentKey]
 
     // Resolve array notation
-    keys[i].match(/\[\d+\]/g)?.forEach(match => {
+    keys[i].match(/\[\d+\]/g)?.forEach((match) => {
       const arrayIndex = parseInt(match.replace(/[[\]]/g, ''))
 
-      if (!Array.isArray(currentValue) || currentValue[arrayIndex] === undefined) {
+      if (
+        !Array.isArray(currentValue) ||
+        currentValue[arrayIndex] === undefined
+      ) {
         currentValue = undefined
       } else {
         currentValue = currentValue[arrayIndex]
@@ -93,7 +96,7 @@ export class Reference extends Operand {
    * @constructor
    * @param {string} key Context key.
    */
-  constructor (key: string) {
+  constructor(key: string) {
     if (key.trim() === '') {
       throw new Error('invalid reference key')
     }
@@ -106,14 +109,14 @@ export class Reference extends Operand {
    * @param {Context} ctx
    * @return {boolean}
    */
-  evaluate (ctx: Context): Result {
+  evaluate(ctx: Context): Result {
     return contextValueLookup(ctx, this.key)
   }
 
   /**
    * {@link Evaluable.simplify}
    */
-  simplify (ctx: Context, ignoreKeys: string[]): Result | Evaluable {
+  simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable {
     const keys = extractKeys(ctx, this.key)
 
     if (!keys) {
@@ -130,7 +133,7 @@ export class Reference extends Operand {
   /**
    * {@link Evaluable.serialize}
    */
-  serialize ({ referenceSerialization }: Options): string {
+  serialize({ referenceSerialization }: Options): string {
     return referenceSerialization(this.key)
   }
 
@@ -138,7 +141,7 @@ export class Reference extends Operand {
    * Get the strict representation of the operand.
    * @return {string}
    */
-  toString (): string {
+  toString(): string {
     return `{${this.key}}`
   }
 }

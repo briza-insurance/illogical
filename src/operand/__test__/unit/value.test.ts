@@ -3,9 +3,7 @@ import { Value } from '../../value'
 
 describe('Operand - Value', () => {
   describe('constructor', () => {
-    test.each([
-      [[1, '2', true]]
-    ])('arguments %p should throw', (value) => {
+    test.each([[[1, '2', true]]])('arguments %p should throw', (value) => {
       expect(() => new Value(value)).toThrowError()
     })
   })
@@ -15,7 +13,7 @@ describe('Operand - Value', () => {
     ['1', '1'],
     [true, true],
     [undefined, undefined],
-    [null, null]
+    [null, null],
   ]
 
   describe('evaluate', () => {

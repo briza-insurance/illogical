@@ -18,8 +18,8 @@ export class Overlap extends Comparison {
    * @param {Evaluable} left Left operand.
    * @param {Evaluable} right Right operand.
    */
-  constructor (...args: Evaluable[]);
-  constructor (left: Evaluable, right: Evaluable) {
+  constructor(...args: Evaluable[])
+  constructor(left: Evaluable, right: Evaluable) {
     if (arguments.length !== 2) {
       throw new Error('comparison expression expects left and right operands')
     }
@@ -29,9 +29,13 @@ export class Overlap extends Comparison {
   /**
    * {@link Comparison.comparison}
    */
-  comparison (left: Result, right: Result): boolean {
-    if (left === undefined || left === null ||
-      right === undefined || right === null) {
+  comparison(left: Result, right: Result): boolean {
+    if (
+      left === undefined ||
+      left === null ||
+      right === undefined ||
+      right === null
+    ) {
       return false
     }
 
@@ -39,8 +43,8 @@ export class Overlap extends Comparison {
       throw new Error('invalid OVERLAP expression, both operands must be array')
     }
 
-    const leftArray = left as (string|number)[]
-    const rightArray = right as (string|number)[]
+    const leftArray = left as (string | number)[]
+    const rightArray = right as (string | number)[]
     return leftArray.some((element) => rightArray.includes(element))
   }
 
@@ -48,7 +52,7 @@ export class Overlap extends Comparison {
    * Get the strict representation of the expression.
    * @return {string}
    */
-  toString (): string {
+  toString(): string {
     const left = this.left.toString()
     const right = this.right.toString()
     return `(${left} ${this.operator} ${right})`
