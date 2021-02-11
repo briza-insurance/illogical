@@ -33,6 +33,7 @@ export abstract class Comparison implements Evaluable {
     protected readonly right: Operand
   ) {}
 
+  // Enforces strict data type in comparison by default
   public strict = true;
 
   /**

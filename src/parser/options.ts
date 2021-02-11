@@ -72,6 +72,7 @@ export interface Options {
 
   /**
    * Configures strict data type check in comparison expressions
+   * Default set to true which ensures that type coercion is NOT allowed
    */
   strictTypeComparison: boolean;
 
