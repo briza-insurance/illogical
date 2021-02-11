@@ -1,8 +1,4 @@
-import {
-  isNumber,
-  isString,
-  isObject
-} from '../../type-check'
+import { isNumber, isObject, isString } from '../../type-check'
 
 describe('Common - Type Check', () => {
   describe('isNumber', () => {
@@ -17,7 +13,8 @@ describe('Common - Type Check', () => {
       [true, false],
       [false, false],
       [{}, false],
-      [() => { }, false]
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      [() => {}, false],
     ])('%p should evaluate as %p', (value, expected) => {
       // @ts-ignore
       expect(isNumber(value)).toBe(expected)
@@ -34,7 +31,8 @@ describe('Common - Type Check', () => {
       [true, false],
       [false, false],
       [{}, false],
-      [() => { }, false]
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      [() => {}, false],
     ])('%p should evaluate as %p', (value, expected) => {
       // @ts-ignore
       expect(isString(value)).toBe(expected)
@@ -49,7 +47,7 @@ describe('Common - Type Check', () => {
       ['hi', false],
       [1, false],
       [null, false],
-      [undefined, false]
+      [undefined, false],
     ])('%p should evaluate as %p', (value, expected) => {
       expect(isObject(value)).toBe(expected)
     })

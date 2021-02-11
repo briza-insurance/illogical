@@ -1,22 +1,19 @@
-import { Value } from '../../../../operand/value'
-import { Reference } from '../../../../operand/reference'
-import { Suffix } from '../../suffix'
-import { Collection } from '../../../../operand/collection'
 import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
+import { Collection } from '../../../../operand/collection'
+import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
+import { Suffix } from '../../suffix'
 
 describe('Expression - Comparison - Suffix', () => {
   describe('constructor', () => {
-    test.each([
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]]
-    ])('arguments %p should throw', (args) => {
-      expect(() => new Suffix(...(args))).toThrowError()
-    })
+    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
+      'arguments %p should throw',
+      (args) => {
+        expect(() => new Suffix(...args)).toThrowError()
+      }
+    )
   })
 
   const testCases: [Operand, Operand, boolean][] = [
@@ -38,10 +35,12 @@ describe('Expression - Comparison - Suffix', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)
-      ('%p and %p should evaluate as %p', (left, right, expected) => {
+    test.each(testCases)(
+      '%p and %p should evaluate as %p',
+      (left, right, expected) => {
         expect(new Suffix(left, right).evaluate({})).toBe(expected)
-      })
+      }
+    )
   })
 
   describe('simplify', () => {
@@ -49,7 +48,7 @@ describe('Expression - Comparison - Suffix', () => {
       [operand(10), notSimplified(), 'self'],
       [notSimplified(), operand(10), 'self'],
       [notSimplified(), notSimplified(), 'self'],
-      ...testCases
+      ...testCases,
     ])('%p should be simplified to $p', (left, right, expected) => {
       const equal = new Suffix(left, right)
       const result = equal.simplify({}, [])
@@ -63,9 +62,12 @@ describe('Expression - Comparison - Suffix', () => {
 
   describe('serialize', () => {
     it.each<[Operand, Operand, [Input, Input]]>([
-      [new Value(10), new Value(20), [10, 20]]
+      [new Value(10), new Value(20), [10, 20]],
     ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new Suffix(left, right).serialize(defaultOptions)).toEqual(['SUFFIX', ...serialized])
+      expect(new Suffix(left, right).serialize(defaultOptions)).toEqual([
+        'SUFFIX',
+        ...serialized,
+      ])
     })
   })
 })

@@ -16,7 +16,7 @@ export abstract class Operand implements Evaluable {
   /**
    * {@link Evaluable.evaluate}
    */
-  abstract evaluate (ctx: Context): Result
+  abstract evaluate(ctx: Context): Result
 
   /**
    * {@link Evaluable.simplify}
@@ -31,7 +31,7 @@ export abstract class Operand implements Evaluable {
   /**
    * Get the strict representation.
    */
-  toString (): string {
+  toString(): string {
     throw new Error('not implemented exception')
   }
 }

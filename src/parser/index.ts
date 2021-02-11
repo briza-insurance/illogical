@@ -5,18 +5,45 @@
 
 import { Evaluable, EvaluableType } from '../common/evaluable'
 import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
-import { GreaterThanOrEqual, OPERATOR as OPERATOR_GE } from '../expression/comparison/ge'
-import { GreaterThan, OPERATOR as OPERATOR_GT } from '../expression/comparison/gt'
+import {
+  GreaterThanOrEqual,
+  OPERATOR as OPERATOR_GE,
+} from '../expression/comparison/ge'
+import {
+  GreaterThan,
+  OPERATOR as OPERATOR_GT,
+} from '../expression/comparison/gt'
 import { In, OPERATOR as OPERATOR_IN } from '../expression/comparison/in'
-import { LessThanOrEqual, OPERATOR as OPERATOR_LE } from '../expression/comparison/le'
+import {
+  LessThanOrEqual,
+  OPERATOR as OPERATOR_LE,
+} from '../expression/comparison/le'
 import { LessThan, OPERATOR as OPERATOR_LT } from '../expression/comparison/lt'
 import { NotEqual, OPERATOR as OPERATOR_NE } from '../expression/comparison/ne'
-import { NotIn, OPERATOR as OPERATOR_NOT_IN } from '../expression/comparison/not-in'
-import { OPERATOR as OPERATOR_OVERLAP, Overlap } from '../expression/comparison/overlap'
-import { OPERATOR as OPERATOR_PREFIX, Prefix } from '../expression/comparison/prefix'
-import { OPERATOR as OPERATOR_PRESENT, Present } from '../expression/comparison/present'
-import { OPERATOR as OPERATOR_SUFFIX, Suffix } from '../expression/comparison/suffix'
-import { OPERATOR as OPERATOR_UNDEFINED, Undefined } from '../expression/comparison/undefined'
+import {
+  NotIn,
+  OPERATOR as OPERATOR_NOT_IN,
+} from '../expression/comparison/not-in'
+import {
+  OPERATOR as OPERATOR_OVERLAP,
+  Overlap,
+} from '../expression/comparison/overlap'
+import {
+  OPERATOR as OPERATOR_PREFIX,
+  Prefix,
+} from '../expression/comparison/prefix'
+import {
+  OPERATOR as OPERATOR_PRESENT,
+  Present,
+} from '../expression/comparison/present'
+import {
+  OPERATOR as OPERATOR_SUFFIX,
+  Suffix,
+} from '../expression/comparison/suffix'
+import {
+  OPERATOR as OPERATOR_UNDEFINED,
+  Undefined,
+} from '../expression/comparison/undefined'
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
 import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
@@ -29,7 +56,13 @@ import { Value } from '../operand/value'
 import { defaultOptions, Options, optionValue } from './options'
 
 // Input types
-export type Input = string | number | boolean | null | Input[] | [string, ...Input[]]
+export type Input =
+  | string
+  | number
+  | boolean
+  | null
+  | Input[]
+  | [string, ...Input[]]
 export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
@@ -44,7 +77,7 @@ export class Parser {
    * @constructor
    * @param {Options?} options Parser options.
    */
-  constructor (options?: Partial<Options>) {
+  constructor(options?: Partial<Options>) {
     this.opts = { ...defaultOptions }
     // Apply exclusive options overrides
     if (options) {
@@ -62,7 +95,7 @@ export class Parser {
    * Parser options
    * @type {Options}
    */
-  get options (): Options {
+  get options(): Options {
     return this.opts
   }
 
@@ -71,13 +104,14 @@ export class Parser {
    * @param {ExpressionInput} raw Raw expression.
    * @return {Evaluable}
    */
-  parse (raw: ExpressionInput): Evaluable {
-    if (raw === undefined || raw === null || Array.isArray(raw) === false
-    ) {
+  parse(raw: ExpressionInput): Evaluable {
+    if (raw === undefined || raw === null || Array.isArray(raw) === false) {
       throw new Error('invalid expression')
     }
 
-    if ((raw as ArrayInput).length === 0 || !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
+    if (
+      (raw as ArrayInput).length === 0 ||
+      !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
       throw new Error('invalid expression')
     }
@@ -89,7 +123,7 @@ export class Parser {
    * @param {Input} raw Raw expression.
    * @return {Evaluable}
    */
-  private parseRawExp (raw: Input): Evaluable {
+  private parseRawExp(raw: Input): Evaluable {
     // Value / Reference
     if (!Array.isArray(raw)) {
       return this.getOperand(raw)
@@ -114,14 +148,14 @@ export class Parser {
       operands: Evaluable[],
       collapsible = false
     ): Evaluable | undefined => {
-      if (operands.length === 0 ||
-        operands.filter((operand) => operand.type === EvaluableType.Expression).length === 0
+      if (
+        operands.length === 0 ||
+        operands.filter((operand) => operand.type === EvaluableType.Expression)
+          .length === 0
       ) {
         return this.getOperand(raw)
       }
-      return collapsible && operands.length === 1
-        ? operands[0]
-        : undefined
+      return collapsible && operands.length === 1 ? operands[0] : undefined
     }
 
     switch (operator) {
@@ -152,59 +186,73 @@ export class Parser {
        * Comparison
        */
       case this.opts.operatorMapping.get(OPERATOR_EQ):
-        expression = (operands: Evaluable[]): Evaluable => new Equal(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Equal(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NE):
-        expression = (operands: Evaluable[]): Evaluable => new NotEqual(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new NotEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GT):
-        expression = (operands: Evaluable[]): Evaluable => new GreaterThan(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new GreaterThan(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_GE):
-        expression = (operands: Evaluable[]): Evaluable => new GreaterThanOrEqual(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new GreaterThanOrEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_LT):
-        expression = (operands: Evaluable[]): Evaluable => new LessThan(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new LessThan(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_LE):
-        expression = (operands: Evaluable[]): Evaluable => new LessThanOrEqual(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new LessThanOrEqual(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_IN):
         expression = (operands: Evaluable[]): Evaluable => new In(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT_IN):
-        expression = (operands: Evaluable[]): Evaluable => new NotIn(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new NotIn(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_PREFIX):
-        expression = (operands: Evaluable[]): Evaluable => new Prefix(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Prefix(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_SUFFIX):
-        expression = (operands: Evaluable[]): Evaluable => new Suffix(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Suffix(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_OVERLAP):
-        expression = (operands: Evaluable[]): Evaluable => new Overlap(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Overlap(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_UNDEFINED):
-        expression = (operands: Evaluable[]): Evaluable => new Undefined(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Undefined(...operands)
         break
       case this.opts.operatorMapping.get(OPERATOR_PRESENT):
-        expression = (operands: Evaluable[]): Evaluable => new Present(...operands)
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Present(...operands)
         break
       // Collection
       default:
         return this.getOperand(raw)
     }
 
-    return expression(operands.map((operand) => {
-      return this.parseRawExp(operand)
-    }))
+    return expression(
+      operands.map((operand) => {
+        return this.parseRawExp(operand)
+      })
+    )
   }
 
   /**
    * Get resolved operand
    * @param raw Raw data
    */
-  private getOperand (raw: Input): Operand {
+  private getOperand(raw: Input): Operand {
     const resolve = (raw: Input): Value | Reference =>
       this.opts.referencePredicate(raw as string)
         ? new Reference(this.opts.referenceTransform(raw as string))

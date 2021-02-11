@@ -24,7 +24,9 @@ import { OPERATOR as OPERATOR_OR } from '../expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 
 // Option value whitelist
-export type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>
+export type optionValue =
+  | ((operand: string) => string | boolean)
+  | Map<symbol, string>
 
 // Parser options
 export interface Options {
@@ -36,7 +38,7 @@ export interface Options {
    * * True = reference
    * * False = value
    */
-  referencePredicate: (operand: string) => boolean;
+  referencePredicate: (operand: string) => boolean
 
   /**
    * A function used to transform the operand into the reference annotation
@@ -46,7 +48,7 @@ export interface Options {
    * @param {string} operand
    * @return {string}
    */
-  referenceTransform: (operand: string) => string;
+  referenceTransform: (operand: string) => string
 
   /**
    * A function used to tranform ths stripped form of a reference into an
@@ -59,16 +61,16 @@ export interface Options {
    * @param {string} operand
    * @return {string}
    */
-  referenceSerialization: (operand: string) => string;
+  referenceSerialization: (operand: string) => string
 
   /**
    * Mapping of the operators. The key is unique operator key, and the value
    * is the key used to represent the  given operator in the raw expression.
    */
-  operatorMapping: Map<symbol, string>;
+  operatorMapping: Map<symbol, string>
 
   // Object key accessor whitelisting
-  [k: string]: optionValue;
+  [k: string]: optionValue
 }
 
 /**
@@ -79,7 +81,7 @@ export interface Options {
  * @param {string} key
  * @return {boolean}
  */
-export function defaultReferencePredicate (key: string): boolean {
+export function defaultReferencePredicate(key: string): boolean {
   return isString(key) && (key as string).startsWith('$')
 }
 
@@ -89,11 +91,11 @@ export function defaultReferencePredicate (key: string): boolean {
  * @param {string} key
  * @return {string}
  */
-export function defaultReferenceTransform (key: string): string {
+export function defaultReferenceTransform(key: string): string {
   return key.slice(1)
 }
 
-export function defaultReferenceSerialization (key:string): string {
+export function defaultReferenceSerialization(key: string): string {
   return `$${key}`
 }
 
@@ -119,7 +121,7 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   [OPERATOR_OR, 'OR'],
   [OPERATOR_NOR, 'NOR'],
   [OPERATOR_XOR, 'XOR'],
-  [OPERATOR_NOT, 'NOT']
+  [OPERATOR_NOT, 'NOT'],
 ])
 
 /**
@@ -129,5 +131,5 @@ export const defaultOptions: Options = {
   referencePredicate: defaultReferencePredicate,
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
-  operatorMapping: defaultOperatorMapping
+  operatorMapping: defaultOperatorMapping,
 }

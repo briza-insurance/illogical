@@ -13,7 +13,7 @@ import { Operand } from '.'
  * @param {Result} value
  * @return {string}
  */
-function printValue (value: Result): string {
+function printValue(value: Result): string {
   if (isString(value)) {
     return `"${value}"`
   }
@@ -30,9 +30,11 @@ export class Value extends Operand {
    * @constructor
    * @param {Result} value Constant value.
    */
-  constructor (value: Result) {
+  constructor(value: Result) {
     if (Array.isArray(value)) {
-      throw new Error('deprecated direct usage of array, please use Collection operand')
+      throw new Error(
+        'deprecated direct usage of array, please use Collection operand'
+      )
     }
     super()
     this.value = value
@@ -41,21 +43,21 @@ export class Value extends Operand {
   /**
    * {@link Evaluable.evaluate}
    */
-  evaluate (): Result {
+  evaluate(): Result {
     return this.value
   }
 
   /**
    * {@link Evaluable.simplify}
    */
-  simplify (): Result {
+  simplify(): Result {
     return this.value
   }
 
   /**
    * {@link Evaluable.serialize}
    */
-  serialize (): Input {
+  serialize(): Input {
     return this.value as Input
   }
 
@@ -63,7 +65,7 @@ export class Value extends Operand {
    * Get the strict representation of the operand.
    * @return {string}
    */
-  toString (): string {
+  toString(): string {
     return printValue(this.value)
   }
 }

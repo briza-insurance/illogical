@@ -9,7 +9,14 @@ import { Options } from '../parser/options'
 /**
  * Valid types for context members
  */
-type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[]
+type ContextValue =
+  | Record<string, unknown>
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | ContextValue[]
 
 /**
  * Evaluation Context
@@ -17,37 +24,37 @@ type ContextValue = Record<string, unknown> | string | number | boolean | null |
  * Format: key: value.
  */
 export interface Context {
-  [k: string]: ContextValue;
+  [k: string]: ContextValue
 }
 
 /**
  * Evaluation result
  */
 export type Result =
-  undefined |
-  null |
-  string |
-  number |
-  boolean |
-  Array<Result>
+  | undefined
+  | null
+  | string
+  | number
+  | boolean
+  | Array<Result>
 
 export enum EvaluableType {
   Operand = 'Operand',
-  Expression = 'Expression'
+  Expression = 'Expression',
 }
 
 /**
  * Evaluable
  */
 export interface Evaluable {
-  type: EvaluableType;
+  type: EvaluableType
 
   /**
    * Evaluate in the given context.
    * @param {Context} ctx
    * @return {Result}
    */
-  evaluate(ctx: Context): Result;
+  evaluate(ctx: Context): Result
 
   /**
    * Simplifies this Evaluable when possible.
@@ -63,10 +70,10 @@ export interface Evaluable {
    *
    * @param {Options} options parser options
    */
-  serialize(options: Options): Input;
+  serialize(options: Options): Input
 
   /**
    * Get the strict representation of the evaluable expression.
    */
-  toString(): string;
+  toString(): string
 }

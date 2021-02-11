@@ -18,8 +18,8 @@ export class Not extends Logical {
    * @constructor
    * @param {Evaluable} operand
    */
-  constructor(...args: Evaluable[]);
-  constructor (operand: Evaluable) {
+  constructor(...args: Evaluable[])
+  constructor(operand: Evaluable) {
     if (arguments.length !== 1) {
       throw new Error('logical NOT expression must have exactly one operand')
     }
@@ -31,10 +31,12 @@ export class Not extends Logical {
    * @param {Context} ctx
    * @return {Result}
    */
-  evaluate (ctx: Context): Result {
+  evaluate(ctx: Context): Result {
     const result = this.operands[0].evaluate(ctx)
     if (result !== true && result !== false) {
-      throw new Error('logical NOT expression\'s operand must be evaluated to boolean value')
+      throw new Error(
+        "logical NOT expression's operand must be evaluated to boolean value"
+      )
     }
 
     return !result
@@ -43,7 +45,7 @@ export class Not extends Logical {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify (...args: [Context, string[]]): boolean | Evaluable {
+  simplify(...args: [Context, string[]]): boolean | Evaluable {
     const simplified = this.operands[0].simplify(...args)
     if (isBoolean(simplified)) {
       return !simplified
@@ -51,6 +53,8 @@ export class Not extends Logical {
     if (isEvaluable(simplified)) {
       return new Not(simplified)
     }
-    throw new Error('logical NOT expression\'s operand must be evaluated to boolean value')
+    throw new Error(
+      "logical NOT expression's operand must be evaluated to boolean value"
+    )
   }
 }

@@ -1,10 +1,10 @@
+import { notSimplified, operand } from '../../../../__test__/helpers'
 import { Evaluable } from '../../../../common/evaluable'
 import { Operand } from '../../../../operand'
 import { Reference } from '../../../../operand/reference'
 import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
-import { notSimplified, operand } from '../../../../__test__/helpers'
 import { And } from '../../and'
 
 describe('Expression - Logical - And', () => {
@@ -16,17 +16,16 @@ describe('Expression - Logical - And', () => {
       [[operand(true), operand(false)], false],
       [[operand(false), operand(true)], false],
       [[operand(false), operand(false)], false],
-    ] as [Evaluable[], boolean][])
-      ('%p should evaluate as %p', (operands, expected) => {
+    ] as [Evaluable[], boolean][])(
+      '%p should evaluate as %p',
+      (operands, expected) => {
         expect(new And(operands).evaluate({})).toBe(expected)
-      })
+      }
+    )
 
-    test.each([
-      [[]],
-    ] as [Evaluable[]][])
-      ('%p should throw', (operands) => {
-        expect(() => new And(operands).evaluate({})).toThrowError()
-      })
+    test.each([[[]]] as [Evaluable[]][])('%p should throw', (operands) => {
+      expect(() => new And(operands).evaluate({})).toThrowError()
+    })
   })
 
   describe('simplify', () => {
@@ -34,7 +33,10 @@ describe('Expression - Logical - And', () => {
       [new And([notSimplified(), operand(true)]), notSimplified()],
       [new And([notSimplified(), operand(false), notSimplified()]), false],
       [new And([operand(true), operand(true)]), true],
-      [new And([notSimplified(), operand(true), notSimplified()]), new And([notSimplified(), notSimplified()])]
+      [
+        new And([notSimplified(), operand(true), notSimplified()]),
+        new And([notSimplified(), notSimplified()]),
+      ],
     ])('%p should simplify to %p', (and, expected) => {
       expect(and.simplify({}, [])).toEqual(expected)
     })
@@ -42,9 +44,15 @@ describe('Expression - Logical - And', () => {
 
   describe('serialize', () => {
     it.each<[[Operand, Operand], [Input, Input]]>([
-      [[new Value(10), new Reference('test')], [10, '$test']]
+      [
+        [new Value(10), new Reference('test')],
+        [10, '$test'],
+      ],
     ])('%p should serialize to %p', (operands, expected) => {
-      expect(new And(operands).serialize(defaultOptions)).toEqual(['AND', ...expected])
+      expect(new And(operands).serialize(defaultOptions)).toEqual([
+        'AND',
+        ...expected,
+      ])
     })
   })
 })
