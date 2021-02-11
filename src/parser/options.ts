@@ -71,7 +71,7 @@ export interface Options {
   operatorMapping: Map<symbol, string>;
 
   /**
-   * Enforce type comparison e.g 1 !== '1'
+   * Configures strict data type check in comparison expressions
    */
   strictTypeComparison: boolean;
 

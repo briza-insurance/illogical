@@ -59,6 +59,7 @@ yarn add @briza/illogical -D
     - [Reference Predicate](#reference-predicate)
     - [Reference Transform](#reference-transform)
     - [Operator Mapping](#operator-mapping)
+    - [Strict Type Comparison](#strict-type-comparison)
 - [Breaking Changes](#breaking-changes)
   - [v1.2.0](#v120)
 - [Contributing](#contributing)
@@ -659,6 +660,18 @@ import {
   OPERATOR_NOT
 } from '@briza/illogical'
 ```
+
+#### Strict Type Comparison
+
+Configures strict data type check in comparison expressions
+
+```typescript
+strictTypeComparison: boolean;
+```
+
+**Default strict type comparison:**
+
+> Enforces strict type comparison i.e `1 != '1'`, setting to `false` disables and allows `1 == '1'`.
 
 ## Breaking Changes
 

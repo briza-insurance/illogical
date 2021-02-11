@@ -2,7 +2,7 @@
  * Parser module.
  * @module illogical/parser
  */
-export declare type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
+export declare type optionValue = ((operand: string) => string | boolean) | Map<symbol, string> | boolean;
 export interface Options {
     /**
      * A function used to determine if the operand is a reference type,
@@ -39,6 +39,10 @@ export interface Options {
      * is the key used to represent the  given operator in the raw expression.
      */
     operatorMapping: Map<symbol, string>;
+    /**
+     * Configures strict data type check in comparison expressions
+     */
+    strictTypeComparison: boolean;
     [k: string]: optionValue;
 }
 /**
