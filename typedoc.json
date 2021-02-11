@@ -1,6 +1,4 @@
 {
-  "mode": "modules",
   "out": "docs",
-  "exclude": "**/__test__/*",
-  "target": "ES6"
+  "exclude": "**/__test__/*"
 }
