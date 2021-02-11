@@ -31,7 +31,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     [operand(1), new Collection([new Value('0')]), false]
   ]
 
-  const crossTypeParsingTestCases = (
+  const strictTypeComparisonTestCases = (
     testStatus: boolean
   ): [Operand, Operand, boolean][] => {
     return [
@@ -41,7 +41,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
   }
 
   describe('evaluate without cross type parsing', () => {
-    test.each([...testCases, ...crossTypeParsingTestCases(false)])(
+    test.each([...testCases, ...strictTypeComparisonTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
         expect(new GreaterThanOrEqual(left, right).evaluate({})).toBe(expected)
@@ -50,7 +50,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
   })
 
   describe('evaluate with cross type parsing', () => {
-    test.each([...testCases, ...crossTypeParsingTestCases(true)])(
+    test.each([...testCases, ...strictTypeComparisonTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
         const comparison = new GreaterThanOrEqual(left, right)
