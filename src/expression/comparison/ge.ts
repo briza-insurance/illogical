@@ -4,7 +4,11 @@
  */
 
 import { Evaluable, Result } from '../../common/evaluable'
-import { isNumber } from '../../common/type-check'
+<<<<<<< Updated upstream
+import { isNumber, isString } from '../../common/type-check'
+=======
+import { isNumber, isString } from '../../common/type-check'
+>>>>>>> Stashed changes
 import { toNumber } from '../../common/util'
 import { Comparison } from '../comparison'
 
@@ -36,6 +40,8 @@ export class GreaterThanOrEqual extends Comparison {
 
     if (isNumber(operand(left)) && isNumber(operand(right))) {
       return (left as number) >= (right as number)
+    } else if (isString(left) && isString(right)) {
+      return (left as string) >= (right as string)
     }
 
     return false

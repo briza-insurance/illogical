@@ -20,8 +20,13 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     // Truthy
     [operand(1), operand(0), true],
     [operand(1), operand(1), true],
+    [operand('1'), operand('1'), true],
+    [operand('1.1'), operand('1.0'), true],
+    [operand('2010-01-01'), operand('2009-02-03'), true],
+    [operand('2010-01-01'), operand('2010-01-01'), true],
     // Falsy
     [operand(0), operand(1), false],
+    [operand('2009-01-01'), operand('2010-01-01'), false],
     // Falsy - non-comparable types
     [operand(1), operand(true), false],
     [operand(1), operand(false), false],
@@ -36,11 +41,11 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
   ): [Operand, Operand, boolean][] => {
     return [
       [operand(1), operand('0'), testStatus],
-      [operand('1'), operand('1'), testStatus]
+      [operand(1), operand('1'), testStatus],
     ]
   }
 
-  describe('evaluate without cross type parsing', () => {
+  describe('evaluate without strict type comparison', () => {
     test.each([...testCases, ...strictTypeComparisonTestCases(false)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
@@ -49,7 +54,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     )
   })
 
-  describe('evaluate with cross type parsing', () => {
+  describe('evaluate with strict type comparison', () => {
     test.each([...testCases, ...strictTypeComparisonTestCases(true)])(
       '%p and %p should evaluate as %p',
       (left, right, expected) => {
