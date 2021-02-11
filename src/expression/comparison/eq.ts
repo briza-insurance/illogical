@@ -4,6 +4,7 @@
  */
 
 import { Evaluable, Result } from '../../common/evaluable'
+import { toNumber } from '../../common/util'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -30,8 +31,7 @@ export class Equal extends Comparison {
    * {@link Comparison.comparison}
    */
   comparison (left: Result, right: Result): boolean {
-    const operand = (value: Result) =>
-      this.strict ? value : this.toNumber(value)
+    const operand = (value: Result) => (this.strict ? value : toNumber(value))
     return operand(left) === operand(right)
   }
 }
