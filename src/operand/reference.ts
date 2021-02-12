@@ -96,20 +96,27 @@ enum DataType {
 const dataTypeRegex = new RegExp(
   `^.+\\.\\((${Object.keys(DataType).join('|')})\\)$`
 )
+
 /**
  * Converts a value to a specified data type
  * Silently returns original value if data type conversion has not been implemented.
  * @param value value to cast as data type
+ * @param dataType type to be casted to
  */
-function toDataType(value: Result, dataType: string | undefined): Result {
+function toDataType(value: Result, dataType: DataType | undefined): Result {
+  let result: Result = value
   switch (dataType) {
     case DataType.Number:
-      return toNumber(value)
+      result = toNumber(value)
+      break
     case DataType.String:
-      return toString(value)
-    default:
-      return value
+      result = toString(value)
+      break
   }
+  if (value && dataType && result === undefined) {
+    console.warn(`Casting ${value} to ${dataType} resulted in ${result}`)
+  }
+  return result
 }
 
 /**
