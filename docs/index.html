@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for @briza/illogical">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -51,11 +50,6 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="globals.html">Globals</a>
-				</li>
-			</ul>
 			<h1>@briza/illogical</h1>
 		</div>
 	</div>
@@ -69,7 +63,7 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: August 6, 2020.</p>
+					<p>Revision: February 12, 2021.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -84,8 +78,10 @@
 				<a href="#installation-via-npm-or-yarn" id="installation-via-npm-or-yarn" style="color: inherit; text-decoration: none;">
 					<h2>Installation via NPM or Yarn</h2>
 				</a>
-				<pre><code class="language-sh">npm install -D @briza/illogical</code></pre>
-				<pre><code class="language-sh">yarn add @briza/illogical -D</code></pre>
+				<pre><code class="language-sh"><span style="color: #000000">npm install -D @briza/illogical</span>
+</code></pre>
+				<pre><code class="language-sh"><span style="color: #000000">yarn add @briza/illogical -D</span>
+</code></pre>
 				<p><strong>Table of Content</strong></p>
 				<hr>
 				<ul>
@@ -156,14 +152,15 @@
 				<a href="#basic-usage" id="basic-usage" style="color: inherit; text-decoration: none;">
 					<h2>Basic Usage</h2>
 				</a>
-				<pre><code class="language-js"><span class="hljs-comment">// Import the illogical engine</span>
-<span class="hljs-keyword">import</span> Engine <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@briza/illogical&#x27;</span>;
+				<pre><code class="language-js"><span style="color: #008000">// Import the illogical engine</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Engine</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@briza/illogical&#039;</span><span style="color: #000000">;</span>
 
-<span class="hljs-comment">// Create a new instance of the engine</span>
-<span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> Engine();
+<span style="color: #008000">// Create a new instance of the engine</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">engine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Engine</span><span style="color: #000000">();</span>
 
-<span class="hljs-comment">// Evaluate the raw expression</span>
-<span class="hljs-keyword">const</span> result = engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]);</code></pre>
+<span style="color: #008000">// Evaluate the raw expression</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">result</span><span style="color: #000000"> = </span><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]);</span>
+</code></pre>
 				<blockquote>
 					<p>For advanced usage, please <a href="#engine-options">Engine Options</a>.</p>
 				</blockquote>
@@ -176,74 +173,76 @@
 					<p>Data context is optional.</p>
 				</blockquote>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">// Comparison expression</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]);
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>]);
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]);
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$name&#x27;</span>, <span class="hljs-string">&#x27;peter&#x27;</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>});
-engine.evaluate([<span class="hljs-string">&#x27;UNDEFINED&#x27;</span>, <span class="hljs-string">&#x27;$RefA&#x27;</span>], {});
+				<pre><code class="language-js"><span style="color: #008000">// Comparison expression</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]);</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">]);</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">]);</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$name&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">], {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">});</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$RefA&#039;</span><span style="color: #000000">], {});</span>
 
-<span class="hljs-comment">// Logical expression</span>
-engine.evaluate([
-  <span class="hljs-string">&#x27;AND&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]
-]);
-engine.evaluate([
-  <span class="hljs-string">&#x27;AND&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]
-]);
-engine.evaluate([
-  <span class="hljs-string">&#x27;OR&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$name&#x27;</span>, <span class="hljs-string">&#x27;peter&#x27;</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]
-], {<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>});</code></pre>
+<span style="color: #008000">// Logical expression</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">]);</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">]);</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;OR&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$name&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">], {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">});</span>
+</code></pre>
 				<a href="#statement" id="statement" style="color: inherit; text-decoration: none;">
 					<h3>Statement</h3>
 				</a>
 				<p>Get expression string representation:</p>
 				<p><code>engine.statement(</code><a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Logical Expression</a><code>)</code>  =&gt; <code>string</code></p>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">/* Comparison expression */</span>
+				<pre><code class="language-js"><span style="color: #008000">/* Comparison expression */</span>
 
-engine.statement([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]);
-<span class="hljs-comment">// (5 == 5)</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]);</span>
+<span style="color: #008000">// (5 == 5)</span>
 
-engine.statement([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>]);
-<span class="hljs-comment">// (&quot;circle&quot; == &quot;circle&quot;)</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">]);</span>
+<span style="color: #008000">// (&quot;circle&quot; == &quot;circle&quot;)</span>
 
-engine.statement([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]);
-<span class="hljs-comment">// (true == true)</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">]);</span>
+<span style="color: #008000">// (true == true)</span>
 
-engine.statement([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$name&#x27;</span>, <span class="hljs-string">&#x27;peter&#x27;</span>], {<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>});
-<span class="hljs-comment">// ({name} == &quot;peter&quot;)</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$name&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">], {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">});</span>
+<span style="color: #008000">// ({name} == &quot;peter&quot;)</span>
 
-engine.statement([<span class="hljs-string">&#x27;UNDEFINED&#x27;</span>, <span class="hljs-string">&#x27;$RefA&#x27;</span>]);
-<span class="hljs-comment">// ({RefA} is UNDEFINED)</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$RefA&#039;</span><span style="color: #000000">]);</span>
+<span style="color: #008000">// ({RefA} is UNDEFINED)</span>
 
-<span class="hljs-comment">/* Logical expression */</span>
+<span style="color: #008000">/* Logical expression */</span>
 
-engine.statement([
-  <span class="hljs-string">&#x27;AND&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]
-]);
-<span class="hljs-comment">// ((5 == 5) AND (10 == 10))</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">]);</span>
+<span style="color: #008000">// ((5 == 5) AND (10 == 10))</span>
 
-engine.statement([
-  <span class="hljs-string">&#x27;AND&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]
-]);
-<span class="hljs-comment">// ((&quot;circle&quot; == &quot;circle&quot;) AND (10 == 10))</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">]);</span>
+<span style="color: #008000">// ((&quot;circle&quot; == &quot;circle&quot;) AND (10 == 10))</span>
 
-engine.statement([
-  <span class="hljs-string">&#x27;OR&#x27;</span>,
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$name&#x27;</span>, <span class="hljs-string">&#x27;peter&#x27;</span>],
-  [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]
-], {<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>});
-<span class="hljs-comment">// (({name} == &quot;peter&quot;) OR (5 == 10))</span></code></pre>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">statement</span><span style="color: #000000">([</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&#039;OR&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$name&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">], {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">});</span>
+<span style="color: #008000">// (({name} == &quot;peter&quot;) OR (5 == 10))</span>
+</code></pre>
 				<a href="#parse" id="parse" style="color: inherit; text-decoration: none;">
 					<h3>Parse</h3>
 				</a>
@@ -257,32 +256,35 @@ engine.statement([
 					<li><code>evaluable.toString()</code> please see <a href="#statement">Statement</a>.</li>
 				</ul>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js"><span class="hljs-keyword">let</span> evaluable = engine.parse([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$name&#x27;</span>, <span class="hljs-string">&#x27;peter&#x27;</span>]);
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">evaluable</span><span style="color: #000000"> = </span><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">parse</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$name&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">]);</span>
 
-evaluable.evaluate({<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>}); <span class="hljs-comment">// true</span>
+<span style="color: #001080">evaluable</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">({</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">}); </span><span style="color: #008000">// true</span>
 
-evaluable.toString();
-<span class="hljs-comment">// ({name} == &quot;peter&quot;)</span></code></pre>
+<span style="color: #001080">evaluable</span><span style="color: #000000">.</span><span style="color: #795E26">toString</span><span style="color: #000000">();</span>
+<span style="color: #008000">// ({name} == &quot;peter&quot;)</span>
+</code></pre>
 				<a href="#simplify" id="simplify" style="color: inherit; text-decoration: none;">
 					<h3>Simplify</h3>
 				</a>
 				<p>Simplifies an expression with a given context. This is useful when you already have some of
 				the properties of context and wants to try to eveluate the expression.</p>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js">engine.simplify([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]], { <span class="hljs-attr">a</span>: <span class="hljs-number">10</span> }) <span class="hljs-comment">// [&#x27;==&#x27;, &#x27;$b&#x27;, 20]</span>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]], { </span><span style="color: #001080">a:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> }) </span><span style="color: #008000">// [&#039;==&#039;, &#039;$b&#039;, 20]</span>
 
-engine.simplify([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]], { <span class="hljs-attr">a</span>: <span class="hljs-number">20</span> }) <span class="hljs-comment">// false</span></code></pre>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]], { </span><span style="color: #001080">a:</span><span style="color: #000000"> </span><span style="color: #098658">20</span><span style="color: #000000"> }) </span><span style="color: #008000">// false</span>
+</code></pre>
 				<p>Values not found in the context will cause the parent operand not to be evaluated and returned
 				as part of the simplified expression.</p>
 				<p>In some situations we might want to evaluate the expression even if referred value is not
 					present. You can provide a list of keys that will be evaluated even if they are not present
 				in the context.</p>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js">engine.simplify(
-  [<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$a&#x27;</span>, <span class="hljs-number">10</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$b&#x27;</span>, <span class="hljs-number">20</span>]],
-  { <span class="hljs-attr">a</span>: <span class="hljs-number">10</span> },
-  [<span class="hljs-string">&#x27;b&#x27;</span>] <span class="hljs-comment">// &#x27;$b&#x27; will be evaluted to undefined.</span>
-) <span class="hljs-comment">// false</span></code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">(</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]],</span>
+<span style="color: #000000">  { </span><span style="color: #001080">a:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> },</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">] </span><span style="color: #008000">// &#039;$b&#039; will be evaluted to undefined.</span>
+<span style="color: #000000">) </span><span style="color: #008000">// false</span>
+</code></pre>
 				<a href="#working-with-expressions" id="working-with-expressions" style="color: inherit; text-decoration: none;">
 					<h2>Working with Expressions</h2>
 				</a>
@@ -322,41 +324,53 @@ engine.simplify([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class=
 					<li>E.g. <strong>shapeType</strong> is resolved as &quot;<strong>B</strong>&quot; and would compose the <strong>$shapeB</strong> outer reference.</li>
 					<li>This resolution could be n-nested.</li>
 				</ul>
+				<a href="#data-type-casting" id="data-type-casting" style="color: inherit; text-decoration: none;">
+					<h4>Data Type Casting</h4>
+				</a>
+				<p><code>$payment.amount.(Number)</code></p>
+				<ul>
+					<li>   This forces the data contexts <code>payment.amount</code> to be cast into a <code>number</code> before being used as an operand in the evaluation.</li>
+					<li>  Support data type cas <code>(Number)</code> &lt;=&gt; <code>(String)</code></li>
+				</ul>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">// Data context</span>
-<span class="hljs-keyword">const</span> ctx = {
-  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;peter&#x27;</span>,
-  <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;canada&#x27;</span>,
-  <span class="hljs-attr">age</span>: <span class="hljs-number">21</span>,
-  <span class="hljs-attr">options</span>: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>],
-  <span class="hljs-attr">address</span>: {
-    <span class="hljs-attr">city</span>: <span class="hljs-string">&#x27;Toronto&#x27;</span>,
-    <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;Canada&#x27;</span>,
-  },
-  <span class="hljs-attr">index</span>: <span class="hljs-number">2</span>,
-  <span class="hljs-attr">segment</span>: <span class="hljs-string">&#x27;city&#x27;</span>,
-  <span class="hljs-attr">shapeA</span>: <span class="hljs-string">&#x27;box&#x27;</span>,
-  <span class="hljs-attr">shapeB</span>: <span class="hljs-string">&#x27;circle&#x27;</span>,
-  <span class="hljs-attr">shapeType</span>: <span class="hljs-string">&#x27;B&#x27;</span>
-}
+				<pre><code class="language-js"><span style="color: #008000">// Data context</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ctx</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">  </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;peter&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">country:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;canada&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">21</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">options:</span><span style="color: #000000"> [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">],</span>
+<span style="color: #000000">  </span><span style="color: #001080">address:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">city:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Toronto&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">country:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Canada&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">  </span><span style="color: #001080">index:</span><span style="color: #000000"> </span><span style="color: #098658">2</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">segment:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;city&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">shapeA:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;box&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">shapeB:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">shapeType:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;B&#039;</span>
+<span style="color: #000000">}</span>
 
-<span class="hljs-comment">// Evaluate an expression in the given data context</span>
-engine.evaluate([<span class="hljs-string">&#x27;&gt;&#x27;</span>, <span class="hljs-string">&#x27;$age&#x27;</span>, <span class="hljs-number">20</span>], ctx); <span class="hljs-comment">// true</span>
+<span style="color: #008000">// Evaluate an expression in the given data context</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;&gt;&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$age&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">); </span><span style="color: #008000">// true</span>
 
-<span class="hljs-comment">// Evaluate an expression in the given data context</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$address.city&#x27;</span>, <span class="hljs-string">&#x27;Toronto&#x27;</span>], ctx); <span class="hljs-comment">// true</span>
+<span style="color: #008000">// Evaluate an expression in the given data context</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$address.city&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;Toronto&#039;</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">); </span><span style="color: #008000">// true</span>
 
-<span class="hljs-comment">// Accessing Array Element</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$options[1]&#x27;</span>, <span class="hljs-number">2</span>], ctx) <span class="hljs-comment">// true</span>
+<span style="color: #008000">// Accessing Array Element</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$options[1]&#039;</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">) </span><span style="color: #008000">// true</span>
 
-<span class="hljs-comment">// Accessing Array Element via Reference</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$options[{index}]&#x27;</span>, <span class="hljs-number">3</span>], ctx) <span class="hljs-comment">// true</span>
+<span style="color: #008000">// Accessing Array Element via Reference</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$options[{index}]&#039;</span><span style="color: #000000">, </span><span style="color: #098658">3</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">) </span><span style="color: #008000">// true</span>
 
-<span class="hljs-comment">// Nested Referencing</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$address.{segment}&#x27;</span>, <span class="hljs-string">&#x27;Toronto&#x27;</span>], ctx) <span class="hljs-comment">// true</span>
+<span style="color: #008000">// Nested Referencing</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$address.{segment}&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;Toronto&#039;</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">) </span><span style="color: #008000">// true</span>
 
-<span class="hljs-comment">// Composite Reference Key</span>
-engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;$shape{shapeType}&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>], ctx) <span class="hljs-comment">// true</span></code></pre>
+<span style="color: #008000">// Composite Reference Key</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$shape{shapeType}&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">) </span><span style="color: #008000">// true</span>
+
+<span style="color: #008000">// Data Type Casting</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$age.(String)&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;21&#039;</span><span style="color: #000000">], </span><span style="color: #001080">ctx</span><span style="color: #000000">) </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#operand-types" id="operand-types" style="color: inherit; text-decoration: none;">
 					<h3>Operand Types</h3>
 				</a>
@@ -366,9 +380,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				</a>
 				<p>Simple value types: string, number, boolean.</p>
 				<p><strong>Example</strong></p>
-				<pre><code class="language-js">[<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]
-[<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>]
-[<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-literal">true</span>, <span class="hljs-literal">true</span>]</code></pre>
+				<pre><code class="language-js"><span style="color: #000000">[</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">]</span>
+</code></pre>
 				<a href="#reference" id="reference" style="color: inherit; text-decoration: none;">
 					<h4>Reference</h4>
 				</a>
@@ -430,8 +445,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: string, number, boolean.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#not-equal" id="not-equal" style="color: inherit; text-decoration: none;">
 					<h4>Not Equal</h4>
 				</a>
@@ -439,8 +456,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: string, number, boolean.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;!=&quot;</span>, <span class="hljs-string">&quot;circle&quot;</span>, <span class="hljs-string">&quot;square&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;!=&#x27;</span>, <span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;square&#x27;</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;!=&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;circle&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;!=&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#greater-than" id="greater-than" style="color: inherit; text-decoration: none;">
 					<h4>Greater Than</h4>
 				</a>
@@ -448,8 +467,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: number.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;&gt;&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;&gt;&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;&gt;&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;&gt;&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#greater-than-or-equal" id="greater-than-or-equal" style="color: inherit; text-decoration: none;">
 					<h4>Greater Than or Equal</h4>
 				</a>
@@ -457,8 +478,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: number.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;&gt;=&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;&gt;=&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;&gt;=&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;&gt;=&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#less-than" id="less-than" style="color: inherit; text-decoration: none;">
 					<h4>Less Than</h4>
 				</a>
@@ -466,8 +489,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: number.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;&lt;&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;&lt;&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;&lt;&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;&lt;&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#less-than-or-equal" id="less-than-or-equal" style="color: inherit; text-decoration: none;">
 					<h4>Less Than or Equal</h4>
 				</a>
@@ -475,8 +500,10 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: number.</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;&lt;=&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;&lt;=&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;&lt;=&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;&lt;=&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#in" id="in" style="color: inherit; text-decoration: none;">
 					<h4>In</h4>
 				</a>
@@ -484,10 +511,12 @@ engine.evaluate([<span class="hljs-string">&#x27;==&#x27;</span>, <span class="h
 				<blockquote>
 					<p>Valid operand types: number and number[] or string and string[].</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;IN&quot;</span>, <span class="hljs-number">5</span>, [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]]
-[<span class="hljs-string">&quot;IN&quot;</span>, [<span class="hljs-string">&quot;circle&quot;</span>, <span class="hljs-string">&quot;square&quot;</span>, <span class="hljs-string">&quot;triangle&quot;</span>], <span class="hljs-string">&quot;square&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;IN&#x27;</span>, <span class="hljs-number">5</span>, [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;IN&#x27;</span>, [<span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;square&#x27;</span>, <span class="hljs-string">&#x27;triangle&#x27;</span>], <span class="hljs-string">&#x27;square&#x27;</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;IN&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">]]</span>
+<span style="color: #000000">[</span><span style="color: #A31515">&quot;IN&quot;</span><span style="color: #000000">, [</span><span style="color: #A31515">&quot;circle&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;triangle&quot;</span><span style="color: #000000">], </span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;IN&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;IN&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;triangle&#039;</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#not-in" id="not-in" style="color: inherit; text-decoration: none;">
 					<h4>Not In</h4>
 				</a>
@@ -495,10 +524,12 @@ engine.evaluate([<span class="hljs-string">&#x27;IN&#x27;</span>, [<span class="
 				<blockquote>
 					<p>Valid operand types: number and number[] or string and string[].</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;IN&quot;</span>, <span class="hljs-number">10</span>, [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]]
-[<span class="hljs-string">&quot;IN&quot;</span>, [<span class="hljs-string">&quot;circle&quot;</span>, <span class="hljs-string">&quot;square&quot;</span>, <span class="hljs-string">&quot;triangle&quot;</span>], <span class="hljs-string">&quot;oval&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;NOT IN&#x27;</span>, <span class="hljs-number">10</span>, [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;NOT IN&#x27;</span>, [<span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;square&#x27;</span>, <span class="hljs-string">&#x27;triangle&#x27;</span>], <span class="hljs-string">&#x27;oval&#x27;</span>]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;IN&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">]]</span>
+<span style="color: #000000">[</span><span style="color: #A31515">&quot;IN&quot;</span><span style="color: #000000">, [</span><span style="color: #A31515">&quot;circle&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;triangle&quot;</span><span style="color: #000000">], </span><span style="color: #A31515">&quot;oval&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;NOT IN&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;NOT IN&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;triangle&#039;</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;oval&#039;</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#prefix" id="prefix" style="color: inherit; text-decoration: none;">
 					<h4>Prefix</h4>
 				</a>
@@ -510,9 +541,11 @@ engine.evaluate([<span class="hljs-string">&#x27;NOT IN&#x27;</span>, [<span cla
 					<li>Left operand is the PREFIX term.</li>
 					<li>Right operand is the tested word.</li>
 				</ul>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;PREFIX&quot;</span>, <span class="hljs-string">&quot;hemi&quot;</span>, <span class="hljs-string">&quot;hemisphere&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;PREFIX&#x27;</span>, <span class="hljs-string">&quot;hemi&quot;</span>, <span class="hljs-string">&quot;hemisphere&quot;</span>]); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;PREFIX&#x27;</span>, <span class="hljs-string">&quot;hemi&quot;</span>, <span class="hljs-string">&quot;sphere&quot;</span>]); <span class="hljs-comment">// false</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;PREFIX&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;hemi&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;hemisphere&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PREFIX&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;hemi&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;hemisphere&quot;</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PREFIX&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;hemi&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;sphere&quot;</span><span style="color: #000000">]); </span><span style="color: #008000">// false</span>
+</code></pre>
 				<a href="#suffix" id="suffix" style="color: inherit; text-decoration: none;">
 					<h4>Suffix</h4>
 				</a>
@@ -521,12 +554,16 @@ engine.evaluate([<span class="hljs-string">&#x27;PREFIX&#x27;</span>, <span clas
 					<p>Valid operand types: string.</p>
 				</blockquote>
 				<ul>
-					<li>Left operand is the tested word.</li>
-					<li>Right operand is the SUFFIX term.</li>
+					<li><p>Left operand is the tested word.</p>
+					</li>
+					<li><p>Right operand is the SUFFIX term.</p>
+						<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;SUFFIX&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;establishment&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;ment&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+						<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;SUFFIX&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;establishment&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;ment&quot;</span><span style="color: #000000">]); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;SUFFIX&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;establish&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;ment&quot;</span><span style="color: #000000">]); </span><span style="color: #008000">// false</span>
+</code></pre>
+					</li>
 				</ul>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;SUFFIX&quot;</span>, <span class="hljs-string">&quot;establishment&quot;</span>, <span class="hljs-string">&quot;ment&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;SUFFIX&#x27;</span>, <span class="hljs-string">&quot;establishment&quot;</span>, <span class="hljs-string">&quot;ment&quot;</span>]); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;SUFFIX&#x27;</span>, <span class="hljs-string">&quot;establish&quot;</span>, <span class="hljs-string">&quot;ment&quot;</span>]); <span class="hljs-comment">// false</span></code></pre>
 				<a href="#overlap" id="overlap" style="color: inherit; text-decoration: none;">
 					<h4>Overlap</h4>
 				</a>
@@ -534,30 +571,36 @@ engine.evaluate([<span class="hljs-string">&#x27;SUFFIX&#x27;</span>, <span clas
 				<blockquote>
 					<p>Valid operand types number[] or string[].</p>
 				</blockquote>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;OVERLAP&quot;</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]]
-[<span class="hljs-string">&quot;OVERLAP&quot;</span>, [<span class="hljs-string">&quot;circle&quot;</span>, <span class="hljs-string">&quot;square&quot;</span>, <span class="hljs-string">&quot;triangle&quot;</span>], [<span class="hljs-string">&quot;square&quot;</span>]]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;OVERLAP&#x27;</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;OVERLAP&#x27;</span>, [<span class="hljs-string">&#x27;circle&#x27;</span>, <span class="hljs-string">&#x27;square&#x27;</span>, <span class="hljs-string">&#x27;triangle&#x27;</span>], [<span class="hljs-string">&#x27;square&#x27;</span>, <span class="hljs-string">&#x27;oval&#x27;</span>]]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;OVERLAP&quot;</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #098658">3</span><span style="color: #000000">, </span><span style="color: #098658">4</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]</span>
+<span style="color: #000000">[</span><span style="color: #A31515">&quot;OVERLAP&quot;</span><span style="color: #000000">, [</span><span style="color: #A31515">&quot;circle&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;triangle&quot;</span><span style="color: #000000">], [</span><span style="color: #A31515">&quot;square&quot;</span><span style="color: #000000">]]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;OVERLAP&#039;</span><span style="color: #000000">, [</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #098658">6</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #098658">3</span><span style="color: #000000">, </span><span style="color: #098658">4</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;OVERLAP&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;circle&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;triangle&#039;</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;square&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;oval&#039;</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#undefined" id="undefined" style="color: inherit; text-decoration: none;">
 					<h4>Undefined</h4>
 				</a>
 				<p>Expression format: <code>[&quot;UNDEFINED&quot;, </code><a href="#reference">Reference Operand</a><code>]</code>.</p>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;UNDEFINED&quot;</span>, <span class="hljs-string">&quot;$RefA&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;UNDEFINED&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], {}); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;UNDEFINED&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-literal">undefined</span> }); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;UNDEFINED&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-number">10</span> }); <span class="hljs-comment">// false</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;UNDEFINED&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;$RefA&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], {}); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #0000FF">undefined</span><span style="color: #000000"> }); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> }); </span><span style="color: #008000">// false</span>
+</code></pre>
 				<a href="#present" id="present" style="color: inherit; text-decoration: none;">
 					<h4>Present</h4>
 				</a>
 				<p>Evaluates as FALSE when the operand is UNDEFINED or NULL.</p>
 				<p>Expression format: <code>[&quot;PRESENT&quot;, </code><a href="#reference">Reference Operand</a><code>]</code>.</p>
-				<pre><code class="language-json">[<span class="hljs-string">&quot;PRESENT&quot;</span>, <span class="hljs-string">&quot;$RefA&quot;</span>]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], {}); <span class="hljs-comment">// false</span>
-engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-literal">undefined</span> }); <span class="hljs-comment">// false</span>
-engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-literal">null</span> }); <span class="hljs-comment">// false</span>
-engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-number">10</span> }); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-literal">false</span> }); <span class="hljs-comment">// true</span>
-engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span class="hljs-string">&#x27;RefA&#x27;</span>], { <span class="hljs-attr">RefA</span>: <span class="hljs-number">0</span> }); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span><span style="color: #A31515">&quot;PRESENT&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;$RefA&quot;</span><span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], {}); </span><span style="color: #008000">// false</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #0000FF">undefined</span><span style="color: #000000"> }); </span><span style="color: #008000">// false</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #0000FF">null</span><span style="color: #000000"> }); </span><span style="color: #008000">// false</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> }); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #0000FF">false</span><span style="color: #000000"> }); </span><span style="color: #008000">// true</span>
+<span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;RefA&#039;</span><span style="color: #000000">], { </span><span style="color: #001080">RefA:</span><span style="color: #000000"> </span><span style="color: #098658">0</span><span style="color: #000000"> }); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#logical-expressions" id="logical-expressions" style="color: inherit; text-decoration: none;">
 					<h3>Logical Expressions</h3>
 				</a>
@@ -569,12 +612,14 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				<blockquote>
 					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;AND&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;AND&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;AND&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#or" id="or" style="color: inherit; text-decoration: none;">
 					<h4>Or</h4>
 				</a>
@@ -583,12 +628,14 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				<blockquote>
 					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;OR&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;OR&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;OR&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;OR&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#nor" id="nor" style="color: inherit; text-decoration: none;">
 					<h4>Nor</h4>
 				</a>
@@ -597,12 +644,14 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				<blockquote>
 					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;NOR&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>],
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;NOR&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">1</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;NOR&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;NOR&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#xor" id="xor" style="color: inherit; text-decoration: none;">
 					<h4>Xor</h4>
 				</a>
@@ -611,18 +660,22 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				<blockquote>
 					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;XOR&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>],
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;XOR&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span></code></pre>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;XOR&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>],
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;XOR&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>]]); <span class="hljs-comment">// false</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;XOR&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;XOR&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;XOR&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">],</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;XOR&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">]]); </span><span style="color: #008000">// false</span>
+</code></pre>
 				<a href="#not" id="not" style="color: inherit; text-decoration: none;">
 					<h4>Not</h4>
 				</a>
@@ -631,11 +684,13 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				<blockquote>
 					<p>Valid operand types: <a href="#comparison-expressions">Comparison Expression</a> or <a href="#logical-expressions">Nested Logical Expression</a>.</p>
 				</blockquote>
-				<pre><code class="language-json">[
-  <span class="hljs-string">&quot;NOT&quot;</span>,
-  [<span class="hljs-string">&quot;==&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>],
-]</code></pre>
-				<pre><code class="language-js">engine.evaluate([<span class="hljs-string">&#x27;NOT&#x27;</span>, [<span class="hljs-string">&#x27;==&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>]]); <span class="hljs-comment">// true</span></code></pre>
+				<pre><code class="language-json"><span style="color: #000000">[</span>
+<span style="color: #000000">  </span><span style="color: #A31515">&quot;NOT&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&quot;==&quot;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">],</span>
+<span style="color: #000000">]</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">evaluate</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;NOT&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">, </span><span style="color: #098658">5</span><span style="color: #000000">]]); </span><span style="color: #008000">// true</span>
+</code></pre>
 				<a href="#engine-options" id="engine-options" style="color: inherit; text-decoration: none;">
 					<h2>Engine Options</h2>
 				</a>
@@ -644,19 +699,21 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 				</a>
 				<p>Below described, are individual options object properties which could be used individually. Any missing options will be substituted with the default options.</p>
 				<p><strong>Usage</strong></p>
-				<pre><code class="language-js"><span class="hljs-comment">// Import the illogical engine</span>
-<span class="hljs-keyword">import</span> Engine <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@briza/illogical&#x27;</span>;
+				<pre><code class="language-js"><span style="color: #008000">// Import the illogical engine</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Engine</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@briza/illogical&#039;</span><span style="color: #000000">;</span>
 
-<span class="hljs-comment">// Create a new instance of the engine</span>
-<span class="hljs-keyword">const</span> opts = {
-  <span class="hljs-attr">referencePredicate</span>: <span class="hljs-function">(<span class="hljs-params">operand</span>) =&gt;</span> operand.startsWith(<span class="hljs-string">&#x27;$&#x27;</span>),
-};
-<span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> Engine(opts);</code></pre>
+<span style="color: #008000">// Create a new instance of the engine</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">opts</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">  </span><span style="color: #795E26">referencePredicate</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">operand</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">operand</span><span style="color: #000000">.</span><span style="color: #795E26">startsWith</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">),</span>
+<span style="color: #000000">};</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">engine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Engine</span><span style="color: #000000">(</span><span style="color: #001080">opts</span><span style="color: #000000">);</span>
+</code></pre>
 				<a href="#reference-predicate" id="reference-predicate" style="color: inherit; text-decoration: none;">
 					<h4>Reference Predicate</h4>
 				</a>
 				<p>A function used to determine if the operand is a reference type, otherwise evaluated as a static value.</p>
-				<pre><code class="language-typescript">referencePredicate: <span class="hljs-function">(<span class="hljs-params">operand: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">boolean</span></code></pre>
+				<pre><code class="language-typescript"><span style="color: #000000">referencePredicate: (</span><span style="color: #001080">operand</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">boolean</span>
+</code></pre>
 				<p><strong>Return value:</strong></p>
 				<ul>
 					<li><code>true</code> = reference type</li>
@@ -670,7 +727,8 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 					<h4>Reference Transform</h4>
 				</a>
 				<p>A function used to transform the operand into the reference annotation stripped form. I.e. remove any annotation used to detect the reference type. E.g. &quot;$Reference&quot; =&gt; &quot;Reference&quot;.</p>
-				<pre><code class="language-typescript">referenceTransform: <span class="hljs-function">(<span class="hljs-params">operand: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">string</span></code></pre>
+				<pre><code class="language-typescript"><span style="color: #000000">referenceTransform: (</span><span style="color: #001080">operand</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">string</span>
+</code></pre>
 				<blockquote>
 					<p><strong>Default reference transform:</strong><br>It removes the <code>$</code> symbol at the begging of the operand name.</p>
 				</blockquote>
@@ -678,52 +736,55 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 					<h4>Operator Mapping</h4>
 				</a>
 				<p>Mapping of the operators. The key is unique operator key, and the value is the key used to represent the given operator in the raw expression.</p>
-				<pre><code class="language-typescript">operatorMapping: <span class="hljs-built_in">Map</span>&lt;symbol, <span class="hljs-built_in">string</span>&gt;</code></pre>
+				<pre><code class="language-typescript"><span style="color: #000000">operatorMapping: </span><span style="color: #267F99">Map</span><span style="color: #000000">&lt;</span><span style="color: #001080">symbol</span><span style="color: #000000">, </span><span style="color: #001080">string</span><span style="color: #000000">&gt;</span>
+</code></pre>
 				<p><strong>Default operator mapping:</strong>  </p>
-				<pre><code class="language-typescript"><span class="hljs-comment">// Comparison</span>
-[OPERATOR_EQ, <span class="hljs-string">&#x27;==&#x27;</span>]
-[OPERATOR_NE, <span class="hljs-string">&#x27;!=&#x27;</span>]
-[OPERATOR_GT, <span class="hljs-string">&#x27;&gt;&#x27;</span>]
-[OPERATOR_GE, <span class="hljs-string">&#x27;&gt;=&#x27;</span>]
-[OPERATOR_LT, <span class="hljs-string">&#x27;&lt;&#x27;</span>]
-[OPERATOR_LE, <span class="hljs-string">&#x27;&lt;=&#x27;</span>]
-[OPERATOR_IN, <span class="hljs-string">&#x27;IN&#x27;</span>]
-[OPERATOR_NOT_IN, <span class="hljs-string">&#x27;NOT IN&#x27;</span>]
-[OPERATOR_PREFIX, <span class="hljs-string">&#x27;PREFIX&#x27;</span>]
-[OPERATOR_SUFFIX, <span class="hljs-string">&#x27;SUFFIX&#x27;</span>]
-[OPERATOR_OVERLAP, <span class="hljs-string">&#x27;OVERLAP&#x27;</span>]
-[OPERATOR_UNDEFINED, <span class="hljs-string">&#x27;UNDEFINED&#x27;</span>]
-[OPERATOR_PRESENT, <span class="hljs-string">&#x27;PRESENT&#x27;</span>]
+				<pre><code class="language-typescript"><span style="color: #008000">// Comparison</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_EQ</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_NE</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;!=&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_GT</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;&gt;&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_GE</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;&gt;=&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_LT</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;&lt;&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_LE</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;&lt;=&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_IN</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;IN&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_NOT_IN</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;NOT IN&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_PREFIX</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;PREFIX&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_SUFFIX</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;SUFFIX&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_OVERLAP</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;OVERLAP&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_UNDEFINED</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;UNDEFINED&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_PRESENT</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;PRESENT&#039;</span><span style="color: #000000">]</span>
 
-<span class="hljs-comment">// Logical</span>
-[OPERATOR_AND, <span class="hljs-string">&#x27;AND&#x27;</span>]
-[OPERATOR_OR, <span class="hljs-string">&#x27;OR&#x27;</span>]
-[OPERATOR_NOR, <span class="hljs-string">&#x27;NOR&#x27;</span>]
-[OPERATOR_XOR, <span class="hljs-string">&#x27;XOR&#x27;</span>]
-[OPERATOR_NOT, <span class="hljs-string">&#x27;NOT&#x27;</span>]</code></pre>
+<span style="color: #008000">// Logical</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_AND</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_OR</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;OR&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_NOR</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;NOR&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_XOR</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;XOR&#039;</span><span style="color: #000000">]</span>
+<span style="color: #000000">[</span><span style="color: #0070C1">OPERATOR_NOT</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;NOT&#039;</span><span style="color: #000000">]</span>
+</code></pre>
 				<blockquote>
 					<p>The operator keys are unique symbols which could be imported from the engine package:</p>
 				</blockquote>
-				<pre><code class="language-js"><span class="hljs-keyword">import</span> {
-  OPERATOR_EQ,
-  OPERATOR_NE,
-  OPERATOR_GT,
-  OPERATOR_GE,
-  OPERATOR_LT,
-  OPERATOR_LE,
-  OPERATOR_IN,
-  OPERATOR_NOT_IN,
-  OPERATOR_PREFIX,
-  OPERATOR_SUFFIX,
-  OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINED,
-  OPERATOR_PRESENT,
-  OPERATOR_AND,
-  OPERATOR_OR,
-  OPERATOR_NOR,
-  OPERATOR_XOR,
-  OPERATOR_NOT
-} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@briza/illogical&#x27;</span></code></pre>
+				<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_EQ</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_NE</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_GT</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_GE</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_LT</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_LE</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_IN</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_NOT_IN</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_PREFIX</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_SUFFIX</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_OVERLAP</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_UNDEFINED</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_PRESENT</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_AND</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_OR</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_NOR</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_XOR</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">OPERATOR_NOT</span>
+<span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@briza/illogical&#039;</span>
+</code></pre>
 				<a href="#breaking-changes" id="breaking-changes" style="color: inherit; text-decoration: none;">
 					<h2>Breaking Changes</h2>
 				</a>
@@ -748,95 +809,98 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_common_evaluable_.html">&quot;common/evaluable&quot;</a>
+						<a href="modules/common_evaluable.html">common/evaluable</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_common_type_check_.html">&quot;common/type-<wbr>check&quot;</a>
+						<a href="modules/common_type_check.html">common/type-<wbr>check</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_eq_.html">&quot;expression/comparison/eq&quot;</a>
+						<a href="modules/common_util.html">common/util</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_ge_.html">&quot;expression/comparison/ge&quot;</a>
+						<a href="modules/expression_comparison.html">expression/comparison</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_gt_.html">&quot;expression/comparison/gt&quot;</a>
+						<a href="modules/expression_comparison_eq.html">expression/comparison/eq</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_in_.html">&quot;expression/comparison/in&quot;</a>
+						<a href="modules/expression_comparison_ge.html">expression/comparison/ge</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_index_.html">&quot;expression/comparison/index&quot;</a>
+						<a href="modules/expression_comparison_gt.html">expression/comparison/gt</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_le_.html">&quot;expression/comparison/le&quot;</a>
+						<a href="modules/expression_comparison_in.html">expression/comparison/in</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_lt_.html">&quot;expression/comparison/lt&quot;</a>
+						<a href="modules/expression_comparison_le.html">expression/comparison/le</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_ne_.html">&quot;expression/comparison/ne&quot;</a>
+						<a href="modules/expression_comparison_lt.html">expression/comparison/lt</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_not_in_.html">&quot;expression/comparison/not-<wbr>in&quot;</a>
+						<a href="modules/expression_comparison_ne.html">expression/comparison/ne</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_overlap_.html">&quot;expression/comparison/overlap&quot;</a>
+						<a href="modules/expression_comparison_not_in.html">expression/comparison/not-<wbr>in</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_prefix_.html">&quot;expression/comparison/prefix&quot;</a>
+						<a href="modules/expression_comparison_overlap.html">expression/comparison/overlap</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_present_.html">&quot;expression/comparison/present&quot;</a>
+						<a href="modules/expression_comparison_prefix.html">expression/comparison/prefix</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_suffix_.html">&quot;expression/comparison/suffix&quot;</a>
+						<a href="modules/expression_comparison_present.html">expression/comparison/present</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_comparison_undefined_.html">&quot;expression/comparison/undefined&quot;</a>
+						<a href="modules/expression_comparison_suffix.html">expression/comparison/suffix</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_and_.html">&quot;expression/logical/and&quot;</a>
+						<a href="modules/expression_comparison_undefined.html">expression/comparison/undefined</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_index_.html">&quot;expression/logical/index&quot;</a>
+						<a href="modules/expression_logical.html">expression/logical</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_nor_.html">&quot;expression/logical/nor&quot;</a>
+						<a href="modules/expression_logical_and.html">expression/logical/and</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_not_.html">&quot;expression/logical/not&quot;</a>
+						<a href="modules/expression_logical_nor.html">expression/logical/nor</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_or_.html">&quot;expression/logical/or&quot;</a>
+						<a href="modules/expression_logical_not.html">expression/logical/not</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_expression_logical_xor_.html">&quot;expression/logical/xor&quot;</a>
+						<a href="modules/expression_logical_or.html">expression/logical/or</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_index_.html">&quot;index&quot;</a>
+						<a href="modules/expression_logical_xor.html">expression/logical/xor</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_operand_collection_.html">&quot;operand/collection&quot;</a>
+						<a href="modules/index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_operand_index_.html">&quot;operand/index&quot;</a>
+						<a href="modules/operand.html">operand</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_operand_reference_.html">&quot;operand/reference&quot;</a>
+						<a href="modules/operand_collection.html">operand/collection</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_operand_value_.html">&quot;operand/value&quot;</a>
+						<a href="modules/operand_reference.html">operand/reference</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_parser_index_.html">&quot;parser/index&quot;</a>
+						<a href="modules/operand_value.html">operand/value</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_parser_options_.html">&quot;parser/options&quot;</a>
+						<a href="modules/parser.html">parser</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/parser_options.html">parser/options</a>
 					</li>
 				</ul>
 			</nav>
@@ -852,7 +916,6 @@ engine.evaluate([<span class="hljs-string">&#x27;PRESENT&#x27;</span>, <span cla
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>

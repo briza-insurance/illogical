@@ -1,57 +1,77 @@
 # illogical changelog
 
+## 1.4.0
+
+- Add support for reference variable data type casting before expression evaluation
+
 ## 1.3.0
-* Add simplify method in the engine to simplify expressions
+
+- Add simplify method in the engine to simplify expressions
 
 ## 1.2.4
-* Add support for array element targeting within reference operand key
-* Add support for array element targeting via reference within reference operand key
-* Add support for nested key resolution within reference operand key
-* Add support for composite key resolution within reference operand key
+
+- Add support for array element targeting within reference operand key
+- Add support for array element targeting via reference within reference operand key
+- Add support for nested key resolution within reference operand key
+- Add support for composite key resolution within reference operand key
 
 ## 1.2.3
-* Add support for null and undefined in isObject() method
+
+- Add support for null and undefined in isObject() method
 
 ## 1.2.2
-* Add Present comparison expression.
+
+- Add Present comparison expression.
 
 ## 1.2.1
-* Allow zero argument logical expressions to be treated as a collection.
-* Allow logical expressions without any inner expressions to be treated as a collection.
+
+- Allow zero argument logical expressions to be treated as a collection.
+- Allow logical expressions without any inner expressions to be treated as a collection.
 
 ## 1.2.0
-* Simplification of the codebase.
-* Add Not logical expression.
-* Breaking change: removed parser strict mode.
+
+- Simplification of the codebase.
+- Add Not logical expression.
+- Breaking change: removed parser strict mode.
 
 ## 1.1.5
-* Operand of array value now correctly resolves references.
+
+- Operand of array value now correctly resolves references.
 
 ## 1.1.4
-* Add Overlap comparison expression.
+
+- Add Overlap comparison expression.
 
 ## 1.1.3
-* Add predicate expression types.
-* Add Undefined predicate expression.
+
+- Add predicate expression types.
+- Add Undefined predicate expression.
 
 ## 1.1.2
-* Value operand supports null and undefined as values.
+
+- Value operand supports null and undefined as values.
 
 ## 1.1.1
-* Invalid logical/comparison expression throw exception.
+
+- Invalid logical/comparison expression throw exception.
 
 ## 1.1.0
-* Add Prefix comparison operator.
-* Add Suffix comparison operator.
+
+- Add Prefix comparison operator.
+- Add Suffix comparison operator.
 
 ## 1.0.3
-* Update readme.
+
+- Update readme.
 
 ## 1.0.2
-* Add support for nested data context.
+
+- Add support for nested data context.
 
 ## 1.0.1
-* Add typescript types path into package.json.
+
+- Add typescript types path into package.json.
 
 ## 1.0.0
-* Initial release.
+
+- Initial release.

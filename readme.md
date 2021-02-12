@@ -1,7 +1,7 @@
 # illogical
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: August 6, 2020.
+> Revision: February 12, 2021.
 
 ## About
 This project has been developed to provide a shared conditional logic between front-end and back-end code, stored in JSON or in any other data serialization format. 
@@ -240,6 +240,12 @@ To reference the nested reference, please use "." delimiter, e.g.:
 * E.g. **shapeType** is resolved as "**B**" and would compose the **$shapeB** outer reference.
 * This resolution could be n-nested.
 
+#### Data Type Casting
+`$payment.amount.(Number)`
+
+-    This forces the data contexts `payment.amount` to be cast into a `number` before being used as an operand in the evaluation.
+-     Support data type cas ``(Number)`` <=> ``(String)``
+ 
 **Example**
 ```js
 // Data context
@@ -276,6 +282,9 @@ engine.evaluate(['==', '$address.{segment}', 'Toronto'], ctx) // true
 
 // Composite Reference Key
 engine.evaluate(['==', '$shape{shapeType}', 'circle'], ctx) // true
+
+// Data Type Casting
+engine.evaluate(['==', '$age.(String)', '21'], ctx) // true
 ```
 
 ### Operand Types

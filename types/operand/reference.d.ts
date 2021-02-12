@@ -10,6 +10,7 @@ import { Operand } from '.';
  */
 export declare class Reference extends Operand {
     private readonly key;
+    private readonly dataType;
     /**
      * @constructor
      * @param {string} key Context key.

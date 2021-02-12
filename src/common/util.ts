@@ -19,6 +19,10 @@ export const toNumber = (value: Result): number | undefined => {
   return undefined
 }
 
+/**
+ * Convert a value to string if possible, otherwise return undefined
+ * @param value value to be converted to string
+ */
 export const toString = (value: Result): string | undefined => {
   return value ? `${value}` : undefined
 }
