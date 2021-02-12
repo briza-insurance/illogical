@@ -67,7 +67,7 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', undefined],
       ['RefB.{RefA}', undefined],
       ['Ref{RefB}', undefined],
-      // Data type parsing
+      // Data type casting
       ['RefH[{RefA}].sub{RefD}.(Number)', 2],
       ['RefA.(String)', '1'],
       ['RefJ.(String)', '1'],

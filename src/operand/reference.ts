@@ -87,15 +87,25 @@ function contextValueLookup(ctx: Context, key: string): Result {
   return undefined
 }
 
+enum DataType {
+  Number = 'Number',
+  String = 'String',
+}
+
+// Equivalent to /^.+\.\((Number|String)\)$/
+const dataTypeRegex = new RegExp(
+  `^.+\\.\\((${Object.keys(DataType).join('|')})\\)$`
+)
 /**
- * Converts a value to a specified data type, returns original value if not parseable.
- * @param value value to parse as data type
+ * Converts a value to a specified data type
+ * Silently returns original value if data type conversion has not been implemented.
+ * @param value value to cast as data type
  */
 function toDataType(value: Result, dataType: string | undefined): Result {
   switch (dataType) {
-    case 'Number':
+    case DataType.Number:
       return toNumber(value)
-    case 'String':
+    case DataType.String:
       return toString(value)
     default:
       return value
@@ -107,7 +117,7 @@ function toDataType(value: Result, dataType: string | undefined): Result {
  */
 export class Reference extends Operand {
   private readonly key: string
-  private readonly dataType: string | undefined
+  private readonly dataType: DataType | undefined
 
   /**
    * @constructor
@@ -120,10 +130,9 @@ export class Reference extends Operand {
     super()
     this.key = key
 
-    const dataTypeRegex = /^.+\.\((Number|String|Date)\)$/
     const dataTypeMatch = dataTypeRegex.exec(this.key)
     if (dataTypeMatch) {
-      this.dataType = dataTypeMatch[1]
+      this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
       this.key = this.key.replace(/.\(.+\)$/, '')
     }
   }
