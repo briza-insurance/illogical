@@ -33,6 +33,7 @@ describe('Operand - Value', () => {
       ['A', 'B'],
       ['C', 'D'],
     ],
+    RefJ: '1',
     // This is to make sure the code returns undefined when it can't resolve a complex reference.
     // It applies to this test case: ['Ref{RefB}', undefined].
     // When RefB can't be resolved, it should return undefined right away instead of transforming
@@ -66,6 +67,11 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', undefined],
       ['RefB.{RefA}', undefined],
       ['Ref{RefB}', undefined],
+      // Data type parsing
+      ['RefH[{RefA}].sub{RefD}.(Number)', 2],
+      ['RefA.(String)', '1'],
+      ['RefJ.(String)', '1'],
+      ['RefJ.(Number)', 1],
     ])('%p should evaluate as %p', (value, expected) => {
       expect(new Reference(value).evaluate(context)).toBe(expected)
     })

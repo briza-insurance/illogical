@@ -5,6 +5,7 @@
 
 import { Context, Evaluable, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
+import { toNumber, toString } from '../common/util'
 import { Options } from '../parser/options'
 import { Operand } from '.'
 
@@ -87,10 +88,26 @@ function contextValueLookup(ctx: Context, key: string): Result {
 }
 
 /**
+ * Converts a value to a specified data type, returns original value if not parseable.
+ * @param value value to parse as data type
+ */
+function toDataType(value: Result, dataType: string | undefined): Result {
+  switch (dataType) {
+    case 'Number':
+      return toNumber(value)
+    case 'String':
+      return toString(value)
+    default:
+      return value
+  }
+}
+
+/**
  * Reference operand resolved within the context
  */
 export class Reference extends Operand {
   private readonly key: string
+  private readonly dataType: string | undefined
 
   /**
    * @constructor
@@ -102,6 +119,13 @@ export class Reference extends Operand {
     }
     super()
     this.key = key
+
+    const dataTypeRegex = /^.+\.\((Number|String|Date)\)$/
+    const dataTypeMatch = dataTypeRegex.exec(this.key)
+    if (dataTypeMatch) {
+      this.dataType = dataTypeMatch[1]
+      this.key = this.key.replace(/.\(.+\)$/, '')
+    }
   }
 
   /**
@@ -110,7 +134,7 @@ export class Reference extends Operand {
    * @return {boolean}
    */
   evaluate(ctx: Context): Result {
-    return contextValueLookup(ctx, this.key)
+    return toDataType(contextValueLookup(ctx, this.key), this.dataType)
   }
 
   /**
