@@ -5,6 +5,7 @@
 
 import { Context, Evaluable, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
+import { toNumber, toString } from '../common/util'
 import { Options } from '../parser/options'
 import { Operand } from '.'
 
@@ -86,11 +87,22 @@ function contextValueLookup(ctx: Context, key: string): Result {
   return undefined
 }
 
+export enum DataType {
+  Number = 'Number',
+  String = 'String',
+}
+
+// Equivalent to /^.+\.\((Number|String)\)$/
+const dataTypeRegex = new RegExp(
+  `^.+\\.\\((${Object.keys(DataType).join('|')})\\)$`
+)
+
 /**
  * Reference operand resolved within the context
  */
 export class Reference extends Operand {
   private readonly key: string
+  private readonly dataType: DataType | undefined
 
   /**
    * @constructor
@@ -102,6 +114,15 @@ export class Reference extends Operand {
     }
     super()
     this.key = key
+
+    const dataTypeMatch = dataTypeRegex.exec(this.key)
+    if (dataTypeMatch) {
+      this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
+    }
+
+    if (this.key.match(/.\(.+\)$/)) {
+      this.key = this.key.replace(/.\(.+\)$/, '')
+    }
   }
 
   /**
@@ -110,7 +131,7 @@ export class Reference extends Operand {
    * @return {boolean}
    */
   evaluate(ctx: Context): Result {
-    return contextValueLookup(ctx, this.key)
+    return this.toDataType(contextValueLookup(ctx, this.key))
   }
 
   /**
@@ -143,5 +164,26 @@ export class Reference extends Operand {
    */
   toString(): string {
     return `{${this.key}}`
+  }
+
+  /**
+   * Converts a value to a specified data type
+   * Silently returns original value if data type conversion has not been implemented.
+   * @param value value to cast as data type
+   */
+  private toDataType(value: Result): Result {
+    let result: Result = value
+    switch (this.dataType) {
+      case DataType.Number:
+        result = toNumber(value)
+        break
+      case DataType.String:
+        result = toString(value)
+        break
+    }
+    if (value && result === undefined) {
+      console.warn(`Casting ${value} to ${this.dataType} resulted in ${result}`)
+    }
+    return result
   }
 }

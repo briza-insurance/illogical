@@ -5,11 +5,16 @@
 import { Context, Evaluable, Result } from '../common/evaluable';
 import { Options } from '../parser/options';
 import { Operand } from '.';
+export declare enum DataType {
+    Number = "Number",
+    String = "String"
+}
 /**
  * Reference operand resolved within the context
  */
 export declare class Reference extends Operand {
     private readonly key;
+    private readonly dataType;
     /**
      * @constructor
      * @param {string} key Context key.
@@ -34,4 +39,10 @@ export declare class Reference extends Operand {
      * @return {string}
      */
     toString(): string;
+    /**
+     * Converts a value to a specified data type
+     * Silently returns original value if data type conversion has not been implemented.
+     * @param value value to cast as data type
+     */
+    private toDataType;
 }

@@ -1,5 +1,6 @@
+import { Result } from '../../../common/evaluable'
 import { defaultOptions } from '../../../parser/options'
-import { Reference } from '../../reference'
+import { DataType, Reference } from '../../reference'
 
 describe('Operand - Value', () => {
   describe('constructor', () => {
@@ -33,6 +34,11 @@ describe('Operand - Value', () => {
       ['A', 'B'],
       ['C', 'D'],
     ],
+    RefJ: '1',
+    RefK: {
+      yes: true,
+      no: false,
+    },
     // This is to make sure the code returns undefined when it can't resolve a complex reference.
     // It applies to this test case: ['Ref{RefB}', undefined].
     // When RefB can't be resolved, it should return undefined right away instead of transforming
@@ -66,6 +72,13 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', undefined],
       ['RefB.{RefA}', undefined],
       ['Ref{RefB}', undefined],
+      // Data type casting
+      ['RefH[{RefA}].sub{RefD}.(Number)', 2],
+      ['RefA.(String)', '1'],
+      ['RefJ.(String)', '1'],
+      ['RefJ.(Number)', 1],
+      ['RefK.yes.(Number)', undefined],
+      ['RefK.no.(Number)', undefined],
     ])('%p should evaluate as %p', (value, expected) => {
       expect(new Reference(value).evaluate(context)).toBe(expected)
     })
@@ -137,5 +150,23 @@ describe('Operand - Value', () => {
     test.each([['key', '{key}']])('%p should be %p', (value, expected) => {
       expect(new Reference(value).toString()).toBe(expected)
     })
+  })
+
+  describe('toDataType', () => {
+    console.warn = jest.fn()
+    test.each<[Result, DataType]>([
+      [true, DataType.String],
+      [true, DataType.Number],
+    ])(
+      'should console.warn if cast resulted in an undefined reference',
+      (value, dataType) => {
+        expect(
+          new Reference(`ref.(${dataType})`).evaluate({ ref: value })
+        ).toBe(undefined)
+        expect(console.warn).toHaveBeenCalledWith(
+          `Casting ${value} to ${dataType} resulted in undefined`
+        )
+      }
+    )
   })
 })
