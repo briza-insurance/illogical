@@ -98,29 +98,6 @@ const dataTypeRegex = new RegExp(
 )
 
 /**
- * Converts a value to a specified data type
- * @param value value to cast as data type
- * @param dataType type to be casted to
- */
-function toDataType(value: Result, dataType: DataType | undefined): Result {
-  let result: Result = value
-  switch (dataType) {
-    case DataType.Number:
-      result = toNumber(value)
-      break
-    case DataType.String:
-      result = toString(value)
-      break
-    default:
-      result = undefined
-  }
-  if (value && dataType && result === undefined) {
-    console.warn(`Casting ${value} to ${dataType} resulted in ${result}`)
-  }
-  return result
-}
-
-/**
  * Reference operand resolved within the context
  */
 export class Reference extends Operand {

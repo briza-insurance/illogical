@@ -327,10 +327,15 @@
 				<a href="#data-type-casting" id="data-type-casting" style="color: inherit; text-decoration: none;">
 					<h4>Data Type Casting</h4>
 				</a>
-				<p><code>$payment.amount.(Number)</code></p>
+				<p><code>$payment.amount.(Type)</code></p>
+				<p>Cast the given data context into the desired data type before being used as an operand in the evaluation.</p>
+				<blockquote>
+					<p>Note: If the conversion is invalid, then a warning message is being logged.</p>
+				</blockquote>
+				<p>Supported data type conversions:</p>
 				<ul>
-					<li>   This forces the data contexts <code>payment.amount</code> to be cast into a <code>number</code> before being used as an operand in the evaluation.</li>
-					<li>  Support data type cas <code>(Number)</code> &lt;=&gt; <code>(String)</code></li>
+					<li>.(String): cast a given reference to String.</li>
+					<li>.(Number): cast a given reference to Number.</li>
 				</ul>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span style="color: #008000">// Data context</span>
