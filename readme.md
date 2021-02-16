@@ -241,10 +241,17 @@ To reference the nested reference, please use "." delimiter, e.g.:
 * This resolution could be n-nested.
 
 #### Data Type Casting
-`$payment.amount.(Number)`
+`$payment.amount.(Type)`
 
--    This forces the data contexts `payment.amount` to be cast into a `number` before being used as an operand in the evaluation.
--     Support data type cas ``(Number)`` <=> ``(String)``
+Cast the given data context into the desired data type before being used as an operand in the evaluation.
+
+> Note: If the conversion is invalid, the an warning message is being logged.
+
+Supported data type conversions:
+
+- .(String): cast a given reference to String.
+- .(Number): cast a given reference to Number.
+
  
 **Example**
 ```js
