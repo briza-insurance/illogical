@@ -245,7 +245,7 @@ To reference the nested reference, please use "." delimiter, e.g.:
 
 Cast the given data context into the desired data type before being used as an operand in the evaluation.
 
-> Note: If the conversion is invalid, the an warning message is being logged.
+> Note: If the conversion is invalid, then a warning message is being logged.
 
 Supported data type conversions:
 

@@ -87,7 +87,7 @@ function contextValueLookup(ctx: Context, key: string): Result {
   return undefined
 }
 
-enum DataType {
+export enum DataType {
   Number = 'Number',
   String = 'String',
 }
@@ -99,7 +99,6 @@ const dataTypeRegex = new RegExp(
 
 /**
  * Converts a value to a specified data type
- * Silently returns original value if data type conversion has not been implemented.
  * @param value value to cast as data type
  * @param dataType type to be casted to
  */
@@ -112,6 +111,8 @@ function toDataType(value: Result, dataType: DataType | undefined): Result {
     case DataType.String:
       result = toString(value)
       break
+    default:
+      result = undefined
   }
   if (value && dataType && result === undefined) {
     console.warn(`Casting ${value} to ${dataType} resulted in ${result}`)
@@ -140,6 +141,9 @@ export class Reference extends Operand {
     const dataTypeMatch = dataTypeRegex.exec(this.key)
     if (dataTypeMatch) {
       this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
+    }
+
+    if (this.key.match(/.\(.+\)$/)) {
       this.key = this.key.replace(/.\(.+\)$/, '')
     }
   }
@@ -150,7 +154,7 @@ export class Reference extends Operand {
    * @return {boolean}
    */
   evaluate(ctx: Context): Result {
-    return toDataType(contextValueLookup(ctx, this.key), this.dataType)
+    return this.toDataType(contextValueLookup(ctx, this.key))
   }
 
   /**
@@ -183,5 +187,26 @@ export class Reference extends Operand {
    */
   toString(): string {
     return `{${this.key}}`
+  }
+
+  /**
+   * Converts a value to a specified data type
+   * Silently returns original value if data type conversion has not been implemented.
+   * @param value value to cast as data type
+   */
+  private toDataType(value: Result): Result {
+    let result: Result = value
+    switch (this.dataType) {
+      case DataType.Number:
+        result = toNumber(value)
+        break
+      case DataType.String:
+        result = toString(value)
+        break
+    }
+    if (value && result === undefined) {
+      console.warn(`Casting ${value} to ${this.dataType} resulted in ${result}`)
+    }
+    return result
   }
 }
