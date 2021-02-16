@@ -1,5 +1,5 @@
 import { Result } from './evaluable'
-import { isBoolean, isNumber, isString } from './type-check'
+import { isNumber, isString } from './type-check'
 
 /**
  * Convert a value to number if possible, otherwise return undefined
@@ -15,8 +15,6 @@ export const toNumber = (value: Result): number | undefined => {
     } else if (value.match(/^0$|^[1-9]\d*$/)) {
       return parseInt(value)
     }
-  } else if (isBoolean(value)) {
-    return value ? 1 : 0
   }
   return undefined
 }

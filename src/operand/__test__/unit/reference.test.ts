@@ -77,8 +77,8 @@ describe('Operand - Value', () => {
       ['RefA.(String)', '1'],
       ['RefJ.(String)', '1'],
       ['RefJ.(Number)', 1],
-      ['RefK.yes.(Number)', 1],
-      ['RefK.no.(Number)', 0],
+      ['RefK.yes.(Number)', undefined],
+      ['RefK.no.(Number)', undefined],
     ])('%p should evaluate as %p', (value, expected) => {
       expect(new Reference(value).evaluate(context)).toBe(expected)
     })
@@ -154,7 +154,10 @@ describe('Operand - Value', () => {
 
   describe('toDataType', () => {
     console.warn = jest.fn()
-    test.each<[Result, DataType]>([[true, DataType.String]])(
+    test.each<[Result, DataType]>([
+      [true, DataType.String],
+      [true, DataType.Number],
+    ])(
       'should console.warn if cast resulted in an undefined reference',
       (value, dataType) => {
         expect(
