@@ -51,8 +51,8 @@ export interface Options {
   referenceTransform: (operand: string) => string
 
   /**
-   * A function used to tranform ths stripped form of a reference into an
-   * annoteted version of the reference. This function should be the inverse
+   * A function used to transform the stripped form of a reference into an
+   * annotated version of the reference. This function should be the inverse
    * function of referenceTranform.
    *
    * referenceSerialization(referenceTransform("$Reference")) === '$Reference'
