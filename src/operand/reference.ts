@@ -155,7 +155,8 @@ export class Reference extends Operand {
    * {@link Evaluable.serialize}
    */
   serialize({ referenceSerialization }: Options): string {
-    return referenceSerialization(this.key)
+    const key = this.dataType ? `${this.key}.(${this.dataType})` : this.key
+    return referenceSerialization(key)
   }
 
   /**
