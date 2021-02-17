@@ -144,7 +144,6 @@ describe('Operand - Value', () => {
       // Data type casting
       ['RefH[{RefA}].sub{RefD}.(Number)', '$RefH[{RefA}].sub{RefD}.(Number)'],
       ['RefA.(String)', '$RefA.(String)'],
-      ['RefJ.(String)', '$RefJ.(String)'],
       ['RefJ.(Number)', '$RefJ.(Number)'],
     ])('%p should serialize to %p', (value, expected) => {
       expect(new Reference(value).serialize(defaultOptions)).toEqual(expected)
