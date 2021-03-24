@@ -25,7 +25,7 @@
     "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
     "lint:fix": "eslint --max-warnings 0 \"src/**/*.{ts,js}\" --fix",
     "prepublishOnly": "npm run test && npm run build",
-    "check-licenses": "license-checker --summary --excludePrivatePackages --onlyAllow 'MIT;MIT OR X11;Apache-2.0;ISC;BSD-3-Clause;BSD-2-Clause;CC-BY-4.0;Public Domain;BSD;CC-BY-3.0;CC0-1.0;Unlicense'"
+    "check-licenses": "license-checker --summary --excludePrivatePackages --onlyAllow \"MIT;MIT OR X11;Apache-2.0;ISC;BSD-3-Clause;BSD-2-Clause;CC-BY-4.0;Public Domain;BSD;CC-BY-3.0;CC0-1.0;Unlicense\""
   },
   "repository": {
     "type": "git",
