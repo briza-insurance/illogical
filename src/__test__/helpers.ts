@@ -3,7 +3,7 @@
  * @module illogical/test
  */
 
-import { EvaluableType } from '../common/evaluable'
+import { EvaluableType, Result } from '../common/evaluable'
 import { Operand } from '../operand'
 import { Input } from '../parser'
 
@@ -14,8 +14,8 @@ import { Input } from '../parser'
  * @example
  * ['A', 'B', 'C'] => [['A', 'B'], ['B', 'C'], ['B', 'C']]
  */
-export function permutation(inputs: any[]): [any, any][] {
-  const result: [any, any][] = []
+export function permutation(inputs: unknown[]): [unknown, unknown][] {
+  const result: [unknown, unknown][] = []
   for (let i = 0, j = 0; j < inputs.length - 1; ) {
     result.push([inputs[j], inputs[i + 1]])
     i++
@@ -31,10 +31,10 @@ export function permutation(inputs: any[]): [any, any][] {
  * Create a primitive operand, evaluating as the passed value.
  * @param value
  */
-export const operand = (value: any): Operand =>
+export const operand = (value: Result): Operand =>
   new (class extends Operand {
     type: EvaluableType = EvaluableType.Operand
-    constructor(private readonly value: any) {
+    constructor(private readonly value: Result) {
       super()
     }
     evaluate() {
