@@ -7,6 +7,8 @@ import { EvaluableType, Result } from '../common/evaluable'
 import { Operand } from '../operand'
 import { Input } from '../parser'
 
+type operandValue = Result | null | undefined
+
 /**
  * Get input permutations
  * @param inputs List of unique inputs
@@ -14,8 +16,10 @@ import { Input } from '../parser'
  * @example
  * ['A', 'B', 'C'] => [['A', 'B'], ['B', 'C'], ['B', 'C']]
  */
-export function permutation(inputs: unknown[]): [unknown, unknown][] {
-  const result: [unknown, unknown][] = []
+export function permutation(
+  inputs: operandValue[]
+): [operandValue, operandValue][] {
+  const result: [operandValue, operandValue][] = []
   for (let i = 0, j = 0; j < inputs.length - 1; ) {
     result.push([inputs[j], inputs[i + 1]])
     i++
@@ -31,10 +35,10 @@ export function permutation(inputs: unknown[]): [unknown, unknown][] {
  * Create a primitive operand, evaluating as the passed value.
  * @param value
  */
-export const operand = (value: Result): Operand =>
+export const operand = (value: operandValue): Operand =>
   new (class extends Operand {
     type: EvaluableType = EvaluableType.Operand
-    constructor(private readonly value: Result) {
+    constructor(private readonly value: operandValue) {
       super()
     }
     evaluate() {
