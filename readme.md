@@ -678,6 +678,10 @@ import {
 
 ## Breaking Changes
 
+### v1.4.2
+* Change on `@babel/env` preset to target `> 1%, node 12` this will remove some polyfills that were causing performance 
+problems in some projects.
+
 ### v1.2.0
 * Removed **strict** mode from the Engine constructor options.
 ```const engine = new Engine(strictMode, opts);``` -> ```const engine = new Engine(opts);```
