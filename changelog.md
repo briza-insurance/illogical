@@ -2,7 +2,7 @@
 
 ## 1.4.3
 
-- Prevent unexpected parsing of logical or comparison expression used as an operand in a comparison expression
+- Prevent unexpected parsing of any expression used as an operand in a comparison expression
 
 ## 1.4.2
 
