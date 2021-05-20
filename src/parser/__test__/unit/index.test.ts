@@ -374,7 +374,7 @@ describe('Condition Engine - Parser', () => {
         [
           defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
           ['a', 'b'],
-          ['a'],
+          ['IN'],
         ],
         new Overlap(
           new Collection([new Value('a'), new Value('b')]),
