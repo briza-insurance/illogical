@@ -378,7 +378,7 @@ describe('Condition Engine - Parser', () => {
         ],
         new Overlap(
           new Collection([new Value('a'), new Value('b')]),
-          new Collection([new Value('a')])
+          new Collection([new Value('IN')])
         ),
       ],
       // Reference
