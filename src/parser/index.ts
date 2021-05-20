@@ -247,7 +247,8 @@ export class Parser {
         return this.getOperand(raw)
     }
 
-    return expression(operands.map(operandParser.bind(this)))
+    operandParser = operandParser.bind(this)
+    return expression(operands.map(operandParser))
   }
 
   /**
