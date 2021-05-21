@@ -130,6 +130,7 @@ export class Parser {
     }
 
     let expression: (operands: Evaluable[]) => Evaluable
+    let operandParser: (raw: Input) => Evaluable = this.getOperand
     const operator = (raw as ArrayInput)[0] as string
     const operands = (raw as ArrayInput).slice(1)
 
@@ -165,22 +166,27 @@ export class Parser {
       case this.opts.operatorMapping.get(OPERATOR_AND):
         expression = (operands: Evaluable[]): Evaluable =>
           logicalExpressionReducer(operands, true) || new And(operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
         expression = (operands: Evaluable[]): Evaluable =>
           logicalExpressionReducer(operands, true) || new Or(operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
         expression = (operands: Evaluable[]): Evaluable =>
           logicalExpressionReducer(operands) || new Nor(operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
         expression = (operands: Evaluable[]): Evaluable =>
           logicalExpressionReducer(operands) || new Xor(operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
         expression = (operands: Evaluable[]): Evaluable =>
           logicalExpressionReducer(operands) || new Not(...operands)
+        operandParser = this.parseRawExp
         break
       /**
        * Comparison
@@ -241,11 +247,7 @@ export class Parser {
         return this.getOperand(raw)
     }
 
-    return expression(
-      operands.map((operand) => {
-        return this.parseRawExp(operand)
-      })
-    )
+    return expression(operands.map(operandParser.bind(this)))
   }
 
   /**
