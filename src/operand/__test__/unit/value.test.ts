@@ -1,48 +1,35 @@
-import { Result } from '../../../common/evaluable'
-import { Value } from '../../value'
+import { EvaluatedPrimitive } from '../../../evaluable'
+import { value } from '../../'
 
-describe('Operand - Value', () => {
-  describe('constructor', () => {
-    test.each([[[1, '2', true]]])('arguments %p should throw', (value) => {
-      expect(() => new Value(value)).toThrowError()
-    })
-  })
-
-  const testCases: [Result, Result][] = [
-    [1, 1],
-    ['1', '1'],
-    [true, true],
-    [undefined, undefined],
-    [null, null],
-  ]
+describe('operand - value', () => {
+  const testCases: EvaluatedPrimitive[] = [1, '1', true, null]
 
   describe('evaluate', () => {
-    test.each(testCases)('%p should evaluate as %p', (value, expected) => {
-      expect(new Value(value).evaluate()).toBe(expected)
+    it.each(testCases)('%p should evaluate as self', (operand) => {
+      expect(value(operand).evaluate({})).toBe(operand)
     })
   })
 
   describe('simplify', () => {
-    test.each(testCases)('%p should simplify to %p', (value, expected) => {
-      expect(new Value(value).simplify()).toBe(expected)
+    it.each(testCases)('%p should simplify to self', (operand) => {
+      expect(value(operand).simplify({})).toBe(operand)
     })
   })
 
   describe('serialize', () => {
-    test.each(testCases)('%p should simplify to %p', (value, expected) => {
-      expect(new Value(value).serialize()).toBe(expected)
+    it.each(testCases)('%p should serialize to self', (operand) => {
+      expect(value(operand).serialize()).toBe(operand)
     })
   })
 
   describe('toString', () => {
-    test.each([
+    it.each([
       [1, '1'],
       ['1', '"1"'],
       [true, 'true'],
-      [undefined, 'undefined'],
       [null, 'null'],
-    ])('%p should be %p', (value, expected) => {
-      expect(new Value(value).toString()).toBe(expected)
+    ])('%p should be %p', (operand, expected) => {
+      expect(value(operand).toString()).toBe(expected)
     })
   })
 })

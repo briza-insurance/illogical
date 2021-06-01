@@ -1,176 +1,233 @@
-import { Result } from '../../../common/evaluable'
-import { defaultOptions } from '../../../parser/options'
-import { DataType, Reference } from '../../reference'
+import {
+  contextLookup,
+  DataType,
+  defaultReferenceSerializeOptions,
+  getDataType,
+  isIgnoredPath,
+  reference,
+  toDataType,
+  toNumber,
+  toString,
+  trimDataType,
+} from '../../reference'
 
-describe('Operand - Value', () => {
-  describe('constructor', () => {
-    test.each([['']])('arguments %p should throw', (value) => {
-      expect(() => new Reference(value)).toThrowError()
+describe('operand - reference', () => {
+  const context = {
+    refA: 1,
+    refB: {
+      refB1: 2,
+      refB2: 'refB1',
+      refB3: true,
+    },
+    refC: 'refB1',
+    refD: 'refB2',
+    refE: [1, [2, 3, 4]],
+    refF: 'A',
+    refG: '1',
+    refH: '1.1',
+  }
+
+  describe('contextLookup', () => {
+    it.each([
+      ['UNDEFINED', ['UNDEFINED', undefined]],
+      ['refA', ['refA', 1]],
+      ['refB.refB1', ['refB.refB1', 2]],
+      ['refB.{refC}', ['refB.refB1', 2]],
+      ['refB.{UNDEFINED}', ['refB.{UNDEFINED}', undefined]],
+      ['refB.{refB.refB2}', ['refB.refB1', 2]],
+      ['refB.{refB.{refD}}', ['refB.refB1', 2]],
+      ['refE[0]', ['refE[0]', 1]],
+      ['refE[2]', ['refE[2]', undefined]],
+      ['refE[1][0]', ['refE[1][0]', 2]],
+      ['refE[1][3]', ['refE[1][3]', undefined]],
+      ['refE[{refA}][0]', ['refE[1][0]', 2]],
+      ['refE[{refA}][{refB.refB1}]', ['refE[1][2]', 4]],
+      ['ref{refF}', ['refA', 1]],
+      ['ref{UNDEFINED}', ['ref{UNDEFINED}', undefined]],
+    ])('should resolve %p path as %p', (path, expected) => {
+      expect(contextLookup(context, path)).toStrictEqual(expected)
     })
   })
 
-  const context = {
-    RefA: 1,
-    // RefB = undefined
-    RefC: {
-      subA: 2,
-      subB: {
-        subSubA: 3,
-      },
-    },
-    RefD: 'A',
-    RefE: 'D',
-    RefF: 'subA',
-    RefG: ['Apples', 'Oranges', 'Fish'],
-    RefH: [
-      {
-        subA: 1,
-      },
-      {
-        subA: 2,
-      },
-    ],
-    RefI: [
-      ['A', 'B'],
-      ['C', 'D'],
-    ],
-    RefJ: '1',
-    RefK: {
-      yes: true,
-      no: false,
-    },
-    // This is to make sure the code returns undefined when it can't resolve a complex reference.
-    // It applies to this test case: ['Ref{RefB}', undefined].
-    // When RefB can't be resolved, it should return undefined right away instead of transforming
-    // Ref{RefB} into `Refundefined`. To make sure this works as expected `Refundefined` is added
-    // to the context here so for that test case it would resolve to 'A' instead of undefined if
-    // the implementation was incorrect, and the test would fail.
-    Refundefined: 'A',
-  }
-
   describe('evaluate', () => {
-    test.each([
-      // Existing
-      ['RefA', 1],
-      // Nested
-      ['RefC.subA', 2],
-      ['RefC.subB.subSubA', 3],
-      // Missing
-      ['RefB', undefined],
-      ['RefC.subC', undefined],
-      ['RefC.subB.subSubB', undefined],
-      ['RefC.subA.subSubA', undefined],
-      // Array
-      ['RefG[1]', 'Oranges'],
-      ['RefI[0][1]', 'B'],
-      ['RefI[0][5]', undefined],
-      // Complex
-      ['Ref{Ref{RefE}}', 1],
-      ['RefC.{RefF}', 2],
-      ['RefG[{RefC.sub{RefD}}]', 'Fish'],
-      ['RefH[{RefA}].sub{RefD}', 2],
-      ['RefA{RefA}', undefined],
-      ['RefB.{RefA}', undefined],
-      ['Ref{RefB}', undefined],
-      // Data type casting
-      ['RefH[{RefA}].sub{RefD}.(Number)', 2],
-      ['RefA.(String)', '1'],
-      ['RefJ.(String)', '1'],
-      ['RefJ.(Number)', 1],
-      ['RefK.yes.(Number)', undefined],
-      ['RefK.no.(Number)', undefined],
-    ])('%p should evaluate as %p', (value, expected) => {
-      expect(new Reference(value).evaluate(context)).toBe(expected)
+    console.warn = jest.fn()
+
+    it.each([
+      ['refA', 1],
+      ['refA.(String)', '1'],
+      ['refA.(Boolean)', 1],
+      ['refG.(Number)', 1],
+      ['refH.(Number)', 1.1],
+      ['refB.refB3.(String)', undefined],
+      ['refB.refB3.(Number)', undefined],
+    ])('%p should evaluate as %p', (path, expected) => {
+      expect(reference(path).evaluate(context)).toBe(expected)
+    })
+
+    it.each([['refB'], ['refE']])('%p should throw', (path) => {
+      expect(() => reference(path).evaluate(context)).toThrowError()
     })
   })
 
   describe('simplify', () => {
-    test.each([
-      // Existing
-      ['RefA', 1, []],
-      // Nested
-      ['RefC.subA', 2, []],
-      ['RefC.subB.subSubA', 3, []],
-      // Missing
-      ['RefB', new Reference('RefB'), []],
-      ['RefC.subC', undefined],
-      ['RefC.subB.subSubB', undefined, []],
-      ['RefC.subA.subSubA', undefined, []],
-      // Array
-      ['RefG[1]', 'Oranges', []],
-      ['RefI[0][1]', 'B', []],
-      ['RefI[0][5]', undefined, []],
-      // Complex
-      ['Ref{Ref{RefE}}', 1, []],
-      ['RefC.{RefF}', 2, []],
-      ['RefG[{RefC.sub{RefD}}]', 'Fish', []],
-      ['RefH[{RefA}].sub{RefD}', 2, []],
-      ['RefA{RefA}', new Reference('RefA{RefA}'), []],
-      ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
-      ['Ref{RefB}', new Reference('Ref{RefB}'), []],
-      // Ignore keys
-      ['RefB', undefined, ['RefB']],
-    ])('%p should simplify to %p', (value, expected, ignoredKeys = []) => {
-      expect(new Reference(value).simplify(context, ignoredKeys)).toEqual(
-        expected
-      )
+    it.each([
+      ['UNDEFINED', [], reference('UNDEFINED')],
+      ['UNDEFINED', ['UNDEFINED'], undefined],
+      ['refA', [], 1],
+      ['refB.refB1', [], 2],
+      ['refB.{refC}', [], 2],
+      ['refB.{UNDEFINED}', [], reference('refB.{UNDEFINED}')],
+      ['refB.{UNDEFINED}', [/^refB/], undefined],
+      ['refB.{refB.refB2}', [], 2],
+      ['refB.{refB.{refD}}', [], 2],
+      ['refE[0]', [], 1],
+      ['refE[2]', [], reference('refE[2]')],
+      ['refE[1][0]', [], 2],
+      ['refE[1][3]', [], reference('refE[1][3]')],
+      ['refE[{refA}][0]', [], 2],
+      ['refE[{refA}][{refB.refB1}]', [], 4],
+      ['ref{refF}', [], 1],
+      ['ref{refF}.(String)', [], '1'],
+      ['ref{UNDEFINED}', [], reference('ref{UNDEFINED}')],
+      ['ref{UNDEFINED}.(Number)', [], reference('ref{UNDEFINED}.(Number)')],
+    ])(
+      '%p ignoring %p should simplify to %p',
+      (path, ignoredPaths, expected) => {
+        expect(
+          `${reference(path).simplify(context, {
+            reference: { ignoredPaths },
+          })}`
+        ).toEqual(`${expected}`)
+      }
+    )
+
+    it.each([['refB'], ['refE']])('%p should throw', (path) => {
+      expect(() =>
+        reference(path).simplify(context, { reference: { ignoredPaths: [] } })
+      ).toThrowError()
     })
   })
 
   describe('serialize', () => {
-    test.each([
-      // Existing
-      ['RefA', '$RefA'],
-      // Nested
-      ['RefC.subA', '$RefC.subA'],
-      ['RefC.subB.subSubA', '$RefC.subB.subSubA'],
-      // Missing
-      ['RefB', '$RefB'],
-      ['RefC.subC', '$RefC.subC'],
-      ['RefC.subB.subSubB', '$RefC.subB.subSubB'],
-      ['RefC.subA.subSubA', '$RefC.subA.subSubA'],
-      // Array
-      ['RefG[1]', '$RefG[1]'],
-      ['RefI[0][1]', '$RefI[0][1]'],
-      ['RefI[0][5]', '$RefI[0][5]'],
-      // Complex
-      ['Ref{Ref{RefE}}', '$Ref{Ref{RefE}}'],
-      ['RefC.{RefF}', '$RefC.{RefF}'],
-      ['RefG[{RefC.sub{RefD}}]', '$RefG[{RefC.sub{RefD}}]'],
-      ['RefH[{RefA}].sub{RefD}', '$RefH[{RefA}].sub{RefD}'],
-      ['RefA{RefA}', '$RefA{RefA}'],
-      ['RefB.{RefA}', '$RefB.{RefA}'],
-      ['Ref{RefB}', '$Ref{RefB}'],
-      // Data type casting
-      ['RefH[{RefA}].sub{RefD}.(Number)', '$RefH[{RefA}].sub{RefD}.(Number)'],
-      ['RefA.(String)', '$RefA.(String)'],
-      ['RefJ.(Number)', '$RefJ.(Number)'],
-    ])('%p should serialize to %p', (value, expected) => {
-      expect(new Reference(value).serialize(defaultOptions)).toEqual(expected)
+    it.each([
+      ['refA', '$refA'],
+      ['refA.(Number)', '$refA.(Number)'],
+      ['refA.(Boolean)', '$refA'],
+    ])('should serialize %p path as %p', (path, expected) => {
+      expect(
+        reference(path).serialize({
+          reference: defaultReferenceSerializeOptions,
+        })
+      ).toEqual(expected)
+    })
+
+    it('should use default serialization options', () => {
+      expect(reference('path').serialize()).toBe('$path')
     })
   })
 
   describe('toString', () => {
-    test.each([['key', '{key}']])('%p should be %p', (value, expected) => {
-      expect(new Reference(value).toString()).toBe(expected)
+    it.each([['path', '{path}']])('%p should be %p', (path, expected) => {
+      expect(reference(path).toString()).toBe(expected)
     })
   })
 
-  describe('toDataType', () => {
-    console.warn = jest.fn()
-    test.each<[Result, DataType]>([
-      [true, DataType.String],
-      [true, DataType.Number],
-    ])(
-      'should console.warn if cast resulted in an undefined reference',
-      (value, dataType) => {
-        expect(
-          new Reference(`ref.(${dataType})`).evaluate({ ref: value })
-        ).toBe(undefined)
+  describe('data type parsing', () => {
+    describe('getDataType', () => {
+      it.each([
+        ['ref', DataType.Unknown],
+        ['ref.(String)', DataType.String],
+        ['ref.(Number)', DataType.Number],
+      ])('should get from %p path data type %p', (path, expected) => {
+        expect(getDataType(path)).toBe(expected)
+      })
+
+      test('should log warning for unexpected types', () => {
+        console.warn = jest.fn()
+        expect(getDataType('ref.(Boolean)')).toBe(DataType.Unknown)
         expect(console.warn).toHaveBeenCalledWith(
-          `Casting ${value} to ${dataType} resulted in undefined`
+          'unsupported "Boolean" type casting'
         )
+      })
+    })
+
+    describe('trimDataType', () => {
+      it.each([
+        ['ref', 'ref'],
+        ['ref.(String)', 'ref'],
+      ])('should trim %p path to %p', (path, expected) => {
+        expect(trimDataType(path)).toBe(expected)
+      })
+    })
+
+    describe('toNumber', () => {
+      it.each([
+        [1, 1],
+        ['1', 1],
+        ['1.1', 1.1],
+        ['1,1', undefined],
+        [true, undefined],
+      ])('should parse %p as %p', (value, expected) => {
+        expect(toNumber(value)).toBe(expected)
+      })
+    })
+
+    describe('toString', () => {
+      it.each([
+        [1, '1'],
+        ['1', '1'],
+        [true, undefined],
+      ])('should parse %p as %p', (value, expected) => {
+        expect(toString(value)).toBe(expected)
+      })
+    })
+
+    describe('toDataType', () => {
+      it.each([
+        [1, DataType.String, '1'],
+        ['1', DataType.Number, 1],
+        [true, DataType.Unknown, true],
+      ])('should parse %p to %p as %p', (value, dataType, expected) => {
+        expect(toDataType(dataType)(value)).toBe(expected)
+      })
+
+      test('should log warning for invalid parsing', () => {
+        console.warn = jest.fn()
+        expect(toDataType(DataType.String)(true)).toBe(undefined)
+        expect(console.warn).toHaveBeenCalledWith(
+          `failed to cast "true" to ${DataType.String}`
+        )
+      })
+    })
+  })
+
+  describe('defaultReferenceSerializeOptions.from', () => {
+    it.each([
+      ['$path', 'path'],
+      ['', undefined],
+      ['path', undefined],
+    ])('%p should be resolved as %p', (operand, expected) => {
+      expect(defaultReferenceSerializeOptions.from(operand)).toBe(expected)
+    })
+  })
+
+  describe('defaultReferenceSerializeOptions.to', () => {
+    it.each([['path', '$path']])(
+      '%p should be resolved as %p',
+      (operand, expected) => {
+        expect(defaultReferenceSerializeOptions.to(operand)).toBe(expected)
       }
     )
+  })
+
+  describe('isIgnoredPath', () => {
+    const ignoredPaths = ['ignored', /\.ignored\./]
+    it.each([
+      ['ignored', true],
+      ['root.ignored.property', true],
+      ['expected', false],
+    ])('%p should be resolved as %p', (path, expected) => {
+      expect(isIgnoredPath(ignoredPaths, path)).toBe(expected)
+    })
   })
 })

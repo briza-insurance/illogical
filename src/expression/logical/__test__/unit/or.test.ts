@@ -1,59 +1,64 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Reference } from '../../../../operand/reference'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Or } from '../../or'
+import { identityEvaluable } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { Logical } from '../..'
+import { KIND, or } from '../../or'
 
-describe('Expression - Logical - Or', () => {
-  describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [[operand(true), operand(false)], true],
-      [[operand(false), operand(true)], true],
-      [[operand(true), operand(true)], true],
-      // Falsy
-      [[operand(false), operand(false)], false],
-    ] as [Evaluable[], boolean][])(
-      '%p should evaluate as %p',
-      (operands, expected) => {
-        expect(new Or(operands).evaluate({})).toBe(expected)
+describe('expression - logical - or', () => {
+  describe('constructor', () => {
+    it.each<[Evaluable[]]>([[[]], [[value(1)]]])(
+      '%p should throw',
+      (operands) => {
+        expect(() => or(...operands)).toThrowError()
       }
     )
+  })
 
-    test.each([[[]]] as [Evaluable[]][])('%p should throw', (operands) => {
-      expect(() => new Or(operands).evaluate({})).toThrowError()
+  describe('evaluate', () => {
+    it.each([
+      [or(value(true), value(false)), true],
+      [or(value(false), value(true)), true],
+      [or(value(true), value(true)), true],
+      [or(value(false), value(false)), false],
+    ])('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
     })
   })
 
   describe('simplify', () => {
-    it.each<[Or, Evaluable | boolean]>([
-      [new Or([notSimplified(), operand(false)]), notSimplified()],
-      [new Or([notSimplified(), operand(true), notSimplified()]), true],
-      [new Or([operand(false), operand(true)]), true],
-      [new Or([operand(false), operand(false)]), false],
+    it.each<[Logical, Evaluable | boolean]>([
+      [or(identityEvaluable(), value(false)), identityEvaluable()],
+      [or(identityEvaluable(), value(true), identityEvaluable()), true],
+      [or(value(false), value(true)), true],
+      [or(value(false), value(false)), false],
       [
-        new Or([notSimplified(), operand(false), notSimplified()]),
-        new Or([notSimplified(), notSimplified()]),
+        or(identityEvaluable(), value(false), identityEvaluable()),
+        or(identityEvaluable(), identityEvaluable()),
       ],
-    ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, [])).toEqual(expected)
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(`${expected}`)
     })
   })
 
   describe('serialize', () => {
-    it.each<[[Operand, Operand], [Input, Input]]>([
-      [
-        [new Value(10), new Reference('test')],
-        [10, '$test'],
-      ],
-    ])('%p should serialize to %p', (operands, expected) => {
-      expect(new Or(operands).serialize(defaultOptions)).toEqual([
-        'OR',
-        ...expected,
-      ])
+    it.each<[Logical, unknown[]]>([
+      [or(value(10), reference('test')), [10, '$test']],
+    ])('%p should serialize to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'OR']]),
+        })
+      ).toEqual(['OR', ...expected])
+    })
+  })
+
+  describe('toString', () => {
+    it.each([
+      [or(value(10), reference('ref'), value(5)), '(10 OR {ref} OR 5)'],
+    ])('%p should be %p', (evaluable, expected) => {
+      expect(evaluable.toString()).toBe(expected)
     })
   })
 })

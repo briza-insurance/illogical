@@ -1,96 +1,61 @@
-/**
- * Logical expression module.
- * @module illogical/expression/logical
- */
+import { isBoolean } from '../../common/type-check/'
+import { Evaluable } from '../../evaluable'
+import { Logical, logical } from './logical'
+import { nor } from './nor'
+import { not } from './not'
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
-import { isBoolean } from '../../common/type-check'
-import { Logical } from '../logical'
-import { Nor } from './nor'
-import { Not } from './not'
+export const KIND = Symbol('XOR')
 
-// Operator key
-export const OPERATOR = Symbol('XOR')
+const xorOp = (a: boolean, b: boolean): boolean => (a || b) && !(a && b)
 
-/**
- * Logical xor
- * @param {boolean} a
- * @param {boolean} b
- * @return {boolean}
- */
-function xor(a: boolean, b: boolean): boolean {
-  return (a || b) && !(a && b)
-}
-
-/**
- * Xor logical expression
- */
-export class Xor extends Logical {
-  /**
-   * @constructor
-   * @param {Evaluable[]} operands Collection of operands.
-   */
-  constructor(operands: Evaluable[]) {
-    if (operands.length < 2) {
-      throw new Error('logical expression must have at least two operands')
-    }
-    super('XOR', OPERATOR, operands)
+export const xor = (...operands: Evaluable[]): Logical => {
+  if (operands.length < 2) {
+    throw new Error('logical XOR expression must have at least 2 operands')
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate(ctx: Context): Result {
-    let res = null
-    for (const operand of this.operands) {
-      if (res === null) {
-        res = operand.evaluate(ctx) as boolean
-      } else {
-        res = xor(res, operand.evaluate(ctx) as boolean)
+  return logical({
+    kind: KIND,
+    operator: 'XOR',
+    operands,
+    evaluate: (context) =>
+      operands
+        .slice(1)
+        .reduce(
+          (result, operand) =>
+            xorOp(result, operand.evaluate(context) === true),
+          operands[0].evaluate(context) === true
+        ),
+    simplify: (context, options) => {
+      let truthy = 0
+      let evaluable: Evaluable[] = []
+      for (const operand of operands) {
+        const result = operand.simplify(context, options)
+        if (isBoolean(result)) {
+          if (result) {
+            truthy++
+          }
+          if (truthy > 1) {
+            return false
+          }
+          continue
+        }
+
+        evaluable = [...evaluable, operand]
       }
-    }
-    return res
-  }
 
-  /**
-   * {@link Evaluable.simplify}
-   */
-  simplify(...args: [Context, string[]]): boolean | Evaluable {
-    const [evaluablesLeft, trueCount] = this.operands.reduce<
-      [Evaluable[], number]
-    >(
-      ([notSimplifiedConditions, trueCount], child) => {
-        if (trueCount > 1) {
-          return [notSimplifiedConditions, trueCount]
-        }
-        const childResult = child.simplify(...args)
-        if (!isBoolean(childResult)) {
-          return [[...notSimplifiedConditions, child], trueCount]
-        }
-        if (childResult) {
-          return [notSimplifiedConditions, trueCount + 1]
-        }
-        return [notSimplifiedConditions, trueCount]
-      },
-      [[], 0]
-    )
-    if (trueCount > 1) {
-      return false
-    }
-    if (evaluablesLeft.length === 0) {
-      return trueCount === 1
-    }
-    if (evaluablesLeft.length === 1) {
-      if (trueCount === 1) {
-        return new Not(...evaluablesLeft)
+      if (!evaluable.length) {
+        return truthy === 1
       }
-      return evaluablesLeft[0]
-    }
-    if (trueCount === 1) {
-      return new Nor(evaluablesLeft)
-    }
-    return new Xor(evaluablesLeft)
-  }
+      if (evaluable.length === 1) {
+        if (truthy === 1) {
+          return not(evaluable[0])
+        }
+        return evaluable[0]
+      }
+      if (truthy === 1) {
+        return nor(...evaluable)
+      }
+      return xor(...evaluable)
+    },
+  })
 }

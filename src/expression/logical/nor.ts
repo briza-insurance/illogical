@@ -1,74 +1,41 @@
-/**
- * Logical expression module.
- * @module illogical/expression/logical
- */
+import { isBoolean } from '../../common/type-check/'
+import { Evaluable } from '../../evaluable'
+import { Logical, logical } from './logical'
+import { not } from './not'
 
-import { Context, Evaluable, Result } from '../../common/evaluable'
-import { isBoolean, isEvaluable } from '../../common/type-check'
-import { Logical } from '../logical'
-import { Not } from './not'
+export const KIND = Symbol('nor')
 
-// Operator key
-export const OPERATOR = Symbol('NOR')
-
-/**
- * Nor logical expression
- */
-export class Nor extends Logical {
-  /**
-   * @constructor
-   * @param {Evaluable[]} operands Collection of operands.
-   */
-  constructor(operands: Evaluable[]) {
-    if (operands.length < 2) {
-      throw new Error('logical expression must have at least two operands')
-    }
-    super('NOR', OPERATOR, operands)
+export const nor = (...operands: Evaluable[]): Logical => {
+  if (operands.length < 2) {
+    throw new Error('logical NOR expression must have at least 2 operands')
   }
 
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate(ctx: Context): Result {
-    for (const operand of this.operands) {
-      if (operand.evaluate(ctx) === true) {
-        return false
-      }
-    }
-    return true
-  }
-
-  /**
-   * {@link Evaluable.simplify}
-   */
-  simplify(...args: [Context, string[]]): boolean | Evaluable {
-    const simplified = this.operands.reduce<Evaluable[] | boolean>(
-      (result, child) => {
-        if (result !== false) {
-          const childResult = child.simplify(...args)
-          if (isEvaluable(childResult)) {
-            if (isBoolean(result)) {
-              return [child]
-            }
-            return [...result, child]
-          }
-          if (childResult) {
+  return logical({
+    kind: KIND,
+    operator: 'NOR',
+    operands,
+    evaluate: (context) =>
+      !operands.some((operand) => operand.evaluate(context) === true),
+    simplify: (context, options) => {
+      let simplified: boolean | Evaluable[] = true
+      for (const operand of operands) {
+        const result = operand.simplify(context, options)
+        if (isBoolean(result)) {
+          if (result) {
             return false
           }
+          continue
         }
-        return result
-      },
-      true
-    )
 
-    if (Array.isArray(simplified)) {
-      if (simplified.length === 1) {
-        return new Not(...simplified)
+        simplified = isBoolean(simplified)
+          ? [operand]
+          : [...simplified, operand]
       }
-      return new Nor(simplified)
-    }
-    return simplified
-  }
+
+      if (isBoolean(simplified)) {
+        return simplified
+      }
+      return simplified.length === 1 ? not(simplified[0]) : nor(...simplified)
+    },
+  })
 }
