@@ -1,6 +1,6 @@
 import { hasOwnProperty } from '../..'
 
-describe('common - fp - hasOwnProperty', () => {
+describe('common - utils - hasOwnProperty', () => {
   it.each([
     [{ toString: null }, true],
     [{ toString: undefined }, true],
