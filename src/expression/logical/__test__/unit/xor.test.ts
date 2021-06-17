@@ -1,70 +1,75 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Reference } from '../../../../operand/reference'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Nor } from '../../nor'
-import { Not } from '../../not'
-import { Xor } from '../../xor'
+import { identityEvaluable } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { Logical } from '../..'
+import { nor, not } from '../..'
+import { KIND, xor } from '../../xor'
 
-describe('Expression - Logical - Xor', () => {
-  describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [[operand(true), operand(false)], true],
-      [[operand(false), operand(true)], true],
-      // Falsy
-      [[operand(true), operand(true)], false],
-      [[operand(false), operand(false)], false],
-    ] as [Evaluable[], boolean][])(
-      '%p should evaluate as %p',
-      (operands, expected) => {
-        expect(new Xor(operands).evaluate({})).toBe(expected)
+describe('expression - logical - xor', () => {
+  describe('constructor', () => {
+    it.each<[Evaluable[]]>([[[]], [[value(1)]]])(
+      '%p should throw',
+      (operands) => {
+        expect(() => xor(...operands)).toThrowError()
       }
     )
+  })
 
-    test.each([[[]]] as [Evaluable[]][])('%p should throw', (operands) => {
-      expect(() => new Xor(operands).evaluate({})).toThrowError()
+  describe('evaluate', () => {
+    it.each([
+      [xor(value(true), value(false)), true],
+      [xor(value(false), value(true)), true],
+      [xor(value(false), value(true), value(true)), false],
+      [xor(value(true), value(true)), false],
+      [xor(value(false), value(false)), false],
+    ])('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
     })
   })
 
   describe('simplify', () => {
-    it.each<[Xor, Evaluable | boolean]>([
-      [new Xor([notSimplified(), operand(false)]), notSimplified()],
+    it.each<[Logical, Evaluable | boolean]>([
+      [xor(identityEvaluable(), value(false)), identityEvaluable()],
       [
-        new Xor([notSimplified(), operand(true), notSimplified()]),
-        new Nor([notSimplified(), notSimplified()]),
+        xor(identityEvaluable(), value(true), identityEvaluable()),
+        nor(identityEvaluable(), identityEvaluable()),
       ],
       [
-        new Xor([notSimplified(), operand(true), operand(false)]),
-        new Not(notSimplified()),
+        xor(identityEvaluable(), value(true), value(false)),
+        not(identityEvaluable()),
       ],
-      [new Xor([operand(false), operand(true)]), true],
-      [new Xor([operand(false), operand(false)]), false],
-      [new Xor([operand(true), operand(true), operand(true)]), false],
-      [new Xor([operand(true), notSimplified(), operand(true)]), false],
+      [xor(value(false), value(true)), true],
+      [xor(value(false), value(false)), false],
+      [xor(value(true), value(true), value(true)), false],
+      [xor(value(true), identityEvaluable(), value(true)), false],
       [
-        new Xor([notSimplified(), operand(false), notSimplified()]),
-        new Xor([notSimplified(), notSimplified()]),
+        xor(identityEvaluable(), value(false), identityEvaluable()),
+        xor(identityEvaluable(), identityEvaluable()),
       ],
-    ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, [])).toEqual(expected)
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(`${expected}`)
     })
   })
 
   describe('serialize', () => {
-    it.each<[[Operand, Operand], [Input, Input]]>([
-      [
-        [new Value(10), new Reference('test')],
-        [10, '$test'],
-      ],
-    ])('%p should serialize to %p', (operands, expected) => {
-      expect(new Xor(operands).serialize(defaultOptions)).toEqual([
-        'XOR',
-        ...expected,
-      ])
+    it.each<[Logical, unknown[]]>([
+      [xor(value(10), reference('test')), [10, '$test']],
+    ])('%p should serialize to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'XOR']]),
+        })
+      ).toEqual(['XOR', ...expected])
+    })
+  })
+
+  describe('toString', () => {
+    it.each([
+      [xor(value(10), reference('ref'), value(5)), '(10 XOR {ref} XOR 5)'],
+    ])('%p should be %p', (evaluable, expected) => {
+      expect(evaluable.toString()).toBe(expected)
     })
   })
 })

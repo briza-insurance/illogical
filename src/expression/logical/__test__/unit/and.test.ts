@@ -1,58 +1,63 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Reference } from '../../../../operand/reference'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { And } from '../../and'
+import { identityEvaluable } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { Logical } from '../..'
+import { and, KIND } from '../../and'
 
-describe('Expression - Logical - And', () => {
-  describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [[operand(true), operand(true)], true],
-      // Falsy
-      [[operand(true), operand(false)], false],
-      [[operand(false), operand(true)], false],
-      [[operand(false), operand(false)], false],
-    ] as [Evaluable[], boolean][])(
-      '%p should evaluate as %p',
-      (operands, expected) => {
-        expect(new And(operands).evaluate({})).toBe(expected)
+describe('expression - logical - and', () => {
+  describe('constructor', () => {
+    it.each<[Evaluable[]]>([[[]], [[value(1)]]])(
+      '%p should throw',
+      (operands) => {
+        expect(() => and(...operands)).toThrowError()
       }
     )
+  })
 
-    test.each([[[]]] as [Evaluable[]][])('%p should throw', (operands) => {
-      expect(() => new And(operands).evaluate({})).toThrowError()
+  describe('evaluate', () => {
+    it.each([
+      [and(value(true), value(true)), true],
+      [and(value(true), value(false)), false],
+      [and(value(false), value(true)), false],
+      [and(value(false), value(false)), false],
+    ])('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
     })
   })
 
   describe('simplify', () => {
-    it.each<[And, Evaluable | boolean]>([
-      [new And([notSimplified(), operand(true)]), notSimplified()],
-      [new And([notSimplified(), operand(false), notSimplified()]), false],
-      [new And([operand(true), operand(true)]), true],
+    it.each<[Logical, Evaluable | boolean]>([
+      [and(identityEvaluable(), value(true)), identityEvaluable()],
+      [and(identityEvaluable(), value(false), identityEvaluable()), false],
+      [and(value(true), value(true)), true],
       [
-        new And([notSimplified(), operand(true), notSimplified()]),
-        new And([notSimplified(), notSimplified()]),
+        and(identityEvaluable(), value(true), identityEvaluable()),
+        and(identityEvaluable(), identityEvaluable()),
       ],
-    ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, [])).toEqual(expected)
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(`${expected}`)
     })
   })
 
   describe('serialize', () => {
-    it.each<[[Operand, Operand], [Input, Input]]>([
-      [
-        [new Value(10), new Reference('test')],
-        [10, '$test'],
-      ],
-    ])('%p should serialize to %p', (operands, expected) => {
-      expect(new And(operands).serialize(defaultOptions)).toEqual([
-        'AND',
-        ...expected,
-      ])
+    it.each<[Logical, unknown[]]>([
+      [and(value(10), reference('test')), ['AND', 10, '$test']],
+    ])('%p should serialize to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'AND']]),
+        })
+      ).toEqual(expected)
+    })
+  })
+
+  describe('toString', () => {
+    it.each([
+      [and(value(10), reference('ref'), value(5)), '(10 AND {ref} AND 5)'],
+    ])('%p should be %p', (evaluable, expected) => {
+      expect(evaluable.toString()).toBe(expected)
     })
   })
 })

@@ -1,52 +1,54 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Reference } from '../../../../operand/reference'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Not } from '../../not'
+import { identityEvaluable } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { Logical } from '../..'
+import { KIND, not } from '../../not'
 
-describe('Expression - Logical - Not', () => {
+describe('expression - logical - not', () => {
   describe('evaluate', () => {
-    test.each([
-      // Truthy
-      [operand(false), true],
-      // Falsy
-      [operand(true), false],
-    ] as [Evaluable, boolean][])(
-      '%p should evaluate as %p',
-      (operand, expected) => {
-        expect(new Not(operand).evaluate({})).toBe(expected)
-      }
-    )
-
-    test.each([[[]], [[operand(true), operand(false)]], [[operand(0)]]] as [
-      Evaluable[]
-    ][])('%p should throw', (operands) => {
-      expect(() => new Not(...operands).evaluate({})).toThrowError()
+    it.each([
+      [not(value(false)), true],
+      [not(value(true)), false],
+    ])('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
     })
+
+    expect(() => not(value(1)).evaluate({})).toThrowError()
   })
 
   describe('simplify', () => {
-    it.each<[Not, Evaluable | boolean]>([
-      [new Not(notSimplified()), new Not(notSimplified())],
-      [new Not(operand(false)), true],
-      [new Not(operand(true)), false],
-    ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, [])).toEqual(expected)
+    it.each<[Logical, Evaluable | boolean]>([
+      [not(identityEvaluable()), not(identityEvaluable())],
+      [not(value(false)), true],
+      [not(value(true)), false],
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(`${expected}`)
     })
+
+    expect(() => not(value(1)).simplify({})).toThrowError()
   })
 
   describe('serialize', () => {
-    it.each<[Operand, [Input]]>([
-      [new Reference('test'), ['$test']],
-      [new Value(10), [10]],
-    ])('%p should serialize to %p', (operands, expected) => {
-      expect(new Not(operands).serialize(defaultOptions)).toEqual([
-        'NOT',
-        ...expected,
-      ])
+    it.each<[Logical, unknown]>([
+      [not(reference('test')), '$test'],
+      [not(value(10)), 10],
+    ])('%p should serialize to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'NOT']]),
+        })
+      ).toEqual(['NOT', expected])
     })
+  })
+
+  describe('toString', () => {
+    it.each([[not(reference('ref')), '(NOT {ref})']])(
+      '%p should be %p',
+      (evaluable, expected) => {
+        expect(evaluable.toString()).toBe(expected)
+      }
+    )
   })
 })

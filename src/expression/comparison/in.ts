@@ -1,70 +1,32 @@
-/**
- * Comparison expression module.
- * @module illogical/expression/comparison
- */
+import { asExpected } from '../../common/utils'
+import { Evaluable, EvaluatedPrimitive } from '../../evaluable'
+import { isCollection } from '../../operand/collection'
+import { Comparison, comparison } from './comparison'
 
-import { Evaluable, Result } from '../../common/evaluable'
-import { Comparison } from '../comparison'
+export const KIND = Symbol('in')
 
-// Operator key
-export const OPERATOR = Symbol('IN')
+export const In = (left: Evaluable, right: Evaluable): Comparison => {
+  const leftIsArray = isCollection(left)
+  const rightIsArray = isCollection(right)
 
-/**
- * In comparison expression
- */
-export class In extends Comparison {
-  /**
-   * @constructor
-   * @param {Evaluable} left Left operand.
-   * @param {Evaluable} right Right operand.
-   */
-  constructor(...args: Evaluable[])
-  constructor(left: Evaluable, right: Evaluable) {
-    if (arguments.length !== 2) {
-      throw new Error('comparison expression expects left and right operands')
-    }
-    super('in', OPERATOR, left, right)
+  if (leftIsArray && rightIsArray) {
+    throw new Error('invalid IN expression, both operands are an array')
+  }
+  if (!leftIsArray && !rightIsArray) {
+    throw new Error('invalid IN expression, non of the operands are an array')
   }
 
-  /**
-   * {@link Comparison.comparison}
-   */
-  comparison(left: Result, right: Result): boolean {
-    if (
-      left === undefined ||
-      left === null ||
-      right === undefined ||
-      right === null
-    ) {
-      return false
-    }
-
-    const leftArray = Array.isArray(left)
-    const rightArray = Array.isArray(right)
-    if (leftArray && rightArray) {
-      throw new Error('invalid IN expression, both operands are array')
-    }
-    if (!leftArray && !rightArray) {
-      throw new Error('invalid IN expression, non of the operands is array')
-    }
-    if (leftArray) {
-      return (
-        (left as (string | number)[]).indexOf(right as string | number) > -1
-      )
-    }
-    return (right as (string | number)[]).indexOf(left as string | number) > -1
-  }
-
-  /**
-   * Get the strict representation of the expression.
-   * @return {string}
-   */
-  toString(): string {
-    const left = this.left.toString()
-    const right = this.right.toString()
-    if (left.startsWith('[')) {
-      return `(${right} ${this.operator} ${left})`
-    }
-    return `(${left} ${this.operator} ${right})`
-  }
+  return comparison({
+    operator: 'in',
+    kind: KIND,
+    operands: [left, right],
+    comparison: (left, right) =>
+      asExpected<EvaluatedPrimitive[]>(leftIsArray ? left : right).indexOf(
+        asExpected<EvaluatedPrimitive>(leftIsArray ? right : left)
+      ) > -1,
+    toString: () =>
+      leftIsArray
+        ? `(${right.toString()} in ${left.toString()})`
+        : `(${left.toString()} in ${right.toString()})`,
+  })
 }

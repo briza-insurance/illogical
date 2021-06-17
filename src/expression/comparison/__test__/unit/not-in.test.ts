@@ -1,111 +1,80 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Collection } from '../../../../operand/collection'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { NotIn } from '../../not-in'
+import { identityEvaluable } from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { collection, reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { KIND, notIn } from '../../not-in'
 
-describe('Expression - Comparison - Not In', () => {
+describe('expression - comparison - not in', () => {
   describe('constructor', () => {
-    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
-      'arguments %p should throw',
-      (args) => {
-        expect(() => new NotIn(...args)).toThrowError()
-      }
-    )
-  })
-
-  const testCases: [Operand, Operand, boolean][] = [
-    // Truthy
-    [operand(0), new Collection([new Value(1), new Value(2)]), true],
-    [operand('0'), new Collection([new Value('1'), new Value('2')]), true],
-    [operand(true), new Collection([new Value(false), new Value(false)]), true],
-    // Truthy - Bi-directional
-    [new Collection([new Value(1), new Value(2)]), new Value(0), true],
-    [new Collection([new Value('1'), new Value('2')]), new Value('0'), true],
-    [
-      new Collection([new Value(false), new Value(false)]),
-      new Value(true),
-      true,
-    ],
-    // Truthy - non-comparable types
-    [operand('0'), new Collection([new Value(0), new Value(1)]), true],
-    [operand(0), new Collection([new Value('0'), new Value('1')]), true],
-    // Falsy
-    [operand(1), new Collection([new Value(1), new Value(2)]), false],
-    [operand('1'), new Collection([new Value('1'), new Value('2')]), false],
-    [
-      operand(false),
-      new Collection([new Value(false), new Value(false)]),
-      false,
-    ],
-  ]
-
-  describe('evaluate', () => {
-    test.each(testCases)(
-      '%p and %p should evaluate as %p',
-      (left, right, expected) => {
-        expect(new NotIn(left, right).evaluate({})).toBe(expected)
-      }
-    )
-
-    test.each([
+    it.each([
       // Missing haystack
-      [operand(1), operand(1)],
+      [value(1), value(1)],
       // Double haystack
-      [new Collection([new Value(1)]), new Collection([new Value(1)])],
-    ] as [Evaluable, Evaluable][])('%p and %p should throw', (left, right) => {
-      expect(() => new NotIn(left, right).evaluate({})).toThrowError()
+      [collection([value(1)]), collection([value(1)])],
+    ])('%p and %p should throw', (left, right) => {
+      expect(() => notIn(left, right).evaluate({})).toThrowError()
     })
   })
 
-  describe('toString', () => {
-    test.each([
-      [
-        new Value(0),
-        new Collection([new Value(1), new Value(2)]),
-        '(0 not in [1, 2])',
-      ],
-      [
-        new Collection([new Value(1), new Value(2)]),
-        new Value(0),
-        '(0 not in [1, 2])',
-      ],
-    ] as [Evaluable, Evaluable, string][])(
-      '%p and %p should be %p',
-      (left, right, expected) => {
-        expect(new NotIn(left, right).toString()).toBe(expected)
-      }
-    )
+  const testCases: [Evaluable, boolean][] = [
+    // Truthy
+    [notIn(value(0), collection([value(1), value(2)])), true],
+    [notIn(value('0'), collection([value('1'), value('2')])), true],
+    [notIn(value(true), collection([value(false), value(false)])), true],
+    // Truthy - Bi-directional
+    [notIn(collection([value(1), value(2)]), value(0)), true],
+    [notIn(collection([value('1'), value('2')]), value('0')), true],
+    [notIn(collection([value(false), value(false)]), value(true)), true],
+    // Truthy - non-comparable types
+    [notIn(value('0'), collection([value(0), value(1)])), true],
+    [notIn(value(0), collection([value('0'), value('1')])), true],
+    // Falsy
+    [notIn(value(1), collection([value(1), value(2)])), false],
+    [notIn(value('1'), collection([value('1'), value('2')])), false],
+    [notIn(value(false), collection([value(false), value(false)])), false],
+  ]
+
+  describe('evaluate', () => {
+    it.each(testCases)('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
+    })
   })
 
   describe('simplify', () => {
-    test.each<[Operand, Operand, boolean | 'self']>([
-      [operand(10), notSimplified(), 'self'],
-      [notSimplified(), operand(10), 'self'],
-      [notSimplified(), notSimplified(), 'self'],
+    it.each<[Evaluable, 'self' | boolean]>([
+      [notIn(value(10), collection([identityEvaluable()])), 'self'],
+      [notIn(collection([identityEvaluable()]), value(10)), 'self'],
+      [notIn(identityEvaluable(), collection([identityEvaluable()])), 'self'],
       ...testCases,
-    ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new NotIn(left, right)
-      const result = equal.simplify({}, [])
-      if (expected === 'self') {
-        expect(result).toBe(equal)
-      } else {
-        expect(result).toEqual(expected)
-      }
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(
+        `${expected == 'self' ? evaluable : expected}`
+      )
     })
   })
 
   describe('serialize', () => {
-    it.each<[Operand, Operand, [Input, Input]]>([
-      [new Value(10), new Value(20), [10, 20]],
-    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new NotIn(left, right).serialize(defaultOptions)).toEqual([
-        'NOT IN',
-        ...serialized,
-      ])
+    it.each<[Evaluable, unknown[]]>([
+      [
+        notIn(value(10), collection([reference('ref')])),
+        ['KIND', 10, ['$ref']],
+      ],
+    ])('%p should be serialized to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'KIND']]),
+        })
+      ).toEqual(expected)
+    })
+  })
+
+  describe('toString', () => {
+    it.each([
+      [notIn(value(10), collection([reference('ref')])), '(10 not in [{ref}])'],
+      [notIn(collection([reference('ref')]), value(10)), '(10 not in [{ref}])'],
+    ])('%p should be %p', (evaluable, expected) => {
+      expect(evaluable.toString()).toBe(expected)
     })
   })
 })

@@ -1,73 +1,69 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Operand } from '../../../../operand'
-import { Collection } from '../../../../operand/collection'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Prefix } from '../../prefix'
+import {
+  identityEvaluable,
+  undefinedOperand,
+} from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { collection, reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { KIND, prefix } from '../../prefix'
 
-describe('Expression - Comparison - Prefix', () => {
-  describe('constructor', () => {
-    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
-      'arguments %p should throw',
-      (args) => {
-        expect(() => new Prefix(...args)).toThrowError()
-      }
-    )
-  })
-
-  const testCases: [Operand, Operand, boolean][] = [
+describe('expression - comparison - prefix', () => {
+  const testCases: [Evaluable, boolean][] = [
     // Truthy
-    [operand('a'), operand('abc'), true],
-    [operand('a'), operand('a'), true],
+    [prefix(value('a'), value('abc')), true],
+    [prefix(value('a'), value('a')), true],
     // Falsy
-    [operand('b'), operand('abc'), false],
-    [operand('b'), operand(''), false],
+    [prefix(value('b'), value('abc')), false],
+    [prefix(value('b'), value('')), false],
     // Falsy - non-comparable types
-    [operand('a'), operand(1), false],
-    [operand('a'), operand(true), false],
-    [operand('a'), operand(false), false],
-    [operand('a'), operand(null), false],
-    [operand('a'), operand(undefined), false],
-    [operand('a'), new Collection([new Value(0)]), false],
-    [operand('a'), new Collection([new Value('0')]), false],
-    [operand(1), operand('a'), false],
+    [prefix(value('a'), value(1)), false],
+    [prefix(value('a'), value(true)), false],
+    [prefix(value('a'), value(false)), false],
+    [prefix(value('a'), value(null)), false],
+    [prefix(value('a'), undefinedOperand()), false],
+    [prefix(value('a'), collection([value(0)])), false],
+    [prefix(value('a'), collection([value('0')])), false],
+    [prefix(value(1), value('a')), false],
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)(
-      '%p and %p should evaluate as %p',
-      (left, right, expected) => {
-        expect(new Prefix(left, right).evaluate({})).toBe(expected)
-      }
-    )
+    it.each(testCases)('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
+    })
   })
 
   describe('simplify', () => {
-    test.each<[Operand, Operand, boolean | 'self']>([
-      [operand(10), notSimplified(), 'self'],
-      [notSimplified(), operand(10), 'self'],
-      [notSimplified(), notSimplified(), 'self'],
+    it.each<[Evaluable, 'self' | boolean]>([
+      [prefix(value(10), identityEvaluable()), 'self'],
+      [prefix(identityEvaluable(), value(10)), 'self'],
+      [prefix(identityEvaluable(), identityEvaluable()), 'self'],
       ...testCases,
-    ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new Prefix(left, right)
-      const result = equal.simplify({}, [])
-      if (expected === 'self') {
-        expect(result).toBe(equal)
-      } else {
-        expect(result).toEqual(expected)
-      }
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(
+        `${expected == 'self' ? evaluable : expected}`
+      )
     })
   })
 
   describe('serialize', () => {
-    it.each<[Operand, Operand, [Input, Input]]>([
-      [new Value(10), new Value(20), [10, 20]],
-    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new Prefix(left, right).serialize(defaultOptions)).toEqual([
-        'PREFIX',
-        ...serialized,
-      ])
+    it.each<[Evaluable, unknown[]]>([
+      [prefix(value('prefix'), reference('ref')), ['KIND', 'prefix', '$ref']],
+    ])('%p should be serialized to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'KIND']]),
+        })
+      ).toEqual(expected)
     })
+  })
+
+  describe('toString', () => {
+    it.each([[prefix(value('prefix'), reference('ref')), '(<"prefix">{ref})']])(
+      '%p should be %p',
+      (evaluable, expected) => {
+        expect(evaluable.toString()).toBe(expected)
+      }
+    )
   })
 })

@@ -1,63 +1,61 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Operand } from '../../../../operand'
-import { Collection } from '../../../../operand/collection'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Present } from '../../present'
+import {
+  identityEvaluable,
+  undefinedOperand,
+} from '../../../../__test__/helpers'
+import { Evaluable } from '../../../../evaluable'
+import { collection, reference, value } from '../../../../operand'
+import { defaultReferenceSerializeOptions } from '../../../../operand/reference'
+import { KIND, present } from '../../present'
 
-describe('Expression - Comparison - Undefined', () => {
-  describe('constructor', () => {
-    test.each([[[]], [[operand(5), operand(5)]]])(
-      'arguments %p should throw',
-      (args) => {
-        expect(() => new Present(...args)).toThrowError()
-      }
-    )
-  })
-
-  const testCases: [Operand, boolean][] = [
+describe('expression - comparison - present', () => {
+  const testCases: [Evaluable, boolean][] = [
     // Truthy
-    [operand(1), true],
-    [operand('1'), true],
-    [operand(true), true],
-    [operand(false), true],
-    [new Collection([new Value(1)]), true],
-    [new Collection([new Value('1')]), true],
+    [present(value(1)), true],
+    [present(value('1')), true],
+    [present(value(true)), true],
+    [present(value(false)), true],
+    [present(collection([value(1)])), true],
+    [present(collection([value('1')])), true],
     // Falsy
-    [operand(undefined), false],
-    [operand(null), false],
+    [present(undefinedOperand()), false],
+    [present(value(null)), false],
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)('%p should evaluate as %p', (operand, expected) => {
-      expect(new Present(operand).evaluate({})).toBe(expected)
+    it.each(testCases)('%p should evaluate as %p', (evaluable, expected) => {
+      expect(evaluable.evaluate({})).toBe(expected)
     })
   })
 
   describe('simplify', () => {
-    test.each<[Operand, boolean | 'self']>([
-      [notSimplified(), 'self'],
+    it.each<[Evaluable, 'self' | boolean]>([
+      [present(identityEvaluable()), 'self'],
       ...testCases,
-    ])('%p should be simplified to $p', (left, expected) => {
-      const equal = new Present(left)
-      const result = equal.simplify({}, [])
-      if (expected === 'self') {
-        expect(result).toBe(equal)
-      } else {
-        expect(result).toEqual(expected)
-      }
+    ])('%p should simplify to %p', (evaluable, expected) => {
+      expect(`${evaluable.simplify({})}`).toBe(
+        `${expected == 'self' ? evaluable : expected}`
+      )
     })
   })
 
   describe('serialize', () => {
-    it.each<[Operand, [Input]]>([[new Value(10), [10]]])(
-      '%p and %p should be serialized to %p',
-      (left, serialized) => {
-        expect(new Present(left).serialize(defaultOptions)).toEqual([
-          'PRESENT',
-          ...serialized,
-        ])
+    it.each<[Evaluable, unknown[]]>([
+      [present(reference('ref')), ['KIND', '$ref']],
+    ])('%p should be serialized to %p', (evaluable, expected) => {
+      expect(
+        evaluable.serialize({
+          reference: defaultReferenceSerializeOptions,
+          operatorMapping: new Map([[KIND, 'KIND']]),
+        })
+      ).toEqual(expected)
+    })
+  })
+
+  describe('toString', () => {
+    it.each([[present(reference('ref')), '({ref} is present)']])(
+      '%p should be %p',
+      (evaluable, expected) => {
+        expect(evaluable.toString()).toBe(expected)
       }
     )
   })
