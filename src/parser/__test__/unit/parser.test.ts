@@ -63,7 +63,7 @@ describe('Condition Engine - Parser', () => {
         ['unexpected', undefined],
         [1, undefined],
       ])('%p should be resolved as %p', (value, expected) => {
-        expect(toReferencePath(options)(value)).toBe(expected)
+        expect(toReferencePath(value, options)).toBe(expected)
       })
     })
 
@@ -76,7 +76,7 @@ describe('Condition Engine - Parser', () => {
       ])(
         '%p with %p escape character should be evaluated as %p',
         (value, escapeCharacter, expected) => {
-          expect(isEscaped(escapeCharacter)(value)).toBe(expected)
+          expect(isEscaped(value, escapeCharacter)).toBe(expected)
         }
       )
     })

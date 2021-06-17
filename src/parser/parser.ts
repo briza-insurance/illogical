@@ -60,72 +60,73 @@ type ParsingOptions = {
   escapeCharacter?: string
 }
 
-export const toReferencePath =
-  (options: ReferenceSerializeOptions) =>
-  (value: unknown): string | undefined =>
-    isString(value) ? options.from(value) : undefined
+export const toReferencePath = (
+  value: unknown,
+  options: ReferenceSerializeOptions
+): string | undefined => (isString(value) ? options.from(value) : undefined)
 
-export const isEscaped =
-  (escapeCharacter?: string) =>
-  (value: unknown): boolean =>
-    !isUndefined(escapeCharacter) &&
-    isString(value) &&
-    value.startsWith(escapeCharacter)
+export const isEscaped = (value: unknown, escapeCharacter?: string): boolean =>
+  !isUndefined(escapeCharacter) &&
+  isString(value) &&
+  value.startsWith(escapeCharacter)
 
-export const createOperand =
-  (options: ParsingOptions) =>
-  (input: unknown | unknown[]): Evaluable => {
-    if (isUndefined(input)) {
+export const createOperand = (
+  input: unknown | unknown[],
+  options: ParsingOptions
+): Evaluable => {
+  if (isUndefined(input)) {
+    throw new Error('invalid undefined operand')
+  }
+
+  if (Array.isArray(input)) {
+    if (!input.length) {
       throw new Error('invalid undefined operand')
     }
-
-    if (Array.isArray(input)) {
-      if (!input.length) {
-        throw new Error('invalid undefined operand')
-      }
-      return collection(input.map(parse(options)))
-    }
-
-    const referencePath = toReferencePath(options.referenceSerializeOptions)(
-      input
-    )
-    if (referencePath) {
-      return reference(referencePath)
-    }
-
-    if (!isEvaluatedPrimitive(input)) {
-      throw new Error(`invalid operand, ${input}`)
-    }
-
-    return value(input)
+    return collection(input.map(parse(options)))
   }
 
-export const createExpression =
-  (options: ParsingOptions) =>
-  (expression: unknown[]): Logical | Comparison | undefined => {
-    const [operator, ...operands] = expression
-    const evaluable = options.operatorExpressionMapping.get(`${operator}`)
-
-    if (evaluable) {
-      return evaluable(...operands.map(parse(options)))
-    }
+  const referencePath = toReferencePath(
+    input,
+    options.referenceSerializeOptions
+  )
+  if (referencePath) {
+    return reference(referencePath)
   }
+
+  if (!isEvaluatedPrimitive(input)) {
+    throw new Error(`invalid operand, ${input}`)
+  }
+
+  return value(input)
+}
+
+export const createExpression = (
+  expression: unknown[],
+  options: ParsingOptions
+): Logical | Comparison | undefined => {
+  const [operator, ...operands] = expression
+  const evaluable = options.operatorExpressionMapping.get(`${operator}`)
+
+  if (evaluable) {
+    return evaluable(...operands.map(parse(options)))
+  }
+}
 
 export const parse =
   (options: ParsingOptions) =>
   (expression: unknown | unknown[]): Evaluable => {
     if (!Array.isArray(expression) || expression.length < 2) {
-      return createOperand(options)(expression)
+      return createOperand(expression, options)
     }
 
     const [first, ...rest] = expression
-    if (isEscaped(options.escapeCharacter)(first)) {
-      return createOperand(options)([first.slice(1), ...rest])
+    if (isEscaped(first, options.escapeCharacter)) {
+      return createOperand([first.slice(1), ...rest], options)
     }
 
     return (
-      createExpression(options)(expression) ??
-      createOperand(options)(expression)
+      createExpression(expression, options) ??
+      createOperand(expression, options)
     )
   }
 
