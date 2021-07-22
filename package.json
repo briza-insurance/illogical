@@ -1,6 +1,6 @@
 {
   "name": "@briza/illogical",
-  "version": "1.4.4",
+  "version": "1.4.6",
   "description": "A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.",
   "main": "lib/illogical.js",
   "module": "lib/illogical.esm.js",
@@ -63,7 +63,7 @@
     "jest": "^26.6.3",
     "license-checker": "^25.0.1",
     "prettier": "^2.3.2",
-    "rollup": "^2.52.6",
+    "rollup": "^2.53.3",
     "rollup-plugin-eslint": "^7.0.0",
     "ts-jest": "^26.5.6",
     "typedoc": "^0.21.2",
