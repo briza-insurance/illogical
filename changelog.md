@@ -1,5 +1,13 @@
 # illogical changelog
 
+## 1.4.3
+
+- Prevent unexpected parsing of any expression used as an operand in a comparison expression
+
+## 1.4.2
+
+- Change `@babel/env` preset target to `> 1%, node 12`
+
 ## 1.4.0
 
 - Add support for reference variable data type casting before expression evaluation

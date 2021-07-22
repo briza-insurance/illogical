@@ -359,6 +359,21 @@ describe('Condition Engine - Parser', () => {
         new In(new Value(5), new Collection([new Value(5)])),
       ],
       [
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_IN),
+          5,
+          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 2, 2],
+        ],
+        new In(
+          new Value(5),
+          new Collection([
+            new Value(defaultOptions.operatorMapping.get(OPERATOR_EQ)),
+            new Value(2),
+            new Value(2),
+          ])
+        ),
+      ],
+      [
         [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
         new NotIn(new Value(5), new Collection([new Value(5)])),
       ],
@@ -374,11 +389,11 @@ describe('Condition Engine - Parser', () => {
         [
           defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
           ['a', 'b'],
-          ['a'],
+          ['IN'],
         ],
         new Overlap(
           new Collection([new Value('a'), new Value('b')]),
-          new Collection([new Value('a')])
+          new Collection([new Value('IN')])
         ),
       ],
       // Reference

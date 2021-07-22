@@ -26,7 +26,7 @@ describe('Operand - Collection', () => {
       '%p should throw',
       (value) => {
         expect(() =>
-          new Collection((value as unknown) as []).evaluate({})
+          new Collection(value as unknown as []).evaluate({})
         ).toThrowError()
       }
     )
