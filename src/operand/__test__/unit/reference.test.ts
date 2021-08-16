@@ -85,7 +85,14 @@ describe('Operand - Value', () => {
   })
 
   describe('simplify', () => {
-    test.each([
+    test.each<
+      [
+        value: string,
+        expected: unknown,
+        alwaysEvaluate?: false | string[],
+        deferEvaluate?: false | string[]
+      ]
+    >([
       // Existing
       ['RefA', 1, []],
       // Nested
@@ -110,11 +117,25 @@ describe('Operand - Value', () => {
       ['Ref{RefB}', new Reference('Ref{RefB}'), []],
       // Ignore keys
       ['RefB', undefined, ['RefB']],
-    ])('%p should simplify to %p', (value, expected, ignoredKeys = []) => {
-      expect(new Reference(value).simplify(context, ignoredKeys)).toEqual(
-        expected
-      )
-    })
+      // Always/Never evaluate
+      ['RefB', undefined, ['RefB'], false],
+      ['RefB', undefined, ['RefB'], []],
+      ['RefB', undefined, ['RefB'], ['RefB']],
+      ['RefB', undefined, false, []],
+      ['RefB', undefined, [], []],
+      ['RefB', new Reference('RefB')],
+      ['RefB', new Reference('RefB'), [], false],
+      ['RefB', new Reference('RefB'), false, ['RefB']],
+      ['RefB', new Reference('RefB'), [], ['RefB']],
+      ['RefB', new Reference('RefB'), false, false],
+    ])(
+      '%p should simplify to %p',
+      (value, expected, alwaysEvaluate = false, deferEvaluate = false) => {
+        expect(
+          new Reference(value).simplify(context, alwaysEvaluate, deferEvaluate)
+        ).toEqual(expected)
+      }
+    )
   })
 
   describe('serialize', () => {

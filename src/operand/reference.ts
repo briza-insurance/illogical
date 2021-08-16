@@ -132,7 +132,11 @@ export class Reference extends Operand {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable {
+  simplify(
+    ctx: Context,
+    alwaysEvaluate: false | string[] = false,
+    deferEvaluate: false | string[] = false
+  ): Result | Evaluable {
     const keys = extractKeys(ctx, this.key)
 
     if (!keys) {
@@ -140,7 +144,10 @@ export class Reference extends Operand {
     }
 
     const key = keys[0].replace(/\[.+$/, '')
-    if (ctx[key] !== undefined || ignoreKeys.includes(key)) {
+    const doEval =
+      (alwaysEvaluate !== false && alwaysEvaluate.includes(key)) ||
+      (deferEvaluate !== false && !deferEvaluate.includes(key))
+    if (ctx[key] !== undefined || doEval) {
       return this.evaluate(ctx)
     }
     return this
