@@ -13,7 +13,7 @@ export declare abstract class Operand implements Evaluable {
     /**
      * {@link Evaluable.simplify}
      */
-    abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    abstract simplify(ctx: Context, alwaysEvaluate?: false | string[], deferEvaluate?: false | string[]): Result | Evaluable;
     /**
      * {@link Evaluable.serialize}
      */

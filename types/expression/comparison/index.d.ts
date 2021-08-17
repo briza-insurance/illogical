@@ -1,4 +1,4 @@
-import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable';
+import { Context, Evaluable, EvaluableType, Result, SimplifyArgs } from '../../common/evaluable';
 import { Operand } from '../../operand';
 import { ExpressionInput } from '../../parser';
 import { Options } from '../../parser/options';
@@ -37,7 +37,7 @@ export declare abstract class Comparison implements Evaluable {
     /**
      * {@link Evaluable.simplify}
      */
-    simplify(...args: [Context, string[]]): Result | Evaluable;
+    simplify(...args: SimplifyArgs): Result | Evaluable;
     /**
      * {@link Evaluable.serialize}
      */

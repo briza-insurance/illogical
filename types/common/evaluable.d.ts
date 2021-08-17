@@ -35,10 +35,13 @@ export interface Evaluable {
      * Simplifies this Evaluable when possible.
      *
      * @param {Context} ctx context for the evaluation
-     * @param {string[]} ignoreKeys keys to be considered present even if their not present in the context
+     * @param {false | string[]} alwaysEvaluate keys to be considered present even if they are not present in the context
+     * @param {false | string[]} deferEvaluate keys to be considered not present unless they are also in `alwaysEvaluate`;
+     *  when `alwaysEvaluate` is set to `false` and `deferEvaluate` is an array, every key that is not in `deferEvaluate`
+     *  is considered to be present and thus will be evaluated
      * @returns {Result | Evaluable} simplified value or itself
      */
-    simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    simplify(ctx: Context, alwaysEvaluate?: false | string[], deferEvaluate?: false | string[]): Result | Evaluable;
     /**
      * Serializes the Evaluable to its input format.
      *
@@ -50,4 +53,5 @@ export interface Evaluable {
      */
     toString(): string;
 }
+export declare type SimplifyArgs = Parameters<Evaluable['simplify']>;
 export {};

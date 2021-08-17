@@ -22,7 +22,7 @@ export declare abstract class Logical implements Evaluable {
     /**
      * {@link Evaluable.simplify}
      */
-    abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable;
+    abstract simplify(ctx: Context, alwaysEvaluate?: false | string[], deferEvaluate?: false | string[]): Result | Evaluable;
     /**
      * Get the strict representation of the expression.
      * @return {string}
