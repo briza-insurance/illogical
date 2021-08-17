@@ -79,3 +79,5 @@ export interface Evaluable {
    */
   toString(): string
 }
+
+export type SimplifyArgs = Parameters<Evaluable['simplify']>

@@ -1,4 +1,9 @@
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import {
+  Context,
+  Evaluable,
+  Result,
+  SimplifyArgs,
+} from '../../common/evaluable'
 import { isBoolean } from '../../common/type-check'
 import { Logical } from '../logical'
 import { Nor } from './nor'
@@ -52,7 +57,7 @@ export class Xor extends Logical {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(...args: [Context, string[]]): boolean | Evaluable {
+  simplify(...args: SimplifyArgs): boolean | Evaluable {
     const [evaluablesLeft, trueCount] = this.operands.reduce<
       [Evaluable[], number]
     >(

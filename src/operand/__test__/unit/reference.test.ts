@@ -115,9 +115,8 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', new Reference('RefA{RefA}'), []],
       ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
       ['Ref{RefB}', new Reference('Ref{RefB}'), []],
-      // Ignore keys
+      // Always/Defer evaluate
       ['RefB', undefined, ['RefB']],
-      // Always/Never evaluate
       ['RefB', undefined, ['RefB'], false],
       ['RefB', undefined, ['RefB'], []],
       ['RefB', undefined, ['RefB'], ['RefB']],

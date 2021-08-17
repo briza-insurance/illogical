@@ -3,6 +3,7 @@ import {
   Evaluable,
   EvaluableType,
   Result,
+  SimplifyArgs,
 } from '../../common/evaluable'
 import { isEvaluable } from '../../common/type-check'
 import { Operand } from '../../operand'
@@ -54,7 +55,7 @@ export abstract class Comparison implements Evaluable {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(...args: [Context, string[]]): Result | Evaluable {
+  simplify(...args: SimplifyArgs): Result | Evaluable {
     const left = this.left.simplify(...args)
     const right = this.right.simplify(...args)
     if (!isEvaluable(left) && !isEvaluable(right)) {
