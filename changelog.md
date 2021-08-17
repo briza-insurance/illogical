@@ -1,5 +1,10 @@
 # illogical changelog
 
+## 1.5.0
+
+- Add simplify capability to evaluate the expression for all referred values
+  not present in the context except for a specified list of keys
+
 ## 1.4.3
 
 - Prevent unexpected parsing of any expression used as an operand in a comparison expression
