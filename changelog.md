@@ -2,8 +2,8 @@
 
 ## 1.5.0
 
-- Add simplify capability to evaluate the expression for all referred values
-  not present in the context except for a specified list of keys
+- Add simplify capability to strictly evaluate the expression for all referred values
+  not present in the context except for a specified list of optional keys
 
 ## 1.4.3
 

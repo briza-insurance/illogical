@@ -89,8 +89,8 @@ describe('Operand - Value', () => {
       [
         value: string,
         expected: unknown,
-        strictKeys?: false | string[],
-        optionalKeys?: false | string[]
+        strictKeys?: string[],
+        optionalKeys?: string[]
       ]
     >([
       // Existing
@@ -115,21 +115,21 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', new Reference('RefA{RefA}'), []],
       ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
       ['Ref{RefB}', new Reference('Ref{RefB}'), []],
-      // Always/Defer evaluate
+      // Strict/Optional keys
       ['RefB', undefined, ['RefB']],
-      ['RefB', undefined, ['RefB'], false],
+      ['RefB', undefined, ['RefB'], undefined],
       ['RefB', undefined, ['RefB'], []],
       ['RefB', undefined, ['RefB'], ['RefB']],
-      ['RefB', undefined, false, []],
+      ['RefB', undefined, undefined, []],
       ['RefB', undefined, [], []],
       ['RefB', new Reference('RefB')],
-      ['RefB', new Reference('RefB'), [], false],
-      ['RefB', new Reference('RefB'), false, ['RefB']],
+      ['RefB', new Reference('RefB'), [], undefined],
+      ['RefB', new Reference('RefB'), undefined, ['RefB']],
       ['RefB', new Reference('RefB'), [], ['RefB']],
-      ['RefB', new Reference('RefB'), false, false],
+      ['RefB', new Reference('RefB'), undefined, undefined],
     ])(
       '%p should simplify to %p',
-      (value, expected, strictKeys = false, optionalKeys = false) => {
+      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
           new Reference(value).simplify(context, strictKeys, optionalKeys)
         ).toEqual(expected)

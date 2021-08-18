@@ -55,16 +55,16 @@ export interface Evaluable {
    * Simplifies this Evaluable when possible.
    *
    * @param {Context} ctx context for the evaluation
-   * @param {false | string[]} strictKeys keys to be considered present even if they are not present in the context
-   * @param {false | string[]} optionalKeys keys to be considered not present unless they are also in `strictKeys`;
-   *  when `strictKeys` is set to `false` and `optionalKeys` is an array, every key that is not in `optionalKeys`
+   * @param {string[]} strictKeys keys to be considered present even if they are not present in the context
+   * @param {string[]} optionalKeys keys to be considered not present unless they are also in `strictKeys`;
+   *  when `strictKeys` is `undefined` and `optionalKeys` is an array, every key that is not in `optionalKeys`
    *  is considered to be present and thus will be evaluated
    * @returns {Result | Evaluable} simplified value or itself
    */
   simplify(
     ctx: Context,
-    strictKeys?: false | string[],
-    optionalKeys?: false | string[]
+    strictKeys?: string[],
+    optionalKeys?: string[]
   ): Result | Evaluable
 
   /**

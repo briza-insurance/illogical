@@ -192,8 +192,8 @@ Values not found in the context will cause the parent operand not to be evaluate
 as part of the simplified expression.
 
 In some situations we might want to evaluate the expression even if referred value is not
-present. You can provide a list of keys that will be evaluated even if they are not present
-in the context.
+present. You can provide a list of keys that will be strictly evaluated even if they are not
+present in the context.
 
 **Example**
 
@@ -205,8 +205,8 @@ engine.simplify(
 ) // false
 ```
 
-Alternatively we might want to do the opposite and evaluate the expression for all referred values
-not present in the context except for a specified list of keys.
+Alternatively we might want to do the opposite and strictly evaluate the expression for all referred
+values not present in the context except for a specified list of optional keys.
 
 **Example**
 
@@ -214,7 +214,7 @@ not present in the context except for a specified list of keys.
 engine.simplify(
   ['OR', ['==', '$a', 10], ['==', '$b', 20], ['==', '$c', 20]],
   { c: 10 },
-  false,
+  undefined,
   ['b'] // except for '$b' everything not in context will be evaluated to undefined.
 ) // ['==', '$b', 20]
 ```

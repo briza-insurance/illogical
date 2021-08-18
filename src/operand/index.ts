@@ -18,8 +18,8 @@ export abstract class Operand implements Evaluable {
    */
   abstract simplify(
     ctx: Context,
-    strictKeys?: false | string[],
-    optionalKeys?: false | string[]
+    strictKeys?: string[],
+    optionalKeys?: string[]
   ): Result | Evaluable
 
   /**

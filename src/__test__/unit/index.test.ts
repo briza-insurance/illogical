@@ -162,8 +162,8 @@ describe('Condition Engine', () => {
         exp: ExpressionInput,
         ctx: Context,
         expected: boolean | Input,
-        strictKeys?: false | string[],
-        optionalKeys?: false | string[]
+        strictKeys?: string[],
+        optionalKeys?: string[]
       ]
     >([
       [['==', '$a', '$b'], { a: 10, b: 20 }, false, []],
@@ -197,19 +197,25 @@ describe('Condition Engine', () => {
         ['OR', ['==', '$a', '$b'], ['==', '$c', '$d']],
         { a: 10, b: 20 },
         true,
-        false,
+        undefined,
         ['e'],
       ],
       [
         ['OR', ['==', '$a', 10], ['==', '$b', 20], ['==', '$c', 20]],
         { c: 10 },
         ['==', '$b', 20],
-        false,
+        undefined,
         ['b'],
       ],
     ])(
       '%p with context %p should be simplified to %p',
-      (exp, ctx, expected, strictKeys = false, optionalKeys = false) => {
+      (
+        exp,
+        ctx,
+        expected,
+        strictKeys = undefined,
+        optionalKeys = undefined
+      ) => {
         const engine = new Engine()
         expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
           expected
