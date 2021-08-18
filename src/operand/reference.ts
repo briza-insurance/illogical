@@ -144,13 +144,15 @@ export class Reference extends Operand {
     }
 
     const key = keys[0].replace(/\[.+$/, '')
-    const shouldEvaluate =
-      (strictKeys && strictKeys.includes(key)) ||
-      (optionalKeys && !optionalKeys.includes(key))
-    if (ctx[key] !== undefined || shouldEvaluate) {
+
+    if (ctx[key] !== undefined) {
       return this.evaluate(ctx)
     }
-    return this
+
+    return (strictKeys && strictKeys.includes(key)) ||
+      (optionalKeys && !optionalKeys.includes(key))
+      ? undefined
+      : this
   }
 
   /**
