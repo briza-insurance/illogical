@@ -162,8 +162,8 @@ describe('Condition Engine', () => {
         exp: ExpressionInput,
         ctx: Context,
         expected: boolean | Input,
-        alwaysEvaluate?: false | string[],
-        deferEvaluate?: false | string[]
+        strictKeys?: false | string[],
+        optionalKeys?: false | string[]
       ]
     >([
       [['==', '$a', '$b'], { a: 10, b: 20 }, false, []],
@@ -209,11 +209,11 @@ describe('Condition Engine', () => {
       ],
     ])(
       '%p with context %p should be simplified to %p',
-      (exp, ctx, expected, alwaysEvaluate = false, deferEvaluate = false) => {
+      (exp, ctx, expected, strictKeys = false, optionalKeys = false) => {
         const engine = new Engine()
-        expect(
-          engine.simplify(exp, ctx, alwaysEvaluate, deferEvaluate)
-        ).toEqual(expected)
+        expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
+          expected
+        )
       }
     )
   })

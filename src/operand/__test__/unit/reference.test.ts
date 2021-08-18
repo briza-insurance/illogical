@@ -89,8 +89,8 @@ describe('Operand - Value', () => {
       [
         value: string,
         expected: unknown,
-        alwaysEvaluate?: false | string[],
-        deferEvaluate?: false | string[]
+        strictKeys?: false | string[],
+        optionalKeys?: false | string[]
       ]
     >([
       // Existing
@@ -129,9 +129,9 @@ describe('Operand - Value', () => {
       ['RefB', new Reference('RefB'), false, false],
     ])(
       '%p should simplify to %p',
-      (value, expected, alwaysEvaluate = false, deferEvaluate = false) => {
+      (value, expected, strictKeys = false, optionalKeys = false) => {
         expect(
-          new Reference(value).simplify(context, alwaysEvaluate, deferEvaluate)
+          new Reference(value).simplify(context, strictKeys, optionalKeys)
         ).toEqual(expected)
       }
     )

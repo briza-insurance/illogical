@@ -98,10 +98,10 @@ class Engine {
    *
    * @param {ExpressionInput} exp  Raw expression.
    * @param {Context} context Evaluation data context.
-   * @param {false | string[]} alwaysEvaluate keys to be considered present even if they are not present in the context
+   * @param {false | string[]} strictKeys keys to be considered present even if they are not present in the context
    *  Defaults to false
-   * @param {false | string[]} deferEvaluate keys to be considered not present unless they are also in `alwaysEvaluate`;
-   *  when `alwaysEvaluate` is set to `false` and `deferEvaluate` is an array, every key that is not in `deferEvaluate`
+   * @param {false | string[]} optionalKeys keys to be considered not present unless they are also in `strictKeys`;
+   *  when `strictKeys` is set to `false` and `optionalKeys` is an array, every key that is not in `optionalKeys`
    *  is considered to be present and thus will be evaluated
    *  Defaults to false
    * @returns {Inpunt | boolean}
@@ -109,14 +109,10 @@ class Engine {
   simplify(
     exp: ExpressionInput,
     context: Context,
-    alwaysEvaluate: false | string[] = false,
-    deferEvaluate: false | string[] = false
+    strictKeys: false | string[] = false,
+    optionalKeys: false | string[] = false
   ): Input | boolean {
-    const result = this.parse(exp).simplify(
-      context,
-      alwaysEvaluate,
-      deferEvaluate
-    )
+    const result = this.parse(exp).simplify(context, strictKeys, optionalKeys)
     if (isEvaluable(result)) {
       return result.serialize(this.parser.options)
     }
