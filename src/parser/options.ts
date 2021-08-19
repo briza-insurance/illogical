@@ -1,8 +1,3 @@
-/**
- * Parser module.
- * @module illogical/parser
- */
-
 import { isString } from '../common/type-check'
 import { OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from '../expression/comparison/ge'

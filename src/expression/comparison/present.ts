@@ -1,8 +1,3 @@
-/**
- * Present expression module.
- * @module illogical/expression/comparison
- */
-
 import { Evaluable, Result } from '../../common/evaluable'
 import { Value } from '../../operand/value'
 import { ExpressionInput } from '../../parser'

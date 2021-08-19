@@ -1,8 +1,3 @@
-/**
- * Common module.
- * @module illogical/common
- */
-
 import { Evaluable, Result } from './evaluable'
 
 /**

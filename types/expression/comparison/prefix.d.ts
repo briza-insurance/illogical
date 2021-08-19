@@ -1,7 +1,3 @@
-/**
- * Prefix expression module.
- * @module illogical/expression/prefix
- */
 import { Evaluable, Result } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;

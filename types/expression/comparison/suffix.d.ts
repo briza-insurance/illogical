@@ -1,7 +1,3 @@
-/**
- * Suffix expression module.
- * @module illogical/expression/suffix
- */
 import { Evaluable, Result } from '../../common/evaluable';
 import { Comparison } from '../comparison';
 export declare const OPERATOR: unique symbol;

@@ -1,8 +1,3 @@
-/**
- * Logical expression module.
- * @module illogical/expression/logical
- */
-
 import {
   Context,
   Evaluable,

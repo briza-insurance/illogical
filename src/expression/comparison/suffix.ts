@@ -1,8 +1,3 @@
-/**
- * Suffix expression module.
- * @module illogical/expression/suffix
- */
-
 import { Evaluable, Result } from '../../common/evaluable'
 import { isString } from '../../common/type-check'
 import { Comparison } from '../comparison'

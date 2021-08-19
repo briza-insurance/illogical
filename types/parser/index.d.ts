@@ -1,7 +1,3 @@
-/**
- * Parser module.
- * @module illogical/parser
- */
 import { Evaluable } from '../common/evaluable';
 import { Options } from './options';
 export declare type Input = string | number | boolean | null | Input[] | [string, ...Input[]];

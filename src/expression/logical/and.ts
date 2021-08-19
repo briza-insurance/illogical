@@ -1,8 +1,3 @@
-/**
- * Logical expression module.
- * @module illogical/expression/logical
- */
-
 import { Context, Evaluable, Result } from '../../common/evaluable'
 import { isBoolean } from '../../common/type-check'
 import { Logical } from '../logical'
