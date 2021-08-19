@@ -63,7 +63,7 @@
 				</a>
 				<p>A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.</p>
 				<blockquote>
-					<p>Revision: May 17, 2021.</p>
+					<p>Revision: August 17, 2021.</p>
 				</blockquote>
 				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
 					<h2>About</h2>
@@ -248,7 +248,7 @@
 					<h3>Simplify</h3>
 				</a>
 				<p>Simplifies an expression with a given context. This is useful when you already have some of
-				the properties of context and wants to try to eveluate the expression.</p>
+				the properties of context and wants to try to evaluate the expression.</p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]], { </span><span style="color: #001080">a:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> }) </span><span style="color: #008000">// [&#039;==&#039;, &#039;$b&#039;, 20]</span>
 
@@ -257,14 +257,24 @@
 				<p>Values not found in the context will cause the parent operand not to be evaluated and returned
 				as part of the simplified expression.</p>
 				<p>In some situations we might want to evaluate the expression even if referred value is not
-					present. You can provide a list of keys that will be evaluated even if they are not present
-				in the context.</p>
+					present. You can provide a list of keys that will be strictly evaluated even if they are not
+				present in the context.</p>
 				<p><strong>Example</strong></p>
 				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">(</span>
 <span style="color: #000000">  [</span><span style="color: #A31515">&#039;AND&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]],</span>
 <span style="color: #000000">  { </span><span style="color: #001080">a:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> },</span>
-<span style="color: #000000">  [</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">] </span><span style="color: #008000">// &#039;$b&#039; will be evaluted to undefined.</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">] </span><span style="color: #008000">// &#039;$b&#039; will be evaluated to undefined.</span>
 <span style="color: #000000">) </span><span style="color: #008000">// false</span>
+</code></pre>
+				<p>Alternatively we might want to do the opposite and strictly evaluate the expression for all referred
+				values not present in the context except for a specified list of optional keys.</p>
+				<p><strong>Example</strong></p>
+				<pre><code class="language-js"><span style="color: #001080">engine</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">(</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;OR&#039;</span><span style="color: #000000">, [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$a&#039;</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$b&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">], [</span><span style="color: #A31515">&#039;==&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;$c&#039;</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000">]],</span>
+<span style="color: #000000">  { </span><span style="color: #001080">c:</span><span style="color: #000000"> </span><span style="color: #098658">10</span><span style="color: #000000"> },</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">undefined</span><span style="color: #000000">,</span>
+<span style="color: #000000">  [</span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">] </span><span style="color: #008000">// except for &#039;$b&#039; everything not in context will be evaluated to undefined.</span>
+<span style="color: #000000">) </span><span style="color: #008000">// [&#039;==&#039;, &#039;$b&#039;, 20]</span>
 </code></pre>
 				<a href="#working-with-expressions" id="working-with-expressions" style="color: inherit; text-decoration: none;">
 					<h2>Working with Expressions</h2>
@@ -371,7 +381,7 @@
 				<a href="#reference" id="reference" style="color: inherit; text-decoration: none;">
 					<h4>Reference</h4>
 				</a>
-				<p>The reference operand&#39;s value is resolved from the <a href="#evaluation-data-context">Evaluation Data Context</a>, where the the operands name is used as key in the context.</p>
+				<p>The reference operand value is resolved from the <a href="#evaluation-data-context">Evaluation Data Context</a>, where the the operands name is used as key in the context.</p>
 				<p>The reference operand must be prefixed with <code>$</code> symbol, e.g.: <code>$name</code>. This might be customized via <a href="#reference-predicate">Reference Predicate Parser Option</a>.</p>
 				<p><strong>Example</strong></p>
 				<table>
@@ -693,7 +703,8 @@
 				<pre><code class="language-typescript"><span style="color: #000000">referenceTransform: (</span><span style="color: #001080">operand</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">string</span>
 </code></pre>
 				<blockquote>
-					<p><strong>Default reference transform:</strong><br>It removes the <code>$</code> symbol at the begging of the operand name.</p>
+					<p><strong>Default reference transform:</strong>
+					It removes the <code>$</code> symbol at the begging of the operand name.</p>
 				</blockquote>
 				<a href="#operator-mapping" id="operator-mapping" style="color: inherit; text-decoration: none;">
 					<h4>Operator Mapping</h4>
