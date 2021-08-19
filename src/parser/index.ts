@@ -1,8 +1,3 @@
-/**
- * Parser module.
- * @module illogical/parser
- */
-
 import { Evaluable, EvaluableType } from '../common/evaluable'
 import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import {

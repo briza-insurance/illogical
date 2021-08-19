@@ -1,8 +1,3 @@
-/**
- * Comparison expression module.
- * @module illogical/expression/comparison
- */
-
 import {
   Context,
   Evaluable,

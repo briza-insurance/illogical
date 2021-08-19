@@ -1,8 +1,3 @@
-/**
- * Common module.
- * @module illogical/common
- */
-
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 

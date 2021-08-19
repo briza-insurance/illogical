@@ -1,8 +1,3 @@
-/**
- * Operand module.
- * @module illogical/operand
- */
-
 import { Context, Evaluable, Result } from '../common/evaluable'
 import { isObject } from '../common/type-check'
 import { toNumber, toString } from '../common/util'

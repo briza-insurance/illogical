@@ -1,7 +1,3 @@
-/**
- * Logical expression module.
- * @module illogical/expression/logical
- */
 import { Context, Evaluable, EvaluableType, Result } from '../../common/evaluable';
 import { ExpressionInput } from '../../parser';
 import { Options } from '../../parser/options';

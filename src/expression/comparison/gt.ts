@@ -1,8 +1,3 @@
-/**
- * Comparison expression module.
- * @module illogical/expression/comparison
- */
-
 import { Evaluable, Result } from '../../common/evaluable'
 import { isNumber } from '../../common/type-check'
 import { Comparison } from '../comparison'

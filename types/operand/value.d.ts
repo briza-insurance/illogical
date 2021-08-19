@@ -1,7 +1,3 @@
-/**
- * Operand module.
- * @module illogical/operand
- */
 import { Result } from '../common/evaluable';
 import { Input } from '../parser';
 import { Operand } from '.';

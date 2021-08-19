@@ -1,8 +1,3 @@
-/**
- * Prefix expression module.
- * @module illogical/expression/prefix
- */
-
 import { Evaluable, Result } from '../../common/evaluable'
 import { isString } from '../../common/type-check'
 import { Comparison } from '../comparison'

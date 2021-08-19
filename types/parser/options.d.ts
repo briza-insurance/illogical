@@ -1,7 +1,3 @@
-/**
- * Parser module.
- * @module illogical/parser
- */
 export declare type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
 export interface Options {
     /**
