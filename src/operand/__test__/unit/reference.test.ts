@@ -85,7 +85,14 @@ describe('Operand - Value', () => {
   })
 
   describe('simplify', () => {
-    test.each([
+    test.each<
+      [
+        value: string,
+        expected: unknown,
+        strictKeys?: string[],
+        optionalKeys?: string[]
+      ]
+    >([
       // Existing
       ['RefA', 1, []],
       // Nested
@@ -108,13 +115,26 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', new Reference('RefA{RefA}'), []],
       ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
       ['Ref{RefB}', new Reference('Ref{RefB}'), []],
-      // Ignore keys
+      // Strict/Optional keys
       ['RefB', undefined, ['RefB']],
-    ])('%p should simplify to %p', (value, expected, ignoredKeys = []) => {
-      expect(new Reference(value).simplify(context, ignoredKeys)).toEqual(
-        expected
-      )
-    })
+      ['RefB', undefined, ['RefB'], undefined],
+      ['RefB', undefined, ['RefB'], []],
+      ['RefB', undefined, ['RefB'], ['RefB']],
+      ['RefB', undefined, undefined, []],
+      ['RefB', undefined, [], []],
+      ['RefB', new Reference('RefB')],
+      ['RefB', new Reference('RefB'), [], undefined],
+      ['RefB', new Reference('RefB'), undefined, ['RefB']],
+      ['RefB', new Reference('RefB'), [], ['RefB']],
+      ['RefB', new Reference('RefB'), undefined, undefined],
+    ])(
+      '%p should simplify to %p',
+      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
+        expect(
+          new Reference(value).simplify(context, strictKeys, optionalKeys)
+        ).toEqual(expected)
+      }
+    )
   })
 
   describe('serialize', () => {

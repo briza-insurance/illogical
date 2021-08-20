@@ -32,7 +32,11 @@ export abstract class Logical implements Evaluable {
   /**
    * {@link Evaluable.simplify}
    */
-  abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable
+  abstract simplify(
+    ctx: Context,
+    strictKeys?: string[],
+    optionalKeys?: string[]
+  ): Result | Evaluable
 
   /**
    * Get the strict representation of the expression.

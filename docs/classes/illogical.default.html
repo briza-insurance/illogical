@@ -123,7 +123,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L60">index.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L60">index.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -150,7 +150,7 @@
 					<div class="tsd-signature tsd-kind-icon">parser<span class="tsd-signature-symbol">:</span> <a href="parser.Parser.html" class="tsd-signature-type" data-tsd-kind="Class">Parser</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L54">index.ts:54</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L54">index.ts:54</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,7 +167,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L70">index.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L70">index.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -204,7 +204,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L88">index.ts:88</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L88">index.ts:88</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -229,13 +229,13 @@
 					<a name="simplify" class="tsd-anchor"></a>
 					<h3>simplify</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/parser.html#ExpressionInput" class="tsd-signature-type" data-tsd-kind="Type alias">ExpressionInput</a>, context<span class="tsd-signature-symbol">: </span><a href="../interfaces/common_evaluable.Context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a>, ignoreKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/parser.html#Input" class="tsd-signature-type" data-tsd-kind="Type alias">Input</a></li>
+						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>exp<span class="tsd-signature-symbol">: </span><a href="../modules/parser.html#ExpressionInput" class="tsd-signature-type" data-tsd-kind="Type alias">ExpressionInput</a>, context<span class="tsd-signature-symbol">: </span><a href="../interfaces/common_evaluable.Context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a>, strictKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, optionalKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/parser.html#Input" class="tsd-signature-type" data-tsd-kind="Type alias">Input</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L105">index.ts:105</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L107">index.ts:107</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -261,10 +261,17 @@
 									</div>
 								</li>
 								<li>
-									<h5>ignoreKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> strictKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>keys to be considered present even if their not present in the context.
-										Default to empty array</p>
+										<p>keys to be considered present even if they are not present in the context</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> optionalKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>keys to be considered not present unless they are in the context or in
+											<code>strictKeys</code>; when <code>strictKeys</code> is <code>undefined</code> and <code>optionalKeys</code> is an array, every key that is not in
+										<code>optionalKeys</code> is considered to be present and thus will be evaluated</p>
 									</div>
 								</li>
 							</ul>
@@ -282,7 +289,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/index.ts#L79">index.ts:79</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/index.ts#L79">index.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">

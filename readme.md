@@ -2,7 +2,7 @@
 
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: May 17, 2021.
+> Revision: August 17, 2021.
 
 ## About
 
@@ -178,7 +178,7 @@ evaluable.toString()
 ### Simplify
 
 Simplifies an expression with a given context. This is useful when you already have some of
-the properties of context and wants to try to eveluate the expression.
+the properties of context and wants to try to evaluate the expression.
 
 **Example**
 
@@ -192,8 +192,8 @@ Values not found in the context will cause the parent operand not to be evaluate
 as part of the simplified expression.
 
 In some situations we might want to evaluate the expression even if referred value is not
-present. You can provide a list of keys that will be evaluated even if they are not present
-in the context.
+present. You can provide a list of keys that will be strictly evaluated even if they are not
+present in the context.
 
 **Example**
 
@@ -201,8 +201,22 @@ in the context.
 engine.simplify(
   ['AND', ['==', '$a', 10], ['==', '$b', 20]],
   { a: 10 },
-  ['b'] // '$b' will be evaluted to undefined.
+  ['b'] // '$b' will be evaluated to undefined.
 ) // false
+```
+
+Alternatively we might want to do the opposite and strictly evaluate the expression for all referred
+values not present in the context except for a specified list of optional keys.
+
+**Example**
+
+```js
+engine.simplify(
+  ['OR', ['==', '$a', 10], ['==', '$b', 20], ['==', '$c', 20]],
+  { c: 10 },
+  undefined,
+  ['b'] // except for '$b' everything not in context will be evaluated to undefined.
+) // ['==', '$b', 20]
 ```
 
 ## Working with Expressions
@@ -311,7 +325,7 @@ Simple value types: string, number, boolean.
 
 #### Reference
 
-The reference operand's value is resolved from the [Evaluation Data Context](#evaluation-data-context), where the the operands name is used as key in the context.
+The reference operand value is resolved from the [Evaluation Data Context](#evaluation-data-context), where the the operands name is used as key in the context.
 
 The reference operand must be prefixed with `$` symbol, e.g.: `$name`. This might be customized via [Reference Predicate Parser Option](#reference-predicate).
 
@@ -676,7 +690,7 @@ A function used to transform the operand into the reference annotation stripped 
 referenceTransform: (operand: string) => string
 ```
 
-> **Default reference transform:**  
+> **Default reference transform:**
 > It removes the `$` symbol at the begging of the operand name.
 
 #### Operator Mapping

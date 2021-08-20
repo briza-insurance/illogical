@@ -16,7 +16,11 @@ export abstract class Operand implements Evaluable {
   /**
    * {@link Evaluable.simplify}
    */
-  abstract simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable
+  abstract simplify(
+    ctx: Context,
+    strictKeys?: string[],
+    optionalKeys?: string[]
+  ): Result | Evaluable
 
   /**
    * {@link Evaluable.serialize}

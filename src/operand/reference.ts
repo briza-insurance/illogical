@@ -132,7 +132,11 @@ export class Reference extends Operand {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(ctx: Context, ignoreKeys: string[]): Result | Evaluable {
+  simplify(
+    ctx: Context,
+    strictKeys?: string[],
+    optionalKeys?: string[]
+  ): Result | Evaluable {
     const keys = extractKeys(ctx, this.key)
 
     if (!keys) {
@@ -140,10 +144,15 @@ export class Reference extends Operand {
     }
 
     const key = keys[0].replace(/\[.+$/, '')
-    if (ctx[key] !== undefined || ignoreKeys.includes(key)) {
+
+    if (ctx[key] !== undefined) {
       return this.evaluate(ctx)
     }
-    return this
+
+    return (strictKeys && strictKeys.includes(key)) ||
+      (optionalKeys && !optionalKeys.includes(key))
+      ? undefined
+      : this
   }
 
   /**

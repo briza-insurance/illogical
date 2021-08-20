@@ -1,4 +1,4 @@
-import { Context, Evaluable, Result } from '../../common/evaluable';
+import { Context, Evaluable, Result, SimplifyArgs } from '../../common/evaluable';
 import { Logical } from '../logical';
 export declare const OPERATOR: unique symbol;
 /**
@@ -19,5 +19,5 @@ export declare class Or extends Logical {
     /**
      * {@link Evaluable.simplify}
      */
-    simplify(...args: [Context, string[]]): boolean | Evaluable;
+    simplify(...args: SimplifyArgs): boolean | Evaluable;
 }

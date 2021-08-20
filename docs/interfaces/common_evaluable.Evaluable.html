@@ -121,7 +121,7 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/common_evaluable.EvaluableType.html" class="tsd-signature-type" data-tsd-kind="Enumeration">EvaluableType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/common/evaluable.ts#L49">common/evaluable.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/common/evaluable.ts#L45">common/evaluable.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -138,7 +138,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/common/evaluable.ts#L56">common/evaluable.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/common/evaluable.ts#L52">common/evaluable.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -166,7 +166,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/common/evaluable.ts#L72">common/evaluable.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/common/evaluable.ts#L75">common/evaluable.ts:75</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -191,13 +191,13 @@
 					<a name="simplify" class="tsd-anchor"></a>
 					<h3>simplify</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><a href="common_evaluable.Context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a>, ignoreKeys<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/common_evaluable.html#Result" class="tsd-signature-type" data-tsd-kind="Type alias">Result</a><span class="tsd-signature-symbol"> | </span><a href="common_evaluable.Evaluable.html" class="tsd-signature-type" data-tsd-kind="Interface">Evaluable</a></li>
+						<li class="tsd-signature tsd-kind-icon">simplify<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><a href="common_evaluable.Context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a>, strictKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, optionalKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/common_evaluable.html#Result" class="tsd-signature-type" data-tsd-kind="Type alias">Result</a><span class="tsd-signature-symbol"> | </span><a href="common_evaluable.Evaluable.html" class="tsd-signature-type" data-tsd-kind="Interface">Evaluable</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/common/evaluable.ts#L65">common/evaluable.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/common/evaluable.ts#L64">common/evaluable.ts:64</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -214,9 +214,17 @@
 									</div>
 								</li>
 								<li>
-									<h5>ignoreKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> strictKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>keys to be considered present even if their not present in the context</p>
+										<p>keys to be considered present even if they are not present in the context</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> optionalKeys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>keys to be considered not present unless they are in the context or in
+											<code>strictKeys</code>; when <code>strictKeys</code> is <code>undefined</code> and <code>optionalKeys</code> is an array, every key that is not in
+										<code>optionalKeys</code> is considered to be present and thus will be evaluated</p>
 									</div>
 								</li>
 							</ul>
@@ -235,7 +243,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/af8a6e1/src/common/evaluable.ts#L77">common/evaluable.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/briza-insurance/illogical/blob/245d7e9/src/common/evaluable.ts#L80">common/evaluable.ts:80</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -294,6 +302,9 @@
 				<ul class="after-current">
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/common_evaluable.html#Result" class="tsd-kind-icon">Result</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/common_evaluable.html#SimplifyArgs" class="tsd-kind-icon">Simplify<wbr>Args</a>
 					</li>
 				</ul>
 			</nav>

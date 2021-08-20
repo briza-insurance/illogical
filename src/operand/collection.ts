@@ -1,4 +1,4 @@
-import { Context, Evaluable, Result } from '../common/evaluable'
+import { Context, Evaluable, Result, SimplifyArgs } from '../common/evaluable'
 import { isEvaluable } from '../common/type-check'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
@@ -33,7 +33,7 @@ export class Collection extends Operand {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(...args: [Context, string[]]): Result | Evaluable {
+  simplify(...args: SimplifyArgs): Result | Evaluable {
     const values: Result[] = []
     for (const item of this.items) {
       const simplifiedItem = item.simplify(...args)

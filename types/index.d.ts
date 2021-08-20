@@ -62,10 +62,12 @@ declare class Engine {
      *
      * @param {ExpressionInput} exp  Raw expression.
      * @param {Context} context Evaluation data context.
-     * @param {string[]} ignoreKeys keys to be considered present even if their not present in the context.
-     *  Default to empty array
+     * @param {string[]} strictKeys keys to be considered present even if they are not present in the context
+     * @param {string[]} optionalKeys keys to be considered not present unless they are in the context or in
+     *  `strictKeys`; when `strictKeys` is `undefined` and `optionalKeys` is an array, every key that is not in
+     *  `optionalKeys` is considered to be present and thus will be evaluated
      * @returns {Inpunt | boolean}
      */
-    simplify(exp: ExpressionInput, context: Context, ignoreKeys?: string[]): Input | boolean;
+    simplify(exp: ExpressionInput, context: Context, strictKeys?: string[], optionalKeys?: string[]): Input | boolean;
 }
 export default Engine;

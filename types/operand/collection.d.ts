@@ -1,4 +1,4 @@
-import { Context, Evaluable, Result } from '../common/evaluable';
+import { Context, Evaluable, Result, SimplifyArgs } from '../common/evaluable';
 import { Input } from '../parser';
 import { Options } from '../parser/options';
 import { Operand } from '.';
@@ -23,7 +23,7 @@ export declare class Collection extends Operand {
     /**
      * {@link Evaluable.simplify}
      */
-    simplify(...args: [Context, string[]]): Result | Evaluable;
+    simplify(...args: SimplifyArgs): Result | Evaluable;
     /**
      * {@link Evaluable.serialize}
      */

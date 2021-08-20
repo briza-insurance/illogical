@@ -1,4 +1,9 @@
-import { Context, Evaluable, Result } from '../../common/evaluable'
+import {
+  Context,
+  Evaluable,
+  Result,
+  SimplifyArgs,
+} from '../../common/evaluable'
 import { isBoolean } from '../../common/type-check'
 import { Logical } from '../logical'
 
@@ -37,7 +42,7 @@ export class And extends Logical {
   /**
    * {@link Evaluable.simplify}
    */
-  simplify(...args: [Context, string[]]): boolean | Evaluable {
+  simplify(...args: SimplifyArgs): boolean | Evaluable {
     const simplified = this.operands.reduce<boolean | Evaluable[]>(
       (result, child) => {
         if (result !== false) {
