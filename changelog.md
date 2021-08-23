@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.1
+
+- Fix issue with nested conditions not being completely simplified.
+
 ## 1.5.0
 
 - Add simplify capability to strictly evaluate the expression for all referred values
