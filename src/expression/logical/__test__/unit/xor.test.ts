@@ -5,6 +5,7 @@ import { Reference } from '../../../../operand/reference'
 import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
+import { And } from '../../and'
 import { Nor } from '../../nor'
 import { Not } from '../../not'
 import { Xor } from '../../xor'
@@ -48,6 +49,14 @@ describe('Expression - Logical - Xor', () => {
       [
         new Xor([notSimplified(), operand(false), notSimplified()]),
         new Xor([notSimplified(), notSimplified()]),
+      ],
+      [
+        new Xor([
+          new And([notSimplified(), operand(true)]),
+          operand(true),
+          operand(false),
+        ]),
+        new Not(notSimplified()),
       ],
     ])('%p should simplify to %p', (and, expected) => {
       expect(and.simplify({}, [])).toEqual(expected)

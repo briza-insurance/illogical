@@ -38,6 +38,10 @@ describe('Expression - Logical - Or', () => {
         new Or([notSimplified(), operand(false), notSimplified()]),
         new Or([notSimplified(), notSimplified()]),
       ],
+      [
+        new Or([operand(false), new Or([operand(false), notSimplified()])]),
+        notSimplified(),
+      ],
     ])('%p should simplify to %p', (and, expected) => {
       expect(and.simplify({}, [])).toEqual(expected)
     })

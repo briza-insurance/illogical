@@ -4,7 +4,7 @@ import {
   Result,
   SimplifyArgs,
 } from '../../common/evaluable'
-import { isBoolean } from '../../common/type-check'
+import { isEvaluable } from '../../common/type-check'
 import { Logical } from '../logical'
 import { Nor } from './nor'
 import { Not } from './not'
@@ -66,8 +66,8 @@ export class Xor extends Logical {
           return [notSimplifiedConditions, trueCount]
         }
         const childResult = child.simplify(...args)
-        if (!isBoolean(childResult)) {
-          return [[...notSimplifiedConditions, child], trueCount]
+        if (isEvaluable(childResult)) {
+          return [[...notSimplifiedConditions, childResult], trueCount]
         }
         if (childResult) {
           return [notSimplifiedConditions, trueCount + 1]
