@@ -5,6 +5,7 @@ import { Reference } from '../../../../operand/reference'
 import { Value } from '../../../../operand/value'
 import { Input } from '../../../../parser'
 import { defaultOptions } from '../../../../parser/options'
+import { And } from '../../and'
 import { Nor } from '../../nor'
 import { Not } from '../../not'
 
@@ -37,6 +38,14 @@ describe('Expression - Logical - Nor', () => {
       [
         new Nor([notSimplified(), operand(false), notSimplified()]),
         new Nor([notSimplified(), notSimplified()]),
+      ],
+      [
+        new Nor([operand(false), new Nor([operand(false), notSimplified()])]),
+        new Not(new Not(notSimplified())),
+      ],
+      [
+        new Nor([operand(false), new And([operand(true), notSimplified()])]),
+        new Not(notSimplified()),
       ],
     ])('%p should simplify to %p', (nor, expected) => {
       expect(nor.simplify({}, [])).toEqual(expected)

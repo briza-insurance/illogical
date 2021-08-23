@@ -50,9 +50,9 @@ export class Nor extends Logical {
           const childResult = child.simplify(...args)
           if (isEvaluable(childResult)) {
             if (isBoolean(result)) {
-              return [child]
+              return [childResult]
             }
-            return [...result, child]
+            return [...result, childResult]
           }
           if (childResult) {
             return false

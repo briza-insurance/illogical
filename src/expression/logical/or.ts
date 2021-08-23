@@ -4,7 +4,7 @@ import {
   Result,
   SimplifyArgs,
 } from '../../common/evaluable'
-import { isBoolean } from '../../common/type-check'
+import { isBoolean, isEvaluable } from '../../common/type-check'
 import { Logical } from '../logical'
 
 // Operator key
@@ -48,11 +48,11 @@ export class Or extends Logical {
         if (result !== true) {
           const childResult = child.simplify(...args)
 
-          if (!isBoolean(childResult)) {
+          if (isEvaluable(childResult)) {
             if (isBoolean(result)) {
-              return [child]
+              return [childResult]
             }
-            return [...result, child]
+            return [...result, childResult]
           }
 
           if (childResult) {
