@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.2
+
+- Update dependencies.
+
 ## 1.5.1
 
 - Fix issue with nested conditions not being completely simplified.

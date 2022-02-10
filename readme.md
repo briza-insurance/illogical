@@ -2,7 +2,7 @@
 
 A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.
 
-> Revision: August 17, 2021.
+> Revision: February 1, 2022.
 
 ## About
 
