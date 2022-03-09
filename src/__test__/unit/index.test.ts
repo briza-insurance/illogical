@@ -209,6 +209,7 @@ describe('Condition Engine', () => {
         ['b'],
       ],
       [['PRESENT', '$a'], { a: { obj: 'obj' } }, true, undefined, []],
+      [['==', '$a', null], { a: { obj: 'obj' } }, false, undefined, []],
     ])(
       '%p with context %p should be simplified to %p',
       (
