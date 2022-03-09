@@ -115,6 +115,8 @@ describe('Operand - Value', () => {
       ['RefA{RefA}', new Reference('RefA{RefA}'), []],
       ['RefB.{RefA}', new Reference('RefB.{RefA}'), []],
       ['Ref{RefB}', new Reference('Ref{RefB}'), []],
+      // Object
+      ['RefC.subB', { subSubA: 3 }],
       // Strict/Optional keys
       ['RefB', undefined, ['RefB']],
       ['RefB', undefined, ['RefB'], undefined],
