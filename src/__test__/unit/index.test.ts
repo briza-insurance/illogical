@@ -55,6 +55,7 @@ describe('Condition Engine', () => {
           [expression, { Name: 'David' }, true],
           [expression, { Name: null }, false],
           [expression, { Name: false }, true],
+          [expression, { Name: { obj: 'obj' } }, true],
         ]),
         // NOT UNDEFINED
         ...[['NOT', ['UNDEFINED', '$Name']]].map((expression) => [
