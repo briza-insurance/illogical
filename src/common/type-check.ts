@@ -45,5 +45,13 @@ export function isBoolean(value: unknown): value is boolean {
  * @returns {Evaluable}
  */
 export function isEvaluable(value: Result | Evaluable): value is Evaluable {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    typeof value.evaluate === 'function' &&
+    typeof value.simplify === 'function' &&
+    typeof value.serialize === 'function' &&
+    typeof value.toString === 'function'
+  )
 }

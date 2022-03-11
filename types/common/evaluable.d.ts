@@ -15,7 +15,7 @@ export interface Context {
 /**
  * Evaluation result
  */
-export declare type Result = undefined | null | string | number | boolean | Array<Result>;
+export declare type Result = undefined | null | string | number | boolean | Array<Result> | Record<string, unknown>;
 export declare enum EvaluableType {
     Operand = "Operand",
     Expression = "Expression"

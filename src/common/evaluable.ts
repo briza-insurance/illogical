@@ -32,6 +32,7 @@ export type Result =
   | number
   | boolean
   | Array<Result>
+  | Record<string, unknown>
 
 export enum EvaluableType {
   Operand = 'Operand',
