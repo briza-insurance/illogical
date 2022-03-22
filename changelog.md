@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.4
+
+- Update dependencies.
+
 ## 1.5.3
 
 - Fixed an issue where conditions with object data were not being simplified correctly.
