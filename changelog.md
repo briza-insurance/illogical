@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 1.5.5
+
+- Expose default options for parser
+- Expose isEvaluable
+- Performance improvements in references
+
 ## 1.5.4
 
 - Update dependencies.

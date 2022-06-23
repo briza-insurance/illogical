@@ -11,6 +11,8 @@ export declare enum DataType {
 export declare class Reference extends Operand {
     private readonly key;
     private readonly dataType;
+    private readonly valueLookup;
+    private readonly getKeys;
     /**
      * @constructor
      * @param {string} key Context key.
