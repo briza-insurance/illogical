@@ -88,7 +88,7 @@ describe('Operand - Value', () => {
     test.each<
       [
         value: string,
-        expected: unknown,
+        expected: Result | Reference,
         strictKeys?: string[],
         optionalKeys?: string[]
       ]
@@ -133,8 +133,10 @@ describe('Operand - Value', () => {
       '%p should simplify to %p',
       (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
-          new Reference(value).simplify(context, strictKeys, optionalKeys)
-        ).toEqual(expected)
+          new Reference(value)
+            .simplify(context, strictKeys, optionalKeys)
+            ?.toString()
+        ).toEqual(expected?.toString())
       }
     )
   })

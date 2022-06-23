@@ -137,7 +137,9 @@ describe('Condition Engine - Parser', () => {
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
       (expression, expected) => {
-        expect(parser.parse(expression)).toEqual(expected)
+        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+          expected.serialize(defaultOptions)
+        )
       }
     )
 
@@ -431,7 +433,9 @@ describe('Condition Engine - Parser', () => {
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
       (expression, expected) => {
-        expect(parser.parse(expression)).toEqual(expected)
+        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+          expected.serialize(defaultOptions)
+        )
       }
     )
 

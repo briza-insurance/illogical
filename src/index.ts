@@ -26,7 +26,9 @@ import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
 import { ExpressionInput, Input, Parser } from './parser'
 import { Options } from './parser/options'
 
+export { defaultOptions } from './parser/options'
 export {
+  isEvaluable,
   OPERATOR_EQ,
   OPERATOR_NE,
   OPERATOR_GT,
