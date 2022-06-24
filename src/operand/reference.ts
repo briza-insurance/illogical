@@ -4,13 +4,37 @@ import { toNumber, toString } from '../common/util'
 import { Options } from '../parser/options'
 import { Operand } from '.'
 
-function extractKeys(ctx: Context, key: string): string[] | undefined {
+type Keys = (string | number)[]
+
+const keyWithArrayIndexRegex =
+  /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
+const arrayIndexRegex = /\[(\d+)]/g
+const parseKey = (key: string): Keys =>
+  key.split('.').flatMap((key) => {
+    const parseResult = keyWithArrayIndexRegex.exec(key)
+    const keys: Keys = []
+    if (parseResult) {
+      keys.push(parseResult?.groups?.currentKey ?? key)
+
+      const rawIndexes = parseResult?.groups?.indexes
+      if (rawIndexes) {
+        for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
+          keys.push(parseInt(indexResult[1]))
+        }
+      }
+    } else {
+      keys.push(key)
+    }
+    return keys
+  })
+
+const complexKeyExpression = /{([^{}]+)}/
+function extractComplexKeys(ctx: Context, key: string): Keys | undefined {
   // Resolve complex keys
-  const complexKeyExpression = /{([^{}]+)}/
   let complexKeyMatches = complexKeyExpression.exec(key)
 
   while (complexKeyMatches) {
-    const resolvedValue = contextValueLookup(ctx, complexKeyMatches[1])
+    const resolvedValue = complexValueLookup(ctx, complexKeyMatches[1])
 
     if (resolvedValue === undefined) {
       return undefined
@@ -20,14 +44,31 @@ function extractKeys(ctx: Context, key: string): string[] | undefined {
     complexKeyMatches = complexKeyExpression.exec(key)
   }
 
-  let keys = [key]
-
-  // Nested reference
-  if (key.includes('.')) {
-    keys = key.split('.')
-  }
-  return keys
+  return parseKey(key)
 }
+
+const isContext = (value: unknown): value is Context => isObject(value)
+
+const simpleValueLookup =
+  (keys: Keys) =>
+  (ctx: Context): Result => {
+    let pointer: Context | Result | undefined = ctx
+
+    for (const key of keys) {
+      if (typeof key === 'number') {
+        if (!Array.isArray(pointer)) {
+          return undefined
+        }
+        pointer = pointer[key]
+      } else if (!isContext(pointer)) {
+        return undefined
+      } else {
+        pointer = pointer[key]
+      }
+    }
+
+    return pointer
+  }
 
 /**
  * Lookup for the reference in the context.
@@ -37,49 +78,12 @@ function extractKeys(ctx: Context, key: string): string[] | undefined {
  * @param {string} key Context lookup key.
  * @return {Result}
  */
-function contextValueLookup(ctx: Context, key: string): Result {
-  const keys = extractKeys(ctx, key)
-
+function complexValueLookup(ctx: Context, key: string): Result {
+  const keys = extractComplexKeys(ctx, key)
   if (!keys) {
     return undefined
   }
-
-  // Context pointer
-  let pointer = ctx
-
-  for (let i = 0; i < keys.length; i++) {
-    const currentKey = keys[i].replace(/\[.+$/, '')
-    let currentValue = pointer[currentKey]
-
-    // Resolve array notation
-    keys[i].match(/\[\d+\]/g)?.forEach((match) => {
-      const arrayIndex = parseInt(match.replace(/[[\]]/g, ''))
-
-      if (
-        !Array.isArray(currentValue) ||
-        currentValue[arrayIndex] === undefined
-      ) {
-        currentValue = undefined
-      } else {
-        currentValue = currentValue[arrayIndex]
-      }
-    })
-
-    // Last node
-    if (i === keys.length - 1) {
-      return currentValue as Result
-
-      // Nested path
-    } else if (currentValue !== undefined && isObject(currentValue)) {
-      pointer = currentValue as Context
-
-      // Invalid nested reference path
-    } else {
-      break
-    }
-  }
-
-  return undefined
+  return simpleValueLookup(keys ?? [])(ctx)
 }
 
 export enum DataType {
@@ -92,12 +96,16 @@ const dataTypeRegex = new RegExp(
   `^.+\\.\\((${Object.keys(DataType).join('|')})\\)$`
 )
 
+const isComplexKey = (key: string) => key.indexOf('{') > -1
+
 /**
  * Reference operand resolved within the context
  */
 export class Reference extends Operand {
   private readonly key: string
   private readonly dataType: DataType | undefined
+  private readonly valueLookup: (context: Context) => Result
+  private readonly getKeys: (context: Context) => Keys | undefined
 
   /**
    * @constructor
@@ -118,6 +126,14 @@ export class Reference extends Operand {
     if (this.key.match(/.\(.+\)$/)) {
       this.key = this.key.replace(/.\(.+\)$/, '')
     }
+    if (isComplexKey(this.key)) {
+      this.valueLookup = (context) => complexValueLookup(context, this.key)
+      this.getKeys = (context) => extractComplexKeys(context, this.key)
+    } else {
+      const keys = parseKey(this.key)
+      this.valueLookup = simpleValueLookup(keys)
+      this.getKeys = () => keys
+    }
   }
 
   /**
@@ -126,7 +142,7 @@ export class Reference extends Operand {
    * @return {boolean}
    */
   evaluate(ctx: Context): Result {
-    return this.toDataType(contextValueLookup(ctx, this.key))
+    return this.toDataType(this.valueLookup(ctx))
   }
 
   /**
@@ -137,16 +153,14 @@ export class Reference extends Operand {
     strictKeys?: string[],
     optionalKeys?: string[]
   ): Result | Evaluable {
-    const keys = extractKeys(ctx, this.key)
-
-    if (!keys) {
-      return this
-    }
-
-    const key = keys[0].replace(/\[.+$/, '')
+    const [key] = this.getKeys(ctx) ?? []
 
     if (ctx[key] !== undefined) {
       return this.evaluate(ctx)
+    }
+
+    if (!key || typeof key === 'number') {
+      return this
     }
 
     return (strictKeys && strictKeys.includes(key)) ||
