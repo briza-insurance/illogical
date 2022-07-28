@@ -331,11 +331,11 @@ The reference operand must be prefixed with `$` symbol, e.g.: `$name`. This migh
 
 **Example**
 
-| Expression                    | Data Context      |
-| ----------------------------- | ----------------- |
-| `['==', '$age', 21]`          | `{age: 21}`       |
-| `['==', 'circle', '$shape'] ` | `{age: 'circle'}` |
-| `['==', '$visible', true]`    | `{visible: true}` |
+| Expression                    | Data Context        |
+| ----------------------------- | ------------------- |
+| `['==', '$age', 21]`          | `{age: 21}`         |
+| `['==', 'circle', '$shape'] ` | `{shape: 'circle'}` |
+| `['==', '$visible', true]`    | `{visible: true}`   |
 
 #### Collection
 
