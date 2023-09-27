@@ -32,3 +32,13 @@ export const toString = (value: Result): string | undefined => {
 
   return undefined
 }
+/**
+ * Convert a value to number if it's type is string, otherwise return NaN
+ * @param value value to be converted to number
+ */
+export const toDateNumber = (value: Result): number => {
+  if (isString(value)) {
+    return Date.parse(value)
+  }
+  return NaN
+}
