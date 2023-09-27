@@ -1,5 +1,6 @@
 import { Evaluable, Result } from '../../common/evaluable'
 import { isNumber } from '../../common/type-check'
+import { toDateNumber } from '../../common/util'
 import { Comparison } from '../comparison'
 
 // Operator key
@@ -29,6 +30,13 @@ export class GreaterThan extends Comparison {
     if (isNumber(left) && isNumber(right)) {
       return (left as number) > (right as number)
     }
+
+    const leftDate = toDateNumber(left),
+      rightDate = toDateNumber(right)
+    if (leftDate && rightDate) {
+      return leftDate > rightDate
+    }
+
     return false
   }
 }
