@@ -19,6 +19,11 @@ describe('Expression - Comparison - Less Than', () => {
   const testCases: [Operand, Operand, boolean][] = [
     // Truthy
     [operand(0), operand(1), true],
+    // Truthy date cases
+    [operand('2023-01-01'), operand('2023-01-02'), true],
+    // Falsy date cases
+    [operand('2023-01-01'), operand('2022-12-31'), false],
+    [operand('2023-01-01'), operand('2023-01-01'), false],
     // Falsy
     [operand(1), operand(1), false],
     [operand(1), operand(0), false],

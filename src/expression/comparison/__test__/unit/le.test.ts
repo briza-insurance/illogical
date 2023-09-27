@@ -20,6 +20,11 @@ describe('Expression - Comparison - Less Than or Equal', () => {
     // Truthy
     [operand(0), operand(1), true],
     [operand(1), operand(1), true],
+    // Truthy date cases
+    [operand('2023-01-01'), operand('2023-01-01'), true],
+    [operand('2023-01-01'), operand('2023-01-02'), true],
+    // Falsy date cases
+    [operand('2023-01-01'), operand('2022-12-31'), false],
     // Falsy
     [operand(1), operand(0), false],
     // Falsy - non-comparable types

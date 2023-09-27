@@ -35,6 +35,11 @@ describe('Expression - Comparison - Not Equal', () => {
     // Truthy
     [operand(1), operand(10), true],
     [operand('1'), operand('10'), true],
+    // Truthy date cases
+    [operand('2023-01-01'), operand('2022-12-31'), true],
+    [operand('2023-01-01'), operand('2023-01-02'), true],
+    // Falsy date cases
+    [operand('2023-01-01'), operand('2023-01-01'), false],
     // Array types, truthy in any case
     [new Collection([new Value(1)]), new Collection([new Value(1)]), true],
     [new Collection([new Value('1')]), new Collection([new Value('1')]), true],
