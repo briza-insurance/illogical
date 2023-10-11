@@ -383,56 +383,72 @@ engine.evaluate(['!=', 'circle', 'square']) // true
 
 Expression format: `[">", `[Left Operand](#operand-types), [Right Operand](#operand-types)`]`.
 
-> Valid operand types: number.
+> Valid operand types: number, string.
+
+- String comparison only supports ISO-8601 formatted dates.
 
 ```json
 [">", 10, 5]
+[">", "2023-01-01", "2022-12-31"]
 ```
 
 ```js
 engine.evaluate(['>', 10, 5]) // true
+engine.evaluate(['>', '2023-01-01', '2022-12-31']) // true
 ```
 
 #### Greater Than or Equal
 
 Expression format: `[">=", `[Left Operand](#operand-types), [Right Operand](#operand-types)`]`.
 
-> Valid operand types: number.
+> Valid operand types: number, string.
+
+- String comparison only supports ISO-8601 formatted dates.
 
 ```json
 [">=", 5, 5]
+[">=", "2023-01-01",  "2023-01-01"]
 ```
 
 ```js
 engine.evaluate(['>=', 5, 5]) // true
+engine.evaluate(['>=', '2023-01-01', '2023-01-01']) // true
 ```
 
 #### Less Than
 
 Expression format: `["<", `[Left Operand](#operand-types), [Right Operand](#operand-types)`]`.
 
-> Valid operand types: number.
+> Valid operand types: number, string.
+
+- String comparison only supports ISO-8601 formatted dates.
 
 ```json
 ["<", 5, 10]
+["<", "2022-12-31",  "2023-01-01"]
 ```
 
 ```js
 engine.evaluate(['<', 5, 10]) // true
+engine.evaluate(['<', '2022-12-31', '2023-01-01']) // true
 ```
 
 #### Less Than or Equal
 
 Expression format: `["<=", `[Left Operand](#operand-types), [Right Operand](#operand-types)`]`.
 
-> Valid operand types: number.
+> Valid operand types: number, string.
+
+- String comparison only supports ISO-8601 formatted dates.
 
 ```json
 ["<=", 5, 5]
+["<=", "2023-01-01",  "2023-01-01"]
 ```
 
 ```js
 engine.evaluate(['<=', 5, 5]) // true
+engine.evaluate(['<=', '2023-01-01', '2023-01-01']) // true
 ```
 
 #### In

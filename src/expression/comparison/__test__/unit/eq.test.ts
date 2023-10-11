@@ -28,6 +28,11 @@ describe('Expression - Comparison - Equal', () => {
       operand(value),
       true,
     ]),
+    // Truthy date Cases
+    [operand('2023-01-01'), operand('2023-01-01'), true],
+    // Falsy date Cases
+    [operand('2023-01-01'), operand('2022-12-31'), false],
+    [operand('2023-01-01'), operand('2023-01-02'), false],
     // Falsy - different types - across all permutations
     ...permutation(primitives).map<[Operand, Operand, boolean]>(
       ([left, right]) => [operand(left), operand(right), false]
