@@ -23,7 +23,7 @@ describe('Expression - Comparison - Greater Than or Equal', () => {
     // Truthy date cases
     [operand('2023-01-01'), operand('2022-12-31'), true],
     [operand('2023-01-01'), operand('2023-01-01'), true],
-    // Truthy date cases
+    // Falsy date cases
     [operand('2023-01-01'), operand('2023-01-02'), false],
     // Falsy
     [operand(0), operand(1), false],
