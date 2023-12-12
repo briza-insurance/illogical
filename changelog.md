@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.6
+
+- Comparison Expressions updated to support string comparison for ISO-8601 formatted dates.
+
 ## 1.5.5
 
 - Expose default options for parser
