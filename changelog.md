@@ -1,5 +1,10 @@
 # illogical changelog
 
+## 1.5.7
+
+- Update documentation to include example of comparison operator with two references
+- Fix linting issues
+
 ## 1.5.6
 
 - Comparison Expressions updated to support string comparison for ISO-8601 formatted dates.

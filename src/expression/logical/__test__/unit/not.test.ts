@@ -22,7 +22,7 @@ describe('Expression - Logical - Not', () => {
     )
 
     test.each([[[]], [[operand(true), operand(false)]], [[operand(0)]]] as [
-      Evaluable[]
+      Evaluable[],
     ][])('%p should throw', (operands) => {
       expect(() => new Not(...operands).evaluate({})).toThrowError()
     })

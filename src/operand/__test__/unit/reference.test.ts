@@ -90,7 +90,7 @@ describe('Operand - Value', () => {
         value: string,
         expected: Result | Reference,
         strictKeys?: string[],
-        optionalKeys?: string[]
+        optionalKeys?: string[],
       ]
     >([
       // Existing

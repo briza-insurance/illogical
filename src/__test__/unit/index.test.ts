@@ -164,7 +164,7 @@ describe('Condition Engine', () => {
         ctx: Context,
         expected: boolean | Input,
         strictKeys?: string[],
-        optionalKeys?: string[]
+        optionalKeys?: string[],
       ]
     >([
       [['==', '$a', '$b'], { a: 10, b: 20 }, false, []],
