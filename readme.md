@@ -230,6 +230,26 @@ The evaluation data context is used to provide the expression with variable refe
 To reference the nested reference, please use "." delimiter, e.g.:
 `$address.city`
 
+If the key of the nested reference includes the "." delimiter, please wrap the whole key with backticks `` ` ``, e.g.:
+`` $address.`city.code` `` can reference the object
+```javascript
+{
+  address: {
+    'city.code': 'TOR'
+  }
+}
+```
+
+`` $address.`city.code[0]` `` can reference the object
+```javascript
+{
+  address: {
+    'city.code': ['TOR']
+  }
+}
+```
+when the value of the nested reference is an array.
+
 #### Accessing Array Element:
 
 `$options[1]`

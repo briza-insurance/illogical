@@ -17,6 +17,15 @@ describe('Operand - Value', () => {
       subB: {
         subSubA: 3,
       },
+      'subC.dotKey': {
+        subSubC: 4,
+      },
+      'subD.dotKey': [
+        {
+          subSubD: 5,
+          subSubE: [{ subSubSubE: 6 }],
+        },
+      ],
     },
     RefD: 'A',
     RefE: 'D',
@@ -55,6 +64,9 @@ describe('Operand - Value', () => {
       // Nested
       ['RefC.subA', 2],
       ['RefC.subB.subSubA', 3],
+      ['RefC.`subC.dotKey`.subSubC', 4],
+      ['RefC.`subD.dotKey[0]`.subSubD', 5],
+      ['RefC.`subD.dotKey[0]`.subSubE[0].subSubSubE', 6],
       // Missing
       ['RefB', undefined],
       ['RefC.subC', undefined],

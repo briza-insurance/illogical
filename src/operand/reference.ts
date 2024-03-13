@@ -9,24 +9,30 @@ type Keys = (string | number)[]
 const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
-const parseKey = (key: string): Keys =>
-  key.split('.').flatMap((key) => {
-    const parseResult = keyWithArrayIndexRegex.exec(key)
-    const keys: Keys = []
-    if (parseResult) {
-      keys.push(parseResult?.groups?.currentKey ?? key)
-
-      const rawIndexes = parseResult?.groups?.indexes
-      if (rawIndexes) {
-        for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
-          keys.push(parseInt(indexResult[1]))
+const parseKey = (key: string): Keys => {
+  const keys = key.match(/(`.+`|[^`.]+)/g)
+  return !keys
+    ? []
+    : keys.flatMap((key) => {
+        if (key.startsWith('`') && key.endsWith('`')) {
+          key = key.slice(1, -1)
         }
-      }
-    } else {
-      keys.push(key)
-    }
-    return keys
-  })
+        const parseResult = keyWithArrayIndexRegex.exec(key)
+        const keys: Keys = []
+        if (parseResult) {
+          keys.push(parseResult?.groups?.currentKey ?? key)
+          const rawIndexes = parseResult?.groups?.indexes
+          if (rawIndexes) {
+            for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
+              keys.push(parseInt(indexResult[1]))
+            }
+          }
+        } else {
+          keys.push(key)
+        }
+        return keys
+      })
+}
 
 const complexKeyExpression = /{([^{}]+)}/
 function extractComplexKeys(ctx: Context, key: string): Keys | undefined {
