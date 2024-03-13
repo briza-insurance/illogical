@@ -17,6 +17,18 @@ describe('Operand - Value', () => {
       subB: {
         subSubA: 3,
       },
+      'subC.dotKey': {
+        subSubC: 4,
+      },
+      'subD.dotKey': [
+        {
+          subSubD: 5,
+          subSubE: [{ subSubSubE: 6 }],
+        },
+      ],
+      // key with backticks are acceptable
+      'sub`E.dotKey': { subSubE: 7 },
+      'sub`E.dotKey`': { subSubE: 8 },
     },
     RefD: 'A',
     RefE: 'D',
@@ -55,6 +67,13 @@ describe('Operand - Value', () => {
       // Nested
       ['RefC.subA', 2],
       ['RefC.subB.subSubA', 3],
+      ['RefC.`subC.dotKey`.subSubC', 4],
+      ['RefC.`subD.dotKey`[0].subSubD', 5],
+      // yield an undefined since this is a wrong syntax to access array item for a key that contains a dot
+      ['RefC.`subD.dotKey[0]`.subSubD', undefined],
+      ['RefC.`subD.dotKey`[0].subSubE[0].subSubSubE', 6],
+      ['RefC.`sub`E.dotKey`.subSubE', 7],
+      ['RefC.`sub`E.dotKey``.subSubE', 8],
       // Missing
       ['RefB', undefined],
       ['RefC.subC', undefined],
