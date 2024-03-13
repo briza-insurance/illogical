@@ -9,18 +9,23 @@ type Keys = (string | number)[]
 const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
+
+const parseBacktickWrappedKey = (key: string) =>
+  key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
+
 const parseKey = (key: string): Keys => {
-  const keys = key.match(/(`.+`|[^`.]+)/g)
+  const keys = key.match(/(`[^[\]]+`(\[\d+\])*|[^`.]+)/g)
   return !keys
     ? []
     : keys.flatMap((key) => {
-        if (key.startsWith('`') && key.endsWith('`')) {
-          key = key.slice(1, -1)
-        }
-        const parseResult = keyWithArrayIndexRegex.exec(key)
+        const unwrappedKey = parseBacktickWrappedKey(key)
         const keys: Keys = []
+        const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
         if (parseResult) {
-          keys.push(parseResult?.groups?.currentKey ?? key)
+          const extractedKey = parseBacktickWrappedKey(
+            parseResult?.groups?.currentKey ?? unwrappedKey
+          )
+          keys.push(extractedKey)
           const rawIndexes = parseResult?.groups?.indexes
           if (rawIndexes) {
             for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
@@ -28,7 +33,7 @@ const parseKey = (key: string): Keys => {
             }
           }
         } else {
-          keys.push(key)
+          keys.push(unwrappedKey)
         }
         return keys
       })

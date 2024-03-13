@@ -65,8 +65,10 @@ describe('Operand - Value', () => {
       ['RefC.subA', 2],
       ['RefC.subB.subSubA', 3],
       ['RefC.`subC.dotKey`.subSubC', 4],
-      ['RefC.`subD.dotKey[0]`.subSubD', 5],
-      ['RefC.`subD.dotKey[0]`.subSubE[0].subSubSubE', 6],
+      ['RefC.`subD.dotKey`[0].subSubD', 5],
+      // yield an undefined since this is a wrong syntax to access array item for a key that contains a dot
+      ['RefC.`subD.dotKey[0]`.subSubD', undefined],
+      ['RefC.`subD.dotKey`[0].subSubE[0].subSubSubE', 6],
       // Missing
       ['RefB', undefined],
       ['RefC.subC', undefined],

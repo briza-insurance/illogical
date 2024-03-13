@@ -240,7 +240,7 @@ If the key of the nested reference includes the "." delimiter, please wrap the w
 }
 ```
 
-`` $address.`city.code[0]` `` can reference the object
+`` $address.`city.code`[0] `` can reference the object
 ```javascript
 {
   address: {
