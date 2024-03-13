@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.8
+
+- Introduce the backtick syntax for condition referencing keys that contain dot delimiters
+
 ## 1.5.7
 
 - Update documentation to include example of comparison operator with two references
