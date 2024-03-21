@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.5.9
+
+- Modify OVERLAP expression such that the OVERLAP of two empty arrays returns true
+
 ## 1.5.8
 
 - Introduce the backtick syntax for condition referencing keys that contain dot delimiters
