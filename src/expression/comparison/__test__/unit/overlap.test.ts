@@ -34,6 +34,7 @@ describe('Expression - Comparison - Overlap', () => {
       new Collection([new Value('1'), new Value('2')]),
       true,
     ],
+    [new Collection([]), new Collection([]), true],
     // Truthy - Bi-directional
     [
       new Collection([new Value(1), new Value(2), new Value(5)]),
