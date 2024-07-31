@@ -1,5 +1,9 @@
 import { Evaluable } from '../../../common/evaluable'
 import {
+  OPERATOR as OPERATOR_SUM,
+  Sum,
+} from '../../../expression/arithmetic/sum'
+import {
   Equal,
   OPERATOR as OPERATOR_EQ,
 } from '../../../expression/comparison/eq'
@@ -133,6 +137,19 @@ describe('Condition Engine - Parser', () => {
           new Equal(new Value(10), new Value(10)),
           new Undefined(new Reference('RefA')),
         ]),
+      ],
+      // Arithmetic expression
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
+        new Sum(new Value(5), new Value(5)),
+      ],
+      [
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
+          10,
+        ],
+        new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
@@ -444,6 +461,36 @@ describe('Condition Engine - Parser', () => {
       [[]],
       // Invalid operator
       [['__', 5, 5]],
+    ] as [ExpressionInput][])('%p should throw', (expression) => {
+      expect(() => parser.parse(expression)).toThrowError()
+    })
+  })
+
+  describe('parse - arithmetic expressions', () => {
+    test.each([
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
+        new Sum(new Value(5), new Value(5)),
+      ],
+    ] as [ExpressionInput, Evaluable][])(
+      '%p should evaluate as %p',
+      (expression, expected) => {
+        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+          expected.serialize(defaultOptions)
+        )
+      }
+    )
+
+    test.each([
+      // Invalid form
+      [[]],
+      // Invalid operator
+      [['__', 5, 5]],
+
+      // TODO
+      [['-', 5, 5]],
+      [['/', 5, 5]],
+      [['*', 5, 5]],
     ] as [ExpressionInput][])('%p should throw', (expression) => {
       expect(() => parser.parse(expression)).toThrowError()
     })

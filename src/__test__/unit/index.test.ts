@@ -1,5 +1,6 @@
 import Engine from '../../'
 import { Context } from '../../common/evaluable'
+import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum'
 import { OPERATOR as OPERATOR_EQ } from '../../expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from '../../expression/comparison/ge'
 import { OPERATOR as OPERATOR_GT } from '../../expression/comparison/gt'
@@ -100,6 +101,8 @@ describe('Condition Engine', () => {
       [[OPERATOR_OR]],
       [[OPERATOR_NOR]],
       [[OPERATOR_XOR]],
+      [[OPERATOR_SUM]],
+      [[OPERATOR_SUM, 5, 5, 5]],
     ])('%p should throw', (expression) => {
       expect(() =>
         engine.evaluate(expression as ExpressionInput, {})
@@ -152,6 +155,7 @@ describe('Condition Engine', () => {
       [[OPERATOR_OR]],
       [[OPERATOR_NOR]],
       [[OPERATOR_XOR]],
+      [[OPERATOR_SUM]],
     ])('%p should throw', (expression) => {
       expect(() => engine.parse(expression as ExpressionInput)).toThrowError()
     })
@@ -210,6 +214,8 @@ describe('Condition Engine', () => {
       ],
       [['PRESENT', '$a'], { a: { obj: 'obj' } }, true, undefined, []],
       [['==', '$a', null], { a: { obj: 'obj' } }, false, undefined, []],
+      [['>', ['+', '$a', 5], 6], { a: 5 }, true],
+      [['>', ['+', '$a', 5], 6], { a: -2 }, false],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -222,6 +228,15 @@ describe('Condition Engine', () => {
         const engine = new Engine()
         expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
           expected
+        )
+      }
+    )
+
+    test.each<[ExpressionInput]>([[['+', 5, 5]]])(
+      '%p should throw',
+      (expression) => {
+        expect(() => engine.simplify(expression, {})).toThrowError(
+          'non expression or boolean result should be returned'
         )
       }
     )

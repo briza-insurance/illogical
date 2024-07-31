@@ -55,3 +55,23 @@ export function isEvaluable(value: Result | Evaluable): value is Evaluable {
     typeof value.toString === 'function'
   )
 }
+
+/**
+ * Ensures all values are results.
+ * @param {(Result | Evaluable)[]} values results or evaluables
+ * @returns {boolean} type guard
+ */
+export function areAllResults(
+  values: (Result | Evaluable)[]
+): values is Result[] {
+  return values.every((value) => !isEvaluable(value))
+}
+
+/**
+ * Ensures all values are numbers.
+ * @param {Result[]} results results or evaluables
+ * @returns {boolean} type guard
+ */
+export function areAllNumbers(results: Result[]): results is number[] {
+  return results.every(isNumber)
+}
