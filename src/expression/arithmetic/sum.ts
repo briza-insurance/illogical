@@ -30,6 +30,6 @@ export class Sum extends Arithmetic {
     if (!areAllNumbers(results)) {
       throw new Error('operands must be numbers for sum')
     }
-    return results.reduce((acc, result) => acc + result, 0)
+    return results.reduce((acc, result) => acc + result)
   }
 }

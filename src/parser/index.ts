@@ -1,4 +1,8 @@
 import { Evaluable, EvaluableType } from '../common/evaluable'
+import {
+  OPERATOR as OPERATOR_SUBTRACT,
+  Subtract,
+} from '../expression/arithmetic/subtract'
 import { OPERATOR as OPERATOR_SUM, Sum } from '../expression/arithmetic/sum'
 import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import {
@@ -255,6 +259,10 @@ export class Parser {
       // Arithmetic
       case this.opts.operatorMapping.get(OPERATOR_SUM):
         expression = (operands: Evaluable[]): Evaluable => new Sum(...operands)
+        break
+      case this.opts.operatorMapping.get(OPERATOR_SUBTRACT):
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Subtract(...operands)
         break
 
       // Collection

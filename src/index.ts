@@ -49,6 +49,9 @@ export {
   OPERATOR_NOT,
 }
 
+const unexpectedResultError =
+  'non expression or boolean result should be returned'
+
 /**
  * Condition engine
  */
@@ -70,7 +73,11 @@ class Engine {
    * @return {boolean}
    */
   evaluate(exp: ExpressionInput, ctx: Context): boolean {
-    return this.parse(exp).evaluate(ctx) as boolean
+    const result = this.parse(exp).evaluate(ctx)
+    if (isBoolean(result)) {
+      return result
+    }
+    throw new Error(unexpectedResultError)
   }
 
   /**
@@ -119,7 +126,7 @@ class Engine {
     if (isBoolean(result)) {
       return result
     }
-    throw new Error('non expression or boolean result should be returned')
+    throw new Error(unexpectedResultError)
   }
 }
 
