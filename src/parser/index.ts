@@ -277,18 +277,22 @@ export class Parser {
       // Arithmetic
       case this.opts.operatorMapping.get(OPERATOR_SUM):
         expression = (operands: Evaluable[]): Evaluable => new Sum(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_SUBTRACT):
         expression = (operands: Evaluable[]): Evaluable =>
           new Subtract(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_MULTIPLY):
         expression = (operands: Evaluable[]): Evaluable =>
           new Multiply(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_DIVIDE):
         expression = (operands: Evaluable[]): Evaluable =>
           new Divide(...operands)
+        operandParser = this.parseRawExp
         break
 
       // Collection

@@ -1,4 +1,6 @@
 import { operand } from '../../../__test__/helpers'
+import { Sum } from '../../../expression/arithmetic/sum'
+import { Value } from '../../../operand/value'
 import { Evaluable, Result } from '../../evaluable'
 import {
   areAllNumbers,
@@ -86,8 +88,10 @@ describe('Common - Type Check', () => {
       [[1, '2', 3], true],
       [[1, 2, {}], true],
       [[1, 2, '3'], true],
+      [[1, 2, '3', ['+', 1, 1]], true],
       // Falsy
       [[1, 2, '3', operand(1)], false],
+      [[1, 2, '3', new Sum(new Value(1), new Value(2))], false],
     ])('if %p should evaluate as %p', (values, expectedResult) => {
       const result = areAllResults(values)
       expect(result).toEqual(expectedResult)
