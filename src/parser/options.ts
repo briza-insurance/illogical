@@ -1,4 +1,5 @@
 import { isString } from '../common/type-check'
+import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply'
 import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract'
 import { OPERATOR as OPERATOR_SUM } from '../expression/arithmetic/sum'
 import { OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
@@ -122,6 +123,7 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   // Arithmetic
   [OPERATOR_SUM, '+'],
   [OPERATOR_SUBTRACT, '-'],
+  [OPERATOR_MULTIPLY, '*'],
 ])
 
 /**

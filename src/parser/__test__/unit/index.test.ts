@@ -1,5 +1,9 @@
 import { Evaluable } from '../../../common/evaluable'
 import {
+  Multiply,
+  OPERATOR as OPERATOR_MULTIPLY,
+} from '../../../expression/arithmetic/multiply'
+import {
   OPERATOR as OPERATOR_SUBTRACT,
   Subtract,
 } from '../../../expression/arithmetic/subtract'
@@ -158,6 +162,10 @@ describe('Condition Engine - Parser', () => {
       [
         [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
         new Subtract(new Value(5), new Value(5)),
+      ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
+        new Multiply(new Value(5), new Value(5)),
       ],
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
@@ -484,6 +492,10 @@ describe('Condition Engine - Parser', () => {
         [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
         new Subtract(new Value(5), new Value(5)),
       ],
+      [
+        [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
+        new Multiply(new Value(5), new Value(5)),
+      ],
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
       (expression, expected) => {
@@ -501,7 +513,6 @@ describe('Condition Engine - Parser', () => {
 
       // TODO
       [['/', 5, 5]],
-      [['*', 5, 5]],
     ] as [ExpressionInput][])('%p should throw', (expression) => {
       expect(() => parser.parse(expression)).toThrowError()
     })

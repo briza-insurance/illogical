@@ -109,7 +109,7 @@ describe('Condition Engine', () => {
       ).toThrowError()
     })
 
-    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]]])(
+    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]], [['*', 5, 5]]])(
       '%p should throw',
       (expression) => {
         expect(() => engine.evaluate(expression, {})).toThrowError(
@@ -229,6 +229,9 @@ describe('Condition Engine', () => {
       [['>', ['-', '$a', 5], 6], { a: 12 }, true],
       [['>', ['-', '$a', 5], 6], { a: 11 }, false],
       [['==', ['-', '$a', 1, 1, 1], 0], { a: 3 }, true],
+      [['>', ['*', '$a', 6], 6], { a: 1.1 }, true],
+      [['>', ['*', '$a', 5], 6], { a: 1 }, false],
+      [['==', ['*', '$a', 1, 2, 3], 30], { a: 5 }, true],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -245,7 +248,7 @@ describe('Condition Engine', () => {
       }
     )
 
-    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]]])(
+    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]], [['*', 5, 5]]])(
       '%p should throw',
       (expression) => {
         expect(() => engine.simplify(expression, {})).toThrowError(

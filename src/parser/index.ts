@@ -1,5 +1,9 @@
 import { Evaluable, EvaluableType } from '../common/evaluable'
 import {
+  Multiply,
+  OPERATOR as OPERATOR_MULTIPLY,
+} from '../expression/arithmetic/multiply'
+import {
   OPERATOR as OPERATOR_SUBTRACT,
   Subtract,
 } from '../expression/arithmetic/subtract'
@@ -263,6 +267,10 @@ export class Parser {
       case this.opts.operatorMapping.get(OPERATOR_SUBTRACT):
         expression = (operands: Evaluable[]): Evaluable =>
           new Subtract(...operands)
+        break
+      case this.opts.operatorMapping.get(OPERATOR_MULTIPLY):
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Multiply(...operands)
         break
 
       // Collection
