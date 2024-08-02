@@ -7,7 +7,7 @@ import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
 // Operator key
 export const OPERATOR = Symbol('SUBTRACT')
 
-const subtractWithExpectedDecimals = operateWithExpectedDecimals(false)
+const subtractWithExpectedDecimals = operateWithExpectedDecimals('subtract')
 
 /**
  * Subtract operation expression

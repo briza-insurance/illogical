@@ -46,7 +46,9 @@ describe('Expression - Arithmetic - Subtract', () => {
       [operand(null), operand(1)],
       [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Subtract(...operands).evaluate({})).toThrowError()
+      expect(() => new Subtract(...operands).evaluate({})).toThrowError(
+        'operands must be numbers for subtract'
+      )
     })
   })
 

@@ -58,6 +58,11 @@ yarn add @briza/illogical -D
     - [Nor](#nor)
     - [Xor](#xor)
     - [Not](#not)
+  - [Arithmetic Expressions](#arithmetic-expressions)
+    - [Divide](#divide)
+    - [Multiply](#multiply)
+    - [Subtract](#subtract)
+    - [Sum](#sum)
 - [Engine Options](#engine-options)
   - [Parser Options](#parser-options)
     - [Reference Predicate](#reference-predicate)
@@ -683,6 +688,76 @@ Expression format: `["NOT", Operand]`
 engine.evaluate(['NOT', ['==', 5, 5]]) // true
 ```
 
+### Arithmetic Expressions
+
+Arithmetic Expressions are not supported as root level expressions since they must evaluate to a boolean. But it can be used nested within [Comparisson Expressions](#comparison-expressions).
+
+#### Division
+
+The arithmetical operator for division produces the quotient of its operands where the left-most operand is the dividend and the subsequent one is the divisor, done from left to right.
+
+Expression format: `["/", First Operand, Second Operand, ... , Nth Operand]`.
+
+> Valid operand types: [Arithmetic Expressions](#arithmetic-expressions) or [Operands](#operand-types).
+
+```json
+["==", ["/", 100, 10], 10]
+```
+
+```js
+engine.evaluate(["==", ["/", 100, 10], 10]) // true
+```
+
+#### Multiplication
+
+The arithmetical operator for multiplication produces the product of the operands.
+
+Expression format: `["*", First Operand, Second Operand, ... , Nth Operand]`.
+
+> Valid operand types: [Arithmetic Expressions](#arithmetic-expressions) or [Operands](#operand-types).
+
+```json
+["==", ["*", 100, 10], 10]
+```
+
+```js
+engine.evaluate(["==", ["*", 10, 10], 100]) // true
+```
+
+#### Subtraction
+
+The arithmetical operator for subtraction subtracts the operands, producing their difference.
+
+Expression format: `["-", First Operand, Second Operand, ... , Nth Operand]`.
+
+> Valid operand types: [Arithmetic Expressions](#arithmetic-expressions) or [Operands](#operand-types).
+
+```json
+["==", ["-", 20, 10], 10]
+```
+
+```js
+engine.evaluate(["==", ["-", 20, 10], 10]) // true
+```
+
+
+#### Addition
+
+The arithmetical operator for addition produces the sum of the operands.
+
+Expression format: `["+", First Operand, Second Operand, ... , Nth Operand]`.
+
+> Valid operand types: [Arithmetic Expressions](#arithmetic-expressions) or [Operands](#operand-types).
+
+```json
+["==", ["+", 5, 5], 10]
+```
+
+```js
+engine.evaluate(["==", ["+", 5, 5], 10]) // true
+```
+
+
 ## Engine Options
 
 ### Parser Options
@@ -741,19 +816,31 @@ operatorMapping: Map<symbol, string>
 **Default operator mapping:**
 
 ```typescript
-// Comparison
-;[OPERATOR_EQ, '=='][(OPERATOR_NE, '!=')][(OPERATOR_GT, '>')][
-  (OPERATOR_GE, '>=')
-][(OPERATOR_LT, '<')][(OPERATOR_LE, '<=')][(OPERATOR_IN, 'IN')][
-  (OPERATOR_NOT_IN, 'NOT IN')
-][(OPERATOR_PREFIX, 'PREFIX')][(OPERATOR_SUFFIX, 'SUFFIX')][
-  (OPERATOR_OVERLAP, 'OVERLAP')
-][(OPERATOR_UNDEFINED, 'UNDEFINED')][(OPERATOR_PRESENT, 'PRESENT')][
+  // Comparison
+  [OPERATOR_EQ, '=='],
+  [OPERATOR_NE, '!='],
+  [OPERATOR_GT, '>'],
+  [OPERATOR_GE, '>='],
+  [OPERATOR_LT, '<'],
+  [OPERATOR_LE, '<='],
+  [OPERATOR_IN, 'IN'],
+  [OPERATOR_NOT_IN, 'NOT IN'],
+  [OPERATOR_PREFIX, 'PREFIX'],
+  [OPERATOR_SUFFIX, 'SUFFIX'],
+  [OPERATOR_OVERLAP, 'OVERLAP'],
+  [OPERATOR_UNDEFINED, 'UNDEFINED'],
+  [OPERATOR_PRESENT, 'PRESENT'],
   // Logical
-  (OPERATOR_AND, 'AND')
-][(OPERATOR_OR, 'OR')][(OPERATOR_NOR, 'NOR')][(OPERATOR_XOR, 'XOR')][
-  (OPERATOR_NOT, 'NOT')
-]
+  [OPERATOR_AND, 'AND'],
+  [OPERATOR_OR, 'OR'],
+  [OPERATOR_NOR, 'NOR'],
+  [OPERATOR_XOR, 'XOR'],
+  [OPERATOR_NOT, 'NOT'],
+  // Arithmetic
+  [OPERATOR_SUM, '+'],
+  [OPERATOR_SUBTRACT, '-'],
+  [OPERATOR_MULTIPLY, '*'],
+  [OPERATOR_DIVIDE, '/'],
 ```
 
 > The operator keys are unique symbols which could be imported from the engine package:
@@ -778,6 +865,10 @@ import {
   OPERATOR_NOR,
   OPERATOR_XOR,
   OPERATOR_NOT,
+  OPERATOR_DIVIDE,
+  OPERATOR_MULTIPLY,
+  OPERATOR_SUBTRACT,
+  OPERATOR_SUM,
 } from '@briza/illogical'
 ```
 

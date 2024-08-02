@@ -21,11 +21,11 @@ describe('Expression - Arithmetic - Multiply', () => {
     [-200, operand(-10), operand(20)],
     [200, operand(-10), operand(-20)],
     [0, operand(10), operand(0)],
-    [-0, operand(0), operand(-10)],
+    [0, operand(0), operand(-10)],
     [0, operand(0), operand(0)],
     [3.36, operand(2.8), operand(1.2)],
     [2.592591962963, operand(2.333333), operand(1.111111)],
-    [0.04000000000000001, operand(0.4), operand(0.1)],
+    [0.04, operand(0.4), operand(0.1)],
     [1.776889, operand(1.333), operand(1.333)],
   ]
 
@@ -46,7 +46,9 @@ describe('Expression - Arithmetic - Multiply', () => {
       [operand(null), operand(1)],
       [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Multiply(...operands).evaluate({})).toThrowError()
+      expect(() => new Multiply(...operands).evaluate({})).toThrowError(
+        'operands must be numbers for multiply'
+      )
     })
   })
 

@@ -45,7 +45,9 @@ describe('Expression - Arithmetic - Sum', () => {
       [operand(null), operand(1)],
       [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Sum(...operands).evaluate({})).toThrowError()
+      expect(() => new Sum(...operands).evaluate({})).toThrowError(
+        'operands must be numbers for sum'
+      )
     })
   })
 

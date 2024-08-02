@@ -7,7 +7,7 @@ import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
 // Operator key
 export const OPERATOR = Symbol('SUM')
 
-const addWithExpectedDecimals = operateWithExpectedDecimals()
+const addWithExpectedDecimals = operateWithExpectedDecimals('sum')
 
 /**
  * Sum operation expression

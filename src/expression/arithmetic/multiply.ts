@@ -2,9 +2,12 @@ import { Evaluable, Result } from '../../common/evaluable'
 import { areAllNumbers } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Arithmetic } from '.'
+import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
 
 // Operator key
 export const OPERATOR = Symbol('MULTIPLY')
+
+const multiplyWithExpectedDecimals = operateWithExpectedDecimals('multiply')
 
 /**
  * Multiply operation expression
@@ -30,6 +33,8 @@ export class Multiply extends Arithmetic {
     if (!areAllNumbers(results)) {
       throw new Error('operands must be numbers for multiply')
     }
-    return results.reduce((acc, result) => acc * result)
+    return results.reduce((acc, result) =>
+      multiplyWithExpectedDecimals(acc, result)
+    )
   }
 }

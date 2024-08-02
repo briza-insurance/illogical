@@ -46,7 +46,9 @@ describe('Expression - Arithmetic - Divide', () => {
       [operand(null), operand(1)],
       [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Divide(...operands).evaluate({})).toThrowError()
+      expect(() => new Divide(...operands).evaluate({})).toThrowError(
+        'operands must be numbers for divide'
+      )
     })
   })
 
