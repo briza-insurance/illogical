@@ -116,7 +116,7 @@ describe('Condition Engine', () => {
       [['/', 5, 5]],
     ])('%p should throw', (expression) => {
       expect(() => engine.evaluate(expression, {})).toThrowError(
-        'non expression or boolean result should be returned'
+        'invalid expression'
       )
     })
   })
@@ -263,7 +263,7 @@ describe('Condition Engine', () => {
       [['/', 5, 5]],
     ])('%p should throw', (expression) => {
       expect(() => engine.simplify(expression, {})).toThrowError(
-        'non expression or boolean result should be returned'
+        'invalid expression'
       )
     })
   })

@@ -79,7 +79,13 @@ export type ExpressionInput = [string, ...Input[]]
  */
 export class Parser {
   private readonly opts: Options
-  private readonly expectedOperators: Set<string>
+  private readonly expectedRootOperators: Set<string>
+  private readonly unexpectedRootSymbols: Set<symbol> = new Set([
+    OPERATOR_SUM,
+    OPERATOR_SUBTRACT,
+    OPERATOR_MULTIPLY,
+    OPERATOR_DIVIDE,
+  ])
 
   /**
    * @constructor
@@ -96,7 +102,11 @@ export class Parser {
       }
     }
 
-    this.expectedOperators = new Set<string>(this.opts.operatorMapping.values())
+    this.expectedRootOperators = new Set<string>(
+      Array.from(this.opts.operatorMapping.entries())
+        .filter(([symbol]) => !this.unexpectedRootSymbols.has(symbol))
+        .map(([, operator]) => operator)
+    )
   }
 
   /**
@@ -119,7 +129,7 @@ export class Parser {
 
     if (
       (raw as ArrayInput).length === 0 ||
-      !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
+      !this.expectedRootOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
       throw new Error('invalid expression')
     }

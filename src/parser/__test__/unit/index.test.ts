@@ -150,11 +150,7 @@ describe('Condition Engine - Parser', () => {
           new Undefined(new Reference('RefA')),
         ]),
       ],
-      // Arithmetic expression
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
-        new Sum(new Value(5), new Value(5)),
-      ],
+      // Arithmetic expression - cannot be as root expression
       [
         [
           defaultOptions.operatorMapping.get(OPERATOR_EQ),
@@ -164,16 +160,28 @@ describe('Condition Engine - Parser', () => {
         new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
-        new Subtract(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
+          0,
+        ],
+        new Equal(new Subtract(new Value(5), new Value(5)), new Value(0)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
-        new Multiply(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
+          25,
+        ],
+        new Equal(new Multiply(new Value(5), new Value(5)), new Value(25)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
-        new Divide(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
+          1,
+        ],
+        new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
@@ -195,6 +203,7 @@ describe('Condition Engine - Parser', () => {
       [() => {}],
       // Invalid operator
       [['__', ['==', 5, 5]]],
+      [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
     ] as [ExpressionInput][])('%p should throw', (expression) => {
       expect(() => parser.parse(expression)).toThrowError()
     })
@@ -493,20 +502,36 @@ describe('Condition Engine - Parser', () => {
   describe('parse - arithmetic expressions', () => {
     test.each([
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
-        new Sum(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
+          10,
+        ],
+        new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
-        new Subtract(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
+          0,
+        ],
+        new Equal(new Subtract(new Value(5), new Value(5)), new Value(0)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
-        new Multiply(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
+          25,
+        ],
+        new Equal(new Multiply(new Value(5), new Value(5)), new Value(25)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
-        new Divide(new Value(5), new Value(5)),
+        [
+          defaultOptions.operatorMapping.get(OPERATOR_EQ),
+          [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
+          1,
+        ],
+        new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
     ] as [ExpressionInput, Evaluable][])(
       '%p should evaluate as %p',
@@ -522,6 +547,11 @@ describe('Condition Engine - Parser', () => {
       [[]],
       // Invalid operator
       [['__', 5, 5]],
+      // Invalid root operator
+      [['+', 5, 5]],
+      [['-', 5, 5]],
+      [['*', 5, 5]],
+      [['/', 5, 5]],
     ] as [ExpressionInput][])('%p should throw', (expression) => {
       expect(() => parser.parse(expression)).toThrowError()
     })
