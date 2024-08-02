@@ -27,7 +27,7 @@ export class LessThanOrEqual extends Comparison {
    */
   comparison(left: Result, right: Result): boolean {
     if (isNumber(left) && isNumber(right)) {
-      return (left as number) <= (right as number)
+      return left <= right
     }
 
     const leftDate = toDateNumber(left),

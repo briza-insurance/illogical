@@ -109,14 +109,16 @@ describe('Condition Engine', () => {
       ).toThrowError()
     })
 
-    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]], [['*', 5, 5]]])(
-      '%p should throw',
-      (expression) => {
-        expect(() => engine.evaluate(expression, {})).toThrowError(
-          'non expression or boolean result should be returned'
-        )
-      }
-    )
+    test.each<[ExpressionInput]>([
+      [['+', 5, 5]],
+      [['-', 5, 5]],
+      [['*', 5, 5]],
+      [['/', 5, 5]],
+    ])('%p should throw', (expression) => {
+      expect(() => engine.evaluate(expression, {})).toThrowError(
+        'non expression or boolean result should be returned'
+      )
+    })
   })
 
   test('statement', () => {
@@ -232,6 +234,12 @@ describe('Condition Engine', () => {
       [['>', ['*', '$a', 6], 6], { a: 1.1 }, true],
       [['>', ['*', '$a', 5], 6], { a: 1 }, false],
       [['==', ['*', '$a', 1, 2, 3], 30], { a: 5 }, true],
+      [['>', ['/', '$a', 6], 6], { a: 42 }, true],
+      [['>', ['/', '$a', 5], 6], { a: 30 }, false],
+      [['==', ['/', '$a', 3, 2, 1], 15], { a: 90 }, true],
+      [['>', ['/', 10, 0], 10000], {}, true], // 10 / 0 = Infinity
+      [['>', 10000, ['/', 10, 0]], {}, false], // 10 / 0 = Infinity
+      [['>', ['/', 0, 0], 10000], {}, false], // 0 / 0 = NaN
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -248,13 +256,15 @@ describe('Condition Engine', () => {
       }
     )
 
-    test.each<[ExpressionInput]>([[['+', 5, 5]], [['-', 5, 5]], [['*', 5, 5]]])(
-      '%p should throw',
-      (expression) => {
-        expect(() => engine.simplify(expression, {})).toThrowError(
-          'non expression or boolean result should be returned'
-        )
-      }
-    )
+    test.each<[ExpressionInput]>([
+      [['+', 5, 5]],
+      [['-', 5, 5]],
+      [['*', 5, 5]],
+      [['/', 5, 5]],
+    ])('%p should throw', (expression) => {
+      expect(() => engine.simplify(expression, {})).toThrowError(
+        'non expression or boolean result should be returned'
+      )
+    })
   })
 })

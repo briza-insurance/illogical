@@ -5,7 +5,7 @@ import { Evaluable, Result } from './evaluable'
  * @param value Tested value.
  */
 export function isNumber(value: Result): value is number {
-  return typeof value === 'number' && isFinite(value)
+  return typeof value === 'number'
 }
 
 /**
