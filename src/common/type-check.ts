@@ -1,3 +1,6 @@
+import { Arithmetic } from '../expression/arithmetic'
+import { Operand } from '../operand'
+import { Reference } from '../operand/reference'
 import { Evaluable, Result } from './evaluable'
 
 /**
@@ -6,6 +9,13 @@ import { Evaluable, Result } from './evaluable'
  */
 export function isNumber(value: Result): value is number {
   return typeof value === 'number'
+}
+/**
+ * Is number predicate.
+ * @param value Tested value.
+ */
+export function isInfinite(value: Result): value is typeof Infinity {
+  return typeof value === 'number' && !isFinite(value)
 }
 
 /**
@@ -75,3 +85,12 @@ export function areAllResults(
 export function areAllNumbers(results: Result[]): results is number[] {
   return results.every(isNumber)
 }
+
+export const isSimplifiedArithmeticExpression = (
+  operand: Operand,
+  result: Result | Evaluable
+): result is Result =>
+  operand instanceof Arithmetic &&
+  !isEvaluable(result) &&
+  !isInfinite(result) &&
+  !(operand instanceof Reference)

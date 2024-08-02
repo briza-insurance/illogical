@@ -31,7 +31,7 @@ describe('Expression - Arithmetic - Divide', () => {
 
   describe('evaluate', () => {
     test.each(testCases)(
-      'that %p is the result of divideing %p',
+      'that %p is the result of dividing %p',
       (expected, ...operands) => {
         expect(new Divide(...operands).evaluate({})).toBe(expected)
       }

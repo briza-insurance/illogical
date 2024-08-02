@@ -2,23 +2,12 @@ import { Evaluable, Result } from '../../common/evaluable'
 import { areAllNumbers } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Arithmetic } from '.'
+import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
 
 // Operator key
 export const OPERATOR = Symbol('SUBTRACT')
 
-const getNumDecimals = (num: number) => {
-  const numberSplit = num.toString().split('.')
-  return numberSplit.length == 2 ? numberSplit[1].length : 0
-}
-
-const subtractWithExpectedDecimals = (first: number, second: number) => {
-  const numDecimals1 = getNumDecimals(first)
-  const numDecimals2 = getNumDecimals(second)
-
-  const maxDecimals = numDecimals1 > numDecimals2 ? numDecimals1 : numDecimals2
-
-  return Number((first - second).toFixed(maxDecimals))
-}
+const subtractWithExpectedDecimals = operateWithExpectedDecimals(false)
 
 /**
  * Subtract operation expression

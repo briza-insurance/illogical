@@ -240,6 +240,13 @@ describe('Condition Engine', () => {
       [['>', ['/', 10, 0], 10000], {}, true], // 10 / 0 = Infinity
       [['>', 10000, ['/', 10, 0]], {}, false], // 10 / 0 = Infinity
       [['>', ['/', 0, 0], 10000], {}, false], // 0 / 0 = NaN
+      [
+        ['>', ['/', 10, 0], ['+', '$a', 0]],
+        { b: 0 },
+        ['>', ['/', 10, 0], ['+', '$a', 0]], // Infinity doesn't get simplified to avoid conversion loss
+      ],
+      [['>', ['/', '$a', 0], ['+', 0, 0]], { b: 0 }, ['>', ['/', '$a', 0], 0]],
+      [['>', ['+', 0, 0], ['/', '$a', 0]], { b: 0 }, ['>', 0, ['/', '$a', 0]]],
     ])(
       '%p with context %p should be simplified to %p',
       (

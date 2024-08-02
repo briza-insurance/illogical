@@ -23,6 +23,7 @@ describe('Expression - Arithmetic - Sum', () => {
     [10, operand(10), operand(0)],
     [10, operand(0), operand(10)],
     [0, operand(0), operand(0)],
+    [0.3, operand(0.2), operand(0.1)],
     [4, operand(1.2), operand(2.8)],
     [0, operand(1.333), operand(-1.333)],
   ]
