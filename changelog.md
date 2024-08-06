@@ -1,5 +1,13 @@
 # illogical changelog
 
+## 1.6.0
+
+- Added support for Arithmetic expressions within other Comparison expressions. This allows for
+more complex and dynamic comparisons to be made. Now, you can perform mathematical operations
+within your conditional expressions, making them even more powerful and flexible. Whether you need
+to calculate sums, differences, products, or divisions, the new Arithmetic expression feature has
+got you covered. There are no breaking changes if this new kind of expression isn't being used.
+
 ## 1.5.9
 
 - Modify OVERLAP expression such that the OVERLAP of two empty arrays returns true
