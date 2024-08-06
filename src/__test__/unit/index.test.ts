@@ -249,6 +249,7 @@ describe('Condition Engine', () => {
       [['>', ['+', 0, 0], ['/', '$a', 0]], { b: 0 }, ['>', 0, ['/', '$a', 0]]],
       [['==', ['+', ['*', 9, 9], 19], 100], {}, true],
       [['==', ['+', ['*', 9, 9], ['-', ['/', 250, 5], 31]], 100], {}, true],
+      [['AND', ['==', ['+', 1, 1], 2], ['==', ['+', 2, 2], 4]], {}, true],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -270,6 +271,9 @@ describe('Condition Engine', () => {
       [['-', 5, 5]],
       [['*', 5, 5]],
       [['/', 5, 5]],
+      [['+', ['AND', ['==', 1, 1]], 1]],
+      [['AND', ['+', 1, -1], ['+', ['-', 1, 1], 1]]],
+      [['NOT', ['+', 1, 1]]],
     ])('%p should throw', (expression) => {
       expect(() => engine.simplify(expression, {})).toThrowError(
         'invalid expression'
