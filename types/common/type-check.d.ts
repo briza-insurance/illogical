@@ -5,6 +5,11 @@ import { Evaluable, Result } from './evaluable';
  */
 export declare function isNumber(value: Result): value is number;
 /**
+ * Is number predicate.
+ * @param value Tested value.
+ */
+export declare function isInfinite(value: Result): value is typeof Infinity;
+/**
  * Is string type predicate.
  * @param value Tested value.
  */
@@ -26,3 +31,15 @@ export declare function isBoolean(value: unknown): value is boolean;
  * @returns {Evaluable}
  */
 export declare function isEvaluable(value: Result | Evaluable): value is Evaluable;
+/**
+ * Ensures all values are results.
+ * @param {(Result | Evaluable)[]} values results or evaluables
+ * @returns {boolean} type guard
+ */
+export declare function areAllResults(values: (Result | Evaluable)[]): values is Result[];
+/**
+ * Ensures all values are numbers.
+ * @param {Result[]} results results or evaluables
+ * @returns {boolean} type guard
+ */
+export declare function areAllNumbers(results: Result[]): results is number[];

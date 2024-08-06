@@ -1,4 +1,4 @@
-export declare type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
+export type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
 export interface Options {
     /**
      * A function used to determine if the operand is a reference type,

@@ -3,7 +3,7 @@ import { Options } from '../parser/options';
 /**
  * Valid types for context members
  */
-declare type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
+type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
 /**
  * Evaluation Context
  * Holds references used during the evaluation process.
@@ -15,7 +15,7 @@ export interface Context {
 /**
  * Evaluation result
  */
-export declare type Result = undefined | null | string | number | boolean | Array<Result> | Record<string, unknown>;
+export type Result = undefined | null | string | number | boolean | Array<Result> | Record<string, unknown>;
 export declare enum EvaluableType {
     Operand = "Operand",
     Expression = "Expression"
@@ -53,5 +53,5 @@ export interface Evaluable {
      */
     toString(): string;
 }
-export declare type SimplifyArgs = Parameters<Evaluable['simplify']>;
+export type SimplifyArgs = Parameters<Evaluable['simplify']>;
 export {};

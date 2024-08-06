@@ -1,14 +1,15 @@
 import { Evaluable } from '../common/evaluable';
 import { Options } from './options';
-export declare type Input = string | number | boolean | null | Input[] | [string, ...Input[]];
-export declare type ArrayInput = Input[];
-export declare type ExpressionInput = [string, ...Input[]];
+export type Input = string | number | boolean | null | Input[] | [string, ...Input[]];
+export type ArrayInput = Input[];
+export type ExpressionInput = [string, ...Input[]];
 /**
  * Parser of raw expressions into Evaluable expression
  */
 export declare class Parser {
     private readonly opts;
-    private readonly expectedOperators;
+    private readonly expectedRootOperators;
+    private readonly unexpectedRootSymbols;
     /**
      * @constructor
      * @param {Options?} options Parser options.
