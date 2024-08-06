@@ -1,6 +1,3 @@
-import { Arithmetic } from '../expression/arithmetic'
-import { Operand } from '../operand'
-import { Reference } from '../operand/reference'
 import { Evaluable, Result } from './evaluable'
 
 /**
@@ -85,12 +82,3 @@ export function areAllResults(
 export function areAllNumbers(results: Result[]): results is number[] {
   return results.every(isNumber)
 }
-
-export const isSimplifiedArithmeticExpression = (
-  operand: Operand,
-  result: Result | Evaluable
-): result is Result =>
-  operand instanceof Arithmetic &&
-  !isEvaluable(result) &&
-  !isInfinite(result) &&
-  !(operand instanceof Reference)

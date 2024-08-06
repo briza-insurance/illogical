@@ -5,14 +5,12 @@ import {
   Result,
   SimplifyArgs,
 } from '../../common/evaluable'
-import {
-  isEvaluable,
-  isSimplifiedArithmeticExpression,
-} from '../../common/type-check'
+import { isEvaluable } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Value } from '../../operand/value'
 import { ExpressionInput } from '../../parser'
 import { Options } from '../../parser/options'
+import { isSimplifiedArithmeticExpression } from '../arithmetic/isSimplifiedArithmeticExpression'
 
 /**
  * Abstract comparison expression
