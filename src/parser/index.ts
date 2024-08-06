@@ -1,4 +1,18 @@
 import { Evaluable, EvaluableType } from '../common/evaluable'
+import {
+  Divide,
+  OPERATOR as OPERATOR_DIVIDE,
+} from '../expression/arithmetic/divide'
+import {
+  Multiply,
+  OPERATOR as OPERATOR_MULTIPLY,
+} from '../expression/arithmetic/multiply'
+import {
+  OPERATOR as OPERATOR_SUBTRACT,
+  Subtract,
+} from '../expression/arithmetic/subtract'
+import { OPERATOR as OPERATOR_SUM, Sum } from '../expression/arithmetic/sum'
+import { Comparison } from '../expression/comparison'
 import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import {
   GreaterThanOrEqual,
@@ -39,6 +53,7 @@ import {
   OPERATOR as OPERATOR_UNDEFINED,
   Undefined,
 } from '../expression/comparison/undefined'
+import { Logical } from '../expression/logical'
 import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
 import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
 import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
@@ -61,12 +76,34 @@ export type Input =
 export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
+const invalidExpression = 'invalid expression'
+
+const logicalIfValidOperands = (
+  operands: Evaluable[],
+  logical: Logical
+): Evaluable => {
+  if (
+    operands.every(
+      (operand) => operand instanceof Logical || operand instanceof Comparison
+    )
+  ) {
+    return logical
+  }
+  throw new Error(invalidExpression)
+}
+
 /**
  * Parser of raw expressions into Evaluable expression
  */
 export class Parser {
   private readonly opts: Options
-  private readonly expectedOperators: Set<string>
+  private readonly expectedRootOperators: Set<string>
+  private readonly unexpectedRootSymbols: Set<symbol> = new Set([
+    OPERATOR_SUM,
+    OPERATOR_SUBTRACT,
+    OPERATOR_MULTIPLY,
+    OPERATOR_DIVIDE,
+  ])
 
   /**
    * @constructor
@@ -83,7 +120,11 @@ export class Parser {
       }
     }
 
-    this.expectedOperators = new Set<string>(this.opts.operatorMapping.values())
+    this.expectedRootOperators = new Set<string>(
+      Array.from(this.opts.operatorMapping.entries())
+        .filter(([symbol]) => !this.unexpectedRootSymbols.has(symbol))
+        .map(([, operator]) => operator)
+    )
   }
 
   /**
@@ -101,14 +142,14 @@ export class Parser {
    */
   parse(raw: ExpressionInput): Evaluable {
     if (raw === undefined || raw === null || Array.isArray(raw) === false) {
-      throw new Error('invalid expression')
+      throw new Error(invalidExpression)
     }
 
     if (
       (raw as ArrayInput).length === 0 ||
-      !this.expectedOperators.has(`${(raw as ArrayInput)[0]}`)
+      !this.expectedRootOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
-      throw new Error('invalid expression')
+      throw new Error(invalidExpression)
     }
     return this.parseRawExp(raw as Input)
   }
@@ -155,61 +196,71 @@ export class Parser {
     }
 
     switch (operator) {
-      /**
-       * Logical
-       */
+      // Logical
       case this.opts.operatorMapping.get(OPERATOR_AND):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands, true) || new And(operands)
+          logicalExpressionReducer(operands, true) ||
+          logicalIfValidOperands(operands, new And(operands))
         operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_OR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands, true) || new Or(operands)
+          logicalExpressionReducer(operands, true) ||
+          logicalIfValidOperands(operands, new Or(operands))
         operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_NOR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Nor(operands)
+          logicalExpressionReducer(operands) ||
+          logicalIfValidOperands(operands, new Nor(operands))
         operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_XOR):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Xor(operands)
+          logicalExpressionReducer(operands) ||
+          logicalIfValidOperands(operands, new Xor(operands))
         operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_NOT):
         expression = (operands: Evaluable[]): Evaluable =>
-          logicalExpressionReducer(operands) || new Not(...operands)
+          logicalExpressionReducer(operands) ||
+          logicalIfValidOperands(operands, new Not(...operands))
         operandParser = this.parseRawExp
         break
-      /**
-       * Comparison
-       */
+
+      // Comparison
       case this.opts.operatorMapping.get(OPERATOR_EQ):
         expression = (operands: Evaluable[]): Evaluable =>
           new Equal(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_NE):
         expression = (operands: Evaluable[]): Evaluable =>
           new NotEqual(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_GT):
         expression = (operands: Evaluable[]): Evaluable =>
           new GreaterThan(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_GE):
         expression = (operands: Evaluable[]): Evaluable =>
           new GreaterThanOrEqual(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_LT):
         expression = (operands: Evaluable[]): Evaluable =>
           new LessThan(...operands)
+        operandParser = this.parseRawExp
         break
       case this.opts.operatorMapping.get(OPERATOR_LE):
         expression = (operands: Evaluable[]): Evaluable =>
           new LessThanOrEqual(...operands)
+        operandParser = this.parseRawExp
         break
+
+      // Containment
       case this.opts.operatorMapping.get(OPERATOR_IN):
         expression = (operands: Evaluable[]): Evaluable => new In(...operands)
         break
@@ -217,18 +268,26 @@ export class Parser {
         expression = (operands: Evaluable[]): Evaluable =>
           new NotIn(...operands)
         break
+
+      // Prefix
       case this.opts.operatorMapping.get(OPERATOR_PREFIX):
         expression = (operands: Evaluable[]): Evaluable =>
           new Prefix(...operands)
         break
+
+      // Suffix
       case this.opts.operatorMapping.get(OPERATOR_SUFFIX):
         expression = (operands: Evaluable[]): Evaluable =>
           new Suffix(...operands)
         break
+
+      // Overlap
       case this.opts.operatorMapping.get(OPERATOR_OVERLAP):
         expression = (operands: Evaluable[]): Evaluable =>
           new Overlap(...operands)
         break
+
+      // Presence
       case this.opts.operatorMapping.get(OPERATOR_UNDEFINED):
         expression = (operands: Evaluable[]): Evaluable =>
           new Undefined(...operands)
@@ -237,6 +296,28 @@ export class Parser {
         expression = (operands: Evaluable[]): Evaluable =>
           new Present(...operands)
         break
+
+      // Arithmetic
+      case this.opts.operatorMapping.get(OPERATOR_SUM):
+        expression = (operands: Evaluable[]): Evaluable => new Sum(...operands)
+        operandParser = this.parseRawExp
+        break
+      case this.opts.operatorMapping.get(OPERATOR_SUBTRACT):
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Subtract(...operands)
+        operandParser = this.parseRawExp
+        break
+      case this.opts.operatorMapping.get(OPERATOR_MULTIPLY):
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Multiply(...operands)
+        operandParser = this.parseRawExp
+        break
+      case this.opts.operatorMapping.get(OPERATOR_DIVIDE):
+        expression = (operands: Evaluable[]): Evaluable =>
+          new Divide(...operands)
+        operandParser = this.parseRawExp
+        break
+
       // Collection
       default:
         return this.getOperand(raw)

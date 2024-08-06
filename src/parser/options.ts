@@ -1,4 +1,8 @@
 import { isString } from '../common/type-check'
+import { OPERATOR as OPERATOR_DIVIDE } from '../expression/arithmetic/divide'
+import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply'
+import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract'
+import { OPERATOR as OPERATOR_SUM } from '../expression/arithmetic/sum'
 import { OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from '../expression/comparison/ge'
 import { OPERATOR as OPERATOR_GT } from '../expression/comparison/gt'
@@ -117,6 +121,11 @@ export const defaultOperatorMapping = new Map<symbol, string>([
   [OPERATOR_NOR, 'NOR'],
   [OPERATOR_XOR, 'XOR'],
   [OPERATOR_NOT, 'NOT'],
+  // Arithmetic
+  [OPERATOR_SUM, '+'],
+  [OPERATOR_SUBTRACT, '-'],
+  [OPERATOR_MULTIPLY, '*'],
+  [OPERATOR_DIVIDE, '/'],
 ])
 
 /**

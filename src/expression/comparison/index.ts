@@ -7,8 +7,10 @@ import {
 } from '../../common/evaluable'
 import { isEvaluable } from '../../common/type-check'
 import { Operand } from '../../operand'
+import { Value } from '../../operand/value'
 import { ExpressionInput } from '../../parser'
 import { Options } from '../../parser/options'
+import { isSimplifiedArithmeticExpression } from '../arithmetic/isSimplifiedArithmeticExpression'
 
 /**
  * Abstract comparison expression
@@ -61,6 +63,21 @@ export abstract class Comparison implements Evaluable {
     if (!isEvaluable(left) && !isEvaluable(right)) {
       return this.comparison(left, right)
     }
+
+    if (
+      isEvaluable(left) &&
+      isSimplifiedArithmeticExpression(this.right, right)
+    ) {
+      return Reflect.construct(this.constructor, [left, new Value(right)])
+    }
+
+    if (
+      isEvaluable(right) &&
+      isSimplifiedArithmeticExpression(this.left, left)
+    ) {
+      return Reflect.construct(this.constructor, [new Value(left), right])
+    }
+
     return this
   }
 

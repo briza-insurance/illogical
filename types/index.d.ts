@@ -4,6 +4,10 @@
  */
 import { Context, Evaluable } from './common/evaluable';
 import { isEvaluable } from './common/type-check';
+import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide';
+import { OPERATOR as OPERATOR_MULTIPLY } from './expression/arithmetic/multiply';
+import { OPERATOR as OPERATOR_SUBTRACT } from './expression/arithmetic/subtract';
+import { OPERATOR as OPERATOR_SUM } from './expression/arithmetic/sum';
 import { OPERATOR as OPERATOR_EQ } from './expression/comparison/eq';
 import { OPERATOR as OPERATOR_GE } from './expression/comparison/ge';
 import { OPERATOR as OPERATOR_GT } from './expression/comparison/gt';
@@ -25,7 +29,7 @@ import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor';
 import { ExpressionInput, Input } from './parser';
 import { Options } from './parser/options';
 export { defaultOptions } from './parser/options';
-export { isEvaluable, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, };
+export { isEvaluable, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
 /**
  * Condition engine
  */

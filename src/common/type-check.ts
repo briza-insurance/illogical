@@ -5,7 +5,14 @@ import { Evaluable, Result } from './evaluable'
  * @param value Tested value.
  */
 export function isNumber(value: Result): value is number {
-  return typeof value === 'number' && isFinite(value)
+  return typeof value === 'number'
+}
+/**
+ * Is number predicate.
+ * @param value Tested value.
+ */
+export function isInfinite(value: Result): value is typeof Infinity {
+  return typeof value === 'number' && !isFinite(value)
 }
 
 /**
@@ -54,4 +61,24 @@ export function isEvaluable(value: Result | Evaluable): value is Evaluable {
     typeof value.serialize === 'function' &&
     typeof value.toString === 'function'
   )
+}
+
+/**
+ * Ensures all values are results.
+ * @param {(Result | Evaluable)[]} values results or evaluables
+ * @returns {boolean} type guard
+ */
+export function areAllResults(
+  values: (Result | Evaluable)[]
+): values is Result[] {
+  return values.every((value) => !isEvaluable(value))
+}
+
+/**
+ * Ensures all values are numbers.
+ * @param {Result[]} results results or evaluables
+ * @returns {boolean} type guard
+ */
+export function areAllNumbers(results: Result[]): results is number[] {
+  return results.every(isNumber)
 }

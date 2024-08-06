@@ -1,4 +1,15 @@
-import { isNumber, isObject, isString } from '../../type-check'
+import { operand } from '../../../__test__/helpers'
+import { Sum } from '../../../expression/arithmetic/sum'
+import { Value } from '../../../operand/value'
+import { Evaluable, Result } from '../../evaluable'
+import {
+  areAllNumbers,
+  areAllResults,
+  isBoolean,
+  isNumber,
+  isObject,
+  isString,
+} from '../../type-check'
 
 describe('Common - Type Check', () => {
   describe('isNumber', () => {
@@ -6,9 +17,10 @@ describe('Common - Type Check', () => {
       // Truthy
       [1, true],
       [1.0, true],
+      [Infinity, true],
+      [-Infinity, true],
+      [NaN, true],
       // Falsy
-      [Infinity, false],
-      [-Infinity, false],
       ['1', false],
       [true, false],
       [false, false],
@@ -50,6 +62,52 @@ describe('Common - Type Check', () => {
       [undefined, false],
     ])('%p should evaluate as %p', (value, expected) => {
       expect(isObject(value)).toBe(expected)
+    })
+  })
+
+  describe('isBoolean', () => {
+    test.each([
+      // Truthy
+      [true, true],
+      [false, true],
+      // Falsy
+      [{}, false],
+      ['hi', false],
+      [1, false],
+      [null, false],
+      [undefined, false],
+    ])('%p should evaluate as %p', (value, expected) => {
+      expect(isBoolean(value)).toBe(expected)
+    })
+  })
+
+  describe('areAllResults', () => {
+    test.each<[(Result | Evaluable)[], boolean]>([
+      // Truthy
+      [[1, 2, 3], true],
+      [[1, '2', 3], true],
+      [[1, 2, {}], true],
+      [[1, 2, '3'], true],
+      [[1, 2, '3', ['+', 1, 1]], true],
+      // Falsy
+      [[1, 2, '3', operand(1)], false],
+      [[1, 2, '3', new Sum(new Value(1), new Value(2))], false],
+    ])('if %p should evaluate as %p', (values, expectedResult) => {
+      const result = areAllResults(values)
+      expect(result).toEqual(expectedResult)
+    })
+  })
+  describe('areAllNumbers', () => {
+    test.each<[Result[], boolean]>([
+      // Truthy
+      [[1, 2, 3], true],
+      // Falsy
+      [[1, '2', 3], false],
+      [[1, 2, {}], false],
+      [[1, 2, '3'], false],
+    ])('if %p should evaluate as %p', (values, expectedResult) => {
+      const result = areAllNumbers(values)
+      expect(result).toEqual(expectedResult)
     })
   })
 })

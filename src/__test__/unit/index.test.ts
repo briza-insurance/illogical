@@ -1,5 +1,6 @@
 import Engine from '../../'
 import { Context } from '../../common/evaluable'
+import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum'
 import { OPERATOR as OPERATOR_EQ } from '../../expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from '../../expression/comparison/ge'
 import { OPERATOR as OPERATOR_GT } from '../../expression/comparison/gt'
@@ -100,10 +101,23 @@ describe('Condition Engine', () => {
       [[OPERATOR_OR]],
       [[OPERATOR_NOR]],
       [[OPERATOR_XOR]],
+      [[OPERATOR_SUM]],
+      [[OPERATOR_SUM, 5, 5, 5]],
     ])('%p should throw', (expression) => {
       expect(() =>
         engine.evaluate(expression as ExpressionInput, {})
       ).toThrowError()
+    })
+
+    test.each<[ExpressionInput]>([
+      [['+', 5, 5]],
+      [['-', 5, 5]],
+      [['*', 5, 5]],
+      [['/', 5, 5]],
+    ])('%p should throw', (expression) => {
+      expect(() => engine.evaluate(expression, {})).toThrowError(
+        'invalid expression'
+      )
     })
   })
 
@@ -152,6 +166,7 @@ describe('Condition Engine', () => {
       [[OPERATOR_OR]],
       [[OPERATOR_NOR]],
       [[OPERATOR_XOR]],
+      [[OPERATOR_SUM]],
     ])('%p should throw', (expression) => {
       expect(() => engine.parse(expression as ExpressionInput)).toThrowError()
     })
@@ -210,6 +225,31 @@ describe('Condition Engine', () => {
       ],
       [['PRESENT', '$a'], { a: { obj: 'obj' } }, true, undefined, []],
       [['==', '$a', null], { a: { obj: 'obj' } }, false, undefined, []],
+      [['>', ['+', '$a', 5], 6], { a: 5 }, true],
+      [['>', ['+', '$a', 5], 6], { a: -2 }, false],
+      [['==', ['+', '$a', 1, 1, 1], 4], { a: 1 }, true],
+      [['>', ['-', '$a', 5], 6], { a: 12 }, true],
+      [['>', ['-', '$a', 5], 6], { a: 11 }, false],
+      [['==', ['-', '$a', 1, 1, 1], 0], { a: 3 }, true],
+      [['>', ['*', '$a', 6], 6], { a: 1.1 }, true],
+      [['>', ['*', '$a', 5], 6], { a: 1 }, false],
+      [['==', ['*', '$a', 1, 2, 3], 30], { a: 5 }, true],
+      [['>', ['/', '$a', 6], 6], { a: 42 }, true],
+      [['>', ['/', '$a', 5], 6], { a: 30 }, false],
+      [['==', ['/', '$a', 3, 2, 1], 15], { a: 90 }, true],
+      [['>', ['/', 10, 0], 10000], {}, true], // 10 / 0 = Infinity
+      [['>', 10000, ['/', 10, 0]], {}, false], // 10 / 0 = Infinity
+      [['>', ['/', 0, 0], 10000], {}, false], // 0 / 0 = NaN
+      [
+        ['>', ['/', 10, 0], ['+', '$a', 0]],
+        { b: 0 },
+        ['>', ['/', 10, 0], ['+', '$a', 0]], // Infinity doesn't get simplified to avoid conversion loss
+      ],
+      [['>', ['/', '$a', 0], ['+', 0, 0]], { b: 0 }, ['>', ['/', '$a', 0], 0]],
+      [['>', ['+', 0, 0], ['/', '$a', 0]], { b: 0 }, ['>', 0, ['/', '$a', 0]]],
+      [['==', ['+', ['*', 9, 9], 19], 100], {}, true],
+      [['==', ['+', ['*', 9, 9], ['-', ['/', 250, 5], 31]], 100], {}, true],
+      [['AND', ['==', ['+', 1, 1], 2], ['==', ['+', 2, 2], 4]], {}, true],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -225,5 +265,19 @@ describe('Condition Engine', () => {
         )
       }
     )
+
+    test.each<[ExpressionInput]>([
+      [['+', 5, 5]],
+      [['-', 5, 5]],
+      [['*', 5, 5]],
+      [['/', 5, 5]],
+      [['+', ['AND', ['==', 1, 1]], 1]],
+      [['AND', ['+', 1, -1], ['+', ['-', 1, 1], 1]]],
+      [['NOT', ['+', 1, 1]]],
+    ])('%p should throw', (expression) => {
+      expect(() => engine.simplify(expression, {})).toThrowError(
+        'invalid expression'
+      )
+    })
   })
 })

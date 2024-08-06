@@ -5,6 +5,10 @@
 
 import { Context, Evaluable } from './common/evaluable'
 import { isBoolean, isEvaluable } from './common/type-check'
+import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide'
+import { OPERATOR as OPERATOR_MULTIPLY } from './expression/arithmetic/multiply'
+import { OPERATOR as OPERATOR_SUBTRACT } from './expression/arithmetic/subtract'
+import { OPERATOR as OPERATOR_SUM } from './expression/arithmetic/sum'
 import { OPERATOR as OPERATOR_EQ } from './expression/comparison/eq'
 import { OPERATOR as OPERATOR_GE } from './expression/comparison/ge'
 import { OPERATOR as OPERATOR_GT } from './expression/comparison/gt'
@@ -47,7 +51,14 @@ export {
   OPERATOR_NOR,
   OPERATOR_XOR,
   OPERATOR_NOT,
+  OPERATOR_DIVIDE,
+  OPERATOR_MULTIPLY,
+  OPERATOR_SUBTRACT,
+  OPERATOR_SUM,
 }
+
+const unexpectedResultError =
+  'non expression or boolean result should be returned'
 
 /**
  * Condition engine
@@ -70,7 +81,11 @@ class Engine {
    * @return {boolean}
    */
   evaluate(exp: ExpressionInput, ctx: Context): boolean {
-    return this.parse(exp).evaluate(ctx) as boolean
+    const result = this.parse(exp).evaluate(ctx)
+    if (isBoolean(result)) {
+      return result
+    }
+    throw new Error(unexpectedResultError)
   }
 
   /**
@@ -119,7 +134,7 @@ class Engine {
     if (isBoolean(result)) {
       return result
     }
-    throw new Error('non expression or boolean result should be returned')
+    throw new Error(unexpectedResultError)
   }
 }
 
