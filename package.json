@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:briza-insurance/illogical.git"
+    "url": "git+ssh://git@github.com/briza-insurance/illogical.git"
   },
   "bugs": {
     "url": "https://github.com/briza-insurance/illogical/issues"
