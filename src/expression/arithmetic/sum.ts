@@ -1,5 +1,4 @@
 import { Evaluable, Result } from '../../common/evaluable'
-import { areAllNumbers } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Arithmetic } from '.'
 import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
@@ -30,9 +29,14 @@ export class Sum extends Arithmetic {
   }
 
   operate(results: Result[]): Result {
-    if (!areAllNumbers(results)) {
-      throw new Error('operands must be numbers for sum')
+    const presentResults = this.getResultValues(results)
+
+    if (presentResults === false) {
+      return false
     }
-    return results.reduce((acc, result) => addWithExpectedDecimals(acc, result))
+
+    return presentResults.reduce((acc, result) =>
+      addWithExpectedDecimals(acc, result)
+    )
   }
 }

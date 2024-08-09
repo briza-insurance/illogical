@@ -1,5 +1,4 @@
 import { Evaluable, Result } from '../../common/evaluable'
-import { areAllNumbers } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Arithmetic } from '.'
 
@@ -27,12 +26,12 @@ export class Divide extends Arithmetic {
   }
 
   operate(results: Result[]): Result {
-    if (!areAllNumbers(results)) {
-      throw new Error('operands must be numbers for divide')
+    const presentResults = this.getResultValues(results)
+
+    if (presentResults === false) {
+      return false
     }
 
-    const result = results.reduce((acc, result) => acc / result)
-
-    return result
+    return presentResults.reduce((acc, result) => acc / result)
   }
 }

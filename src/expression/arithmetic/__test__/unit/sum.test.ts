@@ -8,7 +8,7 @@ import { OPERATOR, Sum } from '../../sum'
 describe('Expression - Arithmetic - Sum', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]]])('arguments %p should throw', (args) => {
-      expect(() => new Sum(...args)).toThrowError(
+      expect(() => new Sum(...args)).toThrow(
         'sum expression requires at least 2 operands'
       )
     })
@@ -26,6 +26,8 @@ describe('Expression - Arithmetic - Sum', () => {
     [0.3, operand(0.2), operand(0.1)],
     [4, operand(1.2), operand(2.8)],
     [0, operand(1.333), operand(-1.333)],
+    [false, operand(null), operand(1)],
+    [false, operand(undefined), operand(1)],
   ]
 
   describe('evaluate', () => {
@@ -42,11 +44,9 @@ describe('Expression - Arithmetic - Sum', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
-      [operand(null), operand(1)],
-      [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Sum(...operands).evaluate({})).toThrowError(
-        'operands must be numbers for sum'
+      expect(() => new Sum(...operands).evaluate({})).toThrow(
+        'operands must be numbers for Sum'
       )
     })
   })
@@ -101,7 +101,7 @@ describe('Expression - Arithmetic - Sum', () => {
           ...defaultOptions,
           operatorMapping: new Map<symbol, string>(),
         })
-      ).toThrowError()
+      ).toThrow()
     })
   })
 })

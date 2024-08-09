@@ -5,7 +5,7 @@ import {
   Result,
   SimplifyArgs,
 } from '../../common/evaluable'
-import { areAllResults } from '../../common/type-check'
+import { areAllNumbers, areAllResults } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { ExpressionInput } from '../../parser'
 import { Options } from '../../parser/options'
@@ -27,6 +27,31 @@ export abstract class Arithmetic implements Evaluable {
     protected readonly operatorSymbol: symbol,
     protected readonly operands: Operand[]
   ) {}
+
+  /**
+   * Helper function to assist with arithmetic evaluation. Ensures that all
+   * operands are present and are numbers. Throws error if any operand is not a
+   * number.
+   *
+   * @param {Result[]} results
+   * @returns {number[] | false} false if any operand is missing, otherwise the
+   *   array of numbers
+   */
+  protected getResultValues(results: Result[]): number[] | false {
+    const presentValues = results.filter(
+      (result) => result !== null && result !== undefined
+    )
+    // If we have missing context values the result must be false
+    if (presentValues.length !== results.length) {
+      return false
+    }
+
+    if (!areAllNumbers(presentValues)) {
+      throw new Error(`operands must be numbers for ${this.constructor.name}`)
+    }
+
+    return presentValues
+  }
 
   /**
    * Performs the arithmetic operation on the operands evaluated values.

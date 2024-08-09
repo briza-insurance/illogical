@@ -8,7 +8,7 @@ import { Divide, OPERATOR } from '../../divide'
 describe('Expression - Arithmetic - Divide', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]]])('arguments %p should throw', (args) => {
-      expect(() => new Divide(...args)).toThrowError(
+      expect(() => new Divide(...args)).toThrow(
         'divide expression requires at least 2 operands'
       )
     })
@@ -27,6 +27,8 @@ describe('Expression - Arithmetic - Divide', () => {
     [2.0999999099999913, operand(2.333333), operand(1.111111)],
     [4, operand(0.4), operand(0.1)],
     [1, operand(1.333), operand(1.333)],
+    [false, operand(null), operand(1)],
+    [false, operand(undefined), operand(1)],
   ]
 
   describe('evaluate', () => {
@@ -43,11 +45,9 @@ describe('Expression - Arithmetic - Divide', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
-      [operand(null), operand(1)],
-      [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Divide(...operands).evaluate({})).toThrowError(
-        'operands must be numbers for divide'
+      expect(() => new Divide(...operands).evaluate({})).toThrow(
+        'operands must be numbers for Divide'
       )
     })
   })
@@ -102,7 +102,7 @@ describe('Expression - Arithmetic - Divide', () => {
           ...defaultOptions,
           operatorMapping: new Map<symbol, string>(),
         })
-      ).toThrowError()
+      ).toThrow()
     })
   })
 })
