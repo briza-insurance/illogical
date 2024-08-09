@@ -8,7 +8,7 @@ import { OPERATOR, Subtract } from '../../subtract'
 describe('Expression - Arithmetic - Subtract', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]]])('arguments %p should throw', (args) => {
-      expect(() => new Subtract(...args)).toThrowError(
+      expect(() => new Subtract(...args)).toThrow(
         'subtract expression requires at least 2 operands'
       )
     })
@@ -27,6 +27,8 @@ describe('Expression - Arithmetic - Subtract', () => {
     [1.222222, operand(2.333333), operand(1.111111)],
     [0.3, operand(0.4), operand(0.1)],
     [0, operand(1.333), operand(1.333)],
+    [false, operand(null), operand(1)],
+    [false, operand(undefined), operand(1)],
   ]
 
   describe('evaluate', () => {
@@ -43,11 +45,9 @@ describe('Expression - Arithmetic - Subtract', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
-      [operand(null), operand(1)],
-      [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Subtract(...operands).evaluate({})).toThrowError(
-        'operands must be numbers for subtract'
+      expect(() => new Subtract(...operands).evaluate({})).toThrow(
+        'operands must be numbers for Subtract'
       )
     })
   })
@@ -102,7 +102,7 @@ describe('Expression - Arithmetic - Subtract', () => {
           ...defaultOptions,
           operatorMapping: new Map<symbol, string>(),
         })
-      ).toThrowError()
+      ).toThrow()
     })
   })
 })

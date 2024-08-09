@@ -83,6 +83,27 @@ describe('Condition Engine', () => {
       expect(engine.evaluate(expression, context)).toEqual(expected)
     })
 
+    test.each<[ExpressionInput, Context, boolean]>([
+      [['==', ['+', 5, 5, 5], 15], {}, true],
+      [['==', ['+', '$RefA', 5], 15], {}, false],
+      [['==', ['+', '$RefA', 5], 15], { RefA: 10 }, true],
+      [['==', ['+', '$RefA', 5], 15], { RefA: 0 }, false],
+      [['>', ['-', '$RefA', 5], 15], {}, false],
+      [['>', '$RefA', 15], {}, false],
+      [['IN', '$RefA', ['option1', 'option2']], {}, false],
+      [['OVERLAP', ['$RefA', '$RefB'], ['option1', 'option2']], {}, false],
+      [['PRESENT', '$RefA'], {}, false],
+      [['UNDEFINED', '$RefA'], {}, true],
+      [
+        ['AND', ['UNDEFINED', '$RefA'], ['PRESENT', '$RefB']],
+        { RefB: 'present' },
+        true,
+      ],
+      [['OR', ['UNDEFINED', '$RefA'], ['PRESENT', '$RefB']], {}, true],
+    ])('%p should evaluate to %p', (expression, context, expectedResult) => {
+      expect(engine.evaluate(expression, context)).toEqual(expectedResult)
+    })
+
     test.each([
       // Operators with invalid operands
       [[OPERATOR_EQ]],

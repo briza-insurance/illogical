@@ -1,5 +1,4 @@
 import { Evaluable, Result } from '../../common/evaluable'
-import { areAllNumbers } from '../../common/type-check'
 import { Operand } from '../../operand'
 import { Arithmetic } from '.'
 import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
@@ -30,10 +29,13 @@ export class Subtract extends Arithmetic {
   }
 
   operate(results: Result[]): Result {
-    if (!areAllNumbers(results)) {
-      throw new Error('operands must be numbers for subtract')
+    const presentResults = this.getResultValues(results)
+
+    if (presentResults === false) {
+      return false
     }
-    return results.reduce((acc, result) =>
+
+    return presentResults.reduce((acc, result) =>
       subtractWithExpectedDecimals(acc, result)
     )
   }

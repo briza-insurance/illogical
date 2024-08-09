@@ -18,6 +18,16 @@ export declare abstract class Arithmetic implements Evaluable {
      */
     constructor(operator: string, operatorSymbol: symbol, operands: Operand[]);
     /**
+     * Helper function to assist with arithmetic evaluation. Ensures that all
+     * operands are present and are numbers. Throws error if any operand is not a
+     * number.
+     *
+     * @param {Result[]} results
+     * @returns {number[] | false} false if any operand is missing, otherwise the
+     *   array of numbers
+     */
+    protected getResultValues(results: Result[]): number[] | false;
+    /**
      * Performs the arithmetic operation on the operands evaluated values.
      * @param {Result[]} results Operand result values.
      * @returns {Result}

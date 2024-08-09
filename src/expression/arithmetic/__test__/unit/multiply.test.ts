@@ -8,7 +8,7 @@ import { Multiply, OPERATOR } from '../../multiply'
 describe('Expression - Arithmetic - Multiply', () => {
   describe('constructor', () => {
     test.each([[[]], [[operand(5)]]])('arguments %p should throw', (args) => {
-      expect(() => new Multiply(...args)).toThrowError(
+      expect(() => new Multiply(...args)).toThrow(
         'multiply expression requires at least 2 operands'
       )
     })
@@ -27,6 +27,8 @@ describe('Expression - Arithmetic - Multiply', () => {
     [2.592591962963, operand(2.333333), operand(1.111111)],
     [0.04, operand(0.4), operand(0.1)],
     [1.776889, operand(1.333), operand(1.333)],
+    [false, operand(null), operand(1)],
+    [false, operand(undefined), operand(1)],
   ]
 
   describe('evaluate', () => {
@@ -43,11 +45,9 @@ describe('Expression - Arithmetic - Multiply', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
-      [operand(null), operand(1)],
-      [operand(undefined), operand(1)],
     ])('%p and %p should throw', (...operands) => {
-      expect(() => new Multiply(...operands).evaluate({})).toThrowError(
-        'operands must be numbers for multiply'
+      expect(() => new Multiply(...operands).evaluate({})).toThrow(
+        'operands must be numbers for Multiply'
       )
     })
   })
@@ -102,7 +102,7 @@ describe('Expression - Arithmetic - Multiply', () => {
           ...defaultOptions,
           operatorMapping: new Map<symbol, string>(),
         })
-      ).toThrowError()
+      ).toThrow()
     })
   })
 })

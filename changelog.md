@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.6.1
+
+- Bugfix on Arithmetic evaluate. Returns false when ContextValue is not present in the Context.
+
 ## 1.6.0
 
 - Added support for Arithmetic expressions within other Comparison expressions. This allows for
