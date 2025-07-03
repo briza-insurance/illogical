@@ -29,6 +29,7 @@ import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
 import { ExpressionInput, Input, Parser } from './parser'
 import { Options } from './parser/options'
+import { unsafeSimplify } from './unsafe/simplify'
 
 export { defaultOptions } from './parser/options'
 export {
@@ -135,6 +136,20 @@ class Engine {
       return result
     }
     throw new Error(unexpectedResultError)
+  }
+
+  unsafeSimplify(
+    exp: ExpressionInput,
+    context: Context,
+    strictKeys?: string[],
+    optionalKeys?: string[]
+  ): Input | boolean {
+    return unsafeSimplify(
+      context,
+      this.parser.options,
+      strictKeys,
+      optionalKeys
+    )(exp)
   }
 }
 
