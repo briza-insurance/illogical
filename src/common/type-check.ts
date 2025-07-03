@@ -82,3 +82,18 @@ export function areAllResults(
 export function areAllNumbers(results: Result[]): results is number[] {
   return results.every(isNumber)
 }
+
+export function isNotObject(
+  value: Result
+): value is Exclude<Result, Record<string, unknown>> {
+  return (
+    Array.isArray(value) ||
+    typeof value !== 'object' ||
+    value === null ||
+    Object.getPrototypeOf(value) !== Object.prototype
+  )
+}
+
+export function isUndefined(value: unknown): value is undefined {
+  return value === undefined
+}

@@ -12,6 +12,10 @@ import { Value } from './value'
 export class Collection extends Operand {
   private readonly items: Array<Value | Reference>
 
+  public size(): number {
+    return this.items.length
+  }
+
   /**
    * @constructor
    * @param {Operand[]} items Collection of operands.
@@ -38,11 +42,13 @@ export class Collection extends Operand {
     for (const item of this.items) {
       const simplifiedItem = item.simplify(...args)
       if (isEvaluable(simplifiedItem)) {
-        return this
+        continue
       }
       values.push(simplifiedItem)
     }
-    return values
+
+    // Return the simplified values we got by omitting any unresolved Reference
+    return this.items.length === 0 || values.length > 0 ? values : this
   }
 
   /**

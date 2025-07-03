@@ -144,12 +144,22 @@ class Engine {
     strictKeys?: string[],
     optionalKeys?: string[]
   ): Input | boolean {
-    return unsafeSimplify(
+    const result = unsafeSimplify(
       context,
       this.parser.options,
       strictKeys,
       optionalKeys
     )(exp)
+    if (isBoolean(result)) {
+      return result
+    }
+
+    // The unsafe implementation should not expose the Evaluable interface
+    if (isEvaluable(result)) {
+      throw new Error('Unexpected Evaluable not serialized result')
+    }
+
+    return result
   }
 }
 

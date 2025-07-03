@@ -271,6 +271,11 @@ describe('Condition Engine', () => {
       [['==', ['+', ['*', 9, 9], 19], 100], {}, true],
       [['==', ['+', ['*', 9, 9], ['-', ['/', 250, 5], 31]], 100], {}, true],
       [['AND', ['==', ['+', 1, 1], 2], ['==', ['+', 2, 2], 4]], {}, true],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        { Ref1: 4 },
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+      ],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -300,5 +305,190 @@ describe('Condition Engine', () => {
         'invalid expression'
       )
     })
+  })
+
+  describe('unsafeSimplify', () => {
+    it.each<
+      [
+        Input,
+        ExpressionInput,
+        Context,
+        string[] | undefined,
+        string[] | undefined,
+      ]
+    >([
+      [true, ['==', 1, 1], {}, undefined, undefined],
+      [false, ['==', 1, 2], {}, undefined, undefined],
+      [true, ['==', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        ['==', '$Ref1', '$Ref2'],
+        ['==', '$Ref1', '$Ref2'],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [false, ['==', '$Ref1', [1]], { Ref1: 1 }, undefined, undefined],
+      [
+        true,
+        ['OR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['OR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['OR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['==', '$Ref1', 1],
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['AND', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['AND', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['AND', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['==', '$Ref1', 1],
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],
+      [false, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['IN', '$Ref1', [1, 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['OR', ['==', 1, 2], ['IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['AND', ['==', 1, 1], ['IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 4,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+    ])(
+      'should result in %j',
+      (expectedResult, condition, context, strictKeys, optionalKeys) => {
+        const unsafeResult = engine.unsafeSimplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        const safeResult = engine.simplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        expect(unsafeResult).toEqual(expectedResult)
+        expect(safeResult).toEqual(expectedResult)
+        expect(safeResult).toEqual(unsafeResult)
+      }
+    )
   })
 })

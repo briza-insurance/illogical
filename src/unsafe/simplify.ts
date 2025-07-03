@@ -4,17 +4,40 @@ import {
   OPERATOR_EQ,
   OPERATOR_IN,
   OPERATOR_NE,
-  OPERATOR_NOT,
   OPERATOR_OR,
   OPERATOR_OVERLAP,
 } from '..'
-import { Context } from '../common/evaluable'
-import { isBoolean, isString } from '../common/type-check'
+import { Context, Evaluable, Result } from '../common/evaluable'
+import {
+  isBoolean,
+  isNotObject,
+  isString,
+  isUndefined,
+} from '../common/type-check'
 import { Reference } from '../operand/reference'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 
 const istrueResult = (value: Input) => value === true
+const isNonFalseResult = (operand: Input | Evaluable): operand is Input =>
+  operand !== false && !isEvaluable(operand)
+const isNonTrueResult = (operand: Input | Evaluable): operand is Input =>
+  operand !== true && !isEvaluable(operand)
+
+const resultToInput = (value: Result): Input | undefined => {
+  if (isUndefined(value)) {
+    return undefined
+  }
+
+  if (Array.isArray(value) && value.some(isUndefined)) {
+    return undefined
+  }
+
+  // TODO Confirm below
+  // Having an Object as a Result seems like a previous mistake. Not handling
+  // it yet.
+  return isNotObject(value) ? (value as Input) : undefined
+}
 
 export const unsafeSimplify = (
   context: Context,
@@ -22,7 +45,7 @@ export const unsafeSimplify = (
   strictKeys?: string[],
   optionalKeys?: string[]
 ) => {
-  const simplifyInput = (input: Input): Input | boolean => {
+  const simplifyInput = (input: Input): Input | Evaluable => {
     // Value or Reference
     if (!Array.isArray(input)) {
       // Reference
@@ -34,10 +57,12 @@ export const unsafeSimplify = (
         )
 
         if (isEvaluable(result)) {
-          return result.serialize(opts)
-        }
-        if (isBoolean(result)) {
           return result
+        }
+
+        const inputResult = resultToInput(result)
+        if (inputResult !== undefined) {
+          return inputResult
         }
         // It should have been a boolean or an Evaluable, but just in case
         // fallback to returning the input.
@@ -51,35 +76,26 @@ export const unsafeSimplify = (
     switch (operator) {
       // Logical operators
       case opts.operatorMapping.get(OPERATOR_AND): {
-        const simplifiedOperands: Input = []
+        const simplifiedOperands: (Input | Evaluable)[] = []
         for (const operand of operands) {
           const simplification = simplifyInput(operand)
-          if (isBoolean(simplification) && !istrueResult(simplification)) {
+          if (
+            isUndefined(simplification) ||
+            (isBoolean(simplification) && !istrueResult(simplification))
+          ) {
             // Short-circuit for AND
             return false
           }
           simplifiedOperands.push(simplification)
         }
 
-        const simplified = simplifiedOperands.reduce<boolean | Input[]>(
-          (result, childResult) => {
-            if (result !== false) {
-              if (isEvaluable(childResult)) {
-                if (isBoolean(result)) {
-                  return [childResult]
-                }
-                return [...result, childResult]
-              }
-              if (!childResult) {
-                return false
-              }
-            }
-            return result
-          },
-          true
-        )
+        // Remove false operands leaving only the Inputs
+        const simplified = simplifiedOperands.filter(isNonTrueResult)
 
         if (Array.isArray(simplified)) {
+          if (simplified.length === 0) {
+            return true
+          }
           if (simplified.length === 1) {
             return simplified[0]
           }
@@ -88,7 +104,7 @@ export const unsafeSimplify = (
         return simplified
       }
       case opts.operatorMapping.get(OPERATOR_OR): {
-        const simplifiedOperands: Input = []
+        const simplifiedOperands: (Input | Evaluable)[] = []
         for (const operand of operands) {
           const simplification = simplifyInput(operand)
           if (isBoolean(simplification) && istrueResult(simplification)) {
@@ -99,58 +115,52 @@ export const unsafeSimplify = (
           }
         }
 
-        const simplified = simplifiedOperands.reduce<boolean | Input[]>(
-          (result, childResult) => {
-            if (result !== true) {
-              if (isEvaluable(childResult)) {
-                if (isBoolean(result)) {
-                  return [childResult]
-                }
-                return [...result, childResult]
-              }
+        const simplified = simplifiedOperands.filter(isNonFalseResult)
 
-              if (childResult) {
-                return true
-              }
-            }
-            return result
-          },
-          false
-        )
         if (Array.isArray(simplified)) {
+          if (simplified.length === 0) {
+            return false
+          }
           if (simplified.length === 1) {
             return simplified[0]
           }
           return [operator, ...simplified]
         }
+
         return simplified
       }
       // case opts.operatorMapping.get(OPERATOR_NOR):
       // case opts.operatorMapping.get(OPERATOR_XOR):
-      case opts.operatorMapping.get(OPERATOR_NOT): {
-        if (operands.length !== 1) {
-          throw new Error(
-            `Unexpected number of operands for NOT operator: ${operands.length}`
-          )
-        }
-        const simplification = simplifyInput(operands[0])
-        return isBoolean(simplification)
-          ? !simplification
-          : ([operator, simplification] satisfies Input)
-      }
+      // case opts.operatorMapping.get(OPERATOR_NOT): {
+      //   if (operands.length !== 1) {
+      //     throw new Error(
+      //       `Unexpected number of operands for NOT operator: ${operands.length}`
+      //     )
+      //   }
+      //   const simplification = simplifyInput(operands[0])
+      //   return isBoolean(simplification)
+      //     ? !simplification
+      //     : ([operator, simplification] satisfies Input)
+      // }
       // Comparison operators
       case opts.operatorMapping.get(OPERATOR_EQ): {
         const [left, right] = operands
         const leftSimplified = simplifyInput(left)
         const rightSimplified = simplifyInput(right)
 
-        if (Array.isArray(left) || Array.isArray(right)) {
+        if (isEvaluable(leftSimplified) || isEvaluable(rightSimplified)) {
           // If either left or right is an array, we cannot simplify further
-          return [operator, leftSimplified, rightSimplified]
+          return [
+            operator,
+            isEvaluable(leftSimplified) ? leftSimplified.serialize(opts) : left,
+            isEvaluable(rightSimplified)
+              ? rightSimplified.serialize(opts)
+              : right,
+          ]
         }
 
         // See Equal.comparison
-        return left === right
+        return leftSimplified === rightSimplified
       }
       case opts.operatorMapping.get(OPERATOR_NE): {
         const [left, right] = operands
@@ -159,11 +169,11 @@ export const unsafeSimplify = (
 
         if (Array.isArray(left) || Array.isArray(right)) {
           // If either left or right is an array, we cannot simplify further
-          return [operator, leftSimplified, rightSimplified]
+          return [operator, left, right]
         }
 
         // See NotEqual.comparison
-        return left !== right
+        return leftSimplified !== rightSimplified
       }
       // case opts.operatorMapping.get(OPERATOR_GT):
       // case opts.operatorMapping.get(OPERATOR_GE):
@@ -174,6 +184,7 @@ export const unsafeSimplify = (
 
         const leftArray = Array.isArray(left)
         const rightArray = Array.isArray(right)
+
         if (
           left === null ||
           left === undefined ||
@@ -184,16 +195,32 @@ export const unsafeSimplify = (
         ) {
           return input
         }
+
         if (leftArray) {
-          const leftSimplified = left.map(simplifyInput)
+          // If any operand is still an Evaluable, we cannot simplify further
           const rightSimplified = simplifyInput(right)
+          if (isEvaluable(rightSimplified)) {
+            return input
+          }
+          const leftSimplified = left.map(simplifyInput)
+          if (leftSimplified.some(isEvaluable)) {
+            return input
+          }
           return leftSimplified.indexOf(rightSimplified) > -1
         }
+
         if (rightArray) {
           const leftSimplified = simplifyInput(left)
+          if (isEvaluable(leftSimplified)) {
+            return input
+          }
           const rightSimplified = right.map(simplifyInput)
+          if (rightSimplified.some(isEvaluable)) {
+            return input
+          }
           return rightSimplified.indexOf(leftSimplified) > -1
         }
+
         return input
       }
       // case opts.operatorMapping.get(OPERATOR_NOT_IN):
@@ -211,7 +238,20 @@ export const unsafeSimplify = (
 
         const rightSet = new Set(rightSimplified)
 
-        return leftSimplified.some((element) => rightSet.has(element))
+        const res = leftSimplified.some((element) => rightSet.has(element))
+
+        if (res) {
+          return true
+        }
+
+        if (
+          leftSimplified.some(isEvaluable) ||
+          rightSimplified.some(isEvaluable)
+        ) {
+          return input
+        }
+
+        return false
       }
       // case opts.operatorMapping.get(OPERATOR_UNDEFINED):
       // case opts.operatorMapping.get(OPERATOR_PRESENT):
@@ -220,9 +260,10 @@ export const unsafeSimplify = (
       // case opts.operatorMapping.get(OPERATOR_MULTIPLY):
       // case opts.operatorMapping.get(OPERATOR_DIVIDE):
       default: {
-        // TODO remove console
-        // console.log(`NO MATCH: ${operator}`)
-        return input
+        // Handle as an array of References / Values if no operator matches
+        const result = input.map(simplifyInput)
+        // TODO Fix return type to handle mixed (Input | Evaluable)[]
+        return result as Input[]
       }
     }
   }
