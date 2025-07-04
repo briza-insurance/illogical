@@ -506,6 +506,52 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      // GT
+      [true, ['>', 2, 1], {}, undefined, undefined],
+      [false, ['>', 1, 2], {}, undefined, undefined],
+      [true, ['>', '$Ref1', 1], { Ref1: 2 }, undefined, undefined],
+      [false, ['>', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        false,
+        ['>', '$Ref1', '2000-01-01'],
+        { Ref1: '1990-01-01' },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['>', '$Ref1', '$Ref2'],
+        { Ref1: 2, Ref2: 1 },
+        undefined,
+        undefined,
+      ],
+      // GE
+      [true, ['>=', 2, 1], {}, undefined, undefined],
+      [true, ['>=', 2, 2], {}, undefined, undefined],
+      [false, ['>=', 1, 2], {}, undefined, undefined],
+      // LT
+      [true, ['<', 1, 2], {}, undefined, undefined],
+      [false, ['<', 2, 1], {}, undefined, undefined],
+      [true, ['<', 1, '$Ref1'], { Ref1: 2 }, undefined, undefined],
+      [false, ['<', 1, '$Ref1'], { Ref1: 1 }, undefined, undefined],
+      [
+        false,
+        ['<', '$Ref1', '1990-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['<', '$Ref1', '$Ref2'],
+        { Ref1: 1, Ref2: 2 },
+        undefined,
+        undefined,
+      ],
+      // LE
+      [true, ['<=', 1, 2], {}, undefined, undefined],
+      [true, ['<=', 2, 2], {}, undefined, undefined],
+      [false, ['<=', 2, 1], {}, undefined, undefined],
       // NOT
       // IN
       [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],

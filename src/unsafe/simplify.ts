@@ -2,7 +2,11 @@ import {
   isEvaluable,
   OPERATOR_AND,
   OPERATOR_EQ,
+  OPERATOR_GE,
+  OPERATOR_GT,
   OPERATOR_IN,
+  OPERATOR_LE,
+  OPERATOR_LT,
   OPERATOR_NE,
   OPERATOR_NOR,
   OPERATOR_NOT,
@@ -14,9 +18,11 @@ import { Context, Evaluable, Result } from '../common/evaluable'
 import {
   isBoolean,
   isNotObject,
+  isNumber,
   isString,
   isUndefined,
 } from '../common/type-check'
+import { toDateNumber } from '../common/util'
 import { Reference } from '../operand/reference'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
@@ -259,10 +265,122 @@ export const unsafeSimplify = (
         // See NotEqual.comparison
         return leftSimplified !== rightSimplified
       }
-      // case opts.operatorMapping.get(OPERATOR_GT):
-      // case opts.operatorMapping.get(OPERATOR_GE):
-      // case opts.operatorMapping.get(OPERATOR_LT):
-      // case opts.operatorMapping.get(OPERATOR_LE):
+      case opts.operatorMapping.get(OPERATOR_GT): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isNumber(leftSimplified) && isNumber(rightSimplified)) {
+          return leftSimplified > rightSimplified
+        }
+
+        const leftDate = toDateNumber(left),
+          rightDate = toDateNumber(right)
+        if (leftDate && rightDate) {
+          return leftDate > rightDate
+        }
+
+        return false
+      }
+      case opts.operatorMapping.get(OPERATOR_GE): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isNumber(leftSimplified) && isNumber(rightSimplified)) {
+          return leftSimplified >= rightSimplified
+        }
+
+        const leftDate = toDateNumber(left),
+          rightDate = toDateNumber(right)
+        if (leftDate && rightDate) {
+          return leftDate >= rightDate
+        }
+
+        return false
+      }
+      case opts.operatorMapping.get(OPERATOR_LT): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isNumber(leftSimplified) && isNumber(rightSimplified)) {
+          return leftSimplified < rightSimplified
+        }
+
+        const leftDate = toDateNumber(left),
+          rightDate = toDateNumber(right)
+        if (leftDate && rightDate) {
+          return leftDate < rightDate
+        }
+
+        return false
+      }
+      case opts.operatorMapping.get(OPERATOR_LE): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isNumber(leftSimplified) && isNumber(rightSimplified)) {
+          return leftSimplified <= rightSimplified
+        }
+
+        const leftDate = toDateNumber(left),
+          rightDate = toDateNumber(right)
+        if (leftDate && rightDate) {
+          return leftDate <= rightDate
+        }
+
+        return false
+      }
       case opts.operatorMapping.get(OPERATOR_IN): {
         const [left, right] = operands
 
