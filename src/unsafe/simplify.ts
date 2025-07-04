@@ -14,13 +14,15 @@ import {
   OPERATOR_OR,
   OPERATOR_OVERLAP,
   OPERATOR_PREFIX,
+  OPERATOR_PRESENT,
   OPERATOR_SUFFIX,
+  OPERATOR_UNDEFINED,
   OPERATOR_XOR,
 } from '..'
 import { Context, Evaluable, Result } from '../common/evaluable'
 import {
   isBoolean,
-  isNotObject,
+  isNull,
   isNumber,
   isString,
   isUndefined,
@@ -46,10 +48,9 @@ const resultToInput = (value: Result): Input | undefined => {
     return undefined
   }
 
-  // TODO Confirm below
-  // Having an Object as a Result seems like a previous mistake. Not handling
-  // it yet.
-  return isNotObject(value) ? (value as Input) : undefined
+  // TODO improve below
+  // Having an Object as a Result can happen, but isn't handled correctly
+  return value as Input
 }
 
 export const unsafeSimplify = (
@@ -545,8 +546,40 @@ export const unsafeSimplify = (
 
         return false
       }
-      // case opts.operatorMapping.get(OPERATOR_UNDEFINED):
-      // case opts.operatorMapping.get(OPERATOR_PRESENT):
+      case opts.operatorMapping.get(OPERATOR_UNDEFINED): {
+        const [operand] = operands
+        const simplified = simplifyInput(operand)
+
+        const isOperandEvaluable = isEvaluable(simplified)
+        if (isOperandEvaluable) {
+          return input
+        }
+
+        // Operand simplifies to itself when it is included in strictKeys or
+        // optionalKeys, thus it was undefined.
+        if (operand === simplified) {
+          return true
+        }
+
+        return isUndefined(simplified)
+      }
+      case opts.operatorMapping.get(OPERATOR_PRESENT): {
+        const [operand] = operands
+        const simplified = simplifyInput(operand)
+
+        const isOperandEvaluable = isEvaluable(simplified)
+        if (isOperandEvaluable) {
+          return input
+        }
+
+        // Operand simplifies to itself when it is included in strictKeys or
+        // optionalKeys, thus it was undefined.
+        if (operand === simplified) {
+          return false
+        }
+
+        return !isUndefined(simplified) && !isNull(simplified)
+      }
       // case opts.operatorMapping.get(OPERATOR_SUM):
       // case opts.operatorMapping.get(OPERATOR_SUBTRACT):
       // case opts.operatorMapping.get(OPERATOR_MULTIPLY):

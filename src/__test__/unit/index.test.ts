@@ -552,7 +552,6 @@ describe('Condition Engine', () => {
       [true, ['<=', 1, 2], {}, undefined, undefined],
       [true, ['<=', 2, 2], {}, undefined, undefined],
       [false, ['<=', 2, 1], {}, undefined, undefined],
-      // NOT
       // IN
       [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],
       [false, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
@@ -700,6 +699,52 @@ describe('Condition Engine', () => {
           Ref1: 1,
         },
         ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        [],
+        ['Ref1', 'Ref2'],
+      ],
+      // UNDEFINED
+      [
+        ['UNDEFINED', '$Ref1'],
+        ['UNDEFINED', '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [true, ['UNDEFINED', '$Ref1'], {}, ['Ref1'], undefined],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: false }, ['Ref1'], undefined],
+      [
+        ['UNDEFINED', '$Ref1'],
+        ['UNDEFINED', '$Ref1'],
+        { Ref1: undefined },
+        undefined,
+        undefined,
+      ],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: 'value' }, undefined, undefined],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: null }, undefined, undefined],
+      // PRESENT
+      [
+        ['PRESENT', '$Ref1'],
+        ['PRESENT', '$Ref1'],
+        { Ref1: undefined },
+        undefined,
+        undefined,
+      ],
+      [true, ['PRESENT', '$Ref1'], { Ref1: 'value' }, undefined, undefined],
+      [false, ['PRESENT', '$Ref1'], { Ref1: null }, undefined, undefined],
+      [true, ['PRESENT', '$Ref1'], { Ref1: false }, undefined, undefined],
+      [
+        true,
+        ['PRESENT', '$Ref1'],
+        { Ref1: { obj: 'obj' } },
+        undefined,
         undefined,
       ],
     ])(
