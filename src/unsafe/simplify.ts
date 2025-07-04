@@ -10,8 +10,11 @@ import {
   OPERATOR_NE,
   OPERATOR_NOR,
   OPERATOR_NOT,
+  OPERATOR_NOT_IN,
   OPERATOR_OR,
   OPERATOR_OVERLAP,
+  OPERATOR_PREFIX,
+  OPERATOR_SUFFIX,
   OPERATOR_XOR,
 } from '..'
 import { Context, Evaluable, Result } from '../common/evaluable'
@@ -425,9 +428,96 @@ export const unsafeSimplify = (
 
         return input
       }
-      // case opts.operatorMapping.get(OPERATOR_NOT_IN):
-      // case opts.operatorMapping.get(OPERATOR_PREFIX):
-      // case opts.operatorMapping.get(OPERATOR_SUFFIX):
+      case opts.operatorMapping.get(OPERATOR_NOT_IN): {
+        const [left, right] = operands
+
+        const leftArray = Array.isArray(left)
+        const rightArray = Array.isArray(right)
+
+        if (
+          left === null ||
+          left === undefined ||
+          right === null ||
+          right === undefined ||
+          (leftArray && rightArray) ||
+          (!leftArray && !rightArray)
+        ) {
+          return input
+        }
+
+        if (leftArray) {
+          // If any operand is still an Evaluable, we cannot simplify further
+          const rightSimplified = simplifyInput(right)
+          if (isEvaluable(rightSimplified)) {
+            return input
+          }
+          const leftSimplified = left.map(simplifyInput)
+          if (leftSimplified.some(isEvaluable)) {
+            return input
+          }
+          return leftSimplified.indexOf(rightSimplified) === -1
+        }
+
+        if (rightArray) {
+          const leftSimplified = simplifyInput(left)
+          if (isEvaluable(leftSimplified)) {
+            return input
+          }
+          const rightSimplified = right.map(simplifyInput)
+          if (rightSimplified.some(isEvaluable)) {
+            return input
+          }
+          return rightSimplified.indexOf(leftSimplified) === -1
+        }
+
+        return input
+      }
+      case opts.operatorMapping.get(OPERATOR_PREFIX): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isString(leftSimplified) && isString(rightSimplified)) {
+          return rightSimplified.startsWith(leftSimplified)
+        }
+
+        return false
+      }
+      case opts.operatorMapping.get(OPERATOR_SUFFIX): {
+        const [left, right] = operands
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
+
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
+        }
+
+        if (isString(leftSimplified) && isString(rightSimplified)) {
+          return leftSimplified.endsWith(rightSimplified)
+        }
+
+        return false
+      }
       case opts.operatorMapping.get(OPERATOR_OVERLAP): {
         const [left, right] = operands
 
