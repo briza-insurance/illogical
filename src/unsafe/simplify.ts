@@ -16,11 +16,13 @@ import {
   OPERATOR_PREFIX,
   OPERATOR_PRESENT,
   OPERATOR_SUFFIX,
+  OPERATOR_SUM,
   OPERATOR_UNDEFINED,
   OPERATOR_XOR,
 } from '..'
 import { Context, Evaluable, Result } from '../common/evaluable'
 import {
+  areAllResults,
   isBoolean,
   isNull,
   isNumber,
@@ -28,6 +30,7 @@ import {
   isUndefined,
 } from '../common/type-check'
 import { toDateNumber } from '../common/util'
+import { operateWithExpectedDecimals } from '../expression/arithmetic/operateWithExpectedDecimals'
 import { Reference } from '../operand/reference'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
@@ -44,13 +47,33 @@ const resultToInput = (value: Result): Input | undefined => {
     return undefined
   }
 
-  if (Array.isArray(value) && value.some(isUndefined)) {
-    return undefined
+  if (Array.isArray(value)) {
+    return value.filter((val) => !isUndefined(val)) as Input
   }
 
   // TODO improve below
   // Having an Object as a Result can happen, but isn't handled correctly
   return value as Input
+}
+
+const areAllNumbers = (results: Input[]): results is number[] => {
+  return results.every(isNumber)
+}
+
+const getInputValues = (results: Input[]): number[] | false => {
+  const presentValues = results.filter(
+    (result) => result !== null && result !== undefined
+  )
+  // If we have missing context values the result must be false
+  if (presentValues.length !== results.length) {
+    return false
+  }
+
+  if (!areAllNumbers(presentValues)) {
+    throw new Error('Operands must be numbers for arithmetic operation')
+  }
+
+  return presentValues
 }
 
 export const unsafeSimplify = (
@@ -106,16 +129,13 @@ export const unsafeSimplify = (
         // Remove false operands leaving only the Inputs
         const simplified = simplifiedOperands.filter(isNonTrueResult)
 
-        if (Array.isArray(simplified)) {
-          if (simplified.length === 0) {
-            return true
-          }
-          if (simplified.length === 1) {
-            return simplified[0]
-          }
-          return [operator, ...simplified]
+        if (simplified.length === 0) {
+          return true
         }
-        return simplified
+        if (simplified.length === 1) {
+          return simplified[0]
+        }
+        return [operator, ...simplified]
       }
       case opts.operatorMapping.get(OPERATOR_OR): {
         const simplifiedOperands: (Input | Evaluable)[] = []
@@ -131,17 +151,13 @@ export const unsafeSimplify = (
 
         const simplified = simplifiedOperands.filter(isNonFalseResult)
 
-        if (Array.isArray(simplified)) {
-          if (simplified.length === 0) {
-            return false
-          }
-          if (simplified.length === 1) {
-            return simplified[0]
-          }
-          return [operator, ...simplified]
+        if (simplified.length === 0) {
+          return false
         }
-
-        return simplified
+        if (simplified.length === 1) {
+          return simplified[0]
+        }
+        return [operator, ...simplified]
       }
       case opts.operatorMapping.get(OPERATOR_NOR): {
         const simplifiedOperands: (Input | Evaluable)[] = []
@@ -160,21 +176,17 @@ export const unsafeSimplify = (
         // Remove true operands leaving only the Inputs
         const simplified = simplifiedOperands.filter(isNonFalseResult)
 
-        if (Array.isArray(simplified)) {
-          if (simplified.length === 0) {
-            return true
-          }
-          if (simplified.length === 1) {
-            return ['NOT', simplified[0]]
-          }
-          return [operator, ...simplified]
+        if (simplified.length === 0) {
+          return true
         }
-
-        return simplified
+        if (simplified.length === 1) {
+          return ['NOT', simplified[0]]
+        }
+        return [operator, ...simplified]
       }
       case opts.operatorMapping.get(OPERATOR_XOR): {
         let trueCount = 0
-        const simplifiedOperands: (Input | Evaluable)[] = []
+        const simplifiedOperands: Input[] = []
         for (const operand of operands) {
           const simplification = simplifyInput(operand)
           if (isBoolean(simplification) && isTrueResult(simplification)) {
@@ -184,7 +196,9 @@ export const unsafeSimplify = (
           if (isBoolean(simplification) && isFalseResult(simplification)) {
             continue
           }
-          simplifiedOperands.push(simplification)
+          if (!isEvaluable(simplification)) {
+            simplifiedOperands.push(simplification)
+          }
         }
 
         if (trueCount > 1) {
@@ -195,35 +209,22 @@ export const unsafeSimplify = (
           return trueCount === 1
         }
 
-        const simplifiedInputs = simplifiedOperands.map((op) =>
-          isEvaluable(op) ? op.serialize(opts) : op
-        )
-
         if (simplifiedOperands.length === 1) {
           if (trueCount === 1) {
-            return ['NOT', simplifiedInputs[0]]
+            return ['NOT', simplifiedOperands[0]]
           }
           return simplifiedOperands[0]
         }
         if (trueCount === 1) {
-          return ['NOR', ...simplifiedInputs]
+          return ['NOR', ...simplifiedOperands]
         }
-        return ['XOR', ...simplifiedInputs]
+        return ['XOR', ...simplifiedOperands]
       }
       case opts.operatorMapping.get(OPERATOR_NOT): {
-        if (operands.length !== 1) {
-          throw new Error(
-            `Unexpected number of operands for NOT operator: ${operands.length}`
-          )
-        }
         const simplification = simplifyInput(operands[0])
 
         if (isBoolean(simplification)) {
           return !simplification
-        }
-
-        if (!isEvaluable(simplification)) {
-          return [operator, simplification] satisfies Input
         }
 
         return input
@@ -290,10 +291,14 @@ export const unsafeSimplify = (
           return leftSimplified > rightSimplified
         }
 
-        const leftDate = toDateNumber(left),
-          rightDate = toDateNumber(right)
+        const leftDate = toDateNumber(leftSimplified),
+          rightDate = toDateNumber(rightSimplified)
         if (leftDate && rightDate) {
           return leftDate > rightDate
+        }
+
+        if (Array.isArray(leftSimplified) || Array.isArray(rightSimplified)) {
+          return [operator, leftSimplified, rightSimplified]
         }
 
         return false
@@ -319,10 +324,14 @@ export const unsafeSimplify = (
           return leftSimplified >= rightSimplified
         }
 
-        const leftDate = toDateNumber(left),
-          rightDate = toDateNumber(right)
+        const leftDate = toDateNumber(leftSimplified),
+          rightDate = toDateNumber(rightSimplified)
         if (leftDate && rightDate) {
           return leftDate >= rightDate
+        }
+
+        if (Array.isArray(leftSimplified) || Array.isArray(rightSimplified)) {
+          return [operator, leftSimplified, rightSimplified]
         }
 
         return false
@@ -348,10 +357,14 @@ export const unsafeSimplify = (
           return leftSimplified < rightSimplified
         }
 
-        const leftDate = toDateNumber(left),
-          rightDate = toDateNumber(right)
+        const leftDate = toDateNumber(leftSimplified),
+          rightDate = toDateNumber(rightSimplified)
         if (leftDate && rightDate) {
           return leftDate < rightDate
+        }
+
+        if (Array.isArray(leftSimplified) || Array.isArray(rightSimplified)) {
+          return [operator, leftSimplified, rightSimplified]
         }
 
         return false
@@ -377,10 +390,14 @@ export const unsafeSimplify = (
           return leftSimplified <= rightSimplified
         }
 
-        const leftDate = toDateNumber(left),
-          rightDate = toDateNumber(right)
+        const leftDate = toDateNumber(leftSimplified),
+          rightDate = toDateNumber(rightSimplified)
         if (leftDate && rightDate) {
           return leftDate <= rightDate
+        }
+
+        if (Array.isArray(leftSimplified) || Array.isArray(rightSimplified)) {
+          return [operator, leftSimplified, rightSimplified]
         }
 
         return false
@@ -395,16 +412,18 @@ export const unsafeSimplify = (
           left === null ||
           left === undefined ||
           right === null ||
-          right === undefined ||
-          (leftArray && rightArray) ||
-          (!leftArray && !rightArray)
+          right === undefined
         ) {
-          return input
+          return false
         }
+        const leftSimplified = simplifyInput(left)
+        const rightSimplified = simplifyInput(right)
 
+        // If left is an array, right side could be a reference containing a
+        // single value or a value directly.
         if (leftArray) {
-          // If any operand is still an Evaluable, we cannot simplify further
           const rightSimplified = simplifyInput(right)
+          // If any operand is still an Evaluable, we cannot simplify further
           if (isEvaluable(rightSimplified)) {
             return input
           }
@@ -415,8 +434,11 @@ export const unsafeSimplify = (
           return leftSimplified.indexOf(rightSimplified) > -1
         }
 
+        // If right is an array, left side could be a reference containing a
+        // single value or a value directly.
         if (rightArray) {
           const leftSimplified = simplifyInput(left)
+          // If any operand is still an Evaluable, we cannot simplify further
           if (isEvaluable(leftSimplified)) {
             return input
           }
@@ -425,6 +447,23 @@ export const unsafeSimplify = (
             return input
           }
           return rightSimplified.indexOf(leftSimplified) > -1
+        }
+
+        // If none of them are arrays it means one of them must be a reference
+        // containing a list of values.
+        if (!leftArray && !rightArray) {
+          if (Array.isArray(leftSimplified)) {
+            if (isEvaluable(rightSimplified)) {
+              return input
+            }
+            return leftSimplified.indexOf(rightSimplified) > -1
+          }
+          if (Array.isArray(rightSimplified)) {
+            if (isEvaluable(leftSimplified)) {
+              return input
+            }
+            return rightSimplified.indexOf(leftSimplified) > -1
+          }
         }
 
         return input
@@ -443,7 +482,7 @@ export const unsafeSimplify = (
           (leftArray && rightArray) ||
           (!leftArray && !rightArray)
         ) {
-          return input
+          return true
         }
 
         if (leftArray) {
@@ -537,14 +576,7 @@ export const unsafeSimplify = (
           return true
         }
 
-        if (
-          leftSimplified.some(isEvaluable) ||
-          rightSimplified.some(isEvaluable)
-        ) {
-          return input
-        }
-
-        return false
+        return input
       }
       case opts.operatorMapping.get(OPERATOR_UNDEFINED): {
         const [operand] = operands
@@ -580,7 +612,23 @@ export const unsafeSimplify = (
 
         return !isUndefined(simplified) && !isNull(simplified)
       }
-      // case opts.operatorMapping.get(OPERATOR_SUM):
+      // Arithmetic operators
+      case opts.operatorMapping.get(OPERATOR_SUM): {
+        const results = operands.map(simplifyInput)
+        if (areAllResults(results)) {
+          const presentValues = getInputValues(results)
+
+          if (isFalseResult(presentValues)) {
+            return false
+          }
+
+          return presentValues.reduce((acc, result) =>
+            operateWithExpectedDecimals('sum')(acc, result)
+          )
+        }
+
+        return input
+      }
       // case opts.operatorMapping.get(OPERATOR_SUBTRACT):
       // case opts.operatorMapping.get(OPERATOR_MULTIPLY):
       // case opts.operatorMapping.get(OPERATOR_DIVIDE):

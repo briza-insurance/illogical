@@ -1,3 +1,4 @@
+import { Input } from '../parser'
 import { Evaluable, Result } from './evaluable'
 
 /**
@@ -68,9 +69,9 @@ export function isEvaluable(value: Result | Evaluable): value is Evaluable {
  * @param {(Result | Evaluable)[]} values results or evaluables
  * @returns {boolean} type guard
  */
-export function areAllResults(
-  values: (Result | Evaluable)[]
-): values is Result[] {
+export function areAllResults<T extends Result | Input>(
+  values: (T | Evaluable)[]
+): values is T[] {
   return values.every((value) => !isEvaluable(value))
 }
 

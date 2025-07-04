@@ -465,6 +465,13 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
+        ['==', '$Ref1', 1],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
         ['XOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
         ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
         {},
@@ -478,10 +485,18 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [false, ['XOR', ['==', 1, 1], ['==', 2, 2]], {}, undefined, undefined],
       // NOT
       [true, ['NOT', ['==', 1, 2]], {}, undefined, undefined],
       [false, ['NOT', ['==', 1, 1]], {}, undefined, undefined],
       [false, ['NOT', ['==', '$Ref1', 1]], { Ref1: 1 }, undefined, undefined],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['NOT', ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
       // COMPARISON
       // Eq
       [true, ['==', 1, 1], {}, undefined, undefined],
@@ -506,9 +521,18 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [
+        ['!=', '$Ref1', '$Ref2'],
+        ['!=', '$Ref1', '$Ref2'],
+        { Ref2: 1 },
+        undefined,
+        undefined,
+      ],
       // GT
       [true, ['>', 2, 1], {}, undefined, undefined],
       [false, ['>', 1, 2], {}, undefined, undefined],
+      [['>', '$Ref1', 1], ['>', '$Ref1', 1], {}, undefined, undefined],
+      [['>', 1, '$Ref1'], ['>', 1, '$Ref1'], {}, undefined, undefined],
       [true, ['>', '$Ref1', 1], { Ref1: 2 }, undefined, undefined],
       [false, ['>', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
       [
@@ -525,15 +549,28 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [false, ['>', '$Ref1', 2], { Ref1: true }, undefined, undefined],
       // GE
       [true, ['>=', 2, 1], {}, undefined, undefined],
       [true, ['>=', 2, 2], {}, undefined, undefined],
       [false, ['>=', 1, 2], {}, undefined, undefined],
+      [['>=', '$Ref1', 2], ['>=', '$Ref1', 2], {}, undefined, undefined],
+      [['>=', 2, '$Ref1'], ['>=', 2, '$Ref1'], {}, undefined, undefined],
+      [
+        true,
+        ['>=', '$Ref1', '2000-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [false, ['>=', '$Ref1', 2], { Ref1: true }, undefined, undefined],
       // LT
       [true, ['<', 1, 2], {}, undefined, undefined],
       [false, ['<', 2, 1], {}, undefined, undefined],
       [true, ['<', 1, '$Ref1'], { Ref1: 2 }, undefined, undefined],
       [false, ['<', 1, '$Ref1'], { Ref1: 1 }, undefined, undefined],
+      [['<', '$Ref1', 2], ['<', '$Ref1', 2], {}, undefined, undefined],
+      [['<', 2, '$Ref1'], ['<', 2, '$Ref1'], {}, undefined, undefined],
       [
         false,
         ['<', '$Ref1', '1990-01-01'],
@@ -548,13 +585,32 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [false, ['<', '$Ref1', 2], { Ref1: true }, undefined, undefined],
       // LE
       [true, ['<=', 1, 2], {}, undefined, undefined],
       [true, ['<=', 2, 2], {}, undefined, undefined],
       [false, ['<=', 2, 1], {}, undefined, undefined],
+      [['<=', '$Ref1', 2], ['<=', '$Ref1', 2], {}, undefined, undefined],
+      [['<=', 2, '$Ref1'], ['<=', 2, '$Ref1'], {}, undefined, undefined],
+      [
+        false,
+        ['<=', '$Ref1', '1990-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [false, ['<=', '$Ref1', 2], { Ref1: true }, undefined, undefined],
       // IN
       [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],
       [false, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
+      [true, ['IN', [1, 2, 3], '$Ref1'], { Ref1: 1 }, undefined, undefined],
+      [
+        ['IN', [1, 2, 3], '$Ref1'],
+        ['IN', [1, 2, 3], '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
       [
         ['IN', '$Ref1', [1, 2, 3]],
         ['IN', '$Ref1', [1, 2, 3]],
@@ -565,6 +621,13 @@ describe('Condition Engine', () => {
       [
         ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
         ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        ['IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
         {},
         undefined,
         undefined,
@@ -583,6 +646,49 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [false, ['IN', null, [1, 2, 3]], {}, undefined, undefined],
+      [
+        true,
+        ['IN', 1, '$Ref1'],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['IN', '$Ref1', 1],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', '$Ref2'],
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', '$Ref2'],
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref2: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3] },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [
+        true,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3], Ref2: 1 },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
       // NOT_IN
       [
         false,
@@ -592,6 +698,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [true, ['NOT IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
+      [true, ['NOT IN', [1, 2, 3], '$Ref1'], { Ref1: 4 }, undefined, undefined],
       [
         ['NOT IN', '$Ref1', [1, 2, 3]],
         ['NOT IN', '$Ref1', [1, 2, 3]],
@@ -602,6 +709,13 @@ describe('Condition Engine', () => {
       [
         ['NOT IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
         ['NOT IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        ['NOT IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
         {},
         undefined,
         undefined,
@@ -616,6 +730,14 @@ describe('Condition Engine', () => {
       [
         ['NOT IN', '$Ref1', [1, 2, 3]],
         ['AND', ['==', 1, 1], ['NOT IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [true, ['NOT IN', null, [1, 2, 3]], {}, undefined, undefined],
+      [
+        ['NOT IN', [1, 2, 3], '$Ref1'],
+        ['NOT IN', [1, 2, 3], '$Ref1'],
         {},
         undefined,
         undefined,
@@ -643,6 +765,14 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [
+        ['PREFIX', 'abc', '$Ref1'],
+        ['PREFIX', 'abc', '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['PREFIX', 1, '$Ref1'], { Ref1: 'abcdef' }, undefined, undefined],
       // SUFFIX
       [
         true,
@@ -666,6 +796,14 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [
+        ['SUFFIX', '$Ref1', 'xyz'],
+        ['SUFFIX', '$Ref1', 'xyz'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['SUFFIX', 1, '$Ref1'], { Ref1: 'abcdef' }, undefined, undefined],
       // OVERLAP
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
@@ -710,6 +848,38 @@ describe('Condition Engine', () => {
         [],
         ['Ref1', 'Ref2'],
       ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {},
+        undefined,
+        ['Ref1', 'Ref2'],
+      ],
+      [
+        true,
+        ['OVERLAP', '$Ref1', [1, 2, 3]],
+        {
+          Ref1: [1],
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        {},
+        ['Ref1'],
+        undefined,
+      ],
+      [
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        {
+          Ref1: 4,
+        },
+        undefined,
+        undefined,
+      ],
       // UNDEFINED
       [
         ['UNDEFINED', '$Ref1'],
@@ -740,6 +910,7 @@ describe('Condition Engine', () => {
       [true, ['PRESENT', '$Ref1'], { Ref1: 'value' }, undefined, undefined],
       [false, ['PRESENT', '$Ref1'], { Ref1: null }, undefined, undefined],
       [true, ['PRESENT', '$Ref1'], { Ref1: false }, undefined, undefined],
+      [false, ['PRESENT', '$Ref1'], {}, ['Ref1'], undefined],
       [
         true,
         ['PRESENT', '$Ref1'],
@@ -747,6 +918,55 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      // ARITHMETIC
+      // SUM
+      [true, ['>', ['+', 1, 2, 3], 5], {}, undefined, undefined],
+      [
+        true,
+        ['>', ['+', '$Ref1', '$Ref2'], 2],
+        { Ref1: 1, Ref2: 2 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['+', '$Ref1', '$Ref2'], 0],
+        ['>', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['+', '$Ref1', '$Ref2'], 3],
+        ['>', ['+', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>=', ['+', '$Ref1', '$Ref2'], 3],
+        ['>=', ['+', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<', ['+', '$Ref1', '$Ref2'], 0],
+        ['<', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<=', ['+', '$Ref1', '$Ref2'], 0],
+        ['<=', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [true, ['>', ['+', '$Ref1', 5], 10], { Ref1: 10 }, undefined, undefined],
+      [true, ['<', ['+', '$Ref1', 5], 10], { Ref1: 0 }, undefined, undefined],
+      [true, ['<', ['+', '$Ref1', 5], 0], { Ref1: -10 }, undefined, undefined],
+      [false, ['>', ['+', null, null], 5], {}, undefined, undefined],
     ])(
       'should result in %j',
       (expectedResult, condition, context, strictKeys, optionalKeys) => {
@@ -766,6 +986,12 @@ describe('Condition Engine', () => {
         expect(unsafeResult).toEqual(expectedResult)
         expect(safeResult).toEqual(unsafeResult)
       }
+    )
+  })
+
+  it('should be closer to 100% code coverage', () => {
+    expect(() => engine.unsafeSimplify(['>', ['+', 1, '2', 3], 5], {})).toThrow(
+      'Operands must be numbers for arithmetic operation'
     )
   })
 })
