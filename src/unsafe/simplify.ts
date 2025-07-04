@@ -1,12 +1,14 @@
 import {
   isEvaluable,
   OPERATOR_AND,
+  OPERATOR_DIVIDE,
   OPERATOR_EQ,
   OPERATOR_GE,
   OPERATOR_GT,
   OPERATOR_IN,
   OPERATOR_LE,
   OPERATOR_LT,
+  OPERATOR_MULTIPLY,
   OPERATOR_NE,
   OPERATOR_NOR,
   OPERATOR_NOT,
@@ -15,6 +17,7 @@ import {
   OPERATOR_OVERLAP,
   OPERATOR_PREFIX,
   OPERATOR_PRESENT,
+  OPERATOR_SUBTRACT,
   OPERATOR_SUFFIX,
   OPERATOR_SUM,
   OPERATOR_UNDEFINED,
@@ -629,9 +632,52 @@ export const unsafeSimplify = (
 
         return input
       }
-      // case opts.operatorMapping.get(OPERATOR_SUBTRACT):
-      // case opts.operatorMapping.get(OPERATOR_MULTIPLY):
-      // case opts.operatorMapping.get(OPERATOR_DIVIDE):
+      case opts.operatorMapping.get(OPERATOR_SUBTRACT): {
+        const results = operands.map(simplifyInput)
+        if (areAllResults(results)) {
+          const presentValues = getInputValues(results)
+
+          if (isFalseResult(presentValues)) {
+            return false
+          }
+
+          return presentValues.reduce((acc, result) =>
+            operateWithExpectedDecimals('subtract')(acc, result)
+          )
+        }
+
+        return input
+      }
+      case opts.operatorMapping.get(OPERATOR_MULTIPLY): {
+        const results = operands.map(simplifyInput)
+        if (areAllResults(results)) {
+          const presentValues = getInputValues(results)
+
+          if (isFalseResult(presentValues)) {
+            return false
+          }
+
+          return presentValues.reduce((acc, result) =>
+            operateWithExpectedDecimals('multiply')(acc, result)
+          )
+        }
+
+        return input
+      }
+      case opts.operatorMapping.get(OPERATOR_DIVIDE): {
+        const results = operands.map(simplifyInput)
+        if (areAllResults(results)) {
+          const presentValues = getInputValues(results)
+
+          if (isFalseResult(presentValues)) {
+            return false
+          }
+
+          return presentValues.reduce((acc, result) => acc / result)
+        }
+
+        return input
+      }
       default: {
         // Handle as an array of References / Values if no operator matches
         const result = input.map(simplifyInput)
