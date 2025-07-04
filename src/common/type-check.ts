@@ -1,3 +1,4 @@
+import { Input } from '../parser'
 import { Evaluable, Result } from './evaluable'
 
 /**
@@ -68,9 +69,9 @@ export function isEvaluable(value: Result | Evaluable): value is Evaluable {
  * @param {(Result | Evaluable)[]} values results or evaluables
  * @returns {boolean} type guard
  */
-export function areAllResults(
-  values: (Result | Evaluable)[]
-): values is Result[] {
+export function areAllResults<T extends Result | Input>(
+  values: (T | Evaluable)[]
+): values is T[] {
   return values.every((value) => !isEvaluable(value))
 }
 
@@ -81,4 +82,23 @@ export function areAllResults(
  */
 export function areAllNumbers(results: Result[]): results is number[] {
   return results.every(isNumber)
+}
+
+export function isNotObject(
+  value: Result
+): value is Exclude<Result, Record<string, unknown>> {
+  return (
+    Array.isArray(value) ||
+    typeof value !== 'object' ||
+    value === null ||
+    Object.getPrototypeOf(value) !== Object.prototype
+  )
+}
+
+export function isUndefined(value: unknown): value is undefined {
+  return value === undefined
+}
+
+export function isNull(value: unknown): value is null {
+  return value === null
 }

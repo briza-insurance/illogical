@@ -73,6 +73,7 @@ export type Input =
   | null
   | Input[]
   | [string, ...Input[]]
+  | Record<string, unknown>
 export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
