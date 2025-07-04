@@ -4,8 +4,11 @@ import {
   OPERATOR_EQ,
   OPERATOR_IN,
   OPERATOR_NE,
+  OPERATOR_NOR,
+  OPERATOR_NOT,
   OPERATOR_OR,
   OPERATOR_OVERLAP,
+  OPERATOR_XOR,
 } from '..'
 import { Context, Evaluable, Result } from '../common/evaluable'
 import {
@@ -18,7 +21,8 @@ import { Reference } from '../operand/reference'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 
-const istrueResult = (value: Input) => value === true
+const isTrueResult = (value: Input) => value === true
+const isFalseResult = (value: Input) => value === false
 const isNonFalseResult = (operand: Input | Evaluable): operand is Input =>
   operand !== false && !isEvaluable(operand)
 const isNonTrueResult = (operand: Input | Evaluable): operand is Input =>
@@ -81,7 +85,7 @@ export const unsafeSimplify = (
           const simplification = simplifyInput(operand)
           if (
             isUndefined(simplification) ||
-            (isBoolean(simplification) && !istrueResult(simplification))
+            (isBoolean(simplification) && !isTrueResult(simplification))
           ) {
             // Short-circuit for AND
             return false
@@ -107,7 +111,7 @@ export const unsafeSimplify = (
         const simplifiedOperands: (Input | Evaluable)[] = []
         for (const operand of operands) {
           const simplification = simplifyInput(operand)
-          if (isBoolean(simplification) && istrueResult(simplification)) {
+          if (isBoolean(simplification) && isTrueResult(simplification)) {
             // Short-circuit for OR
             return true
           } else if (simplification) {
@@ -129,33 +133,106 @@ export const unsafeSimplify = (
 
         return simplified
       }
-      // case opts.operatorMapping.get(OPERATOR_NOR):
-      // case opts.operatorMapping.get(OPERATOR_XOR):
-      // case opts.operatorMapping.get(OPERATOR_NOT): {
-      //   if (operands.length !== 1) {
-      //     throw new Error(
-      //       `Unexpected number of operands for NOT operator: ${operands.length}`
-      //     )
-      //   }
-      //   const simplification = simplifyInput(operands[0])
-      //   return isBoolean(simplification)
-      //     ? !simplification
-      //     : ([operator, simplification] satisfies Input)
-      // }
+      case opts.operatorMapping.get(OPERATOR_NOR): {
+        const simplifiedOperands: (Input | Evaluable)[] = []
+        for (const operand of operands) {
+          const simplification = simplifyInput(operand)
+          if (
+            isUndefined(simplification) ||
+            (isBoolean(simplification) && isTrueResult(simplification))
+          ) {
+            // Short-circuit for AND
+            return false
+          }
+          simplifiedOperands.push(simplification)
+        }
+
+        // Remove true operands leaving only the Inputs
+        const simplified = simplifiedOperands.filter(isNonFalseResult)
+
+        if (Array.isArray(simplified)) {
+          if (simplified.length === 0) {
+            return true
+          }
+          if (simplified.length === 1) {
+            return ['NOT', simplified[0]]
+          }
+          return [operator, ...simplified]
+        }
+
+        return simplified
+      }
+      case opts.operatorMapping.get(OPERATOR_XOR): {
+        let trueCount = 0
+        const simplifiedOperands: (Input | Evaluable)[] = []
+        for (const operand of operands) {
+          const simplification = simplifyInput(operand)
+          if (isBoolean(simplification) && isTrueResult(simplification)) {
+            trueCount++
+            continue
+          }
+          if (isBoolean(simplification) && isFalseResult(simplification)) {
+            continue
+          }
+          simplifiedOperands.push(simplification)
+        }
+
+        if (trueCount > 1) {
+          return false
+        }
+
+        if (simplifiedOperands.length === 0) {
+          return trueCount === 1
+        }
+
+        const simplifiedInputs = simplifiedOperands.map((op) =>
+          isEvaluable(op) ? op.serialize(opts) : op
+        )
+
+        if (simplifiedOperands.length === 1) {
+          if (trueCount === 1) {
+            return ['NOT', simplifiedInputs[0]]
+          }
+          return simplifiedOperands[0]
+        }
+        if (trueCount === 1) {
+          return ['NOR', ...simplifiedInputs]
+        }
+        return ['XOR', ...simplifiedInputs]
+      }
+      case opts.operatorMapping.get(OPERATOR_NOT): {
+        if (operands.length !== 1) {
+          throw new Error(
+            `Unexpected number of operands for NOT operator: ${operands.length}`
+          )
+        }
+        const simplification = simplifyInput(operands[0])
+
+        if (isBoolean(simplification)) {
+          return !simplification
+        }
+
+        if (!isEvaluable(simplification)) {
+          return [operator, simplification] satisfies Input
+        }
+
+        return input
+      }
       // Comparison operators
       case opts.operatorMapping.get(OPERATOR_EQ): {
         const [left, right] = operands
         const leftSimplified = simplifyInput(left)
         const rightSimplified = simplifyInput(right)
 
-        if (isEvaluable(leftSimplified) || isEvaluable(rightSimplified)) {
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
           // If either left or right is an array, we cannot simplify further
           return [
             operator,
-            isEvaluable(leftSimplified) ? leftSimplified.serialize(opts) : left,
-            isEvaluable(rightSimplified)
-              ? rightSimplified.serialize(opts)
-              : right,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
           ]
         }
 
@@ -167,9 +244,16 @@ export const unsafeSimplify = (
         const leftSimplified = simplifyInput(left)
         const rightSimplified = simplifyInput(right)
 
-        if (Array.isArray(left) || Array.isArray(right)) {
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
+
+        if (isLeftEvaluable || isRightEvaluable) {
           // If either left or right is an array, we cannot simplify further
-          return [operator, left, right]
+          return [
+            operator,
+            isLeftEvaluable ? leftSimplified.serialize(opts) : left,
+            isRightEvaluable ? rightSimplified.serialize(opts) : right,
+          ]
         }
 
         // See NotEqual.comparison

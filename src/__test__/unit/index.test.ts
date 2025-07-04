@@ -317,17 +317,8 @@ describe('Condition Engine', () => {
         string[] | undefined,
       ]
     >([
-      [true, ['==', 1, 1], {}, undefined, undefined],
-      [false, ['==', 1, 2], {}, undefined, undefined],
-      [true, ['==', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
-      [
-        ['==', '$Ref1', '$Ref2'],
-        ['==', '$Ref1', '$Ref2'],
-        { Ref1: 1 },
-        undefined,
-        undefined,
-      ],
-      [false, ['==', '$Ref1', [1]], { Ref1: 1 }, undefined, undefined],
+      // LOGICAL
+      // OR
       [
         true,
         ['OR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
@@ -367,6 +358,7 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      // AND
       [
         false,
         ['AND', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
@@ -406,6 +398,116 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      // NOR
+      [
+        ['NOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['NOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['NOR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      // XOR
+      [
+        true,
+        ['XOR', ['==', '$Ref1', 1], ['==', 2, 3], ['==', '$Ref1', 2]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['XOR', ['==', '$Ref1', 1], ['==', 2, 3], ['==', '$Ref1', 2]],
+        {
+          Ref1: 3,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', 2, 2]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['XOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      // NOT
+      [true, ['NOT', ['==', 1, 2]], {}, undefined, undefined],
+      [false, ['NOT', ['==', 1, 1]], {}, undefined, undefined],
+      [false, ['NOT', ['==', '$Ref1', 1]], { Ref1: 1 }, undefined, undefined],
+      // COMPARISON
+      // Eq
+      [true, ['==', 1, 1], {}, undefined, undefined],
+      [false, ['==', 1, 2], {}, undefined, undefined],
+      [true, ['==', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        ['==', '$Ref1', '$Ref2'],
+        ['==', '$Ref1', '$Ref2'],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [false, ['==', '$Ref1', [1]], { Ref1: 1 }, undefined, undefined],
+      // NE
+      [false, ['!=', 1, 1], {}, undefined, undefined],
+      [true, ['!=', 1, 2], {}, undefined, undefined],
+      [false, ['!=', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        ['!=', '$Ref1', '$Ref2'],
+        ['!=', '$Ref1', '$Ref2'],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      // NOT
+      // IN
       [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],
       [false, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
       [
@@ -436,6 +538,7 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      // OVERLAP
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
@@ -473,20 +576,20 @@ describe('Condition Engine', () => {
     ])(
       'should result in %j',
       (expectedResult, condition, context, strictKeys, optionalKeys) => {
-        const unsafeResult = engine.unsafeSimplify(
-          condition,
-          context,
-          strictKeys,
-          optionalKeys
-        )
         const safeResult = engine.simplify(
           condition,
           context,
           strictKeys,
           optionalKeys
         )
-        expect(unsafeResult).toEqual(expectedResult)
+        const unsafeResult = engine.unsafeSimplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
         expect(safeResult).toEqual(expectedResult)
+        expect(unsafeResult).toEqual(expectedResult)
         expect(safeResult).toEqual(unsafeResult)
       }
     )
