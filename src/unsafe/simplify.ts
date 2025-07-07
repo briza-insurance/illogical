@@ -567,19 +567,28 @@ export const unsafeSimplify = (
         const leftSimplified = simplifyInput(left)
         const rightSimplified = simplifyInput(right)
 
+        // If simplified results are not arrays, it means we had a strictKey
+        // without values provided. Simplify to false.
         if (!Array.isArray(leftSimplified) || !Array.isArray(rightSimplified)) {
+          return false
+        }
+
+        const leftValues = leftSimplified.filter((val) => !isEvaluable(val))
+        const rightValues = rightSimplified.filter((val) => !isEvaluable(val))
+
+        if (leftValues.length === 0 || rightValues.length === 0) {
           return input
         }
 
-        const rightSet = new Set(rightSimplified)
+        const rightSet = new Set(rightValues)
 
-        const res = leftSimplified.some((element) => rightSet.has(element))
+        const res = leftValues.some((element) => rightSet.has(element))
 
         if (res) {
           return true
         }
 
-        return input
+        return false
       }
       case opts.operatorMapping.get(OPERATOR_UNDEFINED): {
         const [operand] = operands

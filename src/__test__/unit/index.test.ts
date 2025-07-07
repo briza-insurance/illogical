@@ -813,7 +813,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        false,
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
           Ref1: 4,
@@ -864,21 +864,89 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
+      [false, ['OVERLAP', [1, 2, 3], '$Ref1'], {}, ['Ref1'], undefined],
       [
-        ['OVERLAP', [1, 2, 3], '$Ref1'],
-        ['OVERLAP', [1, 2, 3], '$Ref1'],
-        {},
-        ['Ref1'],
-        undefined,
-      ],
-      [
-        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        false,
         ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
         {
           Ref1: 4,
         },
         undefined,
         undefined,
+      ],
+      [
+        false,
+        [
+          'OVERLAP',
+          ['$Location1Address.region', '$Location2Address.region'],
+          ['DE', 'PA'],
+        ],
+        {
+          Location1Address: {
+            street: '633 E Lake Ave',
+            city: 'Peoria',
+            region: 'IL',
+            postalCode: '61614',
+            county: '',
+            country: 'US',
+            secondary: '',
+          },
+          Location1Wc1Code: {
+            code: '9102-2',
+            industry: '',
+          },
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        [
+          'OR',
+          [
+            'AND',
+            [
+              'OVERLAP',
+              ['$Location1Address.region', '$Location2Address.region'],
+              ['DE', 'PA'],
+            ],
+            [
+              'OVERLAP',
+              ['$Location1Wc1Code.code', '$Location2Wc1Code.code'],
+              ['0936-2'],
+            ],
+          ],
+          [
+            'AND',
+            [
+              'OVERLAP',
+              ['$Location1Address.region', '$Location2Address.region'],
+              ['AK', 'IL'],
+            ],
+            [
+              'OVERLAP',
+              ['$Location1Wc1Code.code', '$Location2Wc1Code.code'],
+              ['7610-3'],
+            ],
+          ],
+        ],
+        {
+          Location1Address: {
+            street: '633 E Lake Ave',
+            city: 'Peoria',
+            region: 'IL',
+            postalCode: '61614',
+            county: '',
+            country: 'US',
+            secondary: '',
+          },
+          Location1Wc1Code: {
+            code: '9102-2',
+            industry: '',
+          },
+        },
+        [],
+        [],
       ],
       // UNDEFINED
       [
