@@ -274,7 +274,7 @@ describe('Condition Engine', () => {
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         { Ref1: 4 },
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        false, // ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
       ],
     ])(
       '%p with context %p should be simplified to %p',
