@@ -45,18 +45,36 @@ const isNonFalseResult = (operand: Input | Evaluable): operand is Input =>
 const isNonTrueResult = (operand: Input | Evaluable): operand is Input =>
   operand !== true && !isEvaluable(operand)
 
+const resultToInputInternal = (value: Result): Input | undefined => {
+  if (isUndefined(value)) {
+    return undefined
+  }
+
+  if (Array.isArray(value)) {
+    return undefined
+  }
+
+  return value
+}
+
 const resultToInput = (value: Result): Input | undefined => {
   if (isUndefined(value)) {
     return undefined
   }
 
   if (Array.isArray(value)) {
-    return value.filter((val) => !isUndefined(val)) as Input
+    const definedValues = value
+      .map(resultToInputInternal)
+      .filter((val) => !isUndefined(val))
+
+    if (definedValues.length === 0) {
+      return undefined
+    }
+
+    return definedValues
   }
 
-  // TODO improve below
-  // Having an Object as a Result can happen, but isn't handled correctly
-  return value as Input
+  return value
 }
 
 const areAllNumbers = (results: Input[]): results is number[] => {
@@ -696,7 +714,8 @@ export const unsafeSimplify = (
       default: {
         // Handle as an array of References / Values if no operator matches
         const result = input.map(simplifyInput)
-        // TODO Fix return type to handle mixed (Input | Evaluable)[]
+        // Returning as Input[] to simplify types in recursion. But operators
+        // need to handle Evaluables being part of the array.
         return result as Input[]
       }
     }
