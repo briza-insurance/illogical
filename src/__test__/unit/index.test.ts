@@ -1035,6 +1035,31 @@ describe('Condition Engine', () => {
       [true, ['<', ['+', '$Ref1', 5], 10], { Ref1: 0 }, undefined, undefined],
       [true, ['<', ['+', '$Ref1', 5], 0], { Ref1: -10 }, undefined, undefined],
       [false, ['>', ['+', null, null], 5], {}, undefined, undefined],
+      [
+        false,
+        [
+          'AND',
+          [
+            '>',
+            [
+              '+',
+              '$Location2Wc1NumberOfFullTimeEmployees',
+              '$Location2Wc1NumberOfPartTimeEmployees',
+            ],
+            99,
+          ],
+          ['>=', '$NumberOfLocations', 2],
+        ],
+        { NumberOfLocations: 1 },
+        [
+          'Location2Wc1NumberOfFullTimeEmployees',
+          'Location2Wc1NumberOfPartTimeEmployees',
+        ],
+        [
+          'Location2Wc1NumberOfFullTimeEmployees',
+          'Location2Wc1NumberOfPartTimeEmployees',
+        ],
+      ],
       // SUBTRACT
       [true, ['>', ['-', 5, 2], 2], {}, undefined, undefined],
       [

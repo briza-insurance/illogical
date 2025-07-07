@@ -67,13 +67,13 @@ const getInputValues = (results: Input[]): number[] | false => {
   const presentValues = results.filter(
     (result) => result !== null && result !== undefined
   )
-  // If we have missing context values the result must be false
-  if (presentValues.length !== results.length) {
+  // If we have missing context values the result or we still have refences
+  // simplify to false.
+  if (
+    presentValues.length !== results.length ||
+    !areAllNumbers(presentValues)
+  ) {
     return false
-  }
-
-  if (!areAllNumbers(presentValues)) {
-    throw new Error('Operands must be numbers for arithmetic operation')
   }
 
   return presentValues
