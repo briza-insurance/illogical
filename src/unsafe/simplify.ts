@@ -25,7 +25,6 @@ import {
 } from '..'
 import { Context, Evaluable, Result } from '../common/evaluable'
 import {
-  areAllResults,
   isBoolean,
   isNull,
   isNumber,
@@ -80,6 +79,9 @@ const resultToInput = (value: Result): Input | undefined => {
 const areAllNumbers = (results: Input[]): results is number[] => {
   return results.every(isNumber)
 }
+
+const areAllInputs = (values: (Input | Evaluable)[]): values is Input[] =>
+  values.every((value) => !isEvaluable(value))
 
 const getInputValues = (results: Input[]): number[] | false => {
   const presentValues = results.filter(
@@ -651,7 +653,7 @@ export const unsafeSimplify = (
       // Arithmetic operators
       case opts.operatorMapping.get(OPERATOR_SUM): {
         const results = operands.map(simplifyInput)
-        if (areAllResults(results)) {
+        if (areAllInputs(results)) {
           const presentValues = getInputValues(results)
 
           if (isFalseResult(presentValues)) {
@@ -667,7 +669,7 @@ export const unsafeSimplify = (
       }
       case opts.operatorMapping.get(OPERATOR_SUBTRACT): {
         const results = operands.map(simplifyInput)
-        if (areAllResults(results)) {
+        if (areAllInputs(results)) {
           const presentValues = getInputValues(results)
 
           if (isFalseResult(presentValues)) {
@@ -683,7 +685,7 @@ export const unsafeSimplify = (
       }
       case opts.operatorMapping.get(OPERATOR_MULTIPLY): {
         const results = operands.map(simplifyInput)
-        if (areAllResults(results)) {
+        if (areAllInputs(results)) {
           const presentValues = getInputValues(results)
 
           if (isFalseResult(presentValues)) {
@@ -699,7 +701,7 @@ export const unsafeSimplify = (
       }
       case opts.operatorMapping.get(OPERATOR_DIVIDE): {
         const results = operands.map(simplifyInput)
-        if (areAllResults(results)) {
+        if (areAllInputs(results)) {
           const presentValues = getInputValues(results)
 
           if (isFalseResult(presentValues)) {
