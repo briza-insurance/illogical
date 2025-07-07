@@ -274,7 +274,12 @@ describe('Condition Engine', () => {
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         { Ref1: 4 },
-        false, // ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        { Ref1: 1 },
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
       ],
     ])(
       '%p with context %p should be simplified to %p',
@@ -813,7 +818,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        false,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
           Ref1: 4,
@@ -822,7 +827,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
           Ref1: 1,
@@ -840,7 +845,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
           Ref1: 1,
@@ -873,7 +878,7 @@ describe('Condition Engine', () => {
         ['Ref1'],
       ],
       [
-        false,
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
         ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
         {
           Ref1: 4,
@@ -882,7 +887,11 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        false,
+        [
+          'OVERLAP',
+          ['$Location1Address.region', '$Location2Address.region'],
+          ['DE', 'PA'],
+        ],
         [
           'OVERLAP',
           ['$Location1Address.region', '$Location2Address.region'],
@@ -964,6 +973,7 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [true, ['UNDEFINED', '$Ref1'], {}, ['Ref1'], undefined],
+      [['UNDEFINED', '$Ref1'], ['UNDEFINED', '$Ref1'], {}, undefined, ['Ref1']],
       [false, ['UNDEFINED', '$Ref1'], { Ref1: false }, ['Ref1'], undefined],
       [
         ['UNDEFINED', '$Ref1'],

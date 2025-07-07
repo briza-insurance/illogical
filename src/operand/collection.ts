@@ -42,13 +42,12 @@ export class Collection extends Operand {
     for (const item of this.items) {
       const simplifiedItem = item.simplify(...args)
       if (isEvaluable(simplifiedItem)) {
-        continue
+        return this
       }
       values.push(simplifiedItem)
     }
 
-    // Return the simplified values we got by omitting any unresolved Reference
-    return this.items.length === 0 || values.length > 0 ? values : this
+    return values
   }
 
   /**

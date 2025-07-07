@@ -602,7 +602,10 @@ export const unsafeSimplify = (
         const leftValues = leftSimplified.filter((val) => !isEvaluable(val))
         const rightValues = rightSimplified.filter((val) => !isEvaluable(val))
 
-        if (leftValues.length === 0 || rightValues.length === 0) {
+        if (
+          leftValues.length !== leftSimplified.length ||
+          rightValues.length !== rightSimplified.length
+        ) {
           return input
         }
 
