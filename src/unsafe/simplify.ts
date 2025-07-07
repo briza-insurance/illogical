@@ -570,6 +570,12 @@ export const unsafeSimplify = (
         // If simplified results are not arrays, it means we had a strictKey
         // without values provided. Simplify to false.
         if (!Array.isArray(leftSimplified) || !Array.isArray(rightSimplified)) {
+          const unresolvedRef = !Array.isArray(leftSimplified)
+            ? leftSimplified
+            : rightSimplified
+          if (isEvaluable(unresolvedRef)) {
+            return input
+          }
           return false
         }
 

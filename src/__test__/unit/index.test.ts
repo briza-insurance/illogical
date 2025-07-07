@@ -866,6 +866,13 @@ describe('Condition Engine', () => {
       ],
       [false, ['OVERLAP', [1, 2, 3], '$Ref1'], {}, ['Ref1'], undefined],
       [
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        {},
+        undefined,
+        ['Ref1'],
+      ],
+      [
         false,
         ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
         {
