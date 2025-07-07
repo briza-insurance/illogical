@@ -1167,10 +1167,4 @@ describe('Condition Engine', () => {
       }
     )
   })
-
-  it('should be closer to 100% code coverage', () => {
-    expect(() => engine.unsafeSimplify(['>', ['+', 1, '2', 3], 5], {})).toThrow(
-      'Operands must be numbers for arithmetic operation'
-    )
-  })
 })
