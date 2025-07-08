@@ -12,10 +12,6 @@ import { Value } from './value'
 export class Collection extends Operand {
   private readonly items: Array<Value | Reference>
 
-  public size(): number {
-    return this.items.length
-  }
-
   /**
    * @constructor
    * @param {Operand[]} items Collection of operands.
