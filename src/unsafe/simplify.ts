@@ -87,7 +87,7 @@ const areAllInputs = (values: (Input | Evaluable)[]): values is Input[] =>
 
 const getInputValues = (results: Input[]): number[] | false => {
   const presentValues = results.filter(
-    (result) => result !== null && result !== undefined
+    (result) => !isNull(result) && !isUndefined(result)
   )
   // If we have missing context values the result or we still have refences
   // simplify to false.
@@ -123,7 +123,7 @@ export const unsafeSimplify = (
         }
 
         const inputResult = resultToInput(result)
-        if (inputResult !== undefined) {
+        if (!isUndefined(inputResult)) {
           return inputResult
         }
         // It should have been a boolean or an Evaluable, but just in case
@@ -434,10 +434,10 @@ export const unsafeSimplify = (
         const rightArray = Array.isArray(right)
 
         if (
-          left === null ||
-          left === undefined ||
-          right === null ||
-          right === undefined
+          isNull(left) ||
+          isUndefined(left) ||
+          isNull(right) ||
+          isUndefined(right)
         ) {
           return false
         }
@@ -498,10 +498,10 @@ export const unsafeSimplify = (
         const rightArray = Array.isArray(right)
 
         if (
-          left === null ||
-          left === undefined ||
-          right === null ||
-          right === undefined ||
+          isNull(left) ||
+          isUndefined(left) ||
+          isNull(right) ||
+          isUndefined(right) ||
           (leftArray && rightArray) ||
           (!leftArray && !rightArray)
         ) {
