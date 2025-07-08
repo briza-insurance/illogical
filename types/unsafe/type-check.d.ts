@@ -9,3 +9,4 @@ export declare const resultToInput: (value: Result) => Input | undefined;
 export declare const areAllNumbers: (results: Input[]) => results is number[];
 export declare const areAllInputs: (values: (Input | Evaluable)[]) => values is Input[];
 export declare const getInputValues: (results: Input[]) => number[] | false;
+export declare const extractValues: (input: Input | Evaluable) => Result[];

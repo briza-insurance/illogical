@@ -10,6 +10,11 @@ import { Value } from './value';
 export declare class Collection extends Operand {
     private readonly items;
     /**
+     * Get the items in the collection.
+     * @returns {Array<Value | Reference>}
+     */
+    getItems(): Array<Value | Reference>;
+    /**
      * @constructor
      * @param {Operand[]} items Collection of operands.
      */
