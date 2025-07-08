@@ -1,6 +1,31 @@
 import { Evaluable } from '../common/evaluable'
 import { isEvaluable, isNull, isUndefined } from '../common/type-check'
 import { Input } from '../parser'
+import { extractValues } from './type-check'
+
+const simplify = (
+  originalInput: Input,
+  nonArrayInput: Input | Evaluable,
+  arrayInput: Input[] | [string, ...Input[]] | Evaluable
+) => {
+  // If we don't have the non-array operand, there is nothing to do.
+  if (isEvaluable(nonArrayInput)) {
+    return originalInput
+  }
+
+  // If we don't have all the values, try with what we have for the
+  // positive case, but otherwise return the original input.
+  if (isEvaluable(arrayInput)) {
+    const leftValues = extractValues(arrayInput)
+    const isFound = leftValues.indexOf(nonArrayInput) > -1
+
+    return isFound ? true : originalInput
+  }
+
+  // If we have all the values, we can check if the non-array operand is
+  // included in the array operand.
+  return arrayInput.indexOf(nonArrayInput) > -1
+}
 
 export const simplifyIn =
   (simplifyInput: (input: Input) => Input | Evaluable) =>
@@ -8,9 +33,6 @@ export const simplifyIn =
     const [, ...operands] = input
 
     const [left, right] = operands
-
-    const leftArray = Array.isArray(left)
-    const rightArray = Array.isArray(right)
 
     if (
       isNull(left) ||
@@ -23,50 +45,18 @@ export const simplifyIn =
     const leftSimplified = simplifyInput(left)
     const rightSimplified = simplifyInput(right)
 
-    // If left is an array, right side could be a reference containing a
-    // single value or a value directly.
-    if (leftArray) {
-      const rightSimplified = simplifyInput(right)
-      // If any operand is still an Evaluable, we cannot simplify further
-      if (isEvaluable(rightSimplified)) {
-        return input
-      }
-      const leftSimplified = left.map(simplifyInput)
-      if (leftSimplified.some(isEvaluable)) {
-        return input
-      }
-      return leftSimplified.indexOf(rightSimplified) > -1
+    const isLeftArray =
+      Array.isArray(leftSimplified) || isEvaluable(leftSimplified)
+    const isRightArray =
+      Array.isArray(rightSimplified) || isEvaluable(rightSimplified)
+
+    if (isLeftArray) {
+      return simplify(input, rightSimplified, leftSimplified)
     }
 
-    // If right is an array, left side could be a reference containing a
-    // single value or a value directly.
-    if (rightArray) {
-      const leftSimplified = simplifyInput(left)
-      // If any operand is still an Evaluable, we cannot simplify further
-      if (isEvaluable(leftSimplified)) {
-        return input
-      }
-      const rightSimplified = right.map(simplifyInput)
-      if (rightSimplified.some(isEvaluable)) {
-        return input
-      }
-      return rightSimplified.indexOf(leftSimplified) > -1
+    if (isRightArray) {
+      return simplify(input, leftSimplified, rightSimplified)
     }
 
-    // If none of them are arrays it means one of them must be a reference
-    // containing a list of values.
-    if (Array.isArray(leftSimplified)) {
-      if (isEvaluable(rightSimplified)) {
-        return input
-      }
-      return leftSimplified.indexOf(rightSimplified) > -1
-    }
-    if (Array.isArray(rightSimplified)) {
-      if (isEvaluable(leftSimplified)) {
-        return input
-      }
-      return rightSimplified.indexOf(leftSimplified) > -1
-    }
-
-    return input
+    return false
   }

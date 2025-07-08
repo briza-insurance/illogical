@@ -1,6 +1,7 @@
 import { Evaluable } from '../common/evaluable'
 import { isEvaluable } from '../common/type-check'
 import { Input } from '../parser'
+import { extractValues } from './type-check'
 
 export const simplifyOverlap =
   (simplifyInput: (input: Input) => Input | Evaluable) =>
@@ -15,8 +16,20 @@ export const simplifyOverlap =
     const isLeftEvaluable = isEvaluable(leftSimplified)
     const isRightEvaluable = isEvaluable(rightSimplified)
 
+    // If we don't have all operands simplified, we can try the positive case
+    // of the values we have satisfying the OVERLAP. But if not, we need to
+    // return the original input.
     if (isLeftEvaluable || isRightEvaluable) {
-      // If either left or right is an array, we cannot simplify further
+      const leftValues = extractValues(leftSimplified)
+      const rightValues = extractValues(rightSimplified)
+
+      const rightSet = new Set(rightValues)
+      const res = leftValues.some((element) => rightSet.has(element))
+
+      if (res) {
+        return true
+      }
+
       return input
     }
 

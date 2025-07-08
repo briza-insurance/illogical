@@ -694,6 +694,14 @@ describe('Condition Engine', () => {
         ['Ref1', 'Ref2'],
         undefined,
       ],
+      [
+        false,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: 1, Ref2: null },
+        undefined,
+        undefined,
+      ],
+      [false, ['IN', '$Ref1', '$Ref2'], { Ref1: 1 }, ['Ref2'], undefined],
       // NOT_IN
       [
         false,
@@ -827,15 +835,6 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
-        {
-          Ref1: 1,
-        },
-        undefined,
-        undefined,
-      ],
-      [
         true,
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
@@ -843,15 +842,6 @@ describe('Condition Engine', () => {
         },
         ['Ref1', 'Ref2'],
         undefined,
-      ],
-      [
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
-        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
-        {
-          Ref1: 1,
-        },
-        [],
-        ['Ref1', 'Ref2'],
       ],
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
@@ -1181,6 +1171,73 @@ describe('Condition Engine', () => {
         expect(safeResult).toEqual(expectedResult)
         expect(unsafeResult).toEqual(expectedResult)
         expect(safeResult).toEqual(unsafeResult)
+      }
+    )
+
+    it.each<
+      [
+        Input,
+        Input,
+        ExpressionInput,
+        Context,
+        string[] | undefined,
+        string[] | undefined,
+      ]
+    >([
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        [],
+        ['Ref1', 'Ref2'],
+      ],
+      [
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        true,
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+    ])(
+      'should have different results as %j and %j',
+      (
+        expectedSafeResult,
+        expectedUnsafeResult,
+        condition,
+        context,
+        strictKeys,
+        optionalKeys
+      ) => {
+        const safeResult = engine.simplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        const unsafeResult = engine.unsafeSimplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        expect(safeResult).toEqual(expectedSafeResult)
+        expect(unsafeResult).toEqual(expectedUnsafeResult)
       }
     )
 

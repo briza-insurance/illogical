@@ -5,6 +5,8 @@ import {
   isNumber,
   isUndefined,
 } from '../common/type-check'
+import { Collection } from '../operand/collection'
+import { Value } from '../operand/value'
 import { Input } from '../parser'
 
 export const isTrueResult = (value: Input) => value === true
@@ -69,4 +71,21 @@ export const getInputValues = (results: Input[]): number[] | false => {
   }
 
   return presentValues
+}
+
+export const extractValues = (input: Input | Evaluable): Result[] => {
+  const evaluable = isEvaluable(input)
+  if (!evaluable) {
+    return Array.isArray(input) ? input : [input]
+  }
+  if (input instanceof Collection) {
+    const results = input.getItems()
+
+    const values = results
+      .map((item) => (item instanceof Value ? item.evaluate() : null))
+      .filter((value) => !isNull(value))
+
+    return values
+  }
+  return []
 }
