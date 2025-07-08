@@ -33,7 +33,9 @@ import {
 } from '../common/type-check'
 import { toDateNumber } from '../common/util'
 import { operateWithExpectedDecimals } from '../expression/arithmetic/operateWithExpectedDecimals'
+import { Collection } from '../operand/collection'
 import { Reference } from '../operand/reference'
+import { Value } from '../operand/value'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 
@@ -474,19 +476,17 @@ export const unsafeSimplify = (
 
         // If none of them are arrays it means one of them must be a reference
         // containing a list of values.
-        if (!leftArray && !rightArray) {
-          if (Array.isArray(leftSimplified)) {
-            if (isEvaluable(rightSimplified)) {
-              return input
-            }
-            return leftSimplified.indexOf(rightSimplified) > -1
+        if (Array.isArray(leftSimplified)) {
+          if (isEvaluable(rightSimplified)) {
+            return input
           }
-          if (Array.isArray(rightSimplified)) {
-            if (isEvaluable(leftSimplified)) {
-              return input
-            }
-            return rightSimplified.indexOf(leftSimplified) > -1
+          return leftSimplified.indexOf(rightSimplified) > -1
+        }
+        if (Array.isArray(rightSimplified)) {
+          if (isEvaluable(leftSimplified)) {
+            return input
           }
+          return rightSimplified.indexOf(leftSimplified) > -1
         }
 
         return input
@@ -587,31 +587,23 @@ export const unsafeSimplify = (
         const leftSimplified = simplifyInput(left)
         const rightSimplified = simplifyInput(right)
 
-        // If simplified results are not arrays, it means we had a strictKey
-        // without values provided. Simplify to false.
-        if (!Array.isArray(leftSimplified) || !Array.isArray(rightSimplified)) {
-          const unresolvedRef = !Array.isArray(leftSimplified)
-            ? leftSimplified
-            : rightSimplified
-          if (isEvaluable(unresolvedRef)) {
-            return input
-          }
-          return false
-        }
+        const isLeftEvaluable = isEvaluable(leftSimplified)
+        const isRightEvaluable = isEvaluable(rightSimplified)
 
-        const leftValues = leftSimplified.filter((val) => !isEvaluable(val))
-        const rightValues = rightSimplified.filter((val) => !isEvaluable(val))
-
-        if (
-          leftValues.length !== leftSimplified.length ||
-          rightValues.length !== rightSimplified.length
-        ) {
+        if (isLeftEvaluable || isRightEvaluable) {
+          // If either left or right is an array, we cannot simplify further
           return input
         }
 
-        const rightSet = new Set(rightValues)
+        // If simplified results are not arrays, it means we had a strictKey
+        // without values provided. Simplify to false.
+        if (!Array.isArray(leftSimplified) || !Array.isArray(rightSimplified)) {
+          return false
+        }
 
-        const res = leftValues.some((element) => rightSet.has(element))
+        const rightSet = new Set(rightSimplified)
+
+        const res = leftSimplified.some((element) => rightSet.has(element))
 
         if (res) {
           return true
@@ -719,9 +711,24 @@ export const unsafeSimplify = (
       default: {
         // Handle as an array of References / Values if no operator matches
         const result = input.map(simplifyInput)
-        // Returning as Input[] to simplify types in recursion. But operators
-        // need to handle Evaluables being part of the array.
-        return result as Input[]
+
+        if (!areAllInputs(result)) {
+          return new Collection(
+            result.map((item) => {
+              if (item instanceof Reference) {
+                return item
+              }
+              if (!isEvaluable(item)) {
+                return new Value(item)
+              }
+              throw new Error(
+                'Unexpected expression found within a collection of values/references'
+              )
+            })
+          )
+        }
+
+        return result
       }
     }
   }
