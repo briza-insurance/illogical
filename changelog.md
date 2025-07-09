@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 1.7.0
+
+- Introducing unsafeSimplify which simplifies the condition without fully parsing it beforehand.
+  Useful when processing complex conditions that have been previously parsed. Should be faster
+  compared to the standard simplify when it can short circuit logical expressions.
+
 ## 1.6.1
 
 - Bugfix on Arithmetic evaluate. Returns false when ContextValue is not present in the Context.
@@ -7,10 +13,10 @@
 ## 1.6.0
 
 - Added support for Arithmetic expressions within other Comparison expressions. This allows for
-more complex and dynamic comparisons to be made. Now, you can perform mathematical operations
-within your conditional expressions, making them even more powerful and flexible. Whether you need
-to calculate sums, differences, products, or divisions, the new Arithmetic expression feature has
-got you covered. There are no breaking changes if this new kind of expression isn't being used.
+  more complex and dynamic comparisons to be made. Now, you can perform mathematical operations
+  within your conditional expressions, making them even more powerful and flexible. Whether you need
+  to calculate sums, differences, products, or divisions, the new Arithmetic expression feature has
+  got you covered. There are no breaking changes if this new kind of expression isn't being used.
 
 ## 1.5.9
 
