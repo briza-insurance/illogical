@@ -1,0 +1,12 @@
+import { Evaluable, Result } from '../common/evaluable';
+import { Input } from '../parser';
+export declare const isTrueResult: (value: Input) => value is true;
+export declare const isFalseResult: (value: Input) => value is false;
+export declare const isNonFalseResult: (operand: Input | Evaluable) => operand is Input;
+export declare const isNonTrueResult: (operand: Input | Evaluable) => operand is Input;
+export declare const resultToInputInternal: (value: Result) => Input | undefined;
+export declare const resultToInput: (value: Result) => Input | undefined;
+export declare const areAllNumbers: (results: Input[]) => results is number[];
+export declare const areAllInputs: (values: (Input | Evaluable)[]) => values is Input[];
+export declare const getInputValues: (results: Input[]) => number[] | false;
+export declare const extractValues: (input: Input | Evaluable) => Result[];

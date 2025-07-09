@@ -43,3 +43,5 @@ export declare function areAllResults(values: (Result | Evaluable)[]): values is
  * @returns {boolean} type guard
  */
 export declare function areAllNumbers(results: Result[]): results is number[];
+export declare function isUndefined(value: unknown): value is undefined;
+export declare function isNull(value: unknown): value is null;

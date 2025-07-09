@@ -271,6 +271,16 @@ describe('Condition Engine', () => {
       [['==', ['+', ['*', 9, 9], 19], 100], {}, true],
       [['==', ['+', ['*', 9, 9], ['-', ['/', 250, 5], 31]], 100], {}, true],
       [['AND', ['==', ['+', 1, 1], 2], ['==', ['+', 2, 2], 4]], {}, true],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        { Ref1: 4 },
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        { Ref1: 1 },
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+      ],
     ])(
       '%p with context %p should be simplified to %p',
       (
@@ -298,6 +308,944 @@ describe('Condition Engine', () => {
     ])('%p should throw', (expression) => {
       expect(() => engine.simplify(expression, {})).toThrowError(
         'invalid expression'
+      )
+    })
+  })
+
+  describe('unsafeSimplify', () => {
+    it.each<
+      [
+        Input,
+        ExpressionInput,
+        Context,
+        string[] | undefined,
+        string[] | undefined,
+      ]
+    >([
+      // LOGICAL
+      // OR
+      [
+        true,
+        ['OR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['OR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['OR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['==', '$Ref1', 1],
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['OR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      // AND
+      [
+        false,
+        ['AND', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['AND', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['AND', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['==', '$Ref1', 1],
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['AND', ['==', 1, 1], ['==', 2, 2], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      // NOR
+      [
+        ['NOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['NOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['NOR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['NOR', ['==', 1, 2], ['==', 2, 3], ['==', '$Ref1', 1]],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      // XOR
+      [
+        true,
+        ['XOR', ['==', '$Ref1', 1], ['==', 2, 3], ['==', '$Ref1', 2]],
+        {
+          Ref1: 2,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['XOR', ['==', '$Ref1', 1], ['==', 2, 3], ['==', '$Ref1', 2]],
+        {
+          Ref1: 3,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', 2, 2]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['==', '$Ref1', 1],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['XOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 2], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOR', ['==', '$Ref1', 1], ['==', '$Ref1', 1]],
+        ['XOR', ['==', '$Ref1', 1], ['==', 1, 1], ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['XOR', ['==', 1, 1], ['==', 2, 2]], {}, undefined, undefined],
+      // NOT
+      [true, ['NOT', ['==', 1, 2]], {}, undefined, undefined],
+      [false, ['NOT', ['==', 1, 1]], {}, undefined, undefined],
+      [false, ['NOT', ['==', '$Ref1', 1]], { Ref1: 1 }, undefined, undefined],
+      [
+        ['NOT', ['==', '$Ref1', 1]],
+        ['NOT', ['==', '$Ref1', 1]],
+        {},
+        undefined,
+        undefined,
+      ],
+      // COMPARISON
+      // Eq
+      [true, ['==', 1, 1], {}, undefined, undefined],
+      [false, ['==', 1, 2], {}, undefined, undefined],
+      [true, ['==', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        ['==', '$Ref1', '$Ref2'],
+        ['==', '$Ref1', '$Ref2'],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [false, ['==', '$Ref1', [1]], { Ref1: 1 }, undefined, undefined],
+      // NE
+      [false, ['!=', 1, 1], {}, undefined, undefined],
+      [true, ['!=', 1, 2], {}, undefined, undefined],
+      [false, ['!=', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        ['!=', '$Ref1', '$Ref2'],
+        ['!=', '$Ref1', '$Ref2'],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['!=', '$Ref1', '$Ref2'],
+        ['!=', '$Ref1', '$Ref2'],
+        { Ref2: 1 },
+        undefined,
+        undefined,
+      ],
+      // GT
+      [true, ['>', 2, 1], {}, undefined, undefined],
+      [false, ['>', 1, 2], {}, undefined, undefined],
+      [['>', '$Ref1', 1], ['>', '$Ref1', 1], {}, undefined, undefined],
+      [['>', 1, '$Ref1'], ['>', 1, '$Ref1'], {}, undefined, undefined],
+      [true, ['>', '$Ref1', 1], { Ref1: 2 }, undefined, undefined],
+      [false, ['>', '$Ref1', 1], { Ref1: 1 }, undefined, undefined],
+      [
+        false,
+        ['>', '$Ref1', '2000-01-01'],
+        { Ref1: '1990-01-01' },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['>', '$Ref1', '$Ref2'],
+        { Ref1: 2, Ref2: 1 },
+        undefined,
+        undefined,
+      ],
+      [false, ['>', '$Ref1', 2], { Ref1: true }, undefined, undefined],
+      // GE
+      [true, ['>=', 2, 1], {}, undefined, undefined],
+      [true, ['>=', 2, 2], {}, undefined, undefined],
+      [false, ['>=', 1, 2], {}, undefined, undefined],
+      [['>=', '$Ref1', 2], ['>=', '$Ref1', 2], {}, undefined, undefined],
+      [['>=', 2, '$Ref1'], ['>=', 2, '$Ref1'], {}, undefined, undefined],
+      [
+        true,
+        ['>=', '$Ref1', '2000-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [false, ['>=', '$Ref1', 2], { Ref1: true }, undefined, undefined],
+      // LT
+      [true, ['<', 1, 2], {}, undefined, undefined],
+      [false, ['<', 2, 1], {}, undefined, undefined],
+      [true, ['<', 1, '$Ref1'], { Ref1: 2 }, undefined, undefined],
+      [false, ['<', 1, '$Ref1'], { Ref1: 1 }, undefined, undefined],
+      [['<', '$Ref1', 2], ['<', '$Ref1', 2], {}, undefined, undefined],
+      [['<', 2, '$Ref1'], ['<', 2, '$Ref1'], {}, undefined, undefined],
+      [
+        false,
+        ['<', '$Ref1', '1990-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['<', '$Ref1', '$Ref2'],
+        { Ref1: 1, Ref2: 2 },
+        undefined,
+        undefined,
+      ],
+      [false, ['<', '$Ref1', 2], { Ref1: true }, undefined, undefined],
+      // LE
+      [true, ['<=', 1, 2], {}, undefined, undefined],
+      [true, ['<=', 2, 2], {}, undefined, undefined],
+      [false, ['<=', 2, 1], {}, undefined, undefined],
+      [['<=', '$Ref1', 2], ['<=', '$Ref1', 2], {}, undefined, undefined],
+      [['<=', 2, '$Ref1'], ['<=', 2, '$Ref1'], {}, undefined, undefined],
+      [
+        false,
+        ['<=', '$Ref1', '1990-01-01'],
+        { Ref1: '2000-01-01' },
+        undefined,
+        undefined,
+      ],
+      [false, ['<=', '$Ref1', 2], { Ref1: true }, undefined, undefined],
+      // IN
+      [true, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 1 }, undefined, undefined],
+      [false, ['IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
+      [true, ['IN', [1, 2, 3], '$Ref1'], { Ref1: 1 }, undefined, undefined],
+      [
+        ['IN', [1, 2, 3], '$Ref1'],
+        ['IN', [1, 2, 3], '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['IN', '$Ref1', [1, 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        ['IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['OR', ['==', 1, 2], ['IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', [1, 2, 3]],
+        ['AND', ['==', 1, 1], ['IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['IN', null, [1, 2, 3]], {}, undefined, undefined],
+      [
+        true,
+        ['IN', 1, '$Ref1'],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['IN', '$Ref1', 1],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', '$Ref2'],
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        ['IN', '$Ref1', '$Ref2'],
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref2: [1, undefined, 3] },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3] },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [
+        true,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: [1, undefined, 3], Ref2: 1 },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [
+        false,
+        ['IN', '$Ref1', '$Ref2'],
+        { Ref1: 1, Ref2: null },
+        undefined,
+        undefined,
+      ],
+      [false, ['IN', '$Ref1', '$Ref2'], { Ref1: 1 }, ['Ref2'], undefined],
+      // NOT_IN
+      [
+        false,
+        ['NOT IN', '$Ref1', [1, 2, 3]],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [true, ['NOT IN', '$Ref1', [1, 2, 3]], { Ref1: 4 }, undefined, undefined],
+      [true, ['NOT IN', [1, 2, 3], '$Ref1'], { Ref1: 4 }, undefined, undefined],
+      [
+        ['NOT IN', '$Ref1', [1, 2, 3]],
+        ['NOT IN', '$Ref1', [1, 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        ['NOT IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        ['NOT IN', ['$Ref1', '$Ref2', '$Ref3'], 1],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT IN', '$Ref1', [1, 2, 3]],
+        ['OR', ['==', 1, 2], ['NOT IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['NOT IN', '$Ref1', [1, 2, 3]],
+        ['AND', ['==', 1, 1], ['NOT IN', '$Ref1', [1, 2, 3]]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [true, ['NOT IN', null, [1, 2, 3]], {}, undefined, undefined],
+      [
+        ['NOT IN', [1, 2, 3], '$Ref1'],
+        ['NOT IN', [1, 2, 3], '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      // PREFIX
+      [
+        true,
+        ['PREFIX', 'abc', '$Ref1'],
+        { Ref1: 'abcdef' },
+        undefined,
+        undefined,
+      ],
+      [false, ['PREFIX', 'abc', '$Ref1'], { Ref1: 'ab' }, undefined, undefined],
+      [
+        false,
+        ['PREFIX', 'abc', '$Ref1'],
+        { Ref1: 'xyz' },
+        undefined,
+        undefined,
+      ],
+      [
+        ['PREFIX', '$Ref1', 'abc'],
+        ['PREFIX', '$Ref1', 'abc'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['PREFIX', 'abc', '$Ref1'],
+        ['PREFIX', 'abc', '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['PREFIX', 1, '$Ref1'], { Ref1: 'abcdef' }, undefined, undefined],
+      // SUFFIX
+      [
+        true,
+        ['SUFFIX', '$Ref1', 'xyz'],
+        { Ref1: 'abcdefxyz' },
+        undefined,
+        undefined,
+      ],
+      [false, ['SUFFIX', '$Ref1', 'xyz'], { Ref1: 'yz' }, undefined, undefined],
+      [
+        false,
+        ['SUFFIX', '$Ref1', 'xyz'],
+        { Ref1: 'abc' },
+        undefined,
+        undefined,
+      ],
+      [
+        ['SUFFIX', 'xyz', '$Ref1'],
+        ['SUFFIX', 'xyz', '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['SUFFIX', '$Ref1', 'xyz'],
+        ['SUFFIX', '$Ref1', 'xyz'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [false, ['SUFFIX', 1, '$Ref1'], { Ref1: 'abcdef' }, undefined, undefined],
+      // OVERLAP
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {},
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 4,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {},
+        undefined,
+        ['Ref1', 'Ref2'],
+      ],
+      [
+        true,
+        ['OVERLAP', '$Ref1', [1, 2, 3]],
+        {
+          Ref1: [1],
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        {},
+        ['Ref1', 'Ref2'],
+        undefined,
+      ],
+      [false, ['OVERLAP', [1, 2, 3], '$Ref1'], {}, ['Ref1'], undefined],
+      [
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        ['OVERLAP', [1, 2, 3], '$Ref1'],
+        {},
+        undefined,
+        ['Ref1'],
+      ],
+      [
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        ['OVERLAP', [1, 2, 3], ['$Ref1', '$Ref2']],
+        {
+          Ref1: 4,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        [
+          'OVERLAP',
+          ['$Location1Address.region', '$Location2Address.region'],
+          ['DE', 'PA'],
+        ],
+        [
+          'OVERLAP',
+          ['$Location1Address.region', '$Location2Address.region'],
+          ['DE', 'PA'],
+        ],
+        {
+          Location1Address: {
+            street: '633 E Lake Ave',
+            city: 'Peoria',
+            region: 'IL',
+            postalCode: '61614',
+            county: '',
+            country: 'US',
+            secondary: '',
+          },
+          Location1Wc1Code: {
+            code: '9102-2',
+            industry: '',
+          },
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        false,
+        [
+          'OR',
+          [
+            'AND',
+            [
+              'OVERLAP',
+              ['$Location1Address.region', '$Location2Address.region'],
+              ['DE', 'PA'],
+            ],
+            [
+              'OVERLAP',
+              ['$Location1Wc1Code.code', '$Location2Wc1Code.code'],
+              ['0936-2'],
+            ],
+          ],
+          [
+            'AND',
+            [
+              'OVERLAP',
+              ['$Location1Address.region', '$Location2Address.region'],
+              ['AK', 'IL'],
+            ],
+            [
+              'OVERLAP',
+              ['$Location1Wc1Code.code', '$Location2Wc1Code.code'],
+              ['7610-3'],
+            ],
+          ],
+        ],
+        {
+          Location1Address: {
+            street: '633 E Lake Ave',
+            city: 'Peoria',
+            region: 'IL',
+            postalCode: '61614',
+            county: '',
+            country: 'US',
+            secondary: '',
+          },
+          Location1Wc1Code: {
+            code: '9102-2',
+            industry: '',
+          },
+        },
+        [],
+        [],
+      ],
+      // UNDEFINED
+      [
+        ['UNDEFINED', '$Ref1'],
+        ['UNDEFINED', '$Ref1'],
+        {},
+        undefined,
+        undefined,
+      ],
+      [true, ['UNDEFINED', '$Ref1'], {}, ['Ref1'], undefined],
+      [['UNDEFINED', '$Ref1'], ['UNDEFINED', '$Ref1'], {}, undefined, ['Ref1']],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: false }, ['Ref1'], undefined],
+      [
+        ['UNDEFINED', '$Ref1'],
+        ['UNDEFINED', '$Ref1'],
+        { Ref1: undefined },
+        undefined,
+        undefined,
+      ],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: 'value' }, undefined, undefined],
+      [false, ['UNDEFINED', '$Ref1'], { Ref1: null }, undefined, undefined],
+      // PRESENT
+      [
+        ['PRESENT', '$Ref1'],
+        ['PRESENT', '$Ref1'],
+        { Ref1: undefined },
+        undefined,
+        undefined,
+      ],
+      [true, ['PRESENT', '$Ref1'], { Ref1: 'value' }, undefined, undefined],
+      [false, ['PRESENT', '$Ref1'], { Ref1: null }, undefined, undefined],
+      [true, ['PRESENT', '$Ref1'], { Ref1: false }, undefined, undefined],
+      [false, ['PRESENT', '$Ref1'], {}, ['Ref1'], undefined],
+      [
+        true,
+        ['PRESENT', '$Ref1'],
+        { Ref1: { obj: 'obj' } },
+        undefined,
+        undefined,
+      ],
+      // ARITHMETIC
+      // SUM
+      [true, ['>', ['+', 1, 2, 3], 5], {}, undefined, undefined],
+      [
+        true,
+        ['>', ['+', '$Ref1', '$Ref2'], 2],
+        { Ref1: 1, Ref2: 2 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['+', '$Ref1', '$Ref2'], 0],
+        ['>', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['+', '$Ref1', '$Ref2'], 3],
+        ['>', ['+', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>=', ['+', '$Ref1', '$Ref2'], 3],
+        ['>=', ['+', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<', ['+', '$Ref1', '$Ref2'], 0],
+        ['<', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<=', ['+', '$Ref1', '$Ref2'], 0],
+        ['<=', ['+', '$Ref1', '$Ref2'], 0],
+        { Ref1: 1 },
+        undefined,
+        undefined,
+      ],
+      [true, ['>', ['+', '$Ref1', 5], 10], { Ref1: 10 }, undefined, undefined],
+      [true, ['<', ['+', '$Ref1', 5], 10], { Ref1: 0 }, undefined, undefined],
+      [true, ['<', ['+', '$Ref1', 5], 0], { Ref1: -10 }, undefined, undefined],
+      [false, ['>', ['+', null, null], 5], {}, undefined, undefined],
+      [
+        false,
+        [
+          'AND',
+          [
+            '>',
+            [
+              '+',
+              '$Location2Wc1NumberOfFullTimeEmployees',
+              '$Location2Wc1NumberOfPartTimeEmployees',
+            ],
+            99,
+          ],
+          ['>=', '$NumberOfLocations', 2],
+        ],
+        { NumberOfLocations: 1 },
+        [
+          'Location2Wc1NumberOfFullTimeEmployees',
+          'Location2Wc1NumberOfPartTimeEmployees',
+        ],
+        [
+          'Location2Wc1NumberOfFullTimeEmployees',
+          'Location2Wc1NumberOfPartTimeEmployees',
+        ],
+      ],
+      // SUBTRACT
+      [true, ['>', ['-', 5, 2], 2], {}, undefined, undefined],
+      [
+        true,
+        ['>', ['-', '$Ref1', '$Ref2'], 2],
+        { Ref1: 5, Ref2: 2 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['-', '$Ref1', '$Ref2'], 0],
+        ['>', ['-', '$Ref1', '$Ref2'], 0],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['-', '$Ref1', '$Ref2'], 3],
+        ['>', ['-', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>=', ['-', '$Ref1', '$Ref2'], 3],
+        ['>=', ['-', '$Ref1', '$Ref2'], ['+', 1, 2]],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<', ['-', '$Ref1', '$Ref2'], 0],
+        ['<', ['-', '$Ref1', '$Ref2'], 0],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<=', ['-', '$Ref1', '$Ref2'], 0],
+        ['<=', ['-', '$Ref1', '$Ref2'], 0],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [false, ['>', ['-', null, null], 5], {}, undefined, undefined],
+      // MULTIPLY
+      [true, ['>', ['*', 2, 3], 5], {}, undefined, undefined],
+      [
+        true,
+        ['>', ['*', '$Ref1', '$Ref2'], 2],
+        { Ref1: 2, Ref2: 3 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['<', ['*', '$Ref1', '$Ref2'], 0],
+        ['<', ['*', '$Ref1', '$Ref2'], 0],
+        { Ref1: 5 },
+        undefined,
+        undefined,
+      ],
+      [false, ['>', ['*', null, null], 5], {}, undefined, undefined],
+      // DIVIDE
+      [true, ['>=', ['/', 10, 2], 5], {}, undefined, undefined],
+      [
+        true,
+        ['>=', ['/', '$Ref1', '$Ref2'], 2],
+        { Ref1: 10, Ref2: 5 },
+        undefined,
+        undefined,
+      ],
+      [
+        ['>', ['/', '$Ref1', '$Ref2'], 0],
+        ['>', ['/', '$Ref1', '$Ref2'], 0],
+        { Ref1: 10 },
+        undefined,
+        undefined,
+      ],
+      [false, ['>', ['/', null, null], 5], {}, undefined, undefined],
+    ])(
+      'should result in %j',
+      (expectedResult, condition, context, strictKeys, optionalKeys) => {
+        const safeResult = engine.simplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        const unsafeResult = engine.unsafeSimplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        expect(safeResult).toEqual(expectedResult)
+        expect(unsafeResult).toEqual(expectedResult)
+        expect(safeResult).toEqual(unsafeResult)
+      }
+    )
+
+    it.each<
+      [
+        Input,
+        Input,
+        ExpressionInput,
+        Context,
+        string[] | undefined,
+        string[] | undefined,
+      ]
+    >([
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+      [
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        true,
+        ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
+        {
+          Ref1: 1,
+        },
+        [],
+        ['Ref1', 'Ref2'],
+      ],
+      [
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        true,
+        ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
+        {
+          Ref1: 1,
+        },
+        undefined,
+        undefined,
+      ],
+    ])(
+      'should have different results as %j and %j',
+      (
+        expectedSafeResult,
+        expectedUnsafeResult,
+        condition,
+        context,
+        strictKeys,
+        optionalKeys
+      ) => {
+        const safeResult = engine.simplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        const unsafeResult = engine.unsafeSimplify(
+          condition,
+          context,
+          strictKeys,
+          optionalKeys
+        )
+        expect(safeResult).toEqual(expectedSafeResult)
+        expect(unsafeResult).toEqual(expectedUnsafeResult)
+      }
+    )
+
+    it('should be closer to 100% code coverage', () => {
+      expect(() =>
+        engine.unsafeSimplify(['OR', [1, [1, '$Ref1', 1], 3], ['==', 1, 1]], {})
+      ).toThrow(
+        'Unexpected expression found within a collection of values/references'
       )
     })
   })

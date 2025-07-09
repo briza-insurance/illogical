@@ -75,5 +75,6 @@ declare class Engine {
      * @returns {Inpunt | boolean}
      */
     simplify(exp: ExpressionInput, context: Context, strictKeys?: string[], optionalKeys?: string[]): Input | boolean;
+    unsafeSimplify(exp: ExpressionInput, context: Context, strictKeys?: string[], optionalKeys?: string[]): Input | boolean;
 }
 export default Engine;

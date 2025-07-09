@@ -1,6 +1,6 @@
 import { Evaluable } from '../common/evaluable';
 import { Options } from './options';
-export type Input = string | number | boolean | null | Input[] | [string, ...Input[]];
+export type Input = string | number | boolean | null | Input[] | [string, ...Input[]] | Record<string, unknown>;
 export type ArrayInput = Input[];
 export type ExpressionInput = [string, ...Input[]];
 /**

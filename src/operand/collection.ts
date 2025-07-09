@@ -13,6 +13,14 @@ export class Collection extends Operand {
   private readonly items: Array<Value | Reference>
 
   /**
+   * Get the items in the collection.
+   * @returns {Array<Value | Reference>}
+   */
+  getItems(): Array<Value | Reference> {
+    return this.items
+  }
+
+  /**
    * @constructor
    * @param {Operand[]} items Collection of operands.
    */
@@ -42,6 +50,7 @@ export class Collection extends Operand {
       }
       values.push(simplifiedItem)
     }
+
     return values
   }
 
