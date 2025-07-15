@@ -141,8 +141,13 @@ export class Parser {
     if (this.options.cacheReferences && this.referenceCache.has(key)) {
       return this.referenceCache.get(key)!
     }
+
     const reference = new Reference(this.opts.referenceTransform(key))
-    this.referenceCache.set(key, reference)
+
+    if (this.options.cacheReferences) {
+      this.referenceCache.set(key, reference)
+    }
+
     return reference
   }
 
