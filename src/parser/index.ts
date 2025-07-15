@@ -105,6 +105,7 @@ export class Parser {
     OPERATOR_MULTIPLY,
     OPERATOR_DIVIDE,
   ])
+  private readonly referenceCache: Map<string, Reference> = new Map()
 
   /**
    * @constructor
@@ -134,6 +135,21 @@ export class Parser {
    */
   get options(): Options {
     return this.opts
+  }
+
+  private getReference(key: string): Reference {
+    if (this.options.cacheReferences && this.referenceCache.has(key)) {
+      return this.referenceCache.get(key)!
+    }
+    const reference = new Reference(this.opts.referenceTransform(key))
+    this.referenceCache.set(key, reference)
+    return reference
+  }
+
+  private resolve(raw: Input): Value | Reference {
+    return this.opts.referencePredicate(raw as string)
+      ? this.getReference(raw as string)
+      : new Value(raw)
   }
 
   /**
@@ -332,14 +348,9 @@ export class Parser {
    * @param raw Raw data
    */
   private getOperand(raw: Input): Operand {
-    const resolve = (raw: Input): Value | Reference =>
-      this.opts.referencePredicate(raw as string)
-        ? new Reference(this.opts.referenceTransform(raw as string))
-        : new Value(raw)
-
     if (Array.isArray(raw)) {
-      return new Collection(raw.map((item) => resolve(item)))
+      return new Collection(raw.map((item) => this.resolve(item)))
     }
-    return resolve(raw)
+    return this.resolve(raw)
   }
 }

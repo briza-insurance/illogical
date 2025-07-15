@@ -26,6 +26,7 @@ import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 export type optionValue =
   | ((operand: string) => string | boolean)
   | Map<symbol, string>
+  | boolean
 
 // Parser options
 export interface Options {
@@ -67,6 +68,8 @@ export interface Options {
    * is the key used to represent the  given operator in the raw expression.
    */
   operatorMapping: Map<symbol, string>
+
+  cacheReferences: boolean
 
   // Object key accessor whitelisting
   [k: string]: optionValue
@@ -136,4 +139,5 @@ export const defaultOptions: Options = {
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping,
+  cacheReferences: false,
 }

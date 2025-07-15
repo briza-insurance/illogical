@@ -10,33 +10,34 @@ const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
 
-const parseBacktickWrappedKey = (key: string) =>
-  key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
+function parseBacktickWrappedKey(key: string) {
+  return key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
+}
 
-const parseKey = (key: string): Keys => {
+function mapKeys(key: string) {
+  const unwrappedKey = parseBacktickWrappedKey(key)
+  const keys: Keys = []
+  const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
+  if (parseResult) {
+    const extractedKey = parseBacktickWrappedKey(
+      parseResult?.groups?.currentKey ?? unwrappedKey
+    )
+    keys.push(extractedKey)
+    const rawIndexes = parseResult?.groups?.indexes
+    if (rawIndexes) {
+      for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
+        keys.push(parseInt(indexResult[1]))
+      }
+    }
+  } else {
+    keys.push(unwrappedKey)
+  }
+  return keys
+}
+
+function parseKey(key: string): Keys {
   const keys = key.match(/(`[^[\]]+`(\[\d+\])*|[^`.]+)/g)
-  return !keys
-    ? []
-    : keys.flatMap((key) => {
-        const unwrappedKey = parseBacktickWrappedKey(key)
-        const keys: Keys = []
-        const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
-        if (parseResult) {
-          const extractedKey = parseBacktickWrappedKey(
-            parseResult?.groups?.currentKey ?? unwrappedKey
-          )
-          keys.push(extractedKey)
-          const rawIndexes = parseResult?.groups?.indexes
-          if (rawIndexes) {
-            for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
-              keys.push(parseInt(indexResult[1]))
-            }
-          }
-        } else {
-          keys.push(unwrappedKey)
-        }
-        return keys
-      })
+  return !keys ? [] : keys.flatMap(mapKeys)
 }
 
 const complexKeyExpression = /{([^{}]+)}/
