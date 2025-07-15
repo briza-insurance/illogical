@@ -14,7 +14,7 @@ function parseBacktickWrappedKey(key: string) {
   return key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
 }
 
-function mapKeys(key: string) {
+function parseKeyComponents(key: string) {
   const unwrappedKey = parseBacktickWrappedKey(key)
   const keys: Keys = []
   const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
@@ -37,7 +37,7 @@ function mapKeys(key: string) {
 
 function parseKey(key: string): Keys {
   const keys = key.match(/(`[^[\]]+`(\[\d+\])*|[^`.]+)/g)
-  return !keys ? [] : keys.flatMap(mapKeys)
+  return !keys ? [] : keys.flatMap(parseKeyComponents)
 }
 
 const complexKeyExpression = /{([^{}]+)}/
