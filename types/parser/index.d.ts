@@ -10,6 +10,7 @@ export declare class Parser {
     private readonly opts;
     private readonly expectedRootOperators;
     private readonly unexpectedRootSymbols;
+    private readonly referenceCache;
     /**
      * @constructor
      * @param {Options?} options Parser options.
@@ -20,6 +21,8 @@ export declare class Parser {
      * @type {Options}
      */
     get options(): Options;
+    private getReference;
+    private resolve;
     /**
      * Parse raw expression into evaluable expression.
      * @param {ExpressionInput} raw Raw expression.
