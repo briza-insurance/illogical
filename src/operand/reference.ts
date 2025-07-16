@@ -10,11 +10,8 @@ const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
 
-const backTick = '`'
 function parseBacktickWrappedKey(key: string) {
-  return key[0] === backTick && key[key.length - 1] === backTick
-    ? key.slice(1, -1)
-    : key
+  return key[0] === '`' && key[key.length - 1] === '`' ? key.slice(1, -1) : key
 }
 
 function parseKeyComponents(key: string) {
