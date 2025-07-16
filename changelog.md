@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.7.1
+
+- Adding Reference cache and other performance improvements to condition parsing.
+
 ## 1.7.0
 
 - Introducing unsafeSimplify which simplifies the condition without fully parsing it beforehand.
