@@ -1,4 +1,3 @@
-import { isString } from '../common/type-check'
 import { OPERATOR as OPERATOR_DIVIDE } from '../expression/arithmetic/divide'
 import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply'
 import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract'
@@ -84,7 +83,7 @@ export interface Options {
  * @return {boolean}
  */
 export function defaultReferencePredicate(key: string): boolean {
-  return isString(key) && key[0] === '$'
+  return key[0] === '$'
 }
 
 /**

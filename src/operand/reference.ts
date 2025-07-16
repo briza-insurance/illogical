@@ -12,7 +12,7 @@ const arrayIndexRegex = /\[(\d+)]/g
 
 const backTick = '`'
 function parseBacktickWrappedKey(key: string) {
-  return key.startsWith(backTick) && key.endsWith(backTick)
+  return key[0] === backTick && key[key.length - 1] === backTick
     ? key.slice(1, -1)
     : key
 }
@@ -115,7 +115,7 @@ const dataTypeRegex = new RegExp(
 
 const isComplexKey = (key: string) => key.indexOf('{') > -1
 
-const castingRegex = /.\(.+\)$/
+const castingRegex = /\.\(.+\)$/
 
 /**
  * Reference operand resolved within the context

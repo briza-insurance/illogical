@@ -1,4 +1,5 @@
 import { Evaluable, EvaluableType } from '../common/evaluable'
+import { isString } from '../common/type-check'
 import {
   Divide,
   OPERATOR as OPERATOR_DIVIDE,
@@ -155,8 +156,8 @@ export class Parser {
   }
 
   private resolve(raw: Input): Value | Reference {
-    return this.opts.referencePredicate(raw as string)
-      ? this.getReference(raw as string)
+    return isString(raw) && this.opts.referencePredicate(raw)
+      ? this.getReference(raw)
       : new Value(raw)
   }
 
