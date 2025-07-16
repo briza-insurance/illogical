@@ -10,8 +10,11 @@ const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
 
+const backTick = '`'
 function parseBacktickWrappedKey(key: string) {
-  return key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
+  return key.startsWith(backTick) && key.endsWith(backTick)
+    ? key.slice(1, -1)
+    : key
 }
 
 function parseKeyComponents(key: string) {
@@ -35,8 +38,10 @@ function parseKeyComponents(key: string) {
   return keys
 }
 
+const parseKeyRegex = /(`[^[\]]+`(\[\d+\])*|[^`.]+)/g
+
 function parseKey(key: string): Keys {
-  const keys = key.match(/(`[^[\]]+`(\[\d+\])*|[^`.]+)/g)
+  const keys = key.match(parseKeyRegex)
   return !keys ? [] : keys.flatMap(parseKeyComponents)
 }
 
@@ -110,6 +115,8 @@ const dataTypeRegex = new RegExp(
 
 const isComplexKey = (key: string) => key.indexOf('{') > -1
 
+const castingRegex = /.\(.+\)$/
+
 /**
  * Reference operand resolved within the context
  */
@@ -135,8 +142,8 @@ export class Reference extends Operand {
       this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
     }
 
-    if (this.key.match(/.\(.+\)$/)) {
-      this.key = this.key.replace(/.\(.+\)$/, '')
+    if (this.key.match(castingRegex)) {
+      this.key = this.key.replace(castingRegex, '')
     }
     if (isComplexKey(this.key)) {
       this.valueLookup = (context) => complexValueLookup(context, this.key)

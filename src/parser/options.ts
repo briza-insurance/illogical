@@ -84,7 +84,7 @@ export interface Options {
  * @return {boolean}
  */
 export function defaultReferencePredicate(key: string): boolean {
-  return isString(key) && (key as string).startsWith('$')
+  return isString(key) && key[0] === '$'
 }
 
 /**

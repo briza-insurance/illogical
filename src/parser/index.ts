@@ -357,7 +357,11 @@ export class Parser {
    */
   private getOperand(raw: Input): Operand {
     if (Array.isArray(raw)) {
-      return new Collection(raw.map((item) => this.resolve(item)))
+      const collectionItems: (Value | Reference)[] = []
+      for (const item of raw) {
+        collectionItems.push(this.resolve(item))
+      }
+      return new Collection(collectionItems)
     }
     return this.resolve(raw)
   }
