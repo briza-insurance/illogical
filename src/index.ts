@@ -125,8 +125,8 @@ class Engine {
   simplify(
     exp: ExpressionInput,
     context: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: Set<string>,
+    optionalKeys?: Set<string>
   ): Input | boolean {
     const result = this.parse(exp).simplify(context, strictKeys, optionalKeys)
     if (isEvaluable(result)) {
@@ -141,8 +141,8 @@ class Engine {
   unsafeSimplify(
     exp: ExpressionInput,
     context: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: Set<string>,
+    optionalKeys?: Set<string>
   ): Input | boolean {
     const result = unsafeSimplify(
       context,

@@ -164,8 +164,8 @@ export class Reference extends Operand {
    */
   simplify(
     ctx: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: Set<string>,
+    optionalKeys?: Set<string>
   ): Result | Evaluable {
     const [key] = this.getKeys(ctx) ?? []
 
@@ -177,8 +177,8 @@ export class Reference extends Operand {
       return this
     }
 
-    return (strictKeys && strictKeys.includes(key)) ||
-      (optionalKeys && !optionalKeys.includes(key))
+    return (strictKeys && strictKeys.has(key)) ||
+      (optionalKeys && !optionalKeys.has(key))
       ? undefined
       : this
   }

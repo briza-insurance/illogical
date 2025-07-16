@@ -34,8 +34,8 @@ export abstract class Logical implements Evaluable {
    */
   abstract simplify(
     ctx: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: Set<string>,
+    optionalKeys?: Set<string>
   ): Result | Evaluable
 
   /**

@@ -154,7 +154,11 @@ describe('Operand - Value', () => {
       (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
           new Reference(value)
-            .simplify(context, strictKeys, optionalKeys)
+            .simplify(
+              context,
+              strictKeys ? new Set(strictKeys) : undefined,
+              optionalKeys ? new Set(optionalKeys) : undefined
+            )
             ?.toString()
         ).toEqual(expected?.toString())
       }

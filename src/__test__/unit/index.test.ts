@@ -291,9 +291,14 @@ describe('Condition Engine', () => {
         optionalKeys = undefined
       ) => {
         const engine = new Engine()
-        expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
-          expected
-        )
+        expect(
+          engine.simplify(
+            exp,
+            ctx,
+            strictKeys ? new Set(strictKeys) : undefined,
+            optionalKeys ? new Set(optionalKeys) : undefined
+          )
+        ).toEqual(expected)
       }
     )
 
@@ -1159,14 +1164,14 @@ describe('Condition Engine', () => {
         const safeResult = engine.simplify(
           condition,
           context,
-          strictKeys,
-          optionalKeys
+          strictKeys ? new Set(strictKeys) : undefined,
+          optionalKeys ? new Set(optionalKeys) : undefined
         )
         const unsafeResult = engine.unsafeSimplify(
           condition,
           context,
-          strictKeys,
-          optionalKeys
+          strictKeys ? new Set(strictKeys) : undefined,
+          optionalKeys ? new Set(optionalKeys) : undefined
         )
         expect(safeResult).toEqual(expectedResult)
         expect(unsafeResult).toEqual(expectedResult)
@@ -1227,14 +1232,14 @@ describe('Condition Engine', () => {
         const safeResult = engine.simplify(
           condition,
           context,
-          strictKeys,
-          optionalKeys
+          strictKeys ? new Set(strictKeys) : undefined,
+          optionalKeys ? new Set(optionalKeys) : undefined
         )
         const unsafeResult = engine.unsafeSimplify(
           condition,
           context,
-          strictKeys,
-          optionalKeys
+          strictKeys ? new Set(strictKeys) : undefined,
+          optionalKeys ? new Set(optionalKeys) : undefined
         )
         expect(safeResult).toEqual(expectedSafeResult)
         expect(unsafeResult).toEqual(expectedUnsafeResult)

@@ -77,7 +77,7 @@ describe('Expression - Arithmetic - Multiply', () => {
       ...testCases,
     ])('if %p is the simplification of %p', (expected, ...operands) => {
       const mult = new Multiply(...operands)
-      const result = mult.simplify({}, [])
+      const result = mult.simplify({}, new Set([]))
       if (expected === 'self') {
         expect(result).toBe(mult)
       } else {
