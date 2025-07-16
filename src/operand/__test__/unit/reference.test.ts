@@ -148,6 +148,7 @@ describe('Operand - Value', () => {
       ['RefB', new Reference('RefB'), undefined, ['RefB']],
       ['RefB', new Reference('RefB'), [], ['RefB']],
       ['RefB', new Reference('RefB'), undefined, undefined],
+      ['RefB.code', new Reference('RefB.code'), undefined, undefined],
     ])(
       '%p should simplify to %p',
       (value, expected, strictKeys = undefined, optionalKeys = undefined) => {

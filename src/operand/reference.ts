@@ -10,33 +10,36 @@ const keyWithArrayIndexRegex =
   /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
 
-const parseBacktickWrappedKey = (key: string) =>
-  key.startsWith('`') && key.endsWith('`') ? key.slice(1, -1) : key
+function parseBacktickWrappedKey(key: string) {
+  return key[0] === '`' && key[key.length - 1] === '`' ? key.slice(1, -1) : key
+}
 
-const parseKey = (key: string): Keys => {
-  const keys = key.match(/(`[^[\]]+`(\[\d+\])*|[^`.]+)/g)
-  return !keys
-    ? []
-    : keys.flatMap((key) => {
-        const unwrappedKey = parseBacktickWrappedKey(key)
-        const keys: Keys = []
-        const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
-        if (parseResult) {
-          const extractedKey = parseBacktickWrappedKey(
-            parseResult?.groups?.currentKey ?? unwrappedKey
-          )
-          keys.push(extractedKey)
-          const rawIndexes = parseResult?.groups?.indexes
-          if (rawIndexes) {
-            for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
-              keys.push(parseInt(indexResult[1]))
-            }
-          }
-        } else {
-          keys.push(unwrappedKey)
-        }
-        return keys
-      })
+function parseKeyComponents(key: string) {
+  const unwrappedKey = parseBacktickWrappedKey(key)
+  const keys: Keys = []
+  const parseResult = keyWithArrayIndexRegex.exec(unwrappedKey)
+  if (parseResult) {
+    const extractedKey = parseBacktickWrappedKey(
+      parseResult?.groups?.currentKey ?? unwrappedKey
+    )
+    keys.push(extractedKey)
+    const rawIndexes = parseResult?.groups?.indexes
+    if (rawIndexes) {
+      for (const indexResult of rawIndexes.matchAll(arrayIndexRegex)) {
+        keys.push(parseInt(indexResult[1]))
+      }
+    }
+  } else {
+    keys.push(unwrappedKey)
+  }
+  return keys
+}
+
+const parseKeyRegex = /(`[^[\]]+`(\[\d+\])*|[^`.]+)/g
+
+function parseKey(key: string): Keys {
+  const keys = key.match(parseKeyRegex)
+  return !keys ? [] : keys.flatMap(parseKeyComponents)
 }
 
 const complexKeyExpression = /{([^{}]+)}/
@@ -109,6 +112,8 @@ const dataTypeRegex = new RegExp(
 
 const isComplexKey = (key: string) => key.indexOf('{') > -1
 
+const castingRegex = /\.\(.+\)$/
+
 /**
  * Reference operand resolved within the context
  */
@@ -132,11 +137,9 @@ export class Reference extends Operand {
     const dataTypeMatch = dataTypeRegex.exec(this.key)
     if (dataTypeMatch) {
       this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
+      this.key = this.key.replace(castingRegex, '')
     }
 
-    if (this.key.match(/.\(.+\)$/)) {
-      this.key = this.key.replace(/.\(.+\)$/, '')
-    }
     if (isComplexKey(this.key)) {
       this.valueLookup = (context) => complexValueLookup(context, this.key)
       this.getKeys = (context) => extractComplexKeys(context, this.key)

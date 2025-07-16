@@ -1,4 +1,5 @@
 import { Evaluable, EvaluableType } from '../common/evaluable'
+import { isString } from '../common/type-check'
 import {
   Divide,
   OPERATOR as OPERATOR_DIVIDE,
@@ -105,6 +106,7 @@ export class Parser {
     OPERATOR_MULTIPLY,
     OPERATOR_DIVIDE,
   ])
+  private readonly referenceCache: Map<string, Reference> = new Map()
 
   /**
    * @constructor
@@ -134,6 +136,25 @@ export class Parser {
    */
   get options(): Options {
     return this.opts
+  }
+
+  private getReference(key: string): Reference {
+    const cached = this.referenceCache.get(key)
+    if (cached !== undefined) {
+      return cached
+    }
+
+    const reference = new Reference(this.opts.referenceTransform(key))
+
+    this.referenceCache.set(key, reference)
+
+    return reference
+  }
+
+  private resolve(raw: Input): Value | Reference {
+    return isString(raw) && this.opts.referencePredicate(raw)
+      ? this.getReference(raw)
+      : new Value(raw)
   }
 
   /**
@@ -332,14 +353,13 @@ export class Parser {
    * @param raw Raw data
    */
   private getOperand(raw: Input): Operand {
-    const resolve = (raw: Input): Value | Reference =>
-      this.opts.referencePredicate(raw as string)
-        ? new Reference(this.opts.referenceTransform(raw as string))
-        : new Value(raw)
-
     if (Array.isArray(raw)) {
-      return new Collection(raw.map((item) => resolve(item)))
+      const collectionItems: (Value | Reference)[] = []
+      for (const item of raw) {
+        collectionItems.push(this.resolve(item))
+      }
+      return new Collection(collectionItems)
     }
-    return resolve(raw)
+    return this.resolve(raw)
   }
 }
