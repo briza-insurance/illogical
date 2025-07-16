@@ -137,11 +137,9 @@ export class Reference extends Operand {
     const dataTypeMatch = dataTypeRegex.exec(this.key)
     if (dataTypeMatch) {
       this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
-    }
-
-    if (this.key.match(castingRegex)) {
       this.key = this.key.replace(castingRegex, '')
     }
+
     if (isComplexKey(this.key)) {
       this.valueLookup = (context) => complexValueLookup(context, this.key)
       this.getKeys = (context) => extractComplexKeys(context, this.key)
