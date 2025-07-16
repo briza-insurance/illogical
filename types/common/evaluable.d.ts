@@ -41,7 +41,7 @@ export interface Evaluable {
      *  `optionalKeys` is considered to be present and thus will be evaluated
      * @returns {Result | Evaluable} simplified value or itself
      */
-    simplify(ctx: Context, strictKeys?: string[], optionalKeys?: string[]): Result | Evaluable;
+    simplify(ctx: Context, strictKeys?: Set<string>, optionalKeys?: Set<string>): Result | Evaluable;
     /**
      * Serializes the Evaluable to its input format.
      *

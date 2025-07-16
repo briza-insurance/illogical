@@ -74,7 +74,7 @@ declare class Engine {
      *  `optionalKeys` is considered to be present and thus will be evaluated
      * @returns {Inpunt | boolean}
      */
-    simplify(exp: ExpressionInput, context: Context, strictKeys?: string[], optionalKeys?: string[]): Input | boolean;
-    unsafeSimplify(exp: ExpressionInput, context: Context, strictKeys?: string[], optionalKeys?: string[]): Input | boolean;
+    simplify(exp: ExpressionInput, context: Context, strictKeys?: Set<string>, optionalKeys?: Set<string>): Input | boolean;
+    unsafeSimplify(exp: ExpressionInput, context: Context, strictKeys?: Set<string>, optionalKeys?: Set<string>): Input | boolean;
 }
 export default Engine;

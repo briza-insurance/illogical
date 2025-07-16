@@ -27,7 +27,7 @@ export declare class Reference extends Operand {
     /**
      * {@link Evaluable.simplify}
      */
-    simplify(ctx: Context, strictKeys?: string[], optionalKeys?: string[]): Result | Evaluable;
+    simplify(ctx: Context, strictKeys?: Set<string>, optionalKeys?: Set<string>): Result | Evaluable;
     /**
      * {@link Evaluable.serialize}
      */
