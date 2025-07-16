@@ -140,7 +140,7 @@ export class Parser {
   private getReference(key: string): Reference {
     if (this.options.cacheReferences) {
       const cached = this.referenceCache.get(key)
-      if (cached) {
+      if (cached !== undefined) {
         return cached
       }
     }
