@@ -68,8 +68,6 @@ export interface Options {
    */
   operatorMapping: Map<symbol, string>
 
-  cacheReferences: boolean
-
   // Object key accessor whitelisting
   [k: string]: optionValue
 }
@@ -138,5 +136,4 @@ export const defaultOptions: Options = {
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping,
-  cacheReferences: false,
 }

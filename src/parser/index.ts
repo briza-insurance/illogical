@@ -139,18 +139,14 @@ export class Parser {
   }
 
   private getReference(key: string): Reference {
-    if (this.options.cacheReferences) {
-      const cached = this.referenceCache.get(key)
-      if (cached !== undefined) {
-        return cached
-      }
+    const cached = this.referenceCache.get(key)
+    if (cached !== undefined) {
+      return cached
     }
 
     const reference = new Reference(this.opts.referenceTransform(key))
 
-    if (this.options.cacheReferences) {
-      this.referenceCache.set(key, reference)
-    }
+    this.referenceCache.set(key, reference)
 
     return reference
   }
