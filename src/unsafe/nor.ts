@@ -1,6 +1,6 @@
-import { OPERATOR_NOT } from '..'
 import { Evaluable } from '../common/evaluable'
 import { isBoolean, isUndefined } from '../common/type-check'
+import { OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 import { isNonFalseResult, isTrueResult } from './type-check'
