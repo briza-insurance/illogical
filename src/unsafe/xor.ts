@@ -1,6 +1,7 @@
-import { OPERATOR_NOR, OPERATOR_NOT } from '..'
 import { Evaluable } from '../common/evaluable'
 import { isBoolean, isEvaluable } from '../common/type-check'
+import { OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
+import { OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
 import { Input } from '../parser'
 import { Options } from '../parser/options'
 import { isFalseResult, isTrueResult } from './type-check'
