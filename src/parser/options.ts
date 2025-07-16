@@ -25,7 +25,6 @@ import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor'
 export type optionValue =
   | ((operand: string) => string | boolean)
   | Map<symbol, string>
-  | boolean
 
 // Parser options
 export interface Options {
