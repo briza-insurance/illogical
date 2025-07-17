@@ -77,7 +77,7 @@ describe('Expression - Arithmetic - Subtract', () => {
       ...testCases,
     ])('if %p is the simplification of %p', (expected, ...operands) => {
       const sum = new Subtract(...operands)
-      const result = sum.simplify({}, [])
+      const result = sum.simplify({}, new Set([]))
       if (expected === 'self') {
         expect(result).toBe(sum)
       } else {

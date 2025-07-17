@@ -104,14 +104,12 @@ describe('Operand - Value', () => {
   })
 
   describe('simplify', () => {
-    test.each<
-      [
-        value: string,
-        expected: Result | Reference,
-        strictKeys?: string[],
-        optionalKeys?: string[],
-      ]
-    >([
+    const testCases: [
+      value: string,
+      expected: Result | Reference,
+      strictKeys?: string[],
+      optionalKeys?: string[],
+    ][] = [
       // Existing
       ['RefA', 1, []],
       // Nested
@@ -149,12 +147,43 @@ describe('Operand - Value', () => {
       ['RefB', new Reference('RefB'), [], ['RefB']],
       ['RefB', new Reference('RefB'), undefined, undefined],
       ['RefB.code', new Reference('RefB.code'), undefined, undefined],
-    ])(
+    ]
+
+    test.each<
+      [
+        value: string,
+        expected: Result | Reference,
+        strictKeys?: string[],
+        optionalKeys?: string[],
+      ]
+    >(testCases)(
       '%p should simplify to %p',
       (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
           new Reference(value)
             .simplify(context, strictKeys, optionalKeys)
+            ?.toString()
+        ).toEqual(expected?.toString())
+      }
+    )
+
+    test.each<
+      [
+        value: string,
+        expected: Result | Reference,
+        strictKeys?: string[],
+        optionalKeys?: string[],
+      ]
+    >(testCases)(
+      '%p should simplify to %p with Set',
+      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
+        expect(
+          new Reference(value)
+            .simplify(
+              context,
+              strictKeys ? new Set(strictKeys) : undefined,
+              optionalKeys ? new Set(optionalKeys) : undefined
+            )
             ?.toString()
         ).toEqual(expected?.toString())
       }

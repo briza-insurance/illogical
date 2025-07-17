@@ -59,7 +59,7 @@ describe('Expression - Logical - Xor', () => {
         new Not(notSimplified()),
       ],
     ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, [])).toEqual(expected)
+      expect(and.simplify({}, new Set([]))).toEqual(expected)
     })
   })
 

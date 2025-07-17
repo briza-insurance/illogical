@@ -51,7 +51,7 @@ describe('Expression - Comparison - Prefix', () => {
       ...testCases,
     ])('%p and %p should be simplified to $p', (left, right, expected) => {
       const equal = new Prefix(left, right)
-      const result = equal.simplify({}, [])
+      const result = equal.simplify({}, new Set([]))
       if (expected === 'self') {
         expect(result).toBe(equal)
       } else {

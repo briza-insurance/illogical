@@ -77,7 +77,7 @@ describe('Expression - Arithmetic - Divide', () => {
       ...testCases,
     ])('if %p is the simplification of %p', (expected, ...operands) => {
       const division = new Divide(...operands)
-      const result = division.simplify({}, [])
+      const result = division.simplify({}, new Set([]))
       if (expected === 'self') {
         expect(result).toBe(division)
       } else {

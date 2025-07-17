@@ -48,7 +48,7 @@ describe('Expression - Logical - Nor', () => {
         new Not(notSimplified()),
       ],
     ])('%p should simplify to %p', (nor, expected) => {
-      expect(nor.simplify({}, [])).toEqual(expected)
+      expect(nor.simplify({}, new Set([]))).toEqual(expected)
     })
   })
 
