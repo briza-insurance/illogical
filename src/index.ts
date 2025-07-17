@@ -29,7 +29,6 @@ import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
 import { ExpressionInput, Input, Parser } from './parser'
 import { Options } from './parser/options'
-import { unsafeSimplify } from './unsafe/simplify'
 
 export { defaultOptions } from './parser/options'
 export {
@@ -136,30 +135,6 @@ class Engine {
       return result
     }
     throw new Error(unexpectedResultError)
-  }
-
-  unsafeSimplify(
-    exp: ExpressionInput,
-    context: Context,
-    strictKeys?: Set<string>,
-    optionalKeys?: Set<string>
-  ): Input | boolean {
-    const result = unsafeSimplify(
-      context,
-      this.parser.options,
-      strictKeys,
-      optionalKeys
-    )(exp)
-    if (isBoolean(result)) {
-      return result
-    }
-
-    // The unsafe implementation should not expose the Evaluable interface
-    if (isEvaluable(result)) {
-      throw new Error('Unexpected Evaluable not serialized result')
-    }
-
-    return result
   }
 }
 

@@ -1167,21 +1167,12 @@ describe('Condition Engine', () => {
           strictKeys ? new Set(strictKeys) : undefined,
           optionalKeys ? new Set(optionalKeys) : undefined
         )
-        const unsafeResult = engine.unsafeSimplify(
-          condition,
-          context,
-          strictKeys ? new Set(strictKeys) : undefined,
-          optionalKeys ? new Set(optionalKeys) : undefined
-        )
         expect(safeResult).toEqual(expectedResult)
-        expect(unsafeResult).toEqual(expectedResult)
-        expect(safeResult).toEqual(unsafeResult)
       }
     )
 
     it.each<
       [
-        Input,
         Input,
         ExpressionInput,
         Context,
@@ -1191,7 +1182,6 @@ describe('Condition Engine', () => {
     >([
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
-        true,
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
         {
           Ref1: 1,
@@ -1201,7 +1191,6 @@ describe('Condition Engine', () => {
       ],
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
-        true,
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
         {
           Ref1: 1,
@@ -1211,7 +1200,6 @@ describe('Condition Engine', () => {
       ],
       [
         ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
-        true,
         ['IN', 1, ['$Ref1', '$Ref2', '$Ref3']],
         {
           Ref1: 1,
@@ -1221,37 +1209,15 @@ describe('Condition Engine', () => {
       ],
     ])(
       'should have different results as %j and %j',
-      (
-        expectedSafeResult,
-        expectedUnsafeResult,
-        condition,
-        context,
-        strictKeys,
-        optionalKeys
-      ) => {
+      (expectedSafeResult, condition, context, strictKeys, optionalKeys) => {
         const safeResult = engine.simplify(
           condition,
           context,
           strictKeys ? new Set(strictKeys) : undefined,
           optionalKeys ? new Set(optionalKeys) : undefined
         )
-        const unsafeResult = engine.unsafeSimplify(
-          condition,
-          context,
-          strictKeys ? new Set(strictKeys) : undefined,
-          optionalKeys ? new Set(optionalKeys) : undefined
-        )
         expect(safeResult).toEqual(expectedSafeResult)
-        expect(unsafeResult).toEqual(expectedUnsafeResult)
       }
     )
-
-    it('should be closer to 100% code coverage', () => {
-      expect(() =>
-        engine.unsafeSimplify(['OR', [1, [1, '$Ref1', 1], 3], ['==', 1, 1]], {})
-      ).toThrow(
-        'Unexpected expression found within a collection of values/references'
-      )
-    })
   })
 })
