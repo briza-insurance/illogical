@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.7.2
+
+- Resolving performance issues on simplify and removing unnecessary unsafeSimplify.
+
 ## 1.7.1
 
 - Adding Reference cache and other performance improvements to condition parsing.
