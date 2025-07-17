@@ -222,19 +222,6 @@ engine.simplify(
 ) // ['==', '$b', 20]
 ```
 
-### Unsafe Simplify
-
-Simplifies an expression with a given context, but without parsing and ensuring the condition is
-syntatically correct. This can be used in situations where you can decouple the parsing from
-the simplification and extra performance is needed in runtime.
-
-```js
-engine.unsafeSimplify(
-  ['OR', ['==', '$a', 10], ['==', '$b', 20], ['==', '$c', 20]],
-  { a: 10 }
-) // true due to $a. Expressions for $b and $c won't even be parsed.
-```
-
 ## Working with Expressions
 
 ### Evaluation Data Context
