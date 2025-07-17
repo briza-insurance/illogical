@@ -158,7 +158,7 @@ describe('Operand - Value', () => {
       ]
     >(testCases)(
       '%p should simplify to %p',
-      (value, expected, strictKeys, optionalKeys) => {
+      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
           new Reference(value)
             .simplify(context, strictKeys, optionalKeys)
@@ -176,7 +176,7 @@ describe('Operand - Value', () => {
       ]
     >(testCases)(
       '%p should simplify to %p with Set',
-      (value, expected, strictKeys, optionalKeys) => {
+      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
         expect(
           new Reference(value)
             .simplify(
