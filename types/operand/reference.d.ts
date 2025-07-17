@@ -24,10 +24,11 @@ export declare class Reference extends Operand {
      * @return {boolean}
      */
     evaluate(ctx: Context): Result;
+    private checkStrictAndOptional;
     /**
      * {@link Evaluable.simplify}
      */
-    simplify(ctx: Context, strictKeys?: Set<string>, optionalKeys?: Set<string>): Result | Evaluable;
+    simplify(ctx: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Result | Evaluable;
     /**
      * {@link Evaluable.serialize}
      */
