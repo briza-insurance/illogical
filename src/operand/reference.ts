@@ -159,13 +159,30 @@ export class Reference extends Operand {
     return this.toDataType(this.valueLookup(ctx))
   }
 
+  private checkStrictAndOptional(
+    key: string,
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
+  ) {
+    return (strictKeys !== undefined &&
+      (Array.isArray(strictKeys)
+        ? strictKeys.includes(key)
+        : strictKeys.has(key))) ||
+      (optionalKeys !== undefined &&
+        (Array.isArray(optionalKeys)
+          ? !optionalKeys.includes(key)
+          : !optionalKeys.has(key)))
+      ? undefined
+      : this
+  }
+
   /**
    * {@link Evaluable.simplify}
    */
   simplify(
     ctx: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
   ): Result | Evaluable {
     const [key] = this.getKeys(ctx) ?? []
 
@@ -177,10 +194,7 @@ export class Reference extends Operand {
       return this
     }
 
-    return (strictKeys && strictKeys.includes(key)) ||
-      (optionalKeys && !optionalKeys.includes(key))
-      ? undefined
-      : this
+    return this.checkStrictAndOptional(key, strictKeys, optionalKeys)
   }
 
   /**

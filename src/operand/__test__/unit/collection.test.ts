@@ -44,7 +44,10 @@ describe('Operand - Collection', () => {
         [20, 10],
       ],
     ])('%p should simplify to %p', (value, expected) => {
-      const collection = new Collection(value).simplify({ refA: 20 }, [])
+      const collection = new Collection(value).simplify(
+        { refA: 20 },
+        new Set([])
+      )
       if (expected === 'self') {
         expect(collection).toBe(collection)
       } else {

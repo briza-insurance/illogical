@@ -29,7 +29,6 @@ import { OPERATOR as OPERATOR_OR } from './expression/logical/or'
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor'
 import { ExpressionInput, Input, Parser } from './parser'
 import { Options } from './parser/options'
-import { unsafeSimplify } from './unsafe/simplify'
 
 export { defaultOptions } from './parser/options'
 export {
@@ -116,17 +115,19 @@ class Engine {
    *
    * @param {ExpressionInput} exp  Raw expression.
    * @param {Context} context Evaluation data context.
-   * @param {string[]} strictKeys keys to be considered present even if they are not present in the context
-   * @param {string[]} optionalKeys keys to be considered not present unless they are in the context or in
+   * @param {string[] | Set<string>} strictKeys keys to be considered present even if they are not present in the
+   *  context. Passing as a Set is recommended for performance reasons.
+   * @param {string[] | Set<string>} optionalKeys keys to be considered not present unless they are in the context or in
    *  `strictKeys`; when `strictKeys` is `undefined` and `optionalKeys` is an array, every key that is not in
-   *  `optionalKeys` is considered to be present and thus will be evaluated
+   *  `optionalKeys` is considered to be present and thus will be evaluated. Passing as a Set is recommended for
+   *  performance reasons.
    * @returns {Inpunt | boolean}
    */
   simplify(
     exp: ExpressionInput,
     context: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
   ): Input | boolean {
     const result = this.parse(exp).simplify(context, strictKeys, optionalKeys)
     if (isEvaluable(result)) {
@@ -136,30 +137,6 @@ class Engine {
       return result
     }
     throw new Error(unexpectedResultError)
-  }
-
-  unsafeSimplify(
-    exp: ExpressionInput,
-    context: Context,
-    strictKeys?: string[],
-    optionalKeys?: string[]
-  ): Input | boolean {
-    const result = unsafeSimplify(
-      context,
-      this.parser.options,
-      strictKeys,
-      optionalKeys
-    )(exp)
-    if (isBoolean(result)) {
-      return result
-    }
-
-    // The unsafe implementation should not expose the Evaluable interface
-    if (isEvaluable(result)) {
-      throw new Error('Unexpected Evaluable not serialized result')
-    }
-
-    return result
   }
 }
 

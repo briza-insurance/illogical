@@ -41,7 +41,7 @@ describe('Expression - Comparison - Undefined', () => {
       ...testCases,
     ])('%p should be simplified to $p', (left, expected) => {
       const equal = new Present(left)
-      const result = equal.simplify({}, [])
+      const result = equal.simplify({}, new Set([]))
       if (expected === 'self') {
         expect(result).toBe(equal)
       } else {
