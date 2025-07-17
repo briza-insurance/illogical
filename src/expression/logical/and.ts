@@ -10,6 +10,22 @@ import { Logical } from '../logical'
 // Operator key
 export const OPERATOR = Symbol('AND')
 
+const reduceOperands =
+  (args: SimplifyArgs) => (result: boolean | Evaluable[], child: Evaluable) => {
+    if (result !== false) {
+      const childResult = child.simplify(...args)
+      if (isEvaluable(childResult)) {
+        if (isBoolean(result)) {
+          return [childResult]
+        }
+        return [...result, childResult]
+      }
+      if (!childResult) {
+        return false
+      }
+    }
+    return result
+  }
 /**
  * And logical expression
  */
@@ -43,22 +59,9 @@ export class And extends Logical {
    * {@link Evaluable.simplify}
    */
   simplify(...args: SimplifyArgs): boolean | Evaluable {
+    const reducer = reduceOperands(args)
     const simplified = this.operands.reduce<boolean | Evaluable[]>(
-      (result, child) => {
-        if (result !== false) {
-          const childResult = child.simplify(...args)
-          if (isEvaluable(childResult)) {
-            if (isBoolean(result)) {
-              return [childResult]
-            }
-            return [...result, childResult]
-          }
-          if (!childResult) {
-            return false
-          }
-        }
-        return result
-      },
+      reducer,
       true
     )
     if (Array.isArray(simplified)) {
