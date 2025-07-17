@@ -291,14 +291,9 @@ describe('Condition Engine', () => {
         optionalKeys = undefined
       ) => {
         const engine = new Engine()
-        expect(
-          engine.simplify(
-            exp,
-            ctx,
-            strictKeys ? new Set(strictKeys) : undefined,
-            optionalKeys ? new Set(optionalKeys) : undefined
-          )
-        ).toEqual(expected)
+        expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
+          expected
+        )
       }
     )
 
@@ -317,7 +312,7 @@ describe('Condition Engine', () => {
     })
   })
 
-  describe('unsafeSimplify', () => {
+  describe('Extra tests for code coverage', () => {
     it.each<
       [
         Input,
@@ -1161,13 +1156,13 @@ describe('Condition Engine', () => {
     ])(
       'should result in %j',
       (expectedResult, condition, context, strictKeys, optionalKeys) => {
-        const safeResult = engine.simplify(
+        const result = engine.simplify(
           condition,
           context,
           strictKeys ? new Set(strictKeys) : undefined,
           optionalKeys ? new Set(optionalKeys) : undefined
         )
-        expect(safeResult).toEqual(expectedResult)
+        expect(result).toEqual(expectedResult)
       }
     )
 

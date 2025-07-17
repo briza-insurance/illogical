@@ -161,11 +161,17 @@ export class Reference extends Operand {
 
   private checkStrictAndOptional(
     key: string,
-    strictKeys?: Set<string>,
-    optionalKeys?: Set<string>
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
   ) {
-    return (strictKeys && strictKeys.has(key)) ||
-      (optionalKeys && !optionalKeys.has(key))
+    return (strictKeys !== undefined &&
+      (Array.isArray(strictKeys)
+        ? strictKeys.includes(key)
+        : strictKeys.has(key))) ||
+      (optionalKeys !== undefined &&
+        (Array.isArray(optionalKeys)
+          ? !optionalKeys.includes(key)
+          : !optionalKeys.has(key)))
       ? undefined
       : this
   }
@@ -175,8 +181,8 @@ export class Reference extends Operand {
    */
   simplify(
     ctx: Context,
-    strictKeys?: Set<string>,
-    optionalKeys?: Set<string>
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
   ): Result | Evaluable {
     const [key] = this.getKeys(ctx) ?? []
 
