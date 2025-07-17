@@ -159,6 +159,17 @@ export class Reference extends Operand {
     return this.toDataType(this.valueLookup(ctx))
   }
 
+  private checkStrictAndOptional(
+    key: string,
+    strictKeys?: Set<string>,
+    optionalKeys?: Set<string>
+  ) {
+    return (strictKeys && strictKeys.has(key)) ||
+      (optionalKeys && !optionalKeys.has(key))
+      ? undefined
+      : this
+  }
+
   /**
    * {@link Evaluable.simplify}
    */
@@ -177,10 +188,7 @@ export class Reference extends Operand {
       return this
     }
 
-    return (strictKeys && strictKeys.has(key)) ||
-      (optionalKeys && !optionalKeys.has(key))
-      ? undefined
-      : this
+    return this.checkStrictAndOptional(key, strictKeys, optionalKeys)
   }
 
   /**
