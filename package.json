@@ -2,9 +2,16 @@
   "name": "@briza/illogical",
   "version": "1.7.2",
   "description": "A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.",
-  "main": "lib/illogical.js",
-  "module": "lib/illogical.esm.js",
-  "typings": "types/index.d.ts",
+  "main": "./lib/illogical.js",
+  "module": "./lib/illogical.esm.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "require": "./lib/illogical.js",
+      "import": "./lib/illogical.esm.js"
+    }
+  },
   "files": [
     "/lib",
     "/types",
