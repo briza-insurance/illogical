@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ES2021"
-    ],
+    "lib": ["ES2021"],
     "module": "NodeNext",
     "target": "ES2021",
     "moduleResolution": "NodeNext",
@@ -10,17 +8,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "declarationDir": "types",
-    "declaration": true
+    "declaration": true,
+    "isolatedModules": true
   },
-  "testMatch": [
-    "**/__test__/**/*.[jt]s?(x)"
-  ],
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "src/__test__",
-    "src/**/*.test.ts"
-  ]
+  "testMatch": ["**/__test__/**/*.[jt]s?(x)"],
+  "include": ["src"],
+  "exclude": ["node_modules", "src/__test__", "src/**/*.test.ts"]
 }
