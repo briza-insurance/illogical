@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.7.3
+
+- Updating tsconfig and other dependencies.
+
 ## 1.7.2
 
 - Resolving performance issues on simplify and removing unnecessary unsafeSimplify.
