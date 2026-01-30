@@ -30,7 +30,7 @@ import { ExpressionInput, Input } from './parser';
 import { Options } from './parser/options';
 export { defaultOptions } from './parser/options';
 export { isEvaluable, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
-export type { Context, ExpressionInput };
+export type { Context, Evaluable, ExpressionInput };
 /**
  * Condition engine
  */
