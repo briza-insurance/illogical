@@ -199,7 +199,6 @@ describe('Condition Engine - Parser', () => {
       [{}],
       [5],
       [''],
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       [() => {}],
       // Invalid operator
       [['__', ['==', 5, 5]]],
