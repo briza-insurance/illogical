@@ -25,7 +25,6 @@ describe('Common - Type Check', () => {
       [true, false],
       [false, false],
       [{}, false],
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       [() => {}, false],
     ])('%p should evaluate as %p', (value, expected) => {
       // @ts-ignore
@@ -43,7 +42,6 @@ describe('Common - Type Check', () => {
       [true, false],
       [false, false],
       [{}, false],
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       [() => {}, false],
     ])('%p should evaluate as %p', (value, expected) => {
       // @ts-ignore
