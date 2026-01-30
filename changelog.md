@@ -1,5 +1,15 @@
 # illogical changelog
 
+## 1.7.5
+
+- Exported type that was missing
+
+## 1.7.4
+
+- Upgrade dependencies
+- Deleted removed types
+- Exported types that were missing
+
 ## 1.7.3
 
 - Updating tsconfig and other dependencies.
