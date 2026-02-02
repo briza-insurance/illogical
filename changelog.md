@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 1.7.6
+
+- Finish conversion to ESM
+
 ## 1.7.5
 
 - Exported type that was missing
