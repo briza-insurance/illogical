@@ -1,5 +1,5 @@
-import { Result } from '../../../common/evaluable'
-import { Value } from '../../value'
+import { Result } from '../../../common/evaluable.js'
+import { Value } from '../../value.js'
 
 describe('Operand - Value', () => {
   describe('constructor', () => {

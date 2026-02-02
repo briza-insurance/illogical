@@ -1,5 +1,5 @@
-import { Context, Evaluable, Result, SimplifyArgs } from '../../common/evaluable';
-import { Logical } from '../logical';
+import { Context, Evaluable, Result, SimplifyArgs } from '../../common/evaluable.js';
+import { Logical } from '../logical/index.js';
 export declare const OPERATOR: unique symbol;
 /**
  * Xor logical expression

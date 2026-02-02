@@ -3,9 +3,9 @@ import {
   Evaluable,
   Result,
   SimplifyArgs,
-} from '../../common/evaluable'
-import { isBoolean, isEvaluable } from '../../common/type-check'
-import { Logical } from '../logical'
+} from '../../common/evaluable.js'
+import { isBoolean, isEvaluable } from '../../common/type-check.js'
+import { Logical } from '../logical/index.js'
 
 // Operator key
 export const OPERATOR = Symbol('AND')

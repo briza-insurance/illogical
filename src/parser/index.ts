@@ -1,70 +1,76 @@
-import { Evaluable, EvaluableType } from '../common/evaluable'
-import { isString } from '../common/type-check'
+import { Evaluable, EvaluableType } from '../common/evaluable.js'
+import { isString } from '../common/type-check.js'
 import {
   Divide,
   OPERATOR as OPERATOR_DIVIDE,
-} from '../expression/arithmetic/divide'
+} from '../expression/arithmetic/divide.js'
 import {
   Multiply,
   OPERATOR as OPERATOR_MULTIPLY,
-} from '../expression/arithmetic/multiply'
+} from '../expression/arithmetic/multiply.js'
 import {
   OPERATOR as OPERATOR_SUBTRACT,
   Subtract,
-} from '../expression/arithmetic/subtract'
-import { OPERATOR as OPERATOR_SUM, Sum } from '../expression/arithmetic/sum'
-import { Comparison } from '../expression/comparison'
-import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq'
+} from '../expression/arithmetic/subtract.js'
+import { OPERATOR as OPERATOR_SUM, Sum } from '../expression/arithmetic/sum.js'
+import { Equal, OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq.js'
 import {
   GreaterThanOrEqual,
   OPERATOR as OPERATOR_GE,
-} from '../expression/comparison/ge'
+} from '../expression/comparison/ge.js'
 import {
   GreaterThan,
   OPERATOR as OPERATOR_GT,
-} from '../expression/comparison/gt'
-import { In, OPERATOR as OPERATOR_IN } from '../expression/comparison/in'
+} from '../expression/comparison/gt.js'
+import { In, OPERATOR as OPERATOR_IN } from '../expression/comparison/in.js'
+import { Comparison } from '../expression/comparison/index.js'
 import {
   LessThanOrEqual,
   OPERATOR as OPERATOR_LE,
-} from '../expression/comparison/le'
-import { LessThan, OPERATOR as OPERATOR_LT } from '../expression/comparison/lt'
-import { NotEqual, OPERATOR as OPERATOR_NE } from '../expression/comparison/ne'
+} from '../expression/comparison/le.js'
+import {
+  LessThan,
+  OPERATOR as OPERATOR_LT,
+} from '../expression/comparison/lt.js'
+import {
+  NotEqual,
+  OPERATOR as OPERATOR_NE,
+} from '../expression/comparison/ne.js'
 import {
   NotIn,
   OPERATOR as OPERATOR_NOT_IN,
-} from '../expression/comparison/not-in'
+} from '../expression/comparison/not-in.js'
 import {
   OPERATOR as OPERATOR_OVERLAP,
   Overlap,
-} from '../expression/comparison/overlap'
+} from '../expression/comparison/overlap.js'
 import {
   OPERATOR as OPERATOR_PREFIX,
   Prefix,
-} from '../expression/comparison/prefix'
+} from '../expression/comparison/prefix.js'
 import {
   OPERATOR as OPERATOR_PRESENT,
   Present,
-} from '../expression/comparison/present'
+} from '../expression/comparison/present.js'
 import {
   OPERATOR as OPERATOR_SUFFIX,
   Suffix,
-} from '../expression/comparison/suffix'
+} from '../expression/comparison/suffix.js'
 import {
   OPERATOR as OPERATOR_UNDEFINED,
   Undefined,
-} from '../expression/comparison/undefined'
-import { Logical } from '../expression/logical'
-import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and'
-import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor'
-import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not'
-import { OPERATOR as OPERATOR_OR, Or } from '../expression/logical/or'
-import { OPERATOR as OPERATOR_XOR, Xor } from '../expression/logical/xor'
-import { Operand } from '../operand'
-import { Collection } from '../operand/collection'
-import { Reference } from '../operand/reference'
-import { Value } from '../operand/value'
-import { defaultOptions, Options, optionValue } from './options'
+} from '../expression/comparison/undefined.js'
+import { And, OPERATOR as OPERATOR_AND } from '../expression/logical/and.js'
+import { Logical } from '../expression/logical/index.js'
+import { Nor, OPERATOR as OPERATOR_NOR } from '../expression/logical/nor.js'
+import { Not, OPERATOR as OPERATOR_NOT } from '../expression/logical/not.js'
+import { OPERATOR as OPERATOR_OR, Or } from '../expression/logical/or.js'
+import { OPERATOR as OPERATOR_XOR, Xor } from '../expression/logical/xor.js'
+import { Collection } from '../operand/collection.js'
+import { Operand } from '../operand/index.js'
+import { Reference } from '../operand/reference.js'
+import { Value } from '../operand/value.js'
+import { defaultOptions, Options, optionValue } from './options.js'
 
 // Input types
 export type Input =

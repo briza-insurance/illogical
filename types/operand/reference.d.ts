@@ -1,6 +1,6 @@
-import { Context, Evaluable, Result } from '../common/evaluable';
-import { Options } from '../parser/options';
-import { Operand } from '.';
+import { Context, Evaluable, Result } from '../common/evaluable.js';
+import { Options } from '../parser/options.js';
+import { Operand } from './index.js';
 export declare enum DataType {
     Number = "Number",
     String = "String"

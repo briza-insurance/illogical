@@ -1,4 +1,4 @@
-import { Result } from './evaluable';
+import { Result } from './evaluable.js';
 /**
  * Convert a value to number if possible, otherwise return undefined
  * @param value value to be converted to number

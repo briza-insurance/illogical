@@ -1,7 +1,7 @@
-import { defaultOptions } from '../../../parser/options'
-import { Collection } from '../../collection'
-import { Reference } from '../../reference'
-import { Value } from '../../value'
+import { defaultOptions } from '../../../parser/options.js'
+import { Collection } from '../../collection.js'
+import { Reference } from '../../reference.js'
+import { Value } from '../../value.js'
 
 describe('Operand - Collection', () => {
   describe('evaluate', () => {

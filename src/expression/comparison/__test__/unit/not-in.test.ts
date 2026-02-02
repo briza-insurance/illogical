@@ -1,11 +1,11 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Collection } from '../../../../operand/collection'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { NotIn } from '../../not-in'
+import { notSimplified, operand } from '../../../../__test__/helpers.js'
+import { Evaluable } from '../../../../common/evaluable.js'
+import { Collection } from '../../../../operand/collection.js'
+import { Operand } from '../../../../operand/index.js'
+import { Value } from '../../../../operand/value.js'
+import { Input } from '../../../../parser/index.js'
+import { defaultOptions } from '../../../../parser/options.js'
+import { NotIn } from '../../not-in.js'
 
 describe('Expression - Comparison - Not In', () => {
   describe('constructor', () => {

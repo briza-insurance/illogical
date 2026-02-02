@@ -1,8 +1,8 @@
-import { Context, Evaluable, Result } from '../common/evaluable'
-import { isObject } from '../common/type-check'
-import { toNumber, toString } from '../common/util'
-import { Options } from '../parser/options'
-import { Operand } from '.'
+import { Context, Evaluable, Result } from '../common/evaluable.js'
+import { isObject } from '../common/type-check.js'
+import { toNumber, toString } from '../common/util.js'
+import { Options } from '../parser/options.js'
+import { Operand } from './index.js'
 
 type Keys = (string | number)[]
 

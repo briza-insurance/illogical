@@ -1,6 +1,8 @@
-import { Result } from '../../../common/evaluable'
-import { defaultOptions } from '../../../parser/options'
-import { DataType, Reference } from '../../reference'
+import { jest } from '@jest/globals'
+
+import { Result } from '../../../common/evaluable.js'
+import { defaultOptions } from '../../../parser/options.js'
+import { DataType, Reference } from '../../reference.js'
 
 describe('Operand - Value', () => {
   describe('constructor', () => {

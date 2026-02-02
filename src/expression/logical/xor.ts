@@ -3,11 +3,11 @@ import {
   Evaluable,
   Result,
   SimplifyArgs,
-} from '../../common/evaluable'
-import { isEvaluable } from '../../common/type-check'
-import { Logical } from '../logical'
-import { Nor } from './nor'
-import { Not } from './not'
+} from '../../common/evaluable.js'
+import { isEvaluable } from '../../common/type-check.js'
+import { Logical } from '../logical/index.js'
+import { Nor } from './nor.js'
+import { Not } from './not.js'
 
 // Operator key
 export const OPERATOR = Symbol('XOR')

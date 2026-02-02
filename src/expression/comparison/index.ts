@@ -4,13 +4,13 @@ import {
   EvaluableType,
   Result,
   SimplifyArgs,
-} from '../../common/evaluable'
-import { isEvaluable } from '../../common/type-check'
-import { Operand } from '../../operand'
-import { Value } from '../../operand/value'
-import { ExpressionInput } from '../../parser'
-import { Options } from '../../parser/options'
-import { isSimplifiedArithmeticExpression } from '../arithmetic/isSimplifiedArithmeticExpression'
+} from '../../common/evaluable.js'
+import { isEvaluable } from '../../common/type-check.js'
+import { Operand } from '../../operand/index.js'
+import { Value } from '../../operand/value.js'
+import { ExpressionInput } from '../../parser/index.js'
+import { Options } from '../../parser/options.js'
+import { isSimplifiedArithmeticExpression } from '../arithmetic/isSimplifiedArithmeticExpression.js'
 
 /**
  * Abstract comparison expression

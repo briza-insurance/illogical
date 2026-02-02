@@ -1,7 +1,7 @@
-import { operand } from '../../../__test__/helpers'
-import { Sum } from '../../../expression/arithmetic/sum'
-import { Value } from '../../../operand/value'
-import { Evaluable, Result } from '../../evaluable'
+import { operand } from '../../../__test__/helpers.js'
+import { Sum } from '../../../expression/arithmetic/sum.js'
+import { Value } from '../../../operand/value.js'
+import { Evaluable, Result } from '../../evaluable.js'
 import {
   areAllNumbers,
   areAllResults,
@@ -9,7 +9,7 @@ import {
   isNumber,
   isObject,
   isString,
-} from '../../type-check'
+} from '../../type-check.js'
 
 describe('Common - Type Check', () => {
   describe('isNumber', () => {

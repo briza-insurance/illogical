@@ -1,7 +1,7 @@
 import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
-import resolve from '@rollup/plugin-node-resolve'
 import eslint from '@rollup/plugin-eslint'
+import resolve from '@rollup/plugin-node-resolve'
 
 const libraryName = 'illogical'
 const input = './src/index.ts'
@@ -13,23 +13,18 @@ const plugins = [
   babel({
     extensions,
     babelHelpers: 'bundled',
-    exclude: 'node_modules/**'
-  })
+    exclude: 'node_modules/**',
+  }),
 ]
 
-export default
-  {
-    input,
-    output: [
-      {
-        file: './lib/' + libraryName + '.esm.js',
-        format: 'esm'
-      },
-      {
-        file: './lib/' + libraryName + '.js',
-        format: 'cjs',
-        exports: 'named'
-      }
-    ],
-    plugins
-  }
+export default {
+  input,
+  output: [
+    {
+      file: './lib/' + libraryName + '.esm.js',
+      format: 'esm',
+    },
+    { file: './lib/' + libraryName + '.cjs', format: 'cjs', exports: 'named' },
+  ],
+  plugins,
+}

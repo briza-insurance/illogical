@@ -1,7 +1,7 @@
-import { Evaluable, Result } from '../../common/evaluable';
-import { ExpressionInput } from '../../parser';
-import { Options } from '../../parser/options';
-import { Comparison } from './index';
+import { Evaluable, Result } from '../../common/evaluable.js';
+import { ExpressionInput } from '../../parser/index.js';
+import { Options } from '../../parser/options.js';
+import { Comparison } from './index.js';
 export declare const OPERATOR: unique symbol;
 /**
  * Present comparison expression

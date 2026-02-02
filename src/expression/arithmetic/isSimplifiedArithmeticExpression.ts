@@ -1,8 +1,8 @@
-import { Evaluable, Result } from '../../common/evaluable'
-import { isEvaluable, isInfinite } from '../../common/type-check'
-import { Operand } from '../../operand'
-import { Reference } from '../../operand/reference'
-import { Arithmetic } from '.'
+import { Evaluable, Result } from '../../common/evaluable.js'
+import { isEvaluable, isInfinite } from '../../common/type-check.js'
+import { Operand } from '../../operand/index.js'
+import { Reference } from '../../operand/reference.js'
+import { Arithmetic } from './index.js'
 
 export const isSimplifiedArithmeticExpression = (
   operand: Operand,

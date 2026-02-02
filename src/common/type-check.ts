@@ -1,4 +1,4 @@
-import { Evaluable, Result } from './evaluable'
+import { Evaluable, Result } from './evaluable.js'
 
 /**
  * Is number predicate.

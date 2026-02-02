@@ -1,9 +1,9 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Result } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Value } from '../../../../operand/value'
-import { defaultOptions } from '../../../../parser/options'
-import { Multiply, OPERATOR } from '../../multiply'
+import { notSimplified, operand } from '../../../../__test__/helpers.js'
+import { Result } from '../../../../common/evaluable.js'
+import { Operand } from '../../../../operand/index.js'
+import { Value } from '../../../../operand/value.js'
+import { defaultOptions } from '../../../../parser/options.js'
+import { Multiply, OPERATOR } from '../../multiply.js'
 
 describe('Expression - Arithmetic - Multiply', () => {
   describe('constructor', () => {

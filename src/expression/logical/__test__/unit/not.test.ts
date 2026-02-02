@@ -1,11 +1,11 @@
-import { notSimplified, operand } from '../../../../__test__/helpers'
-import { Evaluable } from '../../../../common/evaluable'
-import { Operand } from '../../../../operand'
-import { Reference } from '../../../../operand/reference'
-import { Value } from '../../../../operand/value'
-import { Input } from '../../../../parser'
-import { defaultOptions } from '../../../../parser/options'
-import { Not } from '../../not'
+import { notSimplified, operand } from '../../../../__test__/helpers.js'
+import { Evaluable } from '../../../../common/evaluable.js'
+import { Operand } from '../../../../operand/index.js'
+import { Reference } from '../../../../operand/reference.js'
+import { Value } from '../../../../operand/value.js'
+import { Input } from '../../../../parser/index.js'
+import { defaultOptions } from '../../../../parser/options.js'
+import { Not } from '../../not.js'
 
 describe('Expression - Logical - Not', () => {
   describe('evaluate', () => {

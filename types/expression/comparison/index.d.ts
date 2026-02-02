@@ -1,7 +1,7 @@
-import { Context, Evaluable, EvaluableType, Result, SimplifyArgs } from '../../common/evaluable';
-import { Operand } from '../../operand';
-import { ExpressionInput } from '../../parser';
-import { Options } from '../../parser/options';
+import { Context, Evaluable, EvaluableType, Result, SimplifyArgs } from '../../common/evaluable.js';
+import { Operand } from '../../operand/index.js';
+import { ExpressionInput } from '../../parser/index.js';
+import { Options } from '../../parser/options.js';
 /**
  * Abstract comparison expression
  */

@@ -1,5 +1,5 @@
-import { Evaluable, Result } from '../../common/evaluable';
-import { Arithmetic } from '.';
+import { Evaluable, Result } from '../../common/evaluable.js';
+import { Arithmetic } from './index.js';
 export declare const OPERATOR: unique symbol;
 /**
  * Multiply operation expression

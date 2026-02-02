@@ -1,7 +1,7 @@
-import { Result } from '../common/evaluable'
-import { isString } from '../common/type-check'
-import { Input } from '../parser'
-import { Operand } from '.'
+import { Result } from '../common/evaluable.js'
+import { isString } from '../common/type-check.js'
+import { Input } from '../parser/index.js'
+import { Operand } from './index.js'
 
 /**
  * Print value as string
