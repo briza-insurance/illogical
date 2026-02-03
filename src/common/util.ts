@@ -1,5 +1,5 @@
-import { Result } from './evaluable'
-import { isNumber, isString } from './type-check'
+import { Result } from './evaluable.js'
+import { isNumber, isString } from './type-check.js'
 
 /**
  * Convert a value to number if possible, otherwise return undefined

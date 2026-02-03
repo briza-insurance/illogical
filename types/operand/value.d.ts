@@ -1,6 +1,6 @@
-import { Result } from '../common/evaluable';
-import { Input } from '../parser';
-import { Operand } from '.';
+import { Result } from '../common/evaluable.js';
+import { Input } from '../parser/index.js';
+import { Operand } from './index.js';
 /**
  * Static value operand
  */

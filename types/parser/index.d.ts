@@ -1,5 +1,5 @@
-import { Evaluable } from '../common/evaluable';
-import { Options } from './options';
+import { Evaluable } from '../common/evaluable.js';
+import { Options } from './options.js';
 export type Input = string | number | boolean | null | Input[] | [string, ...Input[]] | Record<string, unknown>;
 export type ArrayInput = Input[];
 export type ExpressionInput = [string, ...Input[]];

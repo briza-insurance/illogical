@@ -1,10 +1,15 @@
-import { Context, Evaluable, Result, SimplifyArgs } from '../common/evaluable'
-import { isEvaluable } from '../common/type-check'
-import { Input } from '../parser'
-import { Options } from '../parser/options'
-import { Operand } from '.'
-import { Reference } from './reference'
-import { Value } from './value'
+import {
+  Context,
+  Evaluable,
+  Result,
+  SimplifyArgs,
+} from '../common/evaluable.js'
+import { isEvaluable } from '../common/type-check.js'
+import { Input } from '../parser/index.js'
+import { Options } from '../parser/options.js'
+import { Operand } from './index.js'
+import { Reference } from './reference.js'
+import { Value } from './value.js'
 
 /**
  * Collection operand resolved containing mixture of value and references.

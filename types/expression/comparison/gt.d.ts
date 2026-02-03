@@ -1,5 +1,5 @@
-import { Evaluable, Result } from '../../common/evaluable';
-import { Comparison } from '../comparison';
+import { Evaluable, Result } from '../../common/evaluable.js';
+import { Comparison } from '../comparison/index.js';
 export declare const OPERATOR: unique symbol;
 /**
  * Greater than comparison expression

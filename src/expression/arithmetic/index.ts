@@ -4,11 +4,11 @@ import {
   EvaluableType,
   Result,
   SimplifyArgs,
-} from '../../common/evaluable'
-import { areAllNumbers, areAllResults } from '../../common/type-check'
-import { Operand } from '../../operand'
-import { ExpressionInput } from '../../parser'
-import { Options } from '../../parser/options'
+} from '../../common/evaluable.js'
+import { areAllNumbers, areAllResults } from '../../common/type-check.js'
+import { Operand } from '../../operand/index.js'
+import { ExpressionInput } from '../../parser/index.js'
+import { Options } from '../../parser/options.js'
 
 /**
  * Abstract arithmetic expression

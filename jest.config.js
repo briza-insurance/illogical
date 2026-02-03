@@ -1,8 +1,8 @@
-module.exports = {
-  roots: [
-    '<rootDir>/src'
-  ],
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest'
-  }
+export default {
+  roots: ['<rootDir>/src'],
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  extensionsToTreatAsEsm: ['.ts'],
 }

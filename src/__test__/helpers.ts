@@ -3,9 +3,9 @@
  * @module illogical/test
  */
 
-import { EvaluableType, Result } from '../common/evaluable'
-import { Operand } from '../operand'
-import { Input } from '../parser'
+import { EvaluableType, Result } from '../common/evaluable.js'
+import { Operand } from '../operand/index.js'
+import { Input } from '../parser/index.js'
 
 type operandValue = Result | null | undefined
 

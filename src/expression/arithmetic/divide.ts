@@ -1,6 +1,6 @@
-import { Evaluable, Result } from '../../common/evaluable'
-import { Operand } from '../../operand'
-import { Arithmetic } from '.'
+import { Evaluable, Result } from '../../common/evaluable.js'
+import { Operand } from '../../operand/index.js'
+import { Arithmetic } from './index.js'
 
 // Operator key
 export const OPERATOR = Symbol('DIVIDE')

@@ -1,7 +1,7 @@
-import { Evaluable, Result } from '../../common/evaluable'
-import { isNumber } from '../../common/type-check'
-import { toDateNumber } from '../../common/util'
-import { Comparison } from '../comparison'
+import { Evaluable, Result } from '../../common/evaluable.js'
+import { isNumber } from '../../common/type-check.js'
+import { toDateNumber } from '../../common/util.js'
+import { Comparison } from '../comparison/index.js'
 
 // Operator key
 export const OPERATOR = Symbol('GE')

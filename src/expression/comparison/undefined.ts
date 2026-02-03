@@ -1,8 +1,8 @@
-import { Evaluable, Result } from '../../common/evaluable'
-import { Value } from '../../operand/value'
-import { ExpressionInput } from '../../parser'
-import { Options } from '../../parser/options'
-import { Comparison } from '../comparison'
+import { Evaluable, Result } from '../../common/evaluable.js'
+import { Value } from '../../operand/value.js'
+import { ExpressionInput } from '../../parser/index.js'
+import { Options } from '../../parser/options.js'
+import { Comparison } from '../comparison/index.js'
 
 // Operator key
 export const OPERATOR = Symbol('UNDEFINED')

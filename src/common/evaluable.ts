@@ -1,5 +1,5 @@
-import { Input } from '../parser'
-import { Options } from '../parser/options'
+import { Input } from '../parser/index.js'
+import { Options } from '../parser/options.js'
 
 /**
  * Valid types for context members

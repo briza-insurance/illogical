@@ -3,9 +3,9 @@ import {
   Evaluable,
   EvaluableType,
   Result,
-} from '../../common/evaluable'
-import { ExpressionInput } from '../../parser'
-import { Options } from '../../parser/options'
+} from '../../common/evaluable.js'
+import { ExpressionInput } from '../../parser/index.js'
+import { Options } from '../../parser/options.js'
 
 /**
  * Abstract logical expression

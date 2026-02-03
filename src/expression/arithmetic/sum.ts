@@ -1,7 +1,7 @@
-import { Evaluable, Result } from '../../common/evaluable'
-import { Operand } from '../../operand'
-import { Arithmetic } from '.'
-import { operateWithExpectedDecimals } from './operateWithExpectedDecimals'
+import { Evaluable, Result } from '../../common/evaluable.js'
+import { Operand } from '../../operand/index.js'
+import { Arithmetic } from './index.js'
+import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
 
 // Operator key
 export const OPERATOR = Symbol('SUM')
