@@ -1,6 +1,6 @@
 {
   "name": "@briza/illogical",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A micro conditional javascript engine used to parse the raw logical and comparison expressions, evaluate the expression in the given data context, and provide access to a text form of the given expressions.",
   "type": "module",
   "main": "./lib/illogical.cjs",
@@ -11,7 +11,8 @@
     "require": "./lib/illogical.cjs"
   },
   "files": [
-    "lib/"
+    "lib/",
+    "types/"
   ],
   "author": {
     "name": "David Horak",
@@ -22,7 +23,7 @@
     "type-check": "tsc --noEmit",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "rollup -c",
-    "build": "rm -rf types && npm run build:types && npm run build:js",
+    "build": "rm -rf lib types && npm run build:types && npm run build:js",
     "docs": "typedoc src && git checkout docs/.nojekyll",
     "test": "jest",
     "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
