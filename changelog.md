@@ -1,8 +1,8 @@
 # illogical changelog
 
-## 1.7.6
+## 2.0.0
 
-- Finish conversion to ESM
+- Conversion to ESM
 
 ## 1.7.5
 
