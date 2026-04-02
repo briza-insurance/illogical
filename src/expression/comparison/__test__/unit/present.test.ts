@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, it, test } from 'node:test'
+
 import { notSimplified, operand } from '../../../../__test__/helpers.js'
 import { Collection } from '../../../../operand/collection.js'
 import { Operand } from '../../../../operand/index.js'
@@ -6,14 +9,14 @@ import { Input } from '../../../../parser/index.js'
 import { defaultOptions } from '../../../../parser/options.js'
 import { Present } from '../../present.js'
 
-describe('Expression - Comparison - Undefined', () => {
+describe('Expression - Comparison - Present', () => {
   describe('constructor', () => {
-    test.each([[[]], [[operand(5), operand(5)]]])(
-      'arguments %p should throw',
-      (args) => {
-        expect(() => new Present(...args)).toThrowError()
-      }
-    )
+    const constructorData = [[], [operand(5), operand(5)]]
+    for (const args of constructorData) {
+      test(`arguments ${JSON.stringify(args)} should throw`, () => {
+        assert.throws(() => new Present(...(args as Operand[])))
+      })
+    }
   })
 
   const testCases: [Operand, boolean][] = [
@@ -30,35 +33,40 @@ describe('Expression - Comparison - Undefined', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)('%p should evaluate as %p', (operand, expected) => {
-      expect(new Present(operand).evaluate({})).toBe(expected)
-    })
+    for (const [operandValue, expected] of testCases) {
+      test(`${operandValue} should evaluate as ${expected}`, () => {
+        assert.strictEqual(new Present(operandValue).evaluate({}), expected)
+      })
+    }
   })
 
   describe('simplify', () => {
-    test.each<[Operand, boolean | 'self']>([
+    const simplifyData: [Operand, boolean | 'self'][] = [
       [notSimplified(), 'self'],
       ...testCases,
-    ])('%p should be simplified to $p', (left, expected) => {
-      const equal = new Present(left)
-      const result = equal.simplify({}, new Set([]))
-      if (expected === 'self') {
-        expect(result).toBe(equal)
-      } else {
-        expect(result).toEqual(expected)
-      }
-    })
+    ]
+    for (const [left, expected] of simplifyData) {
+      test(`${left} should be simplified to ${expected}`, () => {
+        const equal = new Present(left)
+        const result = equal.simplify({}, new Set([]))
+        if (expected === 'self') {
+          assert.strictEqual(result, equal)
+        } else {
+          assert.deepStrictEqual(result, expected)
+        }
+      })
+    }
   })
 
   describe('serialize', () => {
-    it.each<[Operand, [Input]]>([[new Value(10), [10]]])(
-      '%p and %p should be serialized to %p',
-      (left, serialized) => {
-        expect(new Present(left).serialize(defaultOptions)).toEqual([
+    const serializeData: [Operand, [Input]][] = [[new Value(10), [10]]]
+    for (const [left, serialized] of serializeData) {
+      it(`${left} and ${serialized} should be serialized to ["PRESENT", ...${serialized}]`, () => {
+        assert.deepStrictEqual(new Present(left).serialize(defaultOptions), [
           'PRESENT',
           ...serialized,
         ])
-      }
-    )
+      })
+    }
   })
 })

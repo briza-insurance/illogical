@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, it, test } from 'node:test'
+
 import { notSimplified, operand } from '../../../../__test__/helpers.js'
 import { Result } from '../../../../common/evaluable.js'
 import { Operand } from '../../../../operand/index.js'
@@ -7,11 +10,15 @@ import { OPERATOR, Subtract } from '../../subtract.js'
 
 describe('Expression - Arithmetic - Subtract', () => {
   describe('constructor', () => {
-    test.each([[[]], [[operand(5)]]])('arguments %p should throw', (args) => {
-      expect(() => new Subtract(...args)).toThrow(
-        'subtract expression requires at least 2 operands'
-      )
-    })
+    const constructorData = [[[]], [[operand(5)]]]
+    for (const args of constructorData) {
+      test(`arguments ${JSON.stringify(args)} should throw`, () => {
+        assert.throws(
+          () => new Subtract(...(args as Operand[])),
+          /subtract expression requires at least 2 operands/
+        )
+      })
+    }
   })
 
   const testCases: [Result, ...Operand[]][] = [
@@ -32,28 +39,31 @@ describe('Expression - Arithmetic - Subtract', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)(
-      'that %p is the result of subtracting %p',
-      (expected, ...operands) => {
-        expect(new Subtract(...operands).evaluate({})).toBe(expected)
-      }
-    )
+    for (const [expected, ...operands] of testCases) {
+      test(`that ${expected} is the result of subtracting ${operands}`, () => {
+        assert.strictEqual(new Subtract(...operands).evaluate({}), expected)
+      })
+    }
   })
 
   describe('evaluate - failure', () => {
-    it.each<[...Operand[]]>([
+    const failureData: [...Operand[]][] = [
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
-    ])('%p and %p should throw', (...operands) => {
-      expect(() => new Subtract(...operands).evaluate({})).toThrow(
-        'operands must be numbers for Subtract'
-      )
-    })
+    ]
+    for (const operands of failureData) {
+      it(`${operands[0]} and ${operands[1]} should throw`, () => {
+        assert.throws(
+          () => new Subtract(...operands).evaluate({}),
+          /operands must be numbers for Subtract/
+        )
+      })
+    }
   })
 
   describe('toString', () => {
-    it.each<[string, ...Value[]]>([
+    const toStringData: [string, ...Value[]][] = [
       ['(5 - 6)', new Value(5), new Value(6)],
       [
         '(1 - 2 - 3 - 4)',
@@ -63,46 +73,53 @@ describe('Expression - Arithmetic - Subtract', () => {
         new Value(4),
       ],
       ['(5 - -6)', new Value(5), new Value(-6)],
-    ])('should stringify into %p', (expectedResult, ...values) => {
-      const result = new Subtract(...values).toString()
-      expect(result).toEqual(expectedResult)
-    })
+    ]
+    for (const [expectedResult, ...values] of toStringData) {
+      it(`should stringify into ${expectedResult}`, () => {
+        const result = new Subtract(...values).toString()
+        assert.strictEqual(result, expectedResult)
+      })
+    }
   })
 
   describe('simplify', () => {
-    test.each<[Result | 'self', ...Operand[]]>([
+    const simplifyData: [Result | 'self', ...Operand[]][] = [
       ['self', operand(10), notSimplified()],
       ['self', notSimplified(), operand(10)],
       ['self', notSimplified(), notSimplified()],
       ...testCases,
-    ])('if %p is the simplification of %p', (expected, ...operands) => {
-      const sum = new Subtract(...operands)
-      const result = sum.simplify({}, new Set([]))
-      if (expected === 'self') {
-        expect(result).toBe(sum)
-      } else {
-        expect(result).toEqual(expected)
-      }
-    })
+    ]
+    for (const [expected, ...operands] of simplifyData) {
+      test(`if ${expected} is the simplification of ${operands}`, () => {
+        const sum = new Subtract(...operands)
+        const result = sum.simplify({}, new Set([]))
+        if (expected === 'self') {
+          assert.strictEqual(result, sum)
+        } else {
+          assert.deepStrictEqual(result, expected)
+        }
+      })
+    }
   })
 
   describe('serialize', () => {
-    it('%p and %p should be serialized to %p', () => {
-      expect(
+    it('10 and 20 should be serialized to ["CUSTOM_SUBTRACT", 10, 20]', () => {
+      assert.deepStrictEqual(
         new Subtract(new Value(10), new Value(20)).serialize({
           ...defaultOptions,
           operatorMapping: new Map([[OPERATOR, 'CUSTOM_SUBTRACT']]),
-        })
-      ).toEqual(['CUSTOM_SUBTRACT', 10, 20])
+        }),
+        ['CUSTOM_SUBTRACT', 10, 20]
+      )
     })
 
     it('should throw if operator symbol is not mapped', () => {
-      expect(() =>
+      assert.throws(() =>
         new Subtract(new Value(10), new Value(20)).serialize({
           ...defaultOptions,
           operatorMapping: new Map<symbol, string>(),
         })
-      ).toThrow()
+      )
     })
   })
 })

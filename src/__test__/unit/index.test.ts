@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, it, test } from 'node:test'
+
 import Engine from '../../'
 import { Context } from '../../common/evaluable.js'
 import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum.js'
@@ -21,69 +24,65 @@ describe('Condition Engine', () => {
   const engine = new Engine()
 
   describe('evaluate', () => {
-    test.each(
-      [
-        // OVERLAP
-        ...[
-          [
-            'OVERLAP',
-            ['$State1', '$State2', '$State3', '$State4'],
-            ['TX', 'CA'],
-          ],
-        ].map((expression) => [
-          [expression, { State1: 'TX' }, true],
-          [expression, { State1: 'AL' }, false],
-          [
-            expression,
-            { State1: 'TX', State2: 'AL', State3: 'CA', State4: 'CO' },
-            true,
-          ],
-          [
-            expression,
-            { State1: 'MI', State2: 'RI', State3: 'NY', State4: 'NY' },
-            false,
-          ],
-        ]),
-        // UNDEFINED
-        ...[['UNDEFINED', '$Name']].map((expression) => [
-          [expression, { Name: undefined }, true],
-          [expression, { Name: 'David' }, false],
-          [expression, { Name: null }, false],
-        ]),
-        // PRESENT
-        ...[['PRESENT', '$Name']].map((expression) => [
-          [expression, { Name: undefined }, false],
-          [expression, { Name: 'David' }, true],
-          [expression, { Name: null }, false],
-          [expression, { Name: false }, true],
-          [expression, { Name: { obj: 'obj' } }, true],
-        ]),
-        // NOT UNDEFINED
-        ...[['NOT', ['UNDEFINED', '$Name']]].map((expression) => [
-          [expression, { Name: undefined }, false],
-          [expression, { Name: 'David' }, true],
-          [expression, { Name: null }, true],
-        ]),
-        // NOT OVERLAP
-        ...[
-          [
-            'NOT',
-            [
-              'OVERLAP',
-              ['$region1', '$region2'],
-              ['FL', 'LA', 'NY', 'RI', 'TX'],
-            ],
-          ],
-        ].map((expression) => [
-          [expression, { region1: 'FL', region2: 'MI' }, false],
-          [expression, { region1: 'AL', region2: 'MI' }, true],
-        ]),
-      ].flat() as [ExpressionInput, Context, boolean][]
-    )('%p in %p should evaluate as %p', (expression, context, expected) => {
-      expect(engine.evaluate(expression, context)).toEqual(expected)
-    })
+    const evaluateData1 = [
+      // OVERLAP
+      ...[
+        ['OVERLAP', ['$State1', '$State2', '$State3', '$State4'], ['TX', 'CA']],
+      ].map((expression) => [
+        [expression, { State1: 'TX' }, true],
+        [expression, { State1: 'AL' }, false],
+        [
+          expression,
+          { State1: 'TX', State2: 'AL', State3: 'CA', State4: 'CO' },
+          true,
+        ],
+        [
+          expression,
+          { State1: 'MI', State2: 'RI', State3: 'NY', State4: 'NY' },
+          false,
+        ],
+      ]),
+      // UNDEFINED
+      ...[['UNDEFINED', '$Name']].map((expression) => [
+        [expression, { Name: undefined }, true],
+        [expression, { Name: 'David' }, false],
+        [expression, { Name: null }, false],
+      ]),
+      // PRESENT
+      ...[['PRESENT', '$Name']].map((expression) => [
+        [expression, { Name: undefined }, false],
+        [expression, { Name: 'David' }, true],
+        [expression, { Name: null }, false],
+        [expression, { Name: false }, true],
+        [expression, { Name: { obj: 'obj' } }, true],
+      ]),
+      // NOT UNDEFINED
+      ...[['NOT', ['UNDEFINED', '$Name']]].map((expression) => [
+        [expression, { Name: undefined }, false],
+        [expression, { Name: 'David' }, true],
+        [expression, { Name: null }, true],
+      ]),
+      // NOT OVERLAP
+      ...[
+        [
+          'NOT',
+          ['OVERLAP', ['$region1', '$region2'], ['FL', 'LA', 'NY', 'RI', 'TX']],
+        ],
+      ].map((expression) => [
+        [expression, { region1: 'FL', region2: 'MI' }, false],
+        [expression, { region1: 'AL', region2: 'MI' }, true],
+      ]),
+    ].flat() as [ExpressionInput, Context, boolean][]
 
-    test.each<[ExpressionInput, Context, boolean]>([
+    for (const [expression, context, expected] of evaluateData1) {
+      test(`${JSON.stringify(expression)} in ${JSON.stringify(
+        context
+      )} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(engine.evaluate(expression, context), expected)
+      })
+    }
+
+    const evaluateData2: [ExpressionInput, Context, boolean][] = [
       [['==', ['+', 5, 5, 5], 15], {}, true],
       [['==', ['+', '$RefA', 5], 15], {}, false],
       [['==', ['+', '$RefA', 5], 15], { RefA: 10 }, true],
@@ -100,11 +99,20 @@ describe('Condition Engine', () => {
         true,
       ],
       [['OR', ['UNDEFINED', '$RefA'], ['PRESENT', '$RefB']], {}, true],
-    ])('%p should evaluate to %p', (expression, context, expectedResult) => {
-      expect(engine.evaluate(expression, context)).toEqual(expectedResult)
-    })
+    ]
 
-    test.each([
+    for (const [expression, context, expectedResult] of evaluateData2) {
+      test(`${JSON.stringify(
+        expression
+      )} should evaluate to ${expectedResult}`, () => {
+        assert.deepStrictEqual(
+          engine.evaluate(expression, context),
+          expectedResult
+        )
+      })
+    }
+
+    const evaluateThrowData = [
       // Operators with invalid operands
       [[OPERATOR_EQ]],
       [[OPERATOR_EQ, 5]],
@@ -124,22 +132,29 @@ describe('Condition Engine', () => {
       [[OPERATOR_XOR]],
       [[OPERATOR_SUM]],
       [[OPERATOR_SUM, 5, 5, 5]],
-    ])('%p should throw', (expression) => {
-      expect(() =>
-        engine.evaluate(expression as ExpressionInput, {})
-      ).toThrowError()
-    })
+    ]
 
-    test.each<[ExpressionInput]>([
+    for (const [expression] of evaluateThrowData) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => engine.evaluate(expression as ExpressionInput, {}))
+      })
+    }
+
+    const evaluateInvalidExpressionData: [ExpressionInput][] = [
       [['+', 5, 5]],
       [['-', 5, 5]],
       [['*', 5, 5]],
       [['/', 5, 5]],
-    ])('%p should throw', (expression) => {
-      expect(() => engine.evaluate(expression, {})).toThrowError(
-        'invalid expression'
-      )
-    })
+    ]
+
+    for (const [expression] of evaluateInvalidExpressionData) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(
+          () => engine.evaluate(expression, {}),
+          /invalid expression/
+        )
+      })
+    }
   })
 
   test('statement', () => {
@@ -164,12 +179,12 @@ describe('Condition Engine', () => {
 
     for (const exception of exceptions) {
       // @ts-ignore
-      expect(() => engine.statement(exception.expression)).toThrowError()
+      assert.throws(() => engine.statement(exception.expression))
     }
   })
 
   describe('parse', () => {
-    test.each([
+    const parseThrowData = [
       // Operators with invalid operands
       [[OPERATOR_EQ]],
       [[OPERATOR_EQ, 5]],
@@ -188,21 +203,23 @@ describe('Condition Engine', () => {
       [[OPERATOR_NOR]],
       [[OPERATOR_XOR]],
       [[OPERATOR_SUM]],
-    ])('%p should throw', (expression) => {
-      expect(() => engine.parse(expression as ExpressionInput)).toThrowError()
-    })
+    ]
+
+    for (const [expression] of parseThrowData) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => engine.parse(expression as ExpressionInput))
+      })
+    }
   })
 
   describe('simplify', () => {
-    test.each<
-      [
-        exp: ExpressionInput,
-        ctx: Context,
-        expected: boolean | Input,
-        strictKeys?: string[],
-        optionalKeys?: string[],
-      ]
-    >([
+    const simplifyData: [
+      exp: ExpressionInput,
+      ctx: Context,
+      expected: boolean | Input,
+      strictKeys?: string[],
+      optionalKeys?: string[],
+    ][] = [
       [['==', '$a', '$b'], { a: 10, b: 20 }, false, []],
       [['==', '$a', '$b'], { a: 10 }, ['==', '$a', '$b'], []],
       [['==', '$a', '$b'], { a: 10, b: 10 }, true, []],
@@ -281,23 +298,21 @@ describe('Condition Engine', () => {
         { Ref1: 1 },
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3]],
       ],
-    ])(
-      '%p with context %p should be simplified to %p',
-      (
-        exp,
-        ctx,
-        expected,
-        strictKeys = undefined,
-        optionalKeys = undefined
-      ) => {
+    ]
+
+    for (const [exp, ctx, expected, strictKeys, optionalKeys] of simplifyData) {
+      test(`${JSON.stringify(exp)} with context ${JSON.stringify(
+        ctx
+      )} should be simplified to ${JSON.stringify(expected)}`, () => {
         const engine = new Engine()
-        expect(engine.simplify(exp, ctx, strictKeys, optionalKeys)).toEqual(
+        assert.deepStrictEqual(
+          engine.simplify(exp, ctx, strictKeys, optionalKeys),
           expected
         )
-      }
-    )
+      })
+    }
 
-    test.each<[ExpressionInput]>([
+    const simplifyThrowData: [ExpressionInput][] = [
       [['+', 5, 5]],
       [['-', 5, 5]],
       [['*', 5, 5]],
@@ -305,23 +320,26 @@ describe('Condition Engine', () => {
       [['+', ['AND', ['==', 1, 1]], 1]],
       [['AND', ['+', 1, -1], ['+', ['-', 1, 1], 1]]],
       [['NOT', ['+', 1, 1]]],
-    ])('%p should throw', (expression) => {
-      expect(() => engine.simplify(expression, {})).toThrowError(
-        'invalid expression'
-      )
-    })
+    ]
+
+    for (const [expression] of simplifyThrowData) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(
+          () => engine.simplify(expression, {}),
+          /invalid expression/
+        )
+      })
+    }
   })
 
   describe('Extra tests for code coverage', () => {
-    it.each<
-      [
-        Input,
-        ExpressionInput,
-        Context,
-        string[] | undefined,
-        string[] | undefined,
-      ]
-    >([
+    const coverageData1: [
+      Input,
+      ExpressionInput,
+      Context,
+      string[] | undefined,
+      string[] | undefined,
+    ][] = [
       // LOGICAL
       // OR
       [
@@ -1153,28 +1171,35 @@ describe('Condition Engine', () => {
         undefined,
       ],
       [false, ['>', ['/', null, null], 5], {}, undefined, undefined],
-    ])(
-      'should result in %j',
-      (expectedResult, condition, context, strictKeys, optionalKeys) => {
+    ]
+
+    for (const [
+      expectedResult,
+      condition,
+      context,
+      strictKeys,
+      optionalKeys,
+    ] of coverageData1) {
+      it(`should result in ${JSON.stringify(expectedResult)} for ${JSON.stringify(
+        condition
+      )}`, () => {
         const result = engine.simplify(
           condition,
           context,
           strictKeys ? new Set(strictKeys) : undefined,
           optionalKeys ? new Set(optionalKeys) : undefined
         )
-        expect(result).toEqual(expectedResult)
-      }
-    )
+        assert.deepStrictEqual(result, expectedResult)
+      })
+    }
 
-    it.each<
-      [
-        Input,
-        ExpressionInput,
-        Context,
-        string[] | undefined,
-        string[] | undefined,
-      ]
-    >([
+    const coverageData2: [
+      Input,
+      ExpressionInput,
+      Context,
+      string[] | undefined,
+      string[] | undefined,
+    ][] = [
       [
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
         ['OVERLAP', ['$Ref1', '$Ref2'], [1, 2, 3, '$Ref3']],
@@ -1202,17 +1227,26 @@ describe('Condition Engine', () => {
         undefined,
         undefined,
       ],
-    ])(
-      'should have different results as %j and %j',
-      (expectedSafeResult, condition, context, strictKeys, optionalKeys) => {
+    ]
+
+    for (const [
+      expectedSafeResult,
+      condition,
+      context,
+      strictKeys,
+      optionalKeys,
+    ] of coverageData2) {
+      it(`should have different results as ${JSON.stringify(
+        expectedSafeResult
+      )} for ${JSON.stringify(condition)}`, () => {
         const safeResult = engine.simplify(
           condition,
           context,
           strictKeys ? new Set(strictKeys) : undefined,
           optionalKeys ? new Set(optionalKeys) : undefined
         )
-        expect(safeResult).toEqual(expectedSafeResult)
-      }
-    )
+        assert.deepStrictEqual(safeResult, expectedSafeResult)
+      })
+    }
   })
 })

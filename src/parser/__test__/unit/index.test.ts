@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, test } from 'node:test'
+
 import { Evaluable } from '../../../common/evaluable.js'
 import {
   Divide,
@@ -107,12 +110,15 @@ describe('Condition Engine - Parser', () => {
     const parser = new Parser(customOptions)
 
     // @ts-ignore
-    expect(parser.options.operatorMapping.get(OPERATOR_EQ)).toEqual('&&')
-    expect(parser.options.notExpected).toBeUndefined()
+    assert.deepStrictEqual(
+      parser.options.operatorMapping.get(OPERATOR_EQ),
+      '&&'
+    )
+    assert.strictEqual(parser.options.notExpected, undefined)
   })
 
   describe('defaultReferencePredicate', () => {
-    test.each([
+    const testCases = [
       // Truthy
       ['$ref', true],
       // Falsy
@@ -124,23 +130,26 @@ describe('Condition Engine - Parser', () => {
       [false, false],
       [[5], false],
       [['5'], false],
-    ])('%p should evaluate as %p', (key, expected) => {
-      // @ts-ignore
-      expect(defaultReferencePredicate(key)).toBe(expected)
-    })
+    ]
+    for (const [key, expected] of testCases) {
+      test(`${key} should evaluate as ${expected}`, () => {
+        // @ts-ignore
+        assert.strictEqual(defaultReferencePredicate(key), expected)
+      })
+    }
   })
 
   describe('defaultReferenceTransform', () => {
-    test.each([['$ref', 'ref']])(
-      '%p should evaluate as %p',
-      (key, expected) => {
-        expect(defaultReferenceTransform(key)).toBe(expected)
-      }
-    )
+    const testCases = [['$ref', 'ref']]
+    for (const [key, expected] of testCases) {
+      test(`${key} should evaluate as ${expected}`, () => {
+        assert.strictEqual(defaultReferenceTransform(key), expected)
+      })
+    }
   })
 
   describe('parse', () => {
-    test.each([
+    const testCases = [
       // Comparison expression
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
@@ -198,16 +207,18 @@ describe('Condition Engine - Parser', () => {
         ],
         new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
-    ] as [ExpressionInput, Evaluable][])(
-      '%p should evaluate as %p',
-      (expression, expected) => {
-        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+    ] as [ExpressionInput, Evaluable][]
+
+    for (const [expression, expected] of testCases) {
+      test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(
+          parser.parse(expression).serialize(defaultOptions),
           expected.serialize(defaultOptions)
         )
-      }
-    )
+      })
+    }
 
-    test.each([
+    const throwTestCases = [
       // Invalid form
       [undefined],
       [null],
@@ -218,13 +229,16 @@ describe('Condition Engine - Parser', () => {
       // Invalid operator
       [['__', ['==', 5, 5]]],
       [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
-    ] as [ExpressionInput][])('%p should throw', (expression) => {
-      expect(() => parser.parse(expression)).toThrowError()
-    })
+    ] as [ExpressionInput][]
+    for (const [expression] of throwTestCases) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => parser.parse(expression))
+      })
+    }
   })
 
   describe('parse - logical expressions', () => {
-    test.each([
+    const testCases = [
       // Not-nested, 3 items
       [
         [
@@ -373,14 +387,15 @@ describe('Condition Engine - Parser', () => {
           new Value(5),
         ]),
       ],
-    ] as [ExpressionInput, Evaluable][])(
-      '%p should evaluate as %p',
-      (expression, expected) => {
-        expect(parser.parse(expression)).toEqual(expected)
-      }
-    )
+    ] as [ExpressionInput, Evaluable][]
 
-    test.each([
+    for (const [expression, expected] of testCases) {
+      test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(parser.parse(expression), expected)
+      })
+    }
+
+    const throwTestCases = [
       // Invalid form
       [[]],
       // Invalid operator, reduce-able expression
@@ -389,13 +404,16 @@ describe('Condition Engine - Parser', () => {
       [['__', ['==', 5, 5], ['==', 5, 5]]],
       // Invalid logical inner expression
       [['IN', 'OR', ['OR', 'AND', [5, 5]]]],
-    ] as [ExpressionInput][])('%p should throw', (expression) => {
-      expect(() => parser.parse(expression)).toThrowError()
-    })
+    ] as [ExpressionInput][]
+    for (const [expression] of throwTestCases) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => parser.parse(expression))
+      })
+    }
   })
 
   describe('parse - comparison expressions', () => {
-    test.each([
+    const testCases = [
       [
         [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
         new Equal(new Value(5), new Value(5)),
@@ -494,27 +512,31 @@ describe('Condition Engine - Parser', () => {
         [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA{RefB}'],
         new Present(new Reference('RefA{RefB}')),
       ],
-    ] as [ExpressionInput, Evaluable][])(
-      '%p should evaluate as %p',
-      (expression, expected) => {
-        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+    ] as [ExpressionInput, Evaluable][]
+    for (const [expression, expected] of testCases) {
+      test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(
+          parser.parse(expression).serialize(defaultOptions),
           expected.serialize(defaultOptions)
         )
-      }
-    )
+      })
+    }
 
-    test.each([
+    const throwTestCases = [
       // Invalid form
       [[]],
       // Invalid operator
       [['__', 5, 5]],
-    ] as [ExpressionInput][])('%p should throw', (expression) => {
-      expect(() => parser.parse(expression)).toThrowError()
-    })
+    ] as [ExpressionInput][]
+    for (const [expression] of throwTestCases) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => parser.parse(expression))
+      })
+    }
   })
 
   describe('parse - arithmetic expressions', () => {
-    test.each([
+    const testCases = [
       [
         [
           defaultOptions.operatorMapping.get(OPERATOR_EQ),
@@ -547,16 +569,17 @@ describe('Condition Engine - Parser', () => {
         ],
         new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
-    ] as [ExpressionInput, Evaluable][])(
-      '%p should evaluate as %p',
-      (expression, expected) => {
-        expect(parser.parse(expression).serialize(defaultOptions)).toEqual(
+    ] as [ExpressionInput, Evaluable][]
+    for (const [expression, expected] of testCases) {
+      test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(
+          parser.parse(expression).serialize(defaultOptions),
           expected.serialize(defaultOptions)
         )
-      }
-    )
+      })
+    }
 
-    test.each([
+    const throwTestCases = [
       // Invalid form
       [[]],
       // Invalid operator
@@ -566,8 +589,11 @@ describe('Condition Engine - Parser', () => {
       [['-', 5, 5]],
       [['*', 5, 5]],
       [['/', 5, 5]],
-    ] as [ExpressionInput][])('%p should throw', (expression) => {
-      expect(() => parser.parse(expression)).toThrowError()
-    })
+    ] as [ExpressionInput][]
+    for (const [expression] of throwTestCases) {
+      test(`${JSON.stringify(expression)} should throw`, () => {
+        assert.throws(() => parser.parse(expression))
+      })
+    }
   })
 })

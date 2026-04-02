@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, test } from 'node:test'
+
 import { defaultOptions } from '../../../parser/options.js'
 import { Collection } from '../../collection.js'
 import { Reference } from '../../reference.js'
@@ -5,7 +8,7 @@ import { Value } from '../../value.js'
 
 describe('Operand - Collection', () => {
   describe('evaluate', () => {
-    test.each([
+    const evaluateData = [
       [[new Value(1)], [1]],
       [[new Value('1')], ['1']],
       [[new Value(true)], [true]],
@@ -14,26 +17,28 @@ describe('Operand - Collection', () => {
         [new Value(1), new Reference('RefA')],
         [1, 'A'],
       ],
-    ])('%p should evaluate as %p', (value, expected) => {
-      expect(
-        new Collection(value).evaluate({
-          RefA: 'A',
-        })
-      ).toStrictEqual(expected)
-    })
+    ]
+    for (const [value, expected] of evaluateData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        assert.deepStrictEqual(
+          new Collection(value as (Value | Reference)[]).evaluate({
+            RefA: 'A',
+          }),
+          expected
+        )
+      })
+    }
 
-    test.each([[1], ['1'], [true], [undefined], [null]])(
-      '%p should throw',
-      (value) => {
-        expect(() =>
-          new Collection(value as unknown as []).evaluate({})
-        ).toThrowError()
-      }
-    )
+    const evaluateThrowData = [[1], ['1'], [true], [undefined], [null]]
+    for (const value of evaluateThrowData) {
+      test(`${value} should throw`, () => {
+        assert.throws(() => new Collection(value as unknown as []).evaluate({}))
+      })
+    }
   })
 
   describe('simplify', () => {
-    test.each<[(Value | Reference)[], 'self' | unknown[]]>([
+    const simplifyData: [(Value | Reference)[], 'self' | unknown[]][] = [
       [[new Reference('test'), new Value(10)], 'self'],
       [
         [new Reference('refA'), new Value(10)],
@@ -43,21 +48,22 @@ describe('Operand - Collection', () => {
         [new Value(20), new Value(10)],
         [20, 10],
       ],
-    ])('%p should simplify to %p', (value, expected) => {
-      const collection = new Collection(value).simplify(
-        { refA: 20 },
-        new Set([])
-      )
-      if (expected === 'self') {
-        expect(collection).toBe(collection)
-      } else {
-        expect(collection).toEqual(expected)
-      }
-    })
+    ]
+    for (const [value, expected] of simplifyData) {
+      test(`${value} should simplify to ${expected}`, () => {
+        const collection = new Collection(value)
+        const result = collection.simplify({ refA: 20 }, new Set([]))
+        if (expected === 'self') {
+          assert.strictEqual(result, collection)
+        } else {
+          assert.deepStrictEqual(result, expected)
+        }
+      })
+    }
   })
 
   describe('serialize', () => {
-    test.each<[(Value | Reference)[], (number | string)[]]>([
+    const serializeData: [(Value | Reference)[], (number | string)[]][] = [
       [
         [new Reference('test'), new Value(10)],
         ['$test', 10],
@@ -74,20 +80,32 @@ describe('Operand - Collection', () => {
         [new Value(20), new Value(10)],
         [20, 10],
       ],
-    ])('%p should serialize to %p', (value, expected) => {
-      expect(new Collection(value).serialize(defaultOptions)).toEqual(expected)
-    })
+    ]
+    for (const [value, expected] of serializeData) {
+      test(`${value} should serialize to ${expected}`, () => {
+        assert.deepStrictEqual(
+          new Collection(value).serialize(defaultOptions),
+          expected
+        )
+      })
+    }
   })
 
   describe('toString', () => {
-    test.each([
+    const toStringData = [
       [[new Value(1)], '[1]'],
       [[new Value('1')], '["1"]'],
       [[new Value(true)], '[true]'],
       [[new Reference('RefA')], '[{RefA}]'],
       [[new Value(1), new Reference('RefA')], '[1, {RefA}]'],
-    ])('%p should be %p', (value, expected) => {
-      expect(new Collection(value).toString()).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of toStringData) {
+      test(`${value} should be ${expected}`, () => {
+        assert.strictEqual(
+          new Collection(value as (Value | Reference)[]).toString(),
+          expected
+        )
+      })
+    }
   })
 })
