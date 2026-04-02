@@ -26,11 +26,24 @@
     "build": "rm -rf lib types && npm run build:types && npm run build:js",
     "docs": "typedoc src && git checkout docs/.nojekyll",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "test:sample-conditions": "node --import tsx --test --test-reporter=spec \"src/__test__/unit/sample-conditions.test.ts\"",
     "test:coverage": "node --import tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage.lcov \"src/**/*.test.ts\"",
     "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
     "lint:fix": "eslint --max-warnings 0 \"src/**/*.{ts,js}\" --fix",
     "prepublishOnly": "npm run test && npm run build",
-    "check-licenses": "license-checker --summary --excludePrivatePackages --onlyAllow \"MIT;MIT OR X11;Apache-2.0;ISC;BSD-3-Clause;BSD-2-Clause;CC-BY-4.0;Public Domain;BSD;CC-BY-3.0;CC0-1.0;Python-2.0;BlueOak-1.0.0;Unlicense\""
+    "check-licenses": "license-checker --summary --excludePrivatePackages --onlyAllow \"MIT;MIT OR X11;Apache-2.0;ISC;BSD-3-Clause;BSD-2-Clause;CC-BY-4.0;Public Domain;BSD;CC-BY-3.0;CC0-1.0;Python-2.0;BlueOak-1.0.0;Unlicense\"",
+    "bench:sample:current:evaluate":    "npm run build && node --import tsx benchmark/evaluate.ts --cases conditions/sample-conditions    --out benchmark/results-sample-evaluate-current.json",
+    "bench:sample:current:simplify":    "npm run build && node --import tsx benchmark/simplify.ts --cases conditions/sample-conditions    --out benchmark/results-sample-simplify-current.json",
+    "bench:synthetic:current:evaluate": "npm run build && node --import tsx benchmark/evaluate.ts --cases conditions/synthetic-conditions --out benchmark/results-synthetic-evaluate-current.json",
+    "bench:synthetic:current:simplify": "npm run build && node --import tsx benchmark/simplify.ts --cases conditions/synthetic-conditions --out benchmark/results-synthetic-simplify-current.json",
+    "bench:sample:baseline:evaluate":   "bash benchmark/run-baseline.sh evaluate --cases conditions/sample-conditions    --out benchmark/results-sample-evaluate-baseline.json",
+    "bench:sample:baseline:simplify":   "bash benchmark/run-baseline.sh simplify --cases conditions/sample-conditions    --out benchmark/results-sample-simplify-baseline.json",
+    "bench:synthetic:baseline:evaluate":"bash benchmark/run-baseline.sh evaluate --cases conditions/synthetic-conditions --out benchmark/results-synthetic-evaluate-baseline.json",
+    "bench:synthetic:baseline:simplify":"bash benchmark/run-baseline.sh simplify --cases conditions/synthetic-conditions --out benchmark/results-synthetic-simplify-baseline.json",
+    "bench:sample:compare:evaluate":    "node --import tsx benchmark/compare.ts benchmark/results-sample-evaluate-baseline.json    benchmark/results-sample-evaluate-current.json",
+    "bench:sample:compare:simplify":    "node --import tsx benchmark/compare.ts benchmark/results-sample-simplify-baseline.json    benchmark/results-sample-simplify-current.json",
+    "bench:synthetic:compare:evaluate": "node --import tsx benchmark/compare.ts benchmark/results-synthetic-evaluate-baseline.json benchmark/results-synthetic-evaluate-current.json",
+    "bench:synthetic:compare:simplify": "node --import tsx benchmark/compare.ts benchmark/results-synthetic-simplify-baseline.json benchmark/results-synthetic-simplify-current.json"
   },
   "repository": {
     "type": "git",
@@ -71,6 +84,7 @@
     "license-checker": "^25.0.1",
     "prettier": "^3.6.2",
     "rollup": "^4.52.5",
+    "tinybench": "^6.0.0",
     "tsx": "^4.19.1",
     "typedoc": "^0.28.18",
     "typescript": "^6.0.2"

@@ -1,0 +1,1 @@
+["AND", ["==", "$status", "active"], [">=", "$age", 18], ["IN", "$role", ["admin", "editor"]]]

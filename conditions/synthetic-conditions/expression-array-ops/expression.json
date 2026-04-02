@@ -1,0 +1,1 @@
+["AND", ["OVERLAP", "$userTags", ["premium", "verified"]], ["NOT IN", "$status", ["banned", "suspended"]]]
