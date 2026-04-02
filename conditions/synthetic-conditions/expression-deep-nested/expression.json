@@ -1,0 +1,103 @@
+["AND",
+  ["==", "$account.status", "active"],
+  ["OR",
+    ["AND",
+      [">=", "$account.age", 21],
+      ["XOR",
+        ["==", "$account.tier", "premium"],
+        ["AND",
+          ["==", "$account.region", "US"],
+          ["OR",
+            ["AND",
+              [">=", "$account.score", 75],
+              ["XOR",
+                ["==", "$account.kycStatus", "verified"],
+                ["AND",
+                  ["NOT", ["==", "$account.flags.restricted", true]],
+                  ["OR",
+                    ["AND",
+                      ["IN", "$account.plan", ["pro", "enterprise", "elite"]],
+                      ["XOR",
+                        [">=", "$account.creditScore", 700],
+                        ["AND",
+                          ["==", "$account.employmentType", "full-time"],
+                          ["OR",
+                            ["AND",
+                              [">=", "$account.annualIncome", 50000],
+                              ["XOR",
+                                ["==", "$account.citizenship", "US"],
+                                ["AND",
+                                  ["NOT", ["UNDEFINED", "$account.taxId"]],
+                                  ["OR",
+                                    ["AND",
+                                      [">=", "$account.yearsEmployed", 2],
+                                      ["XOR",
+                                        ["==", "$account.bankruptcyHistory", false],
+                                        ["AND",
+                                          ["NOT IN", "$account.watchlistStatus", ["flagged", "blocked", "review"]],
+                                          ["OR",
+                                            ["AND",
+                                              [">=", "$account.transactionVolume", 1000],
+                                              ["XOR",
+                                                ["==", "$account.verifiedPhone", true],
+                                                ["AND",
+                                                  ["NOT", ["==", "$account.twoFactorEnabled", false]],
+                                                  ["OR",
+                                                    ["AND",
+                                                      [">=", "$account.loginCount", 5],
+                                                      ["==", "$account.emailVerified", true]
+                                                    ],
+                                                    ["AND",
+                                                      ["==", "$account.ssoProvider", "google"],
+                                                      ["NOT", ["UNDEFINED", "$account.ssoToken"]]
+                                                    ]
+                                                  ]
+                                                ]
+                                              ]
+                                            ],
+                                            ["AND",
+                                              ["==", "$account.paymentMethod", "bank"],
+                                              [">=", "$account.accountBalance", 500]
+                                            ]
+                                          ]
+                                        ]
+                                      ]
+                                    ],
+                                    ["AND",
+                                      ["==", "$account.residencyType", "permanent"],
+                                      ["NOT", ["UNDEFINED", "$account.ssn"]]
+                                    ]
+                                  ]
+                                ]
+                              ]
+                            ],
+                            ["AND",
+                              ["==", "$account.employmentType", "self-employed"],
+                              [">=", "$account.businessRevenue", 100000]
+                            ]
+                          ]
+                        ]
+                      ]
+                    ],
+                    ["AND",
+                      ["==", "$account.plan", "basic"],
+                      [">=", "$account.creditScore", 650]
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            ["AND",
+              ["==", "$account.score", 100],
+              ["==", "$account.kycStatus", "verified"]
+            ]
+          ]
+        ]
+      ]
+    ],
+    ["AND",
+      ["==", "$account.tier", "vip"],
+      ["NOT", ["UNDEFINED", "$account.vipCode"]]
+    ]
+  ]
+]

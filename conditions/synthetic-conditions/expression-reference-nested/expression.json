@@ -1,0 +1,1 @@
+["AND", ["==", "$user.status", "active"], [">=", "$user.profile.age", 18], ["==", "$user.address.country", "US"]]
