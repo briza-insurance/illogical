@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, test } from 'node:test'
+
 import { operand } from '../../../__test__/helpers.js'
 import { Sum } from '../../../expression/arithmetic/sum.js'
 import { Value } from '../../../operand/value.js'
@@ -13,7 +16,7 @@ import {
 
 describe('Common - Type Check', () => {
   describe('isNumber', () => {
-    test.each([
+    const isNumberData = [
       // Truthy
       [1, true],
       [1.0, true],
@@ -26,14 +29,17 @@ describe('Common - Type Check', () => {
       [false, false],
       [{}, false],
       [() => {}, false],
-    ])('%p should evaluate as %p', (value, expected) => {
-      // @ts-ignore
-      expect(isNumber(value)).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of isNumberData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        // @ts-ignore
+        assert.strictEqual(isNumber(value), expected)
+      })
+    }
   })
 
   describe('isString', () => {
-    test.each([
+    const isStringData = [
       // Truthy
       ['1', true],
       [new String('1'), true],
@@ -43,14 +49,17 @@ describe('Common - Type Check', () => {
       [false, false],
       [{}, false],
       [() => {}, false],
-    ])('%p should evaluate as %p', (value, expected) => {
-      // @ts-ignore
-      expect(isString(value)).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of isStringData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        // @ts-ignore
+        assert.strictEqual(isString(value), expected)
+      })
+    }
   })
 
   describe('isObject', () => {
-    test.each([
+    const isObjectData = [
       // Truthy
       [{}, true],
       // Falsy
@@ -58,13 +67,16 @@ describe('Common - Type Check', () => {
       [1, false],
       [null, false],
       [undefined, false],
-    ])('%p should evaluate as %p', (value, expected) => {
-      expect(isObject(value)).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of isObjectData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        assert.strictEqual(isObject(value), expected)
+      })
+    }
   })
 
   describe('isBoolean', () => {
-    test.each([
+    const isBooleanData = [
       // Truthy
       [true, true],
       [false, true],
@@ -74,13 +86,16 @@ describe('Common - Type Check', () => {
       [1, false],
       [null, false],
       [undefined, false],
-    ])('%p should evaluate as %p', (value, expected) => {
-      expect(isBoolean(value)).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of isBooleanData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        assert.strictEqual(isBoolean(value), expected)
+      })
+    }
   })
 
   describe('areAllResults', () => {
-    test.each<[(Result | Evaluable)[], boolean]>([
+    const areAllResultsData: [(Result | Evaluable)[], boolean][] = [
       // Truthy
       [[1, 2, 3], true],
       [[1, '2', 3], true],
@@ -90,22 +105,28 @@ describe('Common - Type Check', () => {
       // Falsy
       [[1, 2, '3', operand(1)], false],
       [[1, 2, '3', new Sum(new Value(1), new Value(2))], false],
-    ])('if %p should evaluate as %p', (values, expectedResult) => {
-      const result = areAllResults(values)
-      expect(result).toEqual(expectedResult)
-    })
+    ]
+    for (const [values, expectedResult] of areAllResultsData) {
+      test(`if ${JSON.stringify(values)} should evaluate as ${expectedResult}`, () => {
+        const result = areAllResults(values)
+        assert.deepStrictEqual(result, expectedResult)
+      })
+    }
   })
   describe('areAllNumbers', () => {
-    test.each<[Result[], boolean]>([
+    const areAllNumbersData: [Result[], boolean][] = [
       // Truthy
       [[1, 2, 3], true],
       // Falsy
       [[1, '2', 3], false],
       [[1, 2, {}], false],
       [[1, 2, '3'], false],
-    ])('if %p should evaluate as %p', (values, expectedResult) => {
-      const result = areAllNumbers(values)
-      expect(result).toEqual(expectedResult)
-    })
+    ]
+    for (const [values, expectedResult] of areAllNumbersData) {
+      test(`if ${JSON.stringify(values)} should evaluate as ${expectedResult}`, () => {
+        const result = areAllNumbers(values)
+        assert.deepStrictEqual(result, expectedResult)
+      })
+    }
   })
 })

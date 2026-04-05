@@ -1,14 +1,18 @@
-import { jest } from '@jest/globals'
+import { strict as assert } from 'node:assert'
+import { describe, mock, test } from 'node:test'
 
 import { Result } from '../../../common/evaluable.js'
 import { defaultOptions } from '../../../parser/options.js'
 import { DataType, Reference } from '../../reference.js'
 
-describe('Operand - Value', () => {
+describe('Operand - Reference', () => {
   describe('constructor', () => {
-    test.each([['']])('arguments %p should throw', (value) => {
-      expect(() => new Reference(value)).toThrowError()
-    })
+    const constructorData = [['']]
+    for (const value of constructorData) {
+      test(`arguments ${value} should throw`, () => {
+        assert.throws(() => new Reference(value))
+      })
+    }
   })
 
   const context = {
@@ -63,7 +67,7 @@ describe('Operand - Value', () => {
   }
 
   describe('evaluate', () => {
-    test.each([
+    const evaluateData = [
       // Existing
       ['RefA', 1],
       // Nested
@@ -100,9 +104,15 @@ describe('Operand - Value', () => {
       ['RefJ.(Number)', 1],
       ['RefK.yes.(Number)', undefined],
       ['RefK.no.(Number)', undefined],
-    ])('%p should evaluate as %p', (value, expected) => {
-      expect(new Reference(value).evaluate(context)).toBe(expected)
-    })
+    ]
+    for (const [value, expected] of evaluateData) {
+      test(`${value} should evaluate as ${expected}`, () => {
+        assert.strictEqual(
+          new Reference(value as string).evaluate(context),
+          expected
+        )
+      })
+    }
   })
 
   describe('simplify', () => {
@@ -151,49 +161,35 @@ describe('Operand - Value', () => {
       ['RefB.code', new Reference('RefB.code'), undefined, undefined],
     ]
 
-    test.each<
-      [
-        value: string,
-        expected: Result | Reference,
-        strictKeys?: string[],
-        optionalKeys?: string[],
-      ]
-    >(testCases)(
-      '%p should simplify to %p',
-      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
-        expect(
+    for (const [value, expected, strictKeys, optionalKeys] of testCases) {
+      test(`${value} should simplify to ${expected}`, () => {
+        assert.deepStrictEqual(
           new Reference(value)
             .simplify(context, strictKeys, optionalKeys)
-            ?.toString()
-        ).toEqual(expected?.toString())
-      }
-    )
+            ?.toString(),
+          expected?.toString()
+        )
+      })
+    }
 
-    test.each<
-      [
-        value: string,
-        expected: Result | Reference,
-        strictKeys?: string[],
-        optionalKeys?: string[],
-      ]
-    >(testCases)(
-      '%p should simplify to %p with Set',
-      (value, expected, strictKeys = undefined, optionalKeys = undefined) => {
-        expect(
+    for (const [value, expected, strictKeys, optionalKeys] of testCases) {
+      test(`${value} should simplify to ${expected} with Set`, () => {
+        assert.deepStrictEqual(
           new Reference(value)
             .simplify(
               context,
               strictKeys ? new Set(strictKeys) : undefined,
               optionalKeys ? new Set(optionalKeys) : undefined
             )
-            ?.toString()
-        ).toEqual(expected?.toString())
-      }
-    )
+            ?.toString(),
+          expected?.toString()
+        )
+      })
+    }
   })
 
   describe('serialize', () => {
-    test.each([
+    const serializeData = [
       // Existing
       ['RefA', '$RefA'],
       // Nested
@@ -220,32 +216,44 @@ describe('Operand - Value', () => {
       ['RefH[{RefA}].sub{RefD}.(Number)', '$RefH[{RefA}].sub{RefD}.(Number)'],
       ['RefA.(String)', '$RefA.(String)'],
       ['RefJ.(Number)', '$RefJ.(Number)'],
-    ])('%p should serialize to %p', (value, expected) => {
-      expect(new Reference(value).serialize(defaultOptions)).toEqual(expected)
-    })
+    ]
+    for (const [value, expected] of serializeData) {
+      test(`${value} should serialize to ${expected}`, () => {
+        assert.strictEqual(
+          new Reference(value).serialize(defaultOptions),
+          expected
+        )
+      })
+    }
   })
 
   describe('toString', () => {
-    test.each([['key', '{key}']])('%p should be %p', (value, expected) => {
-      expect(new Reference(value).toString()).toBe(expected)
-    })
+    const toStringData = [['key', '{key}']]
+    for (const [value, expected] of toStringData) {
+      test(`${value} should be ${expected}`, () => {
+        assert.strictEqual(new Reference(value).toString(), expected)
+      })
+    }
   })
 
   describe('toDataType', () => {
-    console.warn = jest.fn()
-    test.each<[Result, DataType]>([
+    const toDataTypeData: [Result, DataType][] = [
       [true, DataType.String],
       [true, DataType.Number],
-    ])(
-      'should console.warn if cast resulted in an undefined reference',
-      (value, dataType) => {
-        expect(
-          new Reference(`ref.(${dataType})`).evaluate({ ref: value })
-        ).toBe(undefined)
-        expect(console.warn).toHaveBeenCalledWith(
-          `Casting ${value} to ${dataType} resulted in undefined`
+    ]
+    for (const [value, dataType] of toDataTypeData) {
+      test(`should console.warn if cast resulted in an undefined reference for ${value} to ${dataType}`, () => {
+        const warnMock = mock.method(console, 'warn', () => {})
+        assert.strictEqual(
+          new Reference(`ref.(${dataType})`).evaluate({ ref: value }),
+          undefined
         )
-      }
-    )
+        assert.strictEqual(warnMock.mock.callCount(), 1)
+        assert.deepStrictEqual(warnMock.mock.calls[0].arguments, [
+          `Casting ${value} to ${dataType} resulted in undefined`,
+        ])
+        warnMock.mock.restore()
+      })
+    }
   })
 })

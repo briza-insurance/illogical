@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node"],
     "lib": ["ES2021"],
     "module": "NodeNext",
     "target": "ES2021",
@@ -7,6 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "rootDir": "src",
     "declarationDir": "types",
     "declaration": true,
     "isolatedModules": true
