@@ -3,6 +3,9 @@
  * @module illogical
  */
 
+import { compile, CompiledExpression } from './bytecode/compiler.js'
+import { BytecodeEvaluable } from './bytecode/evaluable.js'
+import { interpret } from './bytecode/interpreter.js'
 import { Context, Evaluable } from './common/evaluable.js'
 import { isBoolean, isEvaluable } from './common/type-check.js'
 import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide.js'
@@ -66,6 +69,8 @@ const unexpectedResultError =
  */
 class Engine {
   private readonly parser: Parser
+  private readonly bytecodeCache: WeakMap<ExpressionInput, CompiledExpression> =
+    new WeakMap()
 
   /**
    * @constructor
@@ -75,6 +80,16 @@ class Engine {
     this.parser = new Parser(options)
   }
 
+  private getCompiled(exp: ExpressionInput): CompiledExpression {
+    let compiled = this.bytecodeCache.get(exp)
+    if (compiled === undefined) {
+      this.parser.parse(exp) // validates root operator and expression structure
+      compiled = compile(exp, this.parser.options)
+      this.bytecodeCache.set(exp, compiled)
+    }
+    return compiled
+  }
+
   /**
    * Evaluate the expression.
    * @param {ExpressionInput} exp Raw expression.
@@ -82,7 +97,7 @@ class Engine {
    * @return {boolean}
    */
   evaluate(exp: ExpressionInput, ctx: Context): boolean {
-    const result = this.parse(exp).evaluate(ctx)
+    const result = interpret(this.getCompiled(exp), ctx)
     if (isBoolean(result)) {
       return result
     }
@@ -104,7 +119,7 @@ class Engine {
    * @return {Evaluable}
    */
   parse(exp: ExpressionInput): Evaluable {
-    return this.parser.parse(exp)
+    return new BytecodeEvaluable(this.getCompiled(exp), this.parser.parse(exp))
   }
 
   /**
@@ -130,7 +145,9 @@ class Engine {
     strictKeys?: string[] | Set<string>,
     optionalKeys?: string[] | Set<string>
   ): Input | boolean {
-    const result = this.parse(exp).simplify(context, strictKeys, optionalKeys)
+    const result = this.parser
+      .parse(exp)
+      .simplify(context, strictKeys, optionalKeys)
     if (isEvaluable(result)) {
       return result.serialize(this.parser.options)
     }
