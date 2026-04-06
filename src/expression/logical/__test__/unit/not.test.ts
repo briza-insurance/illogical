@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, it, test } from 'node:test'
+
 import { notSimplified, operand } from '../../../../__test__/helpers.js'
 import { Evaluable } from '../../../../common/evaluable.js'
 import { Operand } from '../../../../operand/index.js'
@@ -9,44 +12,55 @@ import { Not } from '../../not.js'
 
 describe('Expression - Logical - Not', () => {
   describe('evaluate', () => {
-    test.each([
+    const evaluateData = [
       // Truthy
       [operand(false), true],
       // Falsy
       [operand(true), false],
-    ] as [Evaluable, boolean][])(
-      '%p should evaluate as %p',
-      (operand, expected) => {
-        expect(new Not(operand).evaluate({})).toBe(expected)
-      }
-    )
+    ] as [Evaluable, boolean][]
+    for (const [operandValue, expected] of evaluateData) {
+      test(`${operandValue} should evaluate as ${expected}`, () => {
+        assert.strictEqual(new Not(operandValue).evaluate({}), expected)
+      })
+    }
 
-    test.each([[[]], [[operand(true), operand(false)]], [[operand(0)]]] as [
-      Evaluable[],
-    ][])('%p should throw', (operands) => {
-      expect(() => new Not(...operands).evaluate({})).toThrowError()
-    })
+    const evaluateThrowData = [
+      [[]],
+      [[operand(true), operand(false)]],
+      [[operand(0)]],
+    ] as [Evaluable[]][]
+    for (const operands of evaluateThrowData) {
+      test(`${operands} should throw`, () => {
+        assert.throws(() => new Not(...operands).evaluate({}))
+      })
+    }
   })
 
   describe('simplify', () => {
-    it.each<[Not, Evaluable | boolean]>([
+    const simplifyData: [Not, Evaluable | boolean][] = [
       [new Not(notSimplified()), new Not(notSimplified())],
       [new Not(operand(false)), true],
       [new Not(operand(true)), false],
-    ])('%p should simplify to %p', (and, expected) => {
-      expect(and.simplify({}, new Set([]))).toEqual(expected)
-    })
+    ]
+    for (const [and, expected] of simplifyData) {
+      it(`${and} should simplify to ${expected}`, () => {
+        assert.deepStrictEqual(and.simplify({}, new Set([])), expected)
+      })
+    }
   })
 
   describe('serialize', () => {
-    it.each<[Operand, [Input]]>([
+    const serializeData: [Operand, [Input]][] = [
       [new Reference('test'), ['$test']],
       [new Value(10), [10]],
-    ])('%p should serialize to %p', (operands, expected) => {
-      expect(new Not(operands).serialize(defaultOptions)).toEqual([
-        'NOT',
-        ...expected,
-      ])
-    })
+    ]
+    for (const [operands, expected] of serializeData) {
+      it(`${operands} should serialize to ${expected}`, () => {
+        assert.deepStrictEqual(new Not(operands).serialize(defaultOptions), [
+          'NOT',
+          ...expected,
+        ])
+      })
+    }
   })
 })

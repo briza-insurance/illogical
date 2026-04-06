@@ -36,6 +36,6 @@ export abstract class Operand implements Evaluable {
    * Get the strict representation.
    */
   toString(): string {
-    throw new Error('not implemented exception')
+    return '[Operand]'
   }
 }

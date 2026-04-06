@@ -1,3 +1,6 @@
+import { strict as assert } from 'node:assert'
+import { describe, it, test } from 'node:test'
+
 import { notSimplified, operand } from '../../../../__test__/helpers.js'
 import { Evaluable } from '../../../../common/evaluable.js'
 import { Collection } from '../../../../operand/collection.js'
@@ -9,12 +12,16 @@ import { In } from '../../in.js'
 
 describe('Expression - Comparison - In', () => {
   describe('constructor', () => {
-    test.each([[[]], [[operand(5)]], [[operand(5), operand(5), operand(5)]]])(
-      'arguments %p should throw',
-      (args) => {
-        expect(() => new In(...args)).toThrowError()
-      }
-    )
+    const constructorData = [
+      [[]],
+      [[operand(5)]],
+      [[operand(5), operand(5), operand(5)]],
+    ]
+    for (const args of constructorData) {
+      test(`arguments ${JSON.stringify(args)} should throw`, () => {
+        assert.throws(() => new In(...(args as Operand[])))
+      })
+    }
   })
 
   const testCases: [Operand, Operand, boolean][] = [
@@ -44,25 +51,29 @@ describe('Expression - Comparison - In', () => {
   ]
 
   describe('evaluate', () => {
-    test.each(testCases)(
-      '%p and %p should evaluate as %p',
-      (left, right, expected) => {
-        expect(new In(left, right).evaluate({})).toBe(expected)
-      }
-    )
+    for (const [left, right, expected] of testCases) {
+      test(`${left} and ${right} should evaluate as ${expected}`, () => {
+        assert.strictEqual(new In(left, right).evaluate({}), expected)
+      })
+    }
 
-    test.each([
+    const evaluateThrowData = [
       // Missing haystack
       [operand(1), operand(1)],
       // Double haystack
       [new Collection([new Value(1)]), new Collection([new Value(1)])],
-    ] as [Evaluable, Evaluable][])('%p and %p should throw', (left, right) => {
-      expect(() => new In(left, right).evaluate({})).toThrowError()
-    })
+    ]
+    for (const [left, right] of evaluateThrowData) {
+      test(`${left} and ${right} should throw`, () => {
+        assert.throws(() =>
+          new In(left as Evaluable, right as Evaluable).evaluate({})
+        )
+      })
+    }
   })
 
   describe('toString', () => {
-    test.each([
+    const toStringData: [Evaluable, Evaluable, string][] = [
       [
         new Value(0),
         new Collection([new Value(1), new Value(2)]),
@@ -73,39 +84,45 @@ describe('Expression - Comparison - In', () => {
         new Value(0),
         '(0 in [1, 2])',
       ],
-    ] as [Evaluable, Evaluable, string][])(
-      '%p and %p should be %p',
-      (left, right, expected) => {
-        expect(new In(left, right).toString()).toBe(expected)
-      }
-    )
+    ]
+    for (const [left, right, expected] of toStringData) {
+      test(`${left} and ${right} should be ${expected}`, () => {
+        assert.strictEqual(new In(left, right).toString(), expected)
+      })
+    }
   })
 
   describe('simplify', () => {
-    test.each<[Operand, Operand, boolean | 'self']>([
+    const simplifyData: [Operand, Operand, boolean | 'self'][] = [
       [operand(10), notSimplified(), 'self'],
       [notSimplified(), operand(10), 'self'],
       [notSimplified(), notSimplified(), 'self'],
       ...testCases,
-    ])('%p and %p should be simplified to $p', (left, right, expected) => {
-      const equal = new In(left, right)
-      const result = equal.simplify({}, new Set([]))
-      if (expected === 'self') {
-        expect(result).toBe(equal)
-      } else {
-        expect(result).toEqual(expected)
-      }
-    })
+    ]
+    for (const [left, right, expected] of simplifyData) {
+      test(`${left} and ${right} should be simplified to ${expected}`, () => {
+        const equal = new In(left, right)
+        const result = equal.simplify({}, new Set([]))
+        if (expected === 'self') {
+          assert.strictEqual(result, equal)
+        } else {
+          assert.deepStrictEqual(result, expected)
+        }
+      })
+    }
   })
 
   describe('serialize', () => {
-    it.each<[Operand, Operand, [Input, Input]]>([
+    const serializeData: [Operand, Operand, [Input, Input]][] = [
       [new Value(10), new Value(20), [10, 20]],
-    ])('%p and %p should be serialized to %p', (left, right, serialized) => {
-      expect(new In(left, right).serialize(defaultOptions)).toEqual([
-        'IN',
-        ...serialized,
-      ])
-    })
+    ]
+    for (const [left, right, serialized] of serializeData) {
+      it(`${left} and ${right} should be serialized to ${serialized}`, () => {
+        assert.deepStrictEqual(new In(left, right).serialize(defaultOptions), [
+          'IN',
+          ...serialized,
+        ])
+      })
+    }
   })
 })

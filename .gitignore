@@ -15,5 +15,6 @@ npm-debug.log
 .idea
 
 coverage
+coverage.lcov
 
 .npmrc
