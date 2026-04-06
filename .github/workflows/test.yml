@@ -17,6 +17,8 @@ jobs:
         run: npm audit --production
       - name: Check licenses
         run: npm run check-licenses
+      - name: Run type-check
+        run: npm run type-check
       - name: Run test suite
         run: npm t
       - name: Run build

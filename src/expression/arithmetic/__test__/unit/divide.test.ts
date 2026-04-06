@@ -10,11 +10,11 @@ import { Divide, OPERATOR } from '../../divide.js'
 
 describe('Expression - Arithmetic - Divide', () => {
   describe('constructor', () => {
-    const constructorData = [[[]], [[operand(5)]]]
+    const constructorData: Operand[][] = [[], [operand(5)]]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
         assert.throws(
-          () => new Divide(...(args as Operand[])),
+          () => new Divide(...args),
           /divide expression requires at least 2 operands/
         )
       })

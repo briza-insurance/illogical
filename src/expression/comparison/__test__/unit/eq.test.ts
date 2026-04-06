@@ -11,18 +11,18 @@ import { Operand } from '../../../../operand/index.js'
 import { Value } from '../../../../operand/value.js'
 import { Input } from '../../../../parser/index.js'
 import { defaultOptions } from '../../../../parser/options.js'
-import { Equal } from '../../eq'
+import { Equal } from '../../eq.js'
 
 describe('Expression - Comparison - Equal', () => {
   describe('constructor', () => {
-    const constructorData = [
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]],
+    const constructorData: Operand[][] = [
+      [],
+      [operand(5)],
+      [operand(5), operand(5), operand(5)],
     ]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
-        assert.throws(() => new Equal(...(args as Operand[])))
+        assert.throws(() => new Equal(...args))
       })
     }
   })

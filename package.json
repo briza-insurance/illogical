@@ -21,7 +21,7 @@
   "license": "MIT",
   "scripts": {
     "type-check": "tsc --noEmit",
-    "build:types": "tsc --emitDeclarationOnly",
+    "build:types": "tsc --project tsconfig.build.json --emitDeclarationOnly",
     "build:js": "rollup -c",
     "build": "rm -rf lib types && npm run build:types && npm run build:js",
     "docs": "typedoc src && git checkout docs/.nojekyll",

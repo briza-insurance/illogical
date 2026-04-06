@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert'
 import { describe, it, test } from 'node:test'
 
-import Engine from '../../'
+import Engine from '../../index.js'
 import { Context } from '../../common/evaluable.js'
 import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum.js'
 import { OPERATOR as OPERATOR_EQ } from '../../expression/comparison/eq.js'

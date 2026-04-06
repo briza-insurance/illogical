@@ -29,7 +29,7 @@ describe('Expression - Logical - Xor', () => {
       })
     }
 
-    const evaluateThrowData = [[[]]] as [Evaluable[]][]
+    const evaluateThrowData: Evaluable[][] = [[]]
     for (const operands of evaluateThrowData) {
       test(`${operands} should throw`, () => {
         assert.throws(() => new Xor(operands).evaluate({}))

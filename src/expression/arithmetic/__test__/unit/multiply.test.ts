@@ -10,11 +10,11 @@ import { Multiply, OPERATOR } from '../../multiply.js'
 
 describe('Expression - Arithmetic - Multiply', () => {
   describe('constructor', () => {
-    const constructorData = [[[]], [[operand(5)]]]
+    const constructorData: Operand[][] = [[], [operand(5)]]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
         assert.throws(
-          () => new Multiply(...(args as Operand[])),
+          () => new Multiply(...args),
           /multiply expression requires at least 2 operands/
         )
       })
