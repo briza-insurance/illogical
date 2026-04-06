@@ -7,7 +7,7 @@ import { DataType, Reference } from '../../reference.js'
 
 describe('Operand - Reference', () => {
   describe('constructor', () => {
-    const constructorData = [['']]
+    const constructorData: string[] = ['']
     for (const value of constructorData) {
       test(`arguments ${value} should throw`, () => {
         assert.throws(() => new Reference(value))

@@ -10,11 +10,11 @@ import { OPERATOR, Sum } from '../../sum.js'
 
 describe('Expression - Arithmetic - Sum', () => {
   describe('constructor', () => {
-    const constructorData = [[[]], [[operand(5)]]]
+    const constructorData: Operand[][] = [[], [operand(5)]]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
         assert.throws(
-          () => new Sum(...(args as Operand[])),
+          () => new Sum(...args),
           /sum expression requires at least 2 operands/
         )
       })

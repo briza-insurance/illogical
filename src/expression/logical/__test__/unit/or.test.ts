@@ -26,7 +26,7 @@ describe('Expression - Logical - Or', () => {
       })
     }
 
-    const evaluateThrowData = [[[]]] as [Evaluable[]][]
+    const evaluateThrowData: Evaluable[][] = [[]]
     for (const operands of evaluateThrowData) {
       test(`${operands} should throw`, () => {
         assert.throws(() => new Or(operands).evaluate({}))

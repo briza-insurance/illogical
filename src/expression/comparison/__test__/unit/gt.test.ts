@@ -11,14 +11,14 @@ import { GreaterThan } from '../../gt.js'
 
 describe('Expression - Comparison - Greater Than', () => {
   describe('constructor', () => {
-    const constructorData = [
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]],
+    const constructorData: Operand[][] = [
+      [],
+      [operand(5)],
+      [operand(5), operand(5), operand(5)],
     ]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
-        assert.throws(() => new GreaterThan(...(args as Operand[])))
+        assert.throws(() => new GreaterThan(...args))
       })
     }
   })

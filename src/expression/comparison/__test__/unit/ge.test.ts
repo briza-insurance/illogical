@@ -11,14 +11,14 @@ import { GreaterThanOrEqual } from '../../ge.js'
 
 describe('Expression - Comparison - Greater Than or Equal', () => {
   describe('constructor', () => {
-    const constructorData = [
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]],
+    const constructorData: Operand[][] = [
+      [],
+      [operand(5)],
+      [operand(5), operand(5), operand(5)],
     ]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
-        assert.throws(() => new GreaterThanOrEqual(...(args as Operand[])))
+        assert.throws(() => new GreaterThanOrEqual(...args))
       })
     }
   })

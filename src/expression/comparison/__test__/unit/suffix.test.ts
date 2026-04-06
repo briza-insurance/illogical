@@ -11,14 +11,14 @@ import { Suffix } from '../../suffix.js'
 
 describe('Expression - Comparison - Suffix', () => {
   describe('constructor', () => {
-    const constructorData = [
-      [[]],
-      [[operand(5)]],
-      [[operand(5), operand(5), operand(5)]],
+    const constructorData: Operand[][] = [
+      [],
+      [operand(5)],
+      [operand(5), operand(5), operand(5)],
     ]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
-        assert.throws(() => new Suffix(...(args as Operand[])))
+        assert.throws(() => new Suffix(...args))
       })
     }
   })

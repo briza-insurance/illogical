@@ -24,11 +24,11 @@ describe('Expression - Logical - Not', () => {
       })
     }
 
-    const evaluateThrowData = [
-      [[]],
-      [[operand(true), operand(false)]],
-      [[operand(0)]],
-    ] as [Evaluable[]][]
+    const evaluateThrowData: Evaluable[][] = [
+      [],
+      [operand(true), operand(false)],
+      [operand(0)],
+    ]
     for (const operands of evaluateThrowData) {
       test(`${operands} should throw`, () => {
         assert.throws(() => new Not(...operands).evaluate({}))

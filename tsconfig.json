@@ -15,5 +15,5 @@
   },
   "testMatch": ["**/__test__/**/*.[jt]s?(x)"],
   "include": ["src"],
-  "exclude": ["node_modules", "src/__test__", "src/**/*.test.ts"]
+  "exclude": ["node_modules"]
 }

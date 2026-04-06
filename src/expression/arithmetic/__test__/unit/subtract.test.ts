@@ -10,11 +10,11 @@ import { OPERATOR, Subtract } from '../../subtract.js'
 
 describe('Expression - Arithmetic - Subtract', () => {
   describe('constructor', () => {
-    const constructorData = [[[]], [[operand(5)]]]
+    const constructorData: Operand[][] = [[], [operand(5)]]
     for (const args of constructorData) {
       test(`arguments ${JSON.stringify(args)} should throw`, () => {
         assert.throws(
-          () => new Subtract(...(args as Operand[])),
+          () => new Subtract(...args),
           /subtract expression requires at least 2 operands/
         )
       })
