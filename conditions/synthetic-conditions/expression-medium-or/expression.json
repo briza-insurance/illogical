@@ -1,0 +1,1 @@
+["OR", ["==", "$role", "admin"], ["==", "$role", "editor"], ["==", "$role", "superuser"]]

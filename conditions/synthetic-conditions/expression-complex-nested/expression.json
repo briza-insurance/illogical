@@ -1,0 +1,14 @@
+["AND",
+  ["==", "$status", "active"],
+  [">=", "$age", 18],
+  ["OR",
+    ["==", "$role", "admin"],
+    ["AND",
+      ["==", "$role", "editor"],
+      ["PREFIX", "en", "$locale"]
+    ]
+  ],
+  ["NOT", ["UNDEFINED", "$email"]],
+  ["IN", "$plan", ["pro", "enterprise"]],
+  [">=", "$score", 80]
+]
