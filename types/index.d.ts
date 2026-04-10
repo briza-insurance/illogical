@@ -36,11 +36,13 @@ export type { Context, Evaluable, ExpressionInput };
  */
 declare class Engine {
     private readonly parser;
+    private readonly bytecodeCache;
     /**
      * @constructor
      * @param {Options?} options Parser options.
      */
     constructor(options?: Partial<Options>);
+    private getCompiled;
     /**
      * Evaluate the expression.
      * @param {ExpressionInput} exp Raw expression.

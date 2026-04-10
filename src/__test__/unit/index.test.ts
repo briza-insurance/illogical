@@ -1,7 +1,6 @@
 import { strict as assert } from 'node:assert'
 import { describe, it, test } from 'node:test'
 
-import Engine from '../../index.js'
 import { Context } from '../../common/evaluable.js'
 import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum.js'
 import { OPERATOR as OPERATOR_EQ } from '../../expression/comparison/eq.js'
@@ -18,6 +17,7 @@ import { OPERATOR as OPERATOR_AND } from '../../expression/logical/and.js'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor.js'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or.js'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor.js'
+import Engine from '../../index.js'
 import { ExpressionInput, Input } from '../../parser/index.js'
 
 describe('Condition Engine', () => {

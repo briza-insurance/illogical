@@ -40,10 +40,19 @@
     "bench:sample:baseline:simplify":   "bash benchmark/run-baseline.sh simplify --cases conditions/sample-conditions    --out benchmark/results-sample-simplify-baseline.json",
     "bench:synthetic:baseline:evaluate":"bash benchmark/run-baseline.sh evaluate --cases conditions/synthetic-conditions --out benchmark/results-synthetic-evaluate-baseline.json",
     "bench:synthetic:baseline:simplify":"bash benchmark/run-baseline.sh simplify --cases conditions/synthetic-conditions --out benchmark/results-synthetic-simplify-baseline.json",
-    "bench:sample:compare:evaluate":    "node --import tsx src/benchmark/compare.ts benchmark/results-sample-evaluate-baseline.json    benchmark/results-sample-evaluate-current.json",
-    "bench:sample:compare:simplify":    "node --import tsx src/benchmark/compare.ts benchmark/results-sample-simplify-baseline.json    benchmark/results-sample-simplify-current.json",
-    "bench:synthetic:compare:evaluate": "node --import tsx src/benchmark/compare.ts benchmark/results-synthetic-evaluate-baseline.json benchmark/results-synthetic-evaluate-current.json",
-    "bench:synthetic:compare:simplify": "node --import tsx src/benchmark/compare.ts benchmark/results-synthetic-simplify-baseline.json benchmark/results-synthetic-simplify-current.json"
+    "bench:sample:compare:evaluate":    "node --import tsx benchmark/compare.ts benchmark/results-sample-evaluate-baseline.json    benchmark/results-sample-evaluate-current.json",
+    "bench:sample:compare:simplify":    "node --import tsx benchmark/compare.ts benchmark/results-sample-simplify-baseline.json    benchmark/results-sample-simplify-current.json",
+    "bench:synthetic:compare:evaluate": "node --import tsx benchmark/compare.ts benchmark/results-synthetic-evaluate-baseline.json benchmark/results-synthetic-evaluate-current.json",
+    "bench:synthetic:compare:simplify": "node --import tsx benchmark/compare.ts benchmark/results-synthetic-simplify-baseline.json benchmark/results-synthetic-simplify-current.json",
+    "bench:sample:report:evaluate":          "node --import tsx src/benchmark/report.ts benchmark/results-sample-evaluate-baseline.json    benchmark/results-sample-evaluate-current.json    --op evaluate --out benchmark/report-sample-evaluate.md",
+    "bench:sample:report:simplify":          "node --import tsx src/benchmark/report.ts benchmark/results-sample-simplify-baseline.json    benchmark/results-sample-simplify-current.json    --op simplify --out benchmark/report-sample-simplify.md",
+    "bench:synthetic:report:evaluate":       "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-evaluate-baseline.json benchmark/results-synthetic-evaluate-current.json --op evaluate --out benchmark/report-synthetic-evaluate.md",
+    "bench:synthetic:report:simplify":       "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify-baseline.json benchmark/results-synthetic-simplify-current.json --op simplify --out benchmark/report-synthetic-simplify.md",
+    "bench:sample:report:full:evaluate":     "node --import tsx src/benchmark/report.ts benchmark/results-sample-evaluate-baseline.json    benchmark/results-sample-evaluate-current.json    --op evaluate --full --out benchmark/report-sample-evaluate-full.md",
+    "bench:sample:report:full:simplify":     "node --import tsx src/benchmark/report.ts benchmark/results-sample-simplify-baseline.json    benchmark/results-sample-simplify-current.json    --op simplify --full --out benchmark/report-sample-simplify-full.md",
+    "bench:synthetic:report:full:evaluate":  "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-evaluate-baseline.json benchmark/results-synthetic-evaluate-current.json --op evaluate --full --out benchmark/report-synthetic-evaluate-full.md",
+    "bench:synthetic:report:full:simplify":  "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify-baseline.json benchmark/results-synthetic-simplify-current.json --op simplify --full --out benchmark/report-synthetic-simplify-full.md",
+    "get-bytecode": "node --import tsx src/bytecode/get-bytecode.ts"
   },
   "repository": {
     "type": "git",

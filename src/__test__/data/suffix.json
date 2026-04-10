@@ -1,0 +1,14 @@
+[
+  { "expression": ["SUFFIX", "abc", "c"], "context": {}, "expected": true },
+  { "expression": ["SUFFIX", "a", "a"], "context": {}, "expected": true },
+  { "expression": ["SUFFIX", "abc", "a"], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "", "a"], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", 1], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", true], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", false], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", "$null"], "context": { "null": null }, "expected": false },
+  { "expression": ["SUFFIX", "a", "$undef"], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", [0]], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", "a", ["0"]], "context": {}, "expected": false },
+  { "expression": ["SUFFIX", 1, "a"], "context": {}, "expected": false }
+]
