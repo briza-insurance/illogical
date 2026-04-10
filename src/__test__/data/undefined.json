@@ -1,0 +1,8 @@
+[
+  { "expression": ["UNDEFINED", "$v"], "context": {}, "expected": true },
+  { "expression": ["UNDEFINED", "$v"], "context": { "v": 1 }, "expected": false },
+  { "expression": ["UNDEFINED", "$v"], "context": { "v": "1" }, "expected": false },
+  { "expression": ["UNDEFINED", "$v"], "context": { "v": true }, "expected": false },
+  { "expression": ["UNDEFINED", "$v"], "context": { "v": false }, "expected": false },
+  { "expression": ["UNDEFINED", "$v"], "context": { "v": null }, "expected": false }
+]

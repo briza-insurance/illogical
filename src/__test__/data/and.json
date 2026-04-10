@@ -1,0 +1,6 @@
+[
+  { "expression": ["AND", ["==", 1, 1], ["==", 2, 2]], "context": {}, "expected": true },
+  { "expression": ["AND", ["==", 1, 1], ["==", 1, 2]], "context": {}, "expected": false },
+  { "expression": ["AND", ["==", 1, 2], ["==", 2, 2]], "context": {}, "expected": false },
+  { "expression": ["AND", ["==", 1, 2], ["==", 1, 3]], "context": {}, "expected": false }
+]
