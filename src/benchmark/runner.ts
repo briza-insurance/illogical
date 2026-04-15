@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
-import { Bench, type TaskResultWithStatistics } from 'tinybench'
+import { Bench } from 'tinybench'
 import { fileURLToPath } from 'url'
 
 import { generateCases, type GeneratedCases } from './generate-cases.js'
@@ -78,9 +78,9 @@ export async function runBench(
   await bench.run()
 
   const toRow = (t: (typeof bench.tasks)[number]) => {
-    const r = t.result as (TaskResultWithStatistics & object) | undefined
-    const lat = r?.latency
-    const thr = r?.throughput
+    const r = t.result
+    const lat = r && 'latency' in r ? r.latency : undefined
+    const thr = r && 'throughput' in r ? r.throughput : undefined
     return {
       Task: t.name,
       'p50 (µs)': lat ? (lat.p50 * 1e6).toFixed(1) : 'N/A',

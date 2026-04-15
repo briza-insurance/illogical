@@ -65,10 +65,7 @@ function buildContextFromRefs(refList: string[]): Context {
 
 const COMPARISON_OPS = ['IN', 'EQ', '==', 'GE', 'GT', 'LE', 'LT', '===']
 
-function makeBranchTrue(
-  branch: ExpressionNode,
-  ctx: Context
-): void {
+function makeBranchTrue(branch: ExpressionNode, ctx: Context): void {
   if (!isExpression(branch)) {
     return
   }
@@ -102,10 +99,7 @@ function makeBranchTrue(
   }
 }
 
-function makeBranchFalse(
-  branch: ExpressionNode,
-  ctx: Context
-): void {
+function makeBranchFalse(branch: ExpressionNode, ctx: Context): void {
   if (!isExpression(branch)) {
     return
   }
@@ -242,10 +236,7 @@ export function generateCases(expression: ExpressionNode): GeneratedCases {
   }
 }
 
-function generateCompleteTrue(
-  expr: ExpressionNode,
-  refs: string[]
-): Context {
+function generateCompleteTrue(expr: ExpressionNode, refs: string[]): Context {
   const ctx = buildContextFromRefs(refs)
   const satisfied = trySatisfyBranch(expr, ctx)
   if (!satisfied && refs.length > 0) {
