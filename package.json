@@ -43,7 +43,9 @@
     "bench:sample:report:evaluate":           "node --import tsx src/benchmark/report.ts benchmark/results-sample-evaluate-oop.json    benchmark/results-sample-evaluate-bytecode.json    --op evaluate --out benchmark/report-sample-evaluate.md",
     "bench:synthetic:report:evaluate":        "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-evaluate-oop.json benchmark/results-synthetic-evaluate-bytecode.json --op evaluate --out benchmark/report-synthetic-evaluate.md",
     "bench:sample:report:full:evaluate":      "node --import tsx src/benchmark/report.ts benchmark/results-sample-evaluate-oop.json    benchmark/results-sample-evaluate-bytecode.json    --op evaluate --full --out benchmark/report-sample-evaluate-full.md",
-    "bench:synthetic:report:full:evaluate":   "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-evaluate-oop.json benchmark/results-synthetic-evaluate-bytecode.json --op evaluate --full --out benchmark/report-synthetic-evaluate-full.md"
+    "bench:synthetic:report:full:evaluate":   "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-evaluate-oop.json benchmark/results-synthetic-evaluate-bytecode.json --op evaluate --full --out benchmark/report-synthetic-evaluate-full.md",
+    "get-bytecode": "node --import tsx src/bytecode/get-bytecode.ts",
+    "debug-bytecode": "node --import tsx src/tools/debugger.ts"
   },
   "repository": {
     "type": "git",
