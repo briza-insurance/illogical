@@ -2,13 +2,14 @@
  * Evaluate benchmark runner.
  *
  * Usage:
- *   node --import tsx benchmark/evaluate.ts [--cases <path>] [--out <file>] [--engine <path>]
+ *   node --import tsx benchmark/evaluate.ts [--cases <path>] [--out <file>] [--engine <path>] [--options <json>]
  *
  * Examples:
  *   node --import tsx benchmark/evaluate.ts
  *   node --import tsx benchmark/evaluate.ts --cases conditions/synthetic-conditions
  *   node --import tsx benchmark/evaluate.ts --cases conditions/sample-conditions --out benchmark/results-baseline.json
  *   node --import tsx benchmark/evaluate.ts --engine /other/path/lib/illogical.esm.js
+ *   node --import tsx benchmark/evaluate.ts --options '{"evaluator":"bytecode"}'
  */
 
 import { join, resolve } from 'path'
@@ -30,8 +31,10 @@ const enginePath = resolve(
   getArg('--engine') ?? join(__dirname, '../../lib/illogical.esm.js')
 )
 
+const engineOptions = getArg('--options')
+
 const { default: Engine } = await import(enginePath)
-const engine = new Engine()
+const engine = new Engine(engineOptions ? JSON.parse(engineOptions) : undefined)
 
 const conditions = loadConditions(engine, casesRoot)
 
