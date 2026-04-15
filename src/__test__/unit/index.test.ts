@@ -169,27 +169,24 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
     })
 
     test('statement', () => {
-      const exceptions = [
-        { expression: [OPERATOR_EQ] },
-        { expression: [OPERATOR_EQ, 5] },
-        { expression: [OPERATOR_EQ, 5, 5, 5] },
-        { expression: [OPERATOR_NE] },
-        { expression: [OPERATOR_GT] },
-        { expression: [OPERATOR_GE] },
-        { expression: [OPERATOR_LT] },
-        { expression: [OPERATOR_LE] },
-        { expression: [OPERATOR_IN] },
-        { expression: [OPERATOR_NOT_IN] },
-        { expression: [OPERATOR_PREFIX] },
-        { expression: [OPERATOR_SUFFIX] },
-        { expression: [OPERATOR_AND] },
-        { expression: [OPERATOR_OR] },
-        { expression: [OPERATOR_NOR] },
-        { expression: [OPERATOR_XOR] },
+      const exceptions: { expression: ExpressionInput }[] = [
+        { expression: ['=='] },
+        { expression: ['==', 5] },
+        { expression: ['==', 5, 5, 5] },
+        { expression: ['!='] },
+        { expression: ['>'] },
+        { expression: ['>='] },
+        { expression: ['<'] },
+        { expression: ['<='] },
+        { expression: ['IN'] },
+        { expression: ['NOT IN'] },
+        { expression: ['PREFIX'] },
+        { expression: ['SUFFIX'] },
+        { expression: ['NOR', ['==', '$x', 1]] },
+        { expression: ['XOR', ['==', '$x', 1]] },
       ]
 
       for (const exception of exceptions) {
-        // @ts-ignore
         assert.throws(() => engine.statement(exception.expression))
       }
     })

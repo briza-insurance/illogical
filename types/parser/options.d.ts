@@ -55,7 +55,7 @@ export interface Options {
  * @param {string} key
  * @return {boolean}
  */
-export declare function defaultReferencePredicate(key: string): boolean;
+export declare function defaultReferencePredicate(key: unknown): boolean;
 /**
  * Default reference transform.
  * It removes the "$" symbol at the begging of the operand name.

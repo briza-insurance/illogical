@@ -89,8 +89,8 @@ export interface Options {
  * @param {string} key
  * @return {boolean}
  */
-export function defaultReferencePredicate(key: string): boolean {
-  return key[0] === '$'
+export function defaultReferencePredicate(key: unknown): boolean {
+  return typeof key === 'string' && key[0] === '$'
 }
 
 /**
