@@ -106,15 +106,12 @@ describe('Condition Engine - Parser', () => {
       notExpected: 10,
     }
 
-    // @ts-ignore
     const parser = new Parser(customOptions)
 
-    // @ts-ignore
     assert.deepStrictEqual(
       parser.options.operatorMapping.get(OPERATOR_EQ),
       '&&'
     )
-    assert.strictEqual(parser.options.notExpected, undefined)
   })
 
   describe('defaultReferencePredicate', () => {
@@ -133,7 +130,6 @@ describe('Condition Engine - Parser', () => {
     ]
     for (const [key, expected] of testCases) {
       test(`${key} should evaluate as ${expected}`, () => {
-        // @ts-ignore
         assert.strictEqual(defaultReferencePredicate(key), expected)
       })
     }

@@ -26,6 +26,13 @@ export type optionValue =
   | ((operand: string) => string | boolean)
   | Map<symbol, string>
 
+/**
+ * Engine evaluator mode.
+ * - `'oop'` (default): evaluates expressions using the classic OOP evaluable tree.
+ * - `'bytecode'`: compiles expressions to bytecode and interprets them.
+ */
+export type EvaluatorMode = 'oop' | 'bytecode'
+
 // Parser options
 export interface Options {
   /**
@@ -67,8 +74,11 @@ export interface Options {
    */
   operatorMapping: Map<symbol, string>
 
-  // Object key accessor whitelisting
-  [k: string]: optionValue
+  /**
+   * Evaluator mode used by the engine.
+   * Defaults to `'oop'` when not specified.
+   */
+  evaluator?: EvaluatorMode
 }
 
 /**
@@ -79,8 +89,8 @@ export interface Options {
  * @param {string} key
  * @return {boolean}
  */
-export function defaultReferencePredicate(key: string): boolean {
-  return key[0] === '$'
+export function defaultReferencePredicate(key: unknown): boolean {
+  return typeof key === 'string' && key[0] === '$'
 }
 
 /**
