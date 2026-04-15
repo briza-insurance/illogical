@@ -3,7 +3,7 @@ import { Evaluable, Result } from './evaluable.js';
  * Is number predicate.
  * @param value Tested value.
  */
-export declare function isNumber(value: Result): value is number;
+export declare function isNumber(value: unknown): value is number;
 /**
  * Is number predicate.
  * @param value Tested value.
@@ -13,7 +13,7 @@ export declare function isInfinite(value: Result): value is typeof Infinity;
  * Is string type predicate.
  * @param value Tested value.
  */
-export declare function isString(value: Result): value is string;
+export declare function isString(value: unknown): value is string;
 /**
  * Is Object
  * @param value tested value result of the test

@@ -29,6 +29,7 @@ import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor.js';
 import { ExpressionInput, Input } from './parser/index.js';
 import { Options } from './parser/options.js';
 export { defaultOptions } from './parser/options.js';
+export type { EvaluatorMode } from './parser/options.js';
 export { isEvaluable, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
 export type { Context, Evaluable, ExpressionInput };
 /**
@@ -36,11 +37,14 @@ export type { Context, Evaluable, ExpressionInput };
  */
 declare class Engine {
     private readonly parser;
+    private readonly evaluator;
+    private readonly bytecodeCache;
     /**
      * @constructor
      * @param {Options?} options Parser options.
      */
     constructor(options?: Partial<Options>);
+    private getCompiled;
     /**
      * Evaluate the expression.
      * @param {ExpressionInput} exp Raw expression.

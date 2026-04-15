@@ -1,0 +1,13 @@
+[
+  { "expression": ["NOT IN", "$v", [1, 2]], "context": { "v": 0 }, "expected": true },
+  { "expression": ["NOT IN", "$v", ["1", "2"]], "context": { "v": "0" }, "expected": true },
+  { "expression": ["NOT IN", "$v", [false, false]], "context": { "v": true }, "expected": true },
+  { "expression": ["NOT IN", [1, 2], "$v"], "context": { "v": 0 }, "expected": true },
+  { "expression": ["NOT IN", ["1", "2"], "$v"], "context": { "v": "0" }, "expected": true },
+  { "expression": ["NOT IN", [false, false], "$v"], "context": { "v": true }, "expected": true },
+  { "expression": ["NOT IN", "$v", [0, 1]], "context": { "v": "0" }, "expected": true },
+  { "expression": ["NOT IN", "$v", ["0", "1"]], "context": { "v": 0 }, "expected": true },
+  { "expression": ["NOT IN", "$v", [1, 2]], "context": { "v": 1 }, "expected": false },
+  { "expression": ["NOT IN", "$v", ["1", "2"]], "context": { "v": "1" }, "expected": false },
+  { "expression": ["NOT IN", "$v", [false, false]], "context": { "v": false }, "expected": false }
+]

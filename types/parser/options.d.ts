@@ -1,4 +1,10 @@
 export type optionValue = ((operand: string) => string | boolean) | Map<symbol, string>;
+/**
+ * Engine evaluator mode.
+ * - `'oop'` (default): evaluates expressions using the classic OOP evaluable tree.
+ * - `'bytecode'`: compiles expressions to bytecode and interprets them.
+ */
+export type EvaluatorMode = 'oop' | 'bytecode';
 export interface Options {
     /**
      * A function used to determine if the operand is a reference type,
@@ -35,7 +41,11 @@ export interface Options {
      * is the key used to represent the  given operator in the raw expression.
      */
     operatorMapping: Map<symbol, string>;
-    [k: string]: optionValue;
+    /**
+     * Evaluator mode used by the engine.
+     * Defaults to `'oop'` when not specified.
+     */
+    evaluator?: EvaluatorMode;
 }
 /**
  * Default reference predicate.
@@ -45,7 +55,7 @@ export interface Options {
  * @param {string} key
  * @return {boolean}
  */
-export declare function defaultReferencePredicate(key: string): boolean;
+export declare function defaultReferencePredicate(key: unknown): boolean;
 /**
  * Default reference transform.
  * It removes the "$" symbol at the begging of the operand name.

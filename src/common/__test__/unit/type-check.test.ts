@@ -32,7 +32,6 @@ describe('Common - Type Check', () => {
     ]
     for (const [value, expected] of isNumberData) {
       test(`${value} should evaluate as ${expected}`, () => {
-        // @ts-ignore
         assert.strictEqual(isNumber(value), expected)
       })
     }
@@ -52,7 +51,6 @@ describe('Common - Type Check', () => {
     ]
     for (const [value, expected] of isStringData) {
       test(`${value} should evaluate as ${expected}`, () => {
-        // @ts-ignore
         assert.strictEqual(isString(value), expected)
       })
     }
