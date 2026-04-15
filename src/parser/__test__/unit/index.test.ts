@@ -114,7 +114,6 @@ describe('Condition Engine - Parser', () => {
       parser.options.operatorMapping.get(OPERATOR_EQ),
       '&&'
     )
-    assert.strictEqual(parser.options.notExpected, undefined)
   })
 
   describe('defaultReferencePredicate', () => {

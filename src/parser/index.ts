@@ -124,7 +124,9 @@ export class Parser {
     if (options) {
       for (const key of Object.keys(options)) {
         if (key in this.opts) {
-          this.opts[key] = options[key] as optionValue
+          ;(this.opts as unknown as Record<string, optionValue>)[key] = (
+            options as unknown as Record<string, optionValue>
+          )[key]
         }
       }
     }
