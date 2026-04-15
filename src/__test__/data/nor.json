@@ -1,0 +1,6 @@
+[
+  { "expression": ["NOR", ["==", 1, 2], ["==", 1, 3]], "context": {}, "expected": true },
+  { "expression": ["NOR", ["==", 1, 1], ["==", 1, 2]], "context": {}, "expected": false },
+  { "expression": ["NOR", ["==", 1, 2], ["==", 2, 2]], "context": {}, "expected": false },
+  { "expression": ["NOR", ["==", 1, 1], ["==", 2, 2]], "context": {}, "expected": false }
+]
