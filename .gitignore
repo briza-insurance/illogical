@@ -19,3 +19,4 @@ coverage.lcov
 
 .npmrc
 .agents
+.DS_Store
