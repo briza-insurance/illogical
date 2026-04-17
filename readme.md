@@ -27,9 +27,7 @@ and provide access to a text form of the given expressions.
 
 ---
 
-This project has been developed to provide a shared conditional logic
-between front-end and back-end code,
-stored in JSON or in any other data serialization format.
+This project is designed such that business rules can be shared between the front-end and back-end, serialized in JSON.
 
 ## 🚀 Get Started
 
