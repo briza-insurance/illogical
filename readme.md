@@ -19,9 +19,7 @@
 <div align="center">
 <p>
 <br />
-A micro conditional javascript engine used to parse the raw logical
-and comparison expressions, evaluate the expression in the given data context,
-and provide access to a text form of the given expressions.
+JSON DSL for expressing and evaluating business rules. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences. 
 </p>
 </div>
 
