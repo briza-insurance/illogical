@@ -6,7 +6,7 @@
     </a>
   <br />
   <div align="center">
-    <h3 align="center">illogical </h3>
+    <h3 align="center">illogical</h3>
   </div>
 
 [![Build Status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
