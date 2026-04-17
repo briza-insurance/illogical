@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 2.0.2
+
+- Update readme
+
 ## 2.0.1
 
 - Conversion to ESM
