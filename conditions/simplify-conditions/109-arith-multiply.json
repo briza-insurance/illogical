@@ -1,0 +1,1 @@
+{"description":"Arithmetic *: 4 * 3 == 12 → true","expression":["==",["*",4,3],12],"context":{},"expected":true}

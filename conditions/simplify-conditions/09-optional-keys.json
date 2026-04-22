@@ -1,0 +1,7 @@
+{
+  "description": "optionalKeys: $a is forced to undefined (not in optionalKeys) → false AND x → false",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": {},
+  "optionalKeys": ["b"],
+  "expected": false
+}

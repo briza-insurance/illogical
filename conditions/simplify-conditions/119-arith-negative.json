@@ -1,0 +1,1 @@
+{"description":"Arithmetic: -5 + 3 == -2 → true","expression":["==",["+",-5,3],-2],"context":{},"expected":true}

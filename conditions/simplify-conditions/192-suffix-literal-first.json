@@ -1,0 +1,1 @@
+{"description":"SUFFIX: literal word, literal suffix","expression":["SUFFIX","testing","ing"],"context":{},"expected":true}

@@ -1,0 +1,1 @@
+{"description":"Nested reference: a.b known","expression":["==","$a.b",5],"context":{"a":{"b":5}},"expected":true}

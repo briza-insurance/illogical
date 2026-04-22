@@ -256,6 +256,10 @@ function slotSrc(v: Slot): Input {
   if (v._r === 3) {
     // XorState — finalize accumulated XOR state into an expression
     const { xorResiduals: residuals, xorTrueCount: trueCount } = v
+    // "One-hot" XOR: if more than one true was seen, result is false
+    if (trueCount > 1) {
+      return false
+    }
     const effectiveTrueCount = trueCount % 2
     if (residuals.length === 1) {
       return effectiveTrueCount === 1
@@ -313,6 +317,10 @@ let resolvedRefUsedCount = 0
 // can include it in the reconstructed expression.
 const spillBuf: Slot[] = new Array(MAX_STACK)
 let spillTop = -1
+// Track the last jump opcode type to detect transitions between short-circuit
+// sequences. Different jump opcodes (41=JUMP_IF_FALSE vs 42=JUMP_IF_TRUE) indicate
+// different short-circuit sequences (AND vs OR/NOR).
+let lastJumpOp = 0
 
 function relationalCompare(
   left: Result,
@@ -374,6 +382,7 @@ export function interpretSimplify(
     compiled
   stackTop = -1
   spillTop = -1
+  lastJumpOp = 0
 
   let overlapRefsResiduals = overlapRefsResidualsCache.get(compiled)
   if (overlapRefsResiduals === undefined) {
@@ -1157,6 +1166,13 @@ export function interpretSimplify(
         if (!needsReconstruct(top) && slotVal(top) === false) {
           i += offset
         }
+        // Clear spill buffer when transitioning between short-circuit sequences.
+        // Different jump opcodes (41=JUMP_IF_FALSE for AND vs 42=JUMP_IF_TRUE for OR/NOR)
+        // indicate different short-circuit sequences.
+        if (lastJumpOp !== 41) {
+          spillTop = -1
+        }
+        lastJumpOp = 41
         break
       }
 
@@ -1166,6 +1182,11 @@ export function interpretSimplify(
         if (!needsReconstruct(top) && slotVal(top) === true) {
           i += offset
         }
+        // Clear spill buffer when transitioning between short-circuit sequences.
+        if (lastJumpOp !== 42) {
+          spillTop = -1
+        }
+        lastJumpOp = 42
         break
       }
 
@@ -1332,10 +1353,18 @@ export function interpretSimplify(
         const a = stack[stackTop--]
 
         // If neither has unknowns, compute the binary XOR directly (no state needed)
+        // But for "one-hot" XOR semantics, if both are true, we need XorState(trueCount=2)
+        // so subsequent chained XORs also see trueCount > 1.
         if (!needsReconstruct(a) && !needsReconstruct(b)) {
           const av = slotVal(a) === true
           const bv = slotVal(b) === true
-          stack[++stackTop] = (av || bv) && !(av && bv)
+          const trueCount = (av ? 1 : 0) + (bv ? 1 : 0)
+          if (trueCount > 1) {
+            // Both true → "one-hot" XOR is false, but track trueCount for chained XORs
+            stack[++stackTop] = makeXorState([], trueCount)
+          } else {
+            stack[++stackTop] = (av || bv) && !(av && bv)
+          }
           break
         }
 
@@ -1368,6 +1397,14 @@ export function interpretSimplify(
         }
 
         // If no residuals, resolve immediately
+        // "One-hot" XOR: exactly one true → true, otherwise false
+        // This matches the OOP evaluator's behavior.
+        // Use XorState so subsequent chained XORs also see trueCount > 1.
+        if (trueCount > 1) {
+          stack[++stackTop] = makeXorState([], trueCount)
+          break
+        }
+
         if (residuals.length === 0) {
           stack[++stackTop] = trueCount % 2 === 1
           break

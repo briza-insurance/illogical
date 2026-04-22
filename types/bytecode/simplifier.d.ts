@@ -10,7 +10,7 @@
  * Short-circuit logic still applies: AND with a false short-circuits even if
  * other operands are unknown; OR with a true short-circuits likewise.
  */
-import { Context, Result } from '../common/evaluable.js';
+import { Context } from '../common/evaluable.js';
 import { Input } from '../parser/index.js';
 import { CompiledExpression } from './compiler.js';
-export declare function interpretSimplify(compiled: CompiledExpression, ctx: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Result | Input;
+export declare function interpretSimplify(compiled: CompiledExpression, ctx: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Input;

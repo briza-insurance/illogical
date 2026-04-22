@@ -1,0 +1,1 @@
+{"description":"Many variables: 5 vars, one unknown → residual","expression":["AND",["==","$a",1],["==","$b",2],["==","$c",3],["==","$d",4],["==","$e",5]],"context":{"a":1,"b":2,"c":3},"expected":["AND",["==","$d",4],["==","$e",5]]}

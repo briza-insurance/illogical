@@ -1,0 +1,1 @@
+{"description":"optionalKeys: some in context, some optional","expression":["AND",["==","$a",1],["==","$b",2],["==","$c",3]],"context":{"a":1},"optionalKeys":["b","c"],"expected":["AND",["==","$b",2],["==","$c",3]]}

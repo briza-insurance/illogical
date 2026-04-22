@@ -1,0 +1,1 @@
+{"description":"strictKeys: key in context — strictKeys doesn't override when key exists → true","expression":["==","$a",1],"context":{"a":1},"strictKeys":["a"],"expected":true}

@@ -61,7 +61,7 @@ export {
   OPERATOR_SUBTRACT,
   OPERATOR_SUM,
 }
-export type { Context, Evaluable, ExpressionInput }
+export type { Context, Evaluable, ExpressionInput, Input }
 
 const unexpectedResultError =
   'non expression or boolean result should be returned'
