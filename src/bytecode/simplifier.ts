@@ -14,6 +14,23 @@
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
 import { toDateNumber } from '../common/util.js'
+
+// Detect Infinity and NaN — these should not be used as concrete values in
+// comparisons when the other operand is residual, matching the OOP simplifier's
+// isInfinite guard in isSimplifiedArithmeticExpression.
+function isUnusableResult(v: Result): boolean {
+  return typeof v === 'number' && !isFinite(v)
+}
+
+// Marker for division results that are Infinity or NaN.
+// Used to signal that the original division expression should be preserved
+// when the comparison has a residual operand.
+interface DivByZeroMarker {
+  readonly _r: 4
+  readonly _val: Result // the computed Infinity/NaN value
+  left: Input
+  right: Input
+}
 import { Input } from '../parser/index.js'
 import { CompiledExpression } from './compiler.js'
 import {
@@ -147,7 +164,7 @@ interface XorState {
 }
 
 // Union of all slot object wrapper types (distinguishable via _r discriminant).
-type SlotObject = Resolved | Residual | XorState
+type SlotObject = Resolved | Residual | XorState | DivByZeroMarker
 
 // Arrays on the stack carry no _r property. Declaring _r?: undefined here exposes
 // the discriminant on the full "non-null object Slot" union so that needsReconstruct
@@ -182,7 +199,7 @@ function isUnknownRef(v: Slot): boolean {
 
 // True if the slot needs to be reconstructed rather than computed.
 // Hot path — booleans/numbers short-circuit at the first typeof check.
-// No Array.isArray needed: arrays have _r === undefined, failing the 2/3 check.
+// No Array.isArray needed: arrays have _r === undefined, failing the 2/3/4 check.
 function needsReconstruct(v: Slot): boolean {
   if (typeof v === 'string') {
     return v.charCodeAt(0) === 36
@@ -190,13 +207,13 @@ function needsReconstruct(v: Slot): boolean {
   if (typeof v !== 'object' || v === null) {
     return false
   }
-  // v is ArraySlot | SlotObject; _r is undefined|1|2|3
-  return v._r === 2 || v._r === 3
+  // v is ArraySlot | SlotObject; _r is undefined|1|2|3|4
+  return v._r === 2 || v._r === 3 || v._r === 4
 }
 
 // Extract the concrete Result from a slot (unwrap Resolved if needed).
 // Hot path — no Array.isArray needed: for non-Resolved objects (arrays, Residual,
-// XorState), the _r === 1 check is false and they fall through to the primitive branch
+// XorState, DivByZeroMarker), the _r === 1 check is false and they fall through to the primitive branch
 // or return undefined as appropriate.
 function slotVal(v: Slot): Result {
   if (typeof v !== 'object' || v === null) {
@@ -208,6 +225,10 @@ function slotVal(v: Slot): Result {
   }
   if (v._r === undefined) {
     return v // ArraySlot — the array is itself a Result
+  }
+  if (v._r === 4) {
+    // DivByZeroMarker — unwrap as Infinity (for use in comparisons when both operands are concrete)
+    return (v as DivByZeroMarker)._val as Result
   }
   return undefined // Residual or XorState — no concrete value to extract
 }
@@ -273,7 +294,11 @@ function slotSrc(v: Slot): Input {
   if (v._r === 2) {
     return v.expr // Residual — return the reconstructed expression
   }
-  return v.src // v._r === 1 (Resolved) — return original ref key
+  if (v._r === 4) {
+    // DivByZeroMarker — reconstruct as a DIVIDE expression
+    return ['/', v.left, v.right]
+  }
+  return (v as Resolved).src // v._r === 1 (Resolved) — return original ref key
 }
 
 // Wrap a reconstructed expression as a Residual slot.
@@ -777,7 +802,53 @@ export function interpretSimplify(
       case OP_LE: {
         const right = stack[stackTop--]
         const left = stack[stackTop--]
-        if (needsReconstruct(left) || needsReconstruct(right)) {
+        // Check for DivByZeroMarker on either side
+        const leftIsDivZero =
+          typeof left === 'object' &&
+          left !== null &&
+          (left as DivByZeroMarker)._r === 4
+        const rightIsDivZero =
+          typeof right === 'object' &&
+          right !== null &&
+          (right as DivByZeroMarker)._r === 4
+        if (leftIsDivZero) {
+          // Left is a division-by-zero result.
+          // Match OOP isInfinite guard: preserve expression only if right
+          // is a residual. If right is concrete, evaluate directly.
+          if (needsReconstruct(right) && !rightIsDivZero) {
+            const marker = left as DivByZeroMarker
+            stack[++stackTop] = makeResidual([
+              opNames[op],
+              ['/', marker.left, marker.right],
+              slotSrc(right),
+            ])
+          } else {
+            // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
+            stack[++stackTop] = relationalCompare(
+              (left as DivByZeroMarker)._val,
+              slotVal(right),
+              op
+            )
+          }
+        } else if (rightIsDivZero) {
+          // Right is a division-by-zero result.
+          // If left is a residual, preserve expression. Otherwise evaluate directly.
+          if (needsReconstruct(left)) {
+            const marker = right as DivByZeroMarker
+            stack[++stackTop] = makeResidual([
+              opNames[op],
+              slotSrc(left),
+              ['/', marker.left, marker.right],
+            ])
+          } else {
+            // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
+            stack[++stackTop] = relationalCompare(
+              slotVal(left),
+              (right as DivByZeroMarker)._val,
+              op
+            )
+          }
+        } else if (needsReconstruct(left) || needsReconstruct(right)) {
           stack[++stackTop] = makeResidual([
             opNames[op],
             slotSrc(left),
@@ -1113,7 +1184,21 @@ export function interpretSimplify(
           } else if (op === OP_MULTIPLY) {
             stack[++stackTop] = multiplyDecimals(aVal, bVal)
           } else {
-            stack[++stackTop] = divideDecimals(aVal, bVal)
+            // Division — match OOP isInfinite guard: use a marker so
+            // comparisons can decide whether to preserve the expression.
+            const result = divideDecimals(aVal, bVal)
+            if (isUnusableResult(result)) {
+              // Push marker with original operands for reconstruction
+              const marker: DivByZeroMarker = {
+                _r: 4,
+                _val: result,
+                left: aVal,
+                right: bVal,
+              }
+              stack[++stackTop] = marker
+            } else {
+              stack[++stackTop] = result
+            }
           }
           break
         }
@@ -1132,7 +1217,25 @@ export function interpretSimplify(
           // After the throw above, v is narrowed to number
           values[j] = v
         }
-        stack[++stackTop] = hasNull ? false : arithmeticReduce(values, op)
+        const reduced = hasNull ? false : arithmeticReduce(values, op)
+        if (hasNull) {
+          stack[++stackTop] = false
+        } else if (op === OP_DIVIDE && isUnusableResult(reduced as Result)) {
+          // N-operand division producing Infinity/NaN — create marker
+          const result = reduced as Result
+          const marker: DivByZeroMarker = {
+            _r: 4,
+            _val: result,
+            left: values[0],
+            right: values[1],
+          }
+          stack[++stackTop] = marker
+        } else if (isUnusableResult(reduced as Result)) {
+          // Other arithmetic producing Infinity/NaN — preserve expression
+          stack[++stackTop] = makeResidual([opNames[op], ...values])
+        } else {
+          stack[++stackTop] = reduced as number | false
+        }
         break
       }
 

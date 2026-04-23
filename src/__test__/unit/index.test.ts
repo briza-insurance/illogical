@@ -289,10 +289,7 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         [
           ['>', ['/', 10, 0], ['+', '$a', 0]],
           { b: 0 },
-          // OOP preserves the expression; bytecode eagerly evaluates 10/0 to Infinity
-          evaluator === 'bytecode'
-            ? ['>', Infinity, ['+', '$a', 0]]
-            : ['>', ['/', 10, 0], ['+', '$a', 0]],
+          ['>', ['/', 10, 0], ['+', '$a', 0]], // Infinity/NaN from arithmetic is preserved (not eagerly evaluated)
         ],
         [
           ['>', ['/', '$a', 0], ['+', 0, 0]],
