@@ -18,7 +18,7 @@ import { toDateNumber } from '../common/util.js'
 // Detect Infinity and NaN — these should not be used as concrete values in
 // comparisons when the other operand is residual, matching the OOP simplifier's
 // isInfinite guard in isSimplifiedArithmeticExpression.
-function isUnusableResult(v: Result): boolean {
+function isUnusableResult(v: number): boolean {
   return typeof v === 'number' && !isFinite(v)
 }
 
@@ -111,14 +111,15 @@ function numAt(v: number | Result): number {
   return v
 }
 
-// Read a literal value from a bytecode slot — stored literals are always string|number|boolean.
-// Throws if the slot contains null, undefined, or an array (guards against compiler bugs).
-// Returns string|number|boolean, which is a subtype of Input.
-function literalAt(v: number | Result): string | number | boolean {
+// Read a literal value from a bytecode slot — stored literals are string|number|boolean|null.
+// Throws if the slot contains undefined, an array, or an object (guards against compiler bugs).
+// Returns string|number|boolean|null, which is a subtype of Input.
+function literalAt(v: number | Result): string | number | boolean | null {
   if (
     typeof v === 'string' ||
     typeof v === 'number' ||
-    typeof v === 'boolean'
+    typeof v === 'boolean' ||
+    v === null
   ) {
     return v
   }
@@ -173,8 +174,8 @@ type SlotObject = Resolved | Residual | XorState | DivByZeroMarker
 type ArraySlot = Result[] & { readonly _r?: undefined }
 
 // A stack slot is a concrete value (primitives, arrays, SlotObject wrappers).
-// Record<string,unknown> context values are never pushed directly — they are always
-// wrapped in a Resolved object — so the Slot type excludes them.
+// Record<string,unknown> values can be pushed directly from OP_PUSH_VALUE
+// (object literals in expressions), and are returned as-is by slotVal.
 type Slot =
   | null
   | undefined
@@ -183,54 +184,69 @@ type Slot =
   | boolean
   | ArraySlot
   | SlotObject
+  | Record<string, unknown>
+
+// Type guard: checks if a slot is a SlotObject (has _r as an own property).
+// This distinguishes SlotObject types from plain Record<string,unknown> objects.
+function isSlotObject(v: Slot): v is SlotObject {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    Object.prototype.hasOwnProperty.call(v, '_r')
+  )
+}
 
 function isXorState(v: Slot): v is XorState {
-  return typeof v === 'object' && v !== null && v._r === 3
+  return isSlotObject(v) && v._r === 3
 }
 
 function isResidual(v: Slot): v is Residual {
-  return typeof v === 'object' && v !== null && v._r === 2
+  return isSlotObject(v) && v._r === 2
 }
 
-// True if the slot is an unknown ref (string starting with '$')
-function isUnknownRef(v: Slot): boolean {
-  return typeof v === 'string' && v.charCodeAt(0) === 36 // '$'
+function isDivByZeroMarker(v: Slot): v is DivByZeroMarker {
+  return isSlotObject(v) && v._r === 4
 }
 
 // True if the slot needs to be reconstructed rather than computed.
-// Hot path — booleans/numbers short-circuit at the first typeof check.
+// Hot path — booleans/numbers/strings short-circuit at the first typeof check.
+// Unknown refs are always wrapped in Residual (_r === 2), never pushed as raw strings,
+// so no reference-predicate check is needed here.
 // No Array.isArray needed: arrays have _r === undefined, failing the 2/3/4 check.
 function needsReconstruct(v: Slot): boolean {
-  if (typeof v === 'string') {
-    return v.charCodeAt(0) === 36
-  }
   if (typeof v !== 'object' || v === null) {
     return false
   }
-  // v is ArraySlot | SlotObject; _r is undefined|1|2|3|4
+  // v is ArraySlot | SlotObject | Record<string, unknown>; _r is undefined|1|2|3|4
   return v._r === 2 || v._r === 3 || v._r === 4
 }
 
 // Extract the concrete Result from a slot (unwrap Resolved if needed).
 // Hot path — no Array.isArray needed: for non-Resolved objects (arrays, Residual,
-// XorState, DivByZeroMarker), the _r === 1 check is false and they fall through to the primitive branch
-// or return undefined as appropriate.
+// XorState, DivByZeroMarker), the _r === 1 check is false and they
+// fall through to the primitive branch or return the value as appropriate.
 function slotVal(v: Slot): Result {
   if (typeof v !== 'object' || v === null) {
     return v // primitives: boolean, number, string, null, undefined
   }
-  // v is ArraySlot | SlotObject
-  if (v._r === 1) {
-    return v.val // Resolved — unwrap the concrete value
+  // v is ArraySlot | SlotObject | Record<string,unknown>
+  if (isSlotObject(v)) {
+    // v is a SlotObject — discriminate via _r
+    if (v._r === 1) {
+      return v.val // Resolved — unwrap the concrete value
+    }
+    if (v._r === 4) {
+      // DivByZeroMarker — unwrap as Infinity
+      return v._val
+    }
+    // v._r is 2 or 3 (Residual/XorState) — no concrete value to extract
+    return undefined
   }
-  if (v._r === undefined) {
+  // v is ArraySlot or Record<string,unknown> — both are valid Results
+  if (Array.isArray(v)) {
     return v // ArraySlot — the array is itself a Result
   }
-  if (v._r === 4) {
-    // DivByZeroMarker — unwrap as Infinity (for use in comparisons when both operands are concrete)
-    return (v as DivByZeroMarker)._val as Result
-  }
-  return undefined // Residual or XorState — no concrete value to extract
+  return v // Plain object literal — Record<string,unknown> is a valid Result
 }
 
 // Module-level op name references for XorState finalization.
@@ -240,16 +256,21 @@ let _notOpName = 'NOT'
 let _norOpName = 'NOR'
 
 // Type guard: checks whether a Result value is also a valid Input.
-// Input = string | number | boolean | Input[], while Result additionally includes
-// null, undefined, and Record<string,unknown>. Used to narrow in slotSrc.
-function isInput(v: Result): v is Input {
-  if (v === null || v === undefined) {
+// Input = string | number | boolean | null | Input[] | Record<string, unknown>.
+function isInput(v: unknown): v is Input {
+  if (v === undefined) {
     return false
+  }
+  if (v === null) {
+    return true
   }
   if (Array.isArray(v)) {
     return v.every(isInput)
   }
-  return typeof v !== 'object' // excludes Record<string,unknown>
+  if (typeof v === 'object') {
+    return Object.values(v).every(isInput)
+  }
+  return true
 }
 
 // Extract the serialized Input form of a slot for residual reconstruction.
@@ -264,9 +285,9 @@ function slotSrc(v: Slot): Input {
     }
     return v // v narrowed to Input by the type guard above
   }
-  // v is ArraySlot | SlotObject; discriminate via _r
-  if (v._r === undefined) {
-    // ArraySlot — a concrete collection used as an operand
+  // v is ArraySlot | SlotObject | Record<string,unknown>
+  if (Array.isArray(v)) {
+    // v is ArraySlot — a concrete collection used as an operand
     if (!isInput(v)) {
       throw new Error(
         `slotSrc: invariant violated — non-Input array in residual path`
@@ -274,31 +295,42 @@ function slotSrc(v: Slot): Input {
     }
     return v
   }
-  if (v._r === 3) {
-    // XorState — finalize accumulated XOR state into an expression
-    const { xorResiduals: residuals, xorTrueCount: trueCount } = v
-    // "One-hot" XOR: if more than one true was seen, result is false
-    if (trueCount > 1) {
-      return false
-    }
-    const effectiveTrueCount = trueCount % 2
-    if (residuals.length === 1) {
+  // v is a plain object — use isSlotObject to distinguish SlotObject types
+  // (which have _r as an own property) from plain Record<string,unknown> objects.
+  if (isSlotObject(v)) {
+    // v is a SlotObject — discriminate via _r
+    if (v._r === 3) {
+      // XorState — finalize accumulated XOR state into an expression
+      const { xorResiduals: residuals, xorTrueCount: trueCount } = v
+      // "One-hot" XOR: if more than one true was seen, result is false
+      if (trueCount > 1) {
+        return false
+      }
+      const effectiveTrueCount = trueCount % 2
+      if (residuals.length === 1) {
+        return effectiveTrueCount === 1
+          ? [_notOpName, residuals[0]]
+          : residuals[0]
+      }
       return effectiveTrueCount === 1
-        ? [_notOpName, residuals[0]]
-        : residuals[0]
+        ? [_norOpName, ...residuals]
+        : [_xorOpName, ...residuals]
     }
-    return effectiveTrueCount === 1
-      ? [_norOpName, ...residuals]
-      : [_xorOpName, ...residuals]
+    if (v._r === 2) {
+      // Residual — return the reconstructed expression
+      return v.expr
+    }
+    if (v._r === 4) {
+      // DivByZeroMarker — reconstruct as a DIVIDE expression
+      return ['/', v.left, v.right]
+    }
+    if (v._r === 1) {
+      // Resolved — return original ref key
+      return v.src
+    }
   }
-  if (v._r === 2) {
-    return v.expr // Residual — return the reconstructed expression
-  }
-  if (v._r === 4) {
-    // DivByZeroMarker — reconstruct as a DIVIDE expression
-    return ['/', v.left, v.right]
-  }
-  return (v as Resolved).src // v._r === 1 (Resolved) — return original ref key
+  // Plain object literal — return as-is (valid Input)
+  return v
 }
 
 // Wrap a reconstructed expression as a Residual slot.
@@ -456,13 +488,8 @@ export function interpretSimplify(
       // ---------------------------------------------------------------------
       case OP_PUSH_VALUE: {
         const lit = bytecode[i++]
-        // OP_PUSH_VALUE stores only literals (string/number/boolean/null/array) from
-        // parsed Input — never plain objects. Guard lets TypeScript narrow away Record.
-        if (typeof lit === 'object' && lit !== null && !Array.isArray(lit)) {
-          throw new Error(
-            `bytecode integrity error: unexpected object in OP_PUSH_VALUE`
-          )
-        }
+        // OP_PUSH_VALUE stores parsed Input literals, including object literals.
+        // No guard needed — the compiler guarantees valid Input values.
         stack[++stackTop] = lit
         break
       }
@@ -515,8 +542,9 @@ export function interpretSimplify(
           break
         }
 
-        // Key is genuinely unknown — push as residual ref string
-        stack[++stackTop] = refKeys[idx]
+        // Key is genuinely unknown — wrap as Residual so detection does not depend
+        // on the reference character (respects custom referencePredicate/referenceSerialization).
+        stack[++stackTop] = makeResidual(refKeys[idx])
         break
       }
 
@@ -803,50 +831,34 @@ export function interpretSimplify(
         const right = stack[stackTop--]
         const left = stack[stackTop--]
         // Check for DivByZeroMarker on either side
-        const leftIsDivZero =
-          typeof left === 'object' &&
-          left !== null &&
-          (left as DivByZeroMarker)._r === 4
-        const rightIsDivZero =
-          typeof right === 'object' &&
-          right !== null &&
-          (right as DivByZeroMarker)._r === 4
+        const leftIsDivZero = isDivByZeroMarker(left)
+        const rightIsDivZero = isDivByZeroMarker(right)
         if (leftIsDivZero) {
           // Left is a division-by-zero result.
           // Match OOP isInfinite guard: preserve expression only if right
           // is a residual. If right is concrete, evaluate directly.
           if (needsReconstruct(right) && !rightIsDivZero) {
-            const marker = left as DivByZeroMarker
             stack[++stackTop] = makeResidual([
               opNames[op],
-              ['/', marker.left, marker.right],
+              ['/', left.left, left.right],
               slotSrc(right),
             ])
           } else {
             // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
-            stack[++stackTop] = relationalCompare(
-              (left as DivByZeroMarker)._val,
-              slotVal(right),
-              op
-            )
+            stack[++stackTop] = relationalCompare(left._val, slotVal(right), op)
           }
         } else if (rightIsDivZero) {
           // Right is a division-by-zero result.
           // If left is a residual, preserve expression. Otherwise evaluate directly.
           if (needsReconstruct(left)) {
-            const marker = right as DivByZeroMarker
             stack[++stackTop] = makeResidual([
               opNames[op],
               slotSrc(left),
-              ['/', marker.left, marker.right],
+              ['/', right.left, right.right],
             ])
           } else {
             // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
-            stack[++stackTop] = relationalCompare(
-              slotVal(left),
-              (right as DivByZeroMarker)._val,
-              op
-            )
+            stack[++stackTop] = relationalCompare(slotVal(left), right._val, op)
           }
         } else if (needsReconstruct(left) || needsReconstruct(right)) {
           stack[++stackTop] = makeResidual([
@@ -1220,9 +1232,13 @@ export function interpretSimplify(
         const reduced = hasNull ? false : arithmeticReduce(values, op)
         if (hasNull) {
           stack[++stackTop] = false
-        } else if (op === OP_DIVIDE && isUnusableResult(reduced as Result)) {
+        } else if (
+          op === OP_DIVIDE &&
+          reduced !== false &&
+          isUnusableResult(reduced)
+        ) {
           // N-operand division producing Infinity/NaN — create marker
-          const result = reduced as Result
+          const result = reduced
           const marker: DivByZeroMarker = {
             _r: 4,
             _val: result,
@@ -1230,11 +1246,11 @@ export function interpretSimplify(
             right: values[1],
           }
           stack[++stackTop] = marker
-        } else if (isUnusableResult(reduced as Result)) {
+        } else if (reduced !== false && isUnusableResult(reduced)) {
           // Other arithmetic producing Infinity/NaN — preserve expression
           stack[++stackTop] = makeResidual([opNames[op], ...values])
         } else {
-          stack[++stackTop] = reduced as number | false
+          stack[++stackTop] = reduced
         }
         break
       }
@@ -1525,12 +1541,15 @@ export function interpretSimplify(
 
   // Unwrap the top slot to a plain Result | Input
   const top = stack[stackTop]
-  if (isXorState(top) || isResidual(top) || isUnknownRef(top)) {
+  if (isXorState(top) || isResidual(top)) {
     return slotSrc(top)
   }
   const result = slotVal(top)
   if (result === undefined) {
     throw new Error('simplify: unexpected undefined top-level result')
   }
-  return result as Input
+  if (!isInput(result)) {
+    throw new Error('simplify: unexpected non-Input result')
+  }
+  return result
 }

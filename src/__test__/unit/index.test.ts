@@ -1330,5 +1330,131 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         })
       }
     })
+
+    // ===================================================================
+    // Bytecode simplifier bug reproduction tests
+    // These tests target specific bugs in src/bytecode/simplifier.ts
+    // that only manifest with the bytecode evaluator.
+    // ===================================================================
+    describe('Bytecode simplifier bug reproduction', () => {
+      // -----------------------------------------------------------------
+      // Bug 1: isInput() rejects null and object literals in residual paths
+      //
+      // The isInput() type guard returns false for null and Record<string,unknown>,
+      // but the Input type from parser/index.ts includes both null and objects.
+      // This causes slotSrc() to throw when reconstructing residual expressions
+      // that contain null or object literals alongside unknown refs.
+      // -----------------------------------------------------------------
+
+      test('should simplify collection containing null + unknown ref (Bug 1a)', () => {
+        // Expression: ['IN', '$a', [null, '$b']]
+        // With empty context, $a and $b are both unknown.
+        // The collection [null, '$b'] has a null literal + unknown ref.
+        // In residual reconstruction, slotSrc(null) is called but isInput(null) === false,
+        // causing slotSrc to throw.
+        const expression: ExpressionInput = ['IN', '$a', [null, '$b']]
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the collection with null
+        const expected: Input = ['IN', '$a', [null, '$b']]
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+
+      test('should simplify EQ with null literal and unknown ref (Bug 1b)', () => {
+        // Expression: ['==', null, '$a']
+        // With empty context, $a is unknown.
+        // The null literal is pushed via OP_PUSH_VALUE (which accepts null).
+        // When reconstructing the residual EQ expression, slotSrc(null) is called
+        // but isInput(null) === false, causing slotSrc to throw.
+        const expression: ExpressionInput = ['==', null, '$a']
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the equality with null
+        const expected: Input = ['==', null, '$a']
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+
+      test('should simplify NE with null literal and unknown ref (Bug 1c)', () => {
+        // Expression: ['!=', null, '$a']
+        // With empty context, $a is unknown.
+        // The null literal is pushed via OP_PUSH_VALUE (which accepts null).
+        // When reconstructing the residual NE expression, slotSrc(null) is called
+        // but isInput(null) === false, causing slotSrc to throw.
+        const expression: ExpressionInput = ['!=', null, '$a']
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the inequality with null
+        const expected: Input = ['!=', null, '$a']
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+
+      // -----------------------------------------------------------------
+      // Bug 2: literalAt() rejects null in OP_OR_AND_IN_CONST_2
+      //
+      // The literalAt() function only accepts string/number/boolean, but null
+      // is a valid Input literal. In OP_OR_AND_IN_CONST_2 residual reconstruction,
+      // when a null literal is stored in bytecode and the refs are unknown,
+      // literalAt(null) throws.
+      // -----------------------------------------------------------------
+
+      test('should simplify OR-AND-IN pattern with null literal (Bug 2)', () => {
+        // Expression: OR(AND(EQ($a, null), IN($b, [1, 2])), AND(EQ($a, 5), IN($b, [3, 4])))
+        // This compiles to OP_OR_AND_IN_CONST_2 where aVal is null.
+        // With empty context, both $a and $b are unknown, triggering residual reconstruction.
+        // In the reconstruction loop, literalAt(null) is called but throws because
+        // literalAt only accepts string/number/boolean.
+        const expression: ExpressionInput = [
+          'OR',
+          ['AND', ['==', '$a', null], ['IN', '$b', [1, 2]]],
+          ['AND', ['==', '$a', 5], ['IN', '$b', [3, 4]]],
+        ]
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the OR-AND-IN pattern
+        const expected: Input = [
+          'OR',
+          ['AND', ['==', '$a', null], ['IN', '$b', [1, 2]]],
+          ['AND', ['==', '$a', 5], ['IN', '$b', [3, 4]]],
+        ]
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+
+      // -----------------------------------------------------------------
+      // Bug 3: OP_PUSH_VALUE guard rejects object literals (Record<string,unknown>)
+      //
+      // The OP_PUSH_VALUE handler throws on non-null, non-array objects.
+      // But the parser's Input type includes Record<string,unknown>.
+      // When simplifying an expression with an object literal value,
+      // the compiler pushes the object via OP_PUSH_VALUE and the simplifier throws.
+      // -----------------------------------------------------------------
+
+      test('should simplify expression with object literal value (Bug 3a)', () => {
+        // Expression: ['==', '$a', {foo: 1}]
+        // With empty context, $a is unknown.
+        // The object literal {foo: 1} is pushed via OP_PUSH_VALUE.
+        // The simplifier throws: "bytecode integrity error: unexpected object in OP_PUSH_VALUE"
+        const expression: ExpressionInput = ['==', '$a', { foo: 1 }]
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the equality with object literal
+        const expected: Input = ['==', '$a', { foo: 1 }]
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+
+      test('should simplify expression with nested object literal value (Bug 3b)', () => {
+        // Expression: ['==', '$a', {nested: {deep: true}}]
+        // Same pattern as Bug 3a but with a deeply nested object.
+        const expression: ExpressionInput = [
+          '==',
+          '$a',
+          { nested: { deep: true } },
+        ]
+        const context: Context = {}
+        // Expected: residual reconstruction preserving the equality with object literal
+        const expected: Input = ['==', '$a', { nested: { deep: true } }]
+
+        assert.deepStrictEqual(engine.simplify(expression, context), expected)
+      })
+    })
   })
 }
