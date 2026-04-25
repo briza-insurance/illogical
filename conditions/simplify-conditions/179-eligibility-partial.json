@@ -1,0 +1,1 @@
+{"description":"Real-world: partial eligibility","expression":["AND",["AND",["==","$age",18],["IN","$status",["active","premium"]]],["==","$country","US"]],"context":{"age":18},"expected":["AND",["IN","$status",["active","premium"]],["==","$country","US"]]}

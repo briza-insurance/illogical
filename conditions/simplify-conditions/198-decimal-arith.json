@@ -1,0 +1,1 @@
+{"description":"Decimal arithmetic: 0.1 + 0.2 == 0.3","expression":["==",["+",0.1,0.2],0.3],"context":{},"expected":true}

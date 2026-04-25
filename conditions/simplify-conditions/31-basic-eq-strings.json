@@ -1,0 +1,1 @@
+{"description":"Basic equality: string comparison","expression":["==","hello","hello"],"context":{},"expected":true}

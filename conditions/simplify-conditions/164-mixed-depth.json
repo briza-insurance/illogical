@@ -1,0 +1,1 @@
+{"description":"Mixed depth: outer AND short-circuits, inner OR preserved","expression":["AND",["==","$a",1],["OR",["==","$b",2],["==","$c",3]]],"context":{"a":1},"expected":["OR",["==","$b",2],["==","$c",3]]}

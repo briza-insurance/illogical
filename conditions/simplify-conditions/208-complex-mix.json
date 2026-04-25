@@ -1,0 +1,1 @@
+{"description":"Complex: mixed operators, partial evaluation","expression":["AND",["==",["+",2,3],5],["OR",["==","$a",1],["==","$b",2]],["IN","$c",[1,2,3]]],"context":{"c":2},"expected":["OR",["==","$a",1],["==","$b",2]]}

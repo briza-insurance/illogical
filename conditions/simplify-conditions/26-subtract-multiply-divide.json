@@ -1,0 +1,6 @@
+{
+  "description": "Subtract, multiply, divide arithmetic in comparison",
+  "expression": ["==", ["-", ["*", 3, 4], 2], ["/", "$a", 2]],
+  "context": { "a": 5 },
+  "expected": false
+}

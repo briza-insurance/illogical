@@ -1,0 +1,1 @@
+{"description":"Double NOT: NOT(NOT(1==1)) → true","expression":["NOT",["NOT",["==",1,1]]],"context":{},"expected":true}

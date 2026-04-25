@@ -1,0 +1,7 @@
+{
+  "description": "strictKeys forces evaluation of a missing key as undefined",
+  "expression": ["==", "$a", 10],
+  "context": {},
+  "strictKeys": ["a"],
+  "expected": false
+}

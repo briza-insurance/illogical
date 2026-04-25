@@ -8,6 +8,7 @@ import { Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import { CompiledExpression } from './compiler.js'
 import { interpret } from './interpreter.js'
+import { interpretSimplify } from './simplifier.js'
 
 export class BytecodeEvaluable implements Evaluable {
   readonly type = EvaluableType.Expression
@@ -19,14 +20,11 @@ export class BytecodeEvaluable implements Evaluable {
     return interpret(this.compiled, ctx)
   }
   simplify(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _ctx: Context,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _strictKeys?: string[] | Set<string>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _optionalKeys?: string[] | Set<string>
-  ): never {
-    throw new Error('simplify is not supported for bytecode evaluables')
+    ctx: Context,
+    strictKeys?: string[] | Set<string>,
+    optionalKeys?: string[] | Set<string>
+  ): Result | Input {
+    return interpretSimplify(this.compiled, ctx, strictKeys, optionalKeys)
   }
   serialize(options: Options): Input {
     return this.delegate.serialize(options)

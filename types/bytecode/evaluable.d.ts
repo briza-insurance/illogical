@@ -8,7 +8,7 @@ export declare class BytecodeEvaluable implements Evaluable {
     readonly type = EvaluableType.Expression;
     constructor(compiled: CompiledExpression, delegate: Evaluable);
     evaluate(ctx: Context): Result;
-    simplify(_ctx: Context, _strictKeys?: string[] | Set<string>, _optionalKeys?: string[] | Set<string>): never;
+    simplify(ctx: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Result | Input;
     serialize(options: Options): Input;
     toString(): string;
 }
