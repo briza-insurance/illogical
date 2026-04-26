@@ -22,12 +22,10 @@ if (!baselinePath || !currentPath) {
   process.exit(1)
 }
 
-const baseline = JSON.parse(
+const baseline: BenchResultFile = JSON.parse(
   readFileSync(baselinePath, 'utf-8')
-) as BenchResultFile
-const current = JSON.parse(
-  readFileSync(currentPath, 'utf-8')
-) as BenchResultFile
+)
+const current: BenchResultFile = JSON.parse(readFileSync(currentPath, 'utf-8'))
 
 function formatHz(hz: number): string {
   if (hz >= 1_000_000) {

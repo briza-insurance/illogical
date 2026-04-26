@@ -42,12 +42,13 @@ export class In extends Comparison {
     if (!leftArray && !rightArray) {
       throw new Error('invalid IN expression, non of the operands is array')
     }
-    if (leftArray) {
-      return (
-        (left as (string | number)[]).indexOf(right as string | number) > -1
-      )
+    if (Array.isArray(left)) {
+      return left.indexOf(right) > -1
     }
-    return (right as (string | number)[]).indexOf(left as string | number) > -1
+    if (Array.isArray(right)) {
+      return right.indexOf(left) > -1
+    }
+    return false
   }
 
   /**

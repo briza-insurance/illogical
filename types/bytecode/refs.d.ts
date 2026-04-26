@@ -43,9 +43,13 @@ export type CompactRef = string | string[] | CompactRefFull;
  */
 export declare function buildCompactRef(rawKey: string): CompactRef;
 /** Type-safe property access on an object narrowed from `unknown`. */
-export declare function propAt(obj: object, key: string): unknown;
-/** Cast a resolved path-walk result to the public Result type. */
-export declare function toResult(value: unknown): Result;
+export declare function propAt(obj: object, key: string): Result;
+/** Narrow a CompactRef to its string form (OP_PUSH_REF_KEY). Throws on mismatch. */
+export declare function asKeyRef(ref: CompactRef): string;
+/** Narrow a CompactRef to its string[] form (OP_PUSH_REF_KEYS). Throws on mismatch. */
+export declare function asKeysRef(ref: CompactRef): string[];
+/** Narrow a CompactRef to CompactRefFull (OP_PUSH_REF_TOKENS / OP_PUSH_REF_DYNAMIC). Throws on mismatch. */
+export declare function asFullRef(ref: CompactRef): CompactRefFull;
 /**
  * Resolve a multi-key inline path (string[]) against a context.
  * Used by OP_PUSH_REF_KEYS and OP_PUSH_REF_DYNAMIC (after substitution).

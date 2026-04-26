@@ -97,6 +97,14 @@ import {
   defaultReferenceTransform,
 } from '../../options.js'
 
+function getOp(sym: symbol): string {
+  const op = defaultOptions.operatorMapping.get(sym)
+  if (op === undefined) {
+    throw new Error(`Operator not registered: ${sym.toString()}`)
+  }
+  return op
+}
+
 describe('Condition Engine - Parser', () => {
   const parser = new Parser()
 
@@ -145,24 +153,21 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse', () => {
-    const testCases = [
+    const testCases: [ExpressionInput, Evaluable][] = [
       // Comparison expression
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5)),
-      ],
+      [[getOp(OPERATOR_EQ), 5, 5], new Equal(new Value(5), new Value(5))],
       // Unary expression
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+        [getOp(OPERATOR_UNDEFINED), '$RefA'],
         new Undefined(new Reference('RefA')),
       ],
       // Logical expression
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_AND),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
-          [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+          getOp(OPERATOR_AND),
+          [getOp(OPERATOR_EQ), 5, 5],
+          [getOp(OPERATOR_EQ), 10, 10],
+          [getOp(OPERATOR_UNDEFINED), '$RefA'],
         ],
         new And([
           new Equal(new Value(5), new Value(5)),
@@ -172,38 +177,22 @@ describe('Condition Engine - Parser', () => {
       ],
       // Arithmetic expression - cannot be as root expression
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
-          10,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_SUM), 5, 5], 10],
         new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
-          0,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_SUBTRACT), 5, 5], 0],
         new Equal(new Subtract(new Value(5), new Value(5)), new Value(0)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
-          25,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_MULTIPLY), 5, 5], 25],
         new Equal(new Multiply(new Value(5), new Value(5)), new Value(25)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
-          1,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_DIVIDE), 5, 5], 1],
         new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
-    ] as [ExpressionInput, Evaluable][]
+    ]
 
     for (const [expression, expected] of testCases) {
       test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
@@ -214,6 +203,7 @@ describe('Condition Engine - Parser', () => {
       })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const throwTestCases = [
       // Invalid form
       [undefined],
@@ -224,7 +214,7 @@ describe('Condition Engine - Parser', () => {
       [() => {}],
       // Invalid operator
       [['__', ['==', 5, 5]]],
-      [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
+      [getOp(OPERATOR_SUM), 5, 5],
     ] as [ExpressionInput][]
     for (const [expression] of throwTestCases) {
       test(`${JSON.stringify(expression)} should throw`, () => {
@@ -234,13 +224,13 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse - logical expressions', () => {
-    const testCases = [
+    const testCases: [ExpressionInput, Evaluable][] = [
       // Not-nested, 3 items
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_AND),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+          getOp(OPERATOR_AND),
+          [getOp(OPERATOR_EQ), 5, 5],
+          [getOp(OPERATOR_EQ), 10, 10],
         ],
         new And([
           new Equal(new Value(5), new Value(5)),
@@ -249,9 +239,9 @@ describe('Condition Engine - Parser', () => {
       ],
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+          getOp(OPERATOR_OR),
+          [getOp(OPERATOR_EQ), 5, 5],
+          [getOp(OPERATOR_EQ), 10, 10],
         ],
         new Or([
           new Equal(new Value(5), new Value(5)),
@@ -260,9 +250,9 @@ describe('Condition Engine - Parser', () => {
       ],
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_NOR),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+          getOp(OPERATOR_NOR),
+          [getOp(OPERATOR_EQ), 5, 5],
+          [getOp(OPERATOR_EQ), 10, 10],
         ],
         new Nor([
           new Equal(new Value(5), new Value(5)),
@@ -271,9 +261,9 @@ describe('Condition Engine - Parser', () => {
       ],
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_XOR),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+          getOp(OPERATOR_XOR),
+          [getOp(OPERATOR_EQ), 5, 5],
+          [getOp(OPERATOR_EQ), 10, 10],
         ],
         new Xor([
           new Equal(new Value(5), new Value(5)),
@@ -281,28 +271,22 @@ describe('Condition Engine - Parser', () => {
         ]),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_NOT),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        ],
+        [getOp(OPERATOR_NOT), [getOp(OPERATOR_EQ), 5, 5]],
         new Not(new Equal(new Value(5), new Value(5))),
       ],
       // Not-nested, 2 items, reduced into comparison
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_AND),
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        ],
+        [getOp(OPERATOR_AND), [getOp(OPERATOR_EQ), 5, 5]],
         new Equal(new Value(5), new Value(5)),
       ],
       // Not-nested, 2 items, reduced into logical
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_AND),
+          getOp(OPERATOR_AND),
           [
-            defaultOptions.operatorMapping.get(OPERATOR_OR),
-            [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-            [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+            getOp(OPERATOR_OR),
+            [getOp(OPERATOR_EQ), 5, 5],
+            [getOp(OPERATOR_EQ), 10, 10],
           ],
         ],
         new Or([
@@ -313,13 +297,13 @@ describe('Condition Engine - Parser', () => {
       // Nested
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_AND),
+          getOp(OPERATOR_AND),
           [
-            defaultOptions.operatorMapping.get(OPERATOR_OR),
-            [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-            [defaultOptions.operatorMapping.get(OPERATOR_EQ), 10, 10],
+            getOp(OPERATOR_OR),
+            [getOp(OPERATOR_EQ), 5, 5],
+            [getOp(OPERATOR_EQ), 10, 10],
           ],
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 15, 15],
+          [getOp(OPERATOR_EQ), 15, 15],
         ],
         new And([
           new Or([
@@ -331,45 +315,36 @@ describe('Condition Engine - Parser', () => {
       ],
       // Zero argument logical expression treated as collection
       [
+        [getOp(OPERATOR_IN), getOp(OPERATOR_OR), [getOp(OPERATOR_OR)]],
+        new In(
+          new Value(getOp(OPERATOR_OR)),
+          new Collection([new Value(getOp(OPERATOR_OR))])
+        ),
+      ],
+      [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_IN),
-          defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [defaultOptions.operatorMapping.get(OPERATOR_OR)],
+          getOp(OPERATOR_IN),
+          getOp(OPERATOR_OR),
+          [getOp(OPERATOR_OR), getOp(OPERATOR_AND)],
         ],
         new In(
-          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Value(getOp(OPERATOR_OR)),
           new Collection([
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value(getOp(OPERATOR_OR)),
+            new Value(getOp(OPERATOR_AND)),
           ])
         ),
       ],
       [
         [
-          defaultOptions.operatorMapping.get(OPERATOR_IN),
-          defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [
-            defaultOptions.operatorMapping.get(OPERATOR_OR),
-            defaultOptions.operatorMapping.get(OPERATOR_AND),
-          ],
+          getOp(OPERATOR_IN),
+          getOp(OPERATOR_OR),
+          [getOp(OPERATOR_OR), 'AK', 'MN'],
         ],
         new In(
-          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+          new Value(getOp(OPERATOR_OR)),
           new Collection([
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_AND)),
-          ])
-        ),
-      ],
-      [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_IN),
-          defaultOptions.operatorMapping.get(OPERATOR_OR),
-          [defaultOptions.operatorMapping.get(OPERATOR_OR), 'AK', 'MN'],
-        ],
-        new In(
-          new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
-          new Collection([
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_OR)),
+            new Value(getOp(OPERATOR_OR)),
             new Value('AK'),
             new Value('MN'),
           ])
@@ -377,13 +352,10 @@ describe('Condition Engine - Parser', () => {
       ],
       // Not treated as raw array
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_NOT), 5],
-        new Collection([
-          new Value(defaultOptions.operatorMapping.get(OPERATOR_NOT)),
-          new Value(5),
-        ]),
+        [getOp(OPERATOR_NOT), 5],
+        new Collection([new Value(getOp(OPERATOR_NOT)), new Value(5)]),
       ],
-    ] as [ExpressionInput, Evaluable][]
+    ]
 
     for (const [expression, expected] of testCases) {
       test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
@@ -391,6 +363,7 @@ describe('Condition Engine - Parser', () => {
       })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const throwTestCases = [
       // Invalid form
       [[]],
@@ -409,68 +382,48 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse - comparison expressions', () => {
-    const testCases = [
+    const testCases: [ExpressionInput, Evaluable][] = [
+      [[getOp(OPERATOR_EQ), 5, 5], new Equal(new Value(5), new Value(5))],
+      [[getOp(OPERATOR_NE), 5, 5], new NotEqual(new Value(5), new Value(5))],
+      [[getOp(OPERATOR_GT), 5, 5], new GreaterThan(new Value(5), new Value(5))],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, 5],
-        new Equal(new Value(5), new Value(5)),
-      ],
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_NE), 5, 5],
-        new NotEqual(new Value(5), new Value(5)),
-      ],
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_GT), 5, 5],
-        new GreaterThan(new Value(5), new Value(5)),
-      ],
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_GE), 5, 5],
+        [getOp(OPERATOR_GE), 5, 5],
         new GreaterThanOrEqual(new Value(5), new Value(5)),
       ],
+      [[getOp(OPERATOR_LT), 5, 5], new LessThan(new Value(5), new Value(5))],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_LT), 5, 5],
-        new LessThan(new Value(5), new Value(5)),
-      ],
-      [
-        [defaultOptions.operatorMapping.get(OPERATOR_LE), 5, 5],
+        [getOp(OPERATOR_LE), 5, 5],
         new LessThanOrEqual(new Value(5), new Value(5)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_IN), 5, [5]],
+        [getOp(OPERATOR_IN), 5, [5]],
         new In(new Value(5), new Collection([new Value(5)])),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_IN),
-          5,
-          [defaultOptions.operatorMapping.get(OPERATOR_EQ), 2, 2],
-        ],
+        [getOp(OPERATOR_IN), 5, [getOp(OPERATOR_EQ), 2, 2]],
         new In(
           new Value(5),
           new Collection([
-            new Value(defaultOptions.operatorMapping.get(OPERATOR_EQ)),
+            new Value(getOp(OPERATOR_EQ)),
             new Value(2),
             new Value(2),
           ])
         ),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_NOT_IN), 5, [5]],
+        [getOp(OPERATOR_NOT_IN), 5, [5]],
         new NotIn(new Value(5), new Collection([new Value(5)])),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_PREFIX), 'a', 'abc'],
+        [getOp(OPERATOR_PREFIX), 'a', 'abc'],
         new Prefix(new Value('a'), new Value('abc')),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_SUFFIX), 'abc', 'c'],
+        [getOp(OPERATOR_SUFFIX), 'abc', 'c'],
         new Suffix(new Value('abc'), new Value('c')),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
-          ['a', 'b'],
-          ['IN'],
-        ],
+        [getOp(OPERATOR_OVERLAP), ['a', 'b'], ['IN']],
         new Overlap(
           new Collection([new Value('a'), new Value('b')]),
           new Collection([new Value('IN')])
@@ -478,37 +431,30 @@ describe('Condition Engine - Parser', () => {
       ],
       // Reference
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_EQ), '$RefA', 5],
+        [getOp(OPERATOR_EQ), '$RefA', 5],
         new Equal(new Reference('RefA'), new Value(5)),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_EQ), 5, '$RefA'],
+        [getOp(OPERATOR_EQ), 5, '$RefA'],
         new Equal(new Value(5), new Reference('RefA')),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_UNDEFINED), '$RefA'],
+        [getOp(OPERATOR_UNDEFINED), '$RefA'],
         new Undefined(new Reference('RefA')),
       ],
+      [[getOp(OPERATOR_PRESENT), '$RefA'], new Present(new Reference('RefA'))],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA'],
-        new Present(new Reference('RefA')),
-      ],
-      [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_OVERLAP),
-          ['$RefA', '$RefB'],
-          ['a'],
-        ],
+        [getOp(OPERATOR_OVERLAP), ['$RefA', '$RefB'], ['a']],
         new Overlap(
           new Collection([new Reference('RefA'), new Reference('RefB')]),
           new Collection([new Value('a')])
         ),
       ],
       [
-        [defaultOptions.operatorMapping.get(OPERATOR_PRESENT), '$RefA{RefB}'],
+        [getOp(OPERATOR_PRESENT), '$RefA{RefB}'],
         new Present(new Reference('RefA{RefB}')),
       ],
-    ] as [ExpressionInput, Evaluable][]
+    ]
     for (const [expression, expected] of testCases) {
       test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
         assert.deepStrictEqual(
@@ -518,6 +464,7 @@ describe('Condition Engine - Parser', () => {
       })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const throwTestCases = [
       // Invalid form
       [[]],
@@ -532,40 +479,24 @@ describe('Condition Engine - Parser', () => {
   })
 
   describe('parse - arithmetic expressions', () => {
-    const testCases = [
+    const testCases: [ExpressionInput, Evaluable][] = [
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_SUM), 5, 5],
-          10,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_SUM), 5, 5], 10],
         new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_SUBTRACT), 5, 5],
-          0,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_SUBTRACT), 5, 5], 0],
         new Equal(new Subtract(new Value(5), new Value(5)), new Value(0)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_MULTIPLY), 5, 5],
-          25,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_MULTIPLY), 5, 5], 25],
         new Equal(new Multiply(new Value(5), new Value(5)), new Value(25)),
       ],
       [
-        [
-          defaultOptions.operatorMapping.get(OPERATOR_EQ),
-          [defaultOptions.operatorMapping.get(OPERATOR_DIVIDE), 5, 5],
-          1,
-        ],
+        [getOp(OPERATOR_EQ), [getOp(OPERATOR_DIVIDE), 5, 5], 1],
         new Equal(new Divide(new Value(5), new Value(5)), new Value(1)),
       ],
-    ] as [ExpressionInput, Evaluable][]
+    ]
     for (const [expression, expected] of testCases) {
       test(`${JSON.stringify(expression)} should evaluate as ${expected}`, () => {
         assert.deepStrictEqual(
@@ -575,6 +506,7 @@ describe('Condition Engine - Parser', () => {
       })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const throwTestCases = [
       // Invalid form
       [[]],

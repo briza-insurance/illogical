@@ -56,7 +56,9 @@ import {
 } from '../bytecode/opcodes.js'
 import * as opcodes from '../bytecode/opcodes.js'
 import {
-  CompactRefFull,
+  asFullRef,
+  asKeyRef,
+  asKeysRef,
   resolveCompactRef,
   resolveDynamic,
   resolveKeys,
@@ -197,24 +199,24 @@ export function interpretDebug(
         break
 
       case OP_PUSH_REF_KEY:
-        stack[++stackTop] = ctx[refs[numAt(bytecode[++i])] as string]
+        stack[++stackTop] = ctx[asKeyRef(refs[numAt(bytecode[++i])])]
         break
 
       case OP_PUSH_REF_KEYS:
         stack[++stackTop] = resolveKeys(
-          refs[numAt(bytecode[++i])] as string[],
+          asKeysRef(refs[numAt(bytecode[++i])]),
           ctx
         )
         break
 
       case OP_PUSH_REF_TOKENS: {
-        const ref = refs[numAt(bytecode[++i])] as CompactRefFull
+        const ref = asFullRef(refs[numAt(bytecode[++i])])
         stack[++stackTop] = resolveTokens(ref.tokens ?? [], ref.t, ctx)
         break
       }
 
       case OP_PUSH_REF_DYNAMIC: {
-        const ref = refs[numAt(bytecode[++i])] as CompactRefFull
+        const ref = asFullRef(refs[numAt(bytecode[++i])])
         stack[++stackTop] = resolveDynamic(ref.k!, ref.t, ctx)
         break
       }
