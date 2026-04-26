@@ -1,0 +1,1 @@
+{"description":"Eligibility: age=18, status=active, country=US → true","expression":["AND",["AND",["==","$age",18],["IN","$status",["active","premium"]]],["==","$country","US"]],"context":{"age":18,"status":"active","country":"US"},"expected":true}

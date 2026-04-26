@@ -1,0 +1,1 @@
+{"description":"Arithmetic lt: 1 + 1 < 5 → true","expression":["<",["+",1,1],5],"context":{},"expected":true}

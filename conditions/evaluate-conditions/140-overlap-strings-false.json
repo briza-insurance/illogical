@@ -1,0 +1,1 @@
+{"description":"OVERLAP: strings no overlap → false","expression":["OVERLAP",["red","blue"],["green","yellow"]],"context":{},"expected":false}

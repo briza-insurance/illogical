@@ -1,0 +1,1 @@
+{"description":"Equality: 0 vs \"0\" → false","expression":["==",0,"0"],"context":{},"expected":false}
