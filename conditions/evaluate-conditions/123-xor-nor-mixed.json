@@ -1,0 +1,1 @@
+{"description":"XOR + NOR: XOR(NOR(A,B),C)","expression":["XOR",["NOR",["==","$a",1],["==","$b",2]],["==","$c",3]],"context":{"a":1,"b":2,"c":3},"expected":true}

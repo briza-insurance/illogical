@@ -1,0 +1,1 @@
+{"description":"OR: all true → true","expression":["OR",["==",1,1],["==",2,2]],"context":{},"expected":true}

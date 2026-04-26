@@ -1,0 +1,1 @@
+{"description":"Equality: true == true → true","expression":["==",true,true],"context":{},"expected":true}

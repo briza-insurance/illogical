@@ -1,0 +1,1 @@
+{"description":"NOT IN: 2 not in [1,2,3] → false","expression":["NOT IN",2,[1,2,3]],"context":{},"expected":false}
