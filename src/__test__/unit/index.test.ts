@@ -25,6 +25,7 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
     const engine = new Engine({ evaluator })
 
     describe('evaluate', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const evaluateData1 = [
         // OVERLAP
         ...[
@@ -121,6 +122,7 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         })
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const evaluateThrowData = [
         // Operators with invalid operands
         [[OPERATOR_EQ]],
@@ -141,13 +143,11 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         [[OPERATOR_XOR]],
         [[OPERATOR_SUM]],
         [[OPERATOR_SUM, 5, 5, 5]],
-      ]
+      ] as unknown as [ExpressionInput][]
 
       for (const [expression] of evaluateThrowData) {
         test(`${JSON.stringify(expression)} should throw`, () => {
-          assert.throws(() =>
-            engine.evaluate(expression as ExpressionInput, {})
-          )
+          assert.throws(() => engine.evaluate(expression, {}))
         })
       }
 
@@ -192,6 +192,7 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
     })
 
     describe('parse', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const parseThrowData = [
         // Operators with invalid operands
         [[OPERATOR_EQ]],
@@ -211,11 +212,11 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         [[OPERATOR_NOR]],
         [[OPERATOR_XOR]],
         [[OPERATOR_SUM]],
-      ]
+      ] as unknown as [ExpressionInput][]
 
       for (const [expression] of parseThrowData) {
         test(`${JSON.stringify(expression)} should throw`, () => {
-          assert.throws(() => engine.parse(expression as ExpressionInput))
+          assert.throws(() => engine.parse(expression))
         })
       }
     })

@@ -1,5 +1,6 @@
 import { CompiledExpression } from '../bytecode/compiler.js'
 import * as opcodes from '../bytecode/opcodes.js'
+import { Result } from '../common/evaluable.js'
 import { DisassembledInstruction } from './types.js'
 
 const opcodeNames: Record<number, string> = Object.fromEntries(
@@ -11,12 +12,19 @@ export function disassemble(
 ): DisassembledInstruction[] {
   const { bytecode, refs } = compiled
   const result: DisassembledInstruction[] = []
+  function numAt(v: number | Result): number {
+    if (typeof v !== 'number') {
+      throw new Error(`expected number in bytecode, got ${typeof v}`)
+    }
+    return v
+  }
+
   let i = 0
   let index = 0
 
   while (i < bytecode.length) {
     const pcStart = i
-    const op = bytecode[i] as number
+    const op = numAt(bytecode[i])
     const name = opcodeNames[op] ?? `???`
     let text: string
 
@@ -29,7 +37,7 @@ export function disassemble(
       case opcodes.OP_PUSH_REF_KEYS:
       case opcodes.OP_PUSH_REF_TOKENS:
       case opcodes.OP_PUSH_REF_DYNAMIC: {
-        const idx = bytecode[++i] as number
+        const idx = numAt(bytecode[++i])
         text = `${pcStart}: ${name} ${idx} (${JSON.stringify(refs[idx])})`
         break
       }
@@ -53,7 +61,7 @@ export function disassemble(
         break
 
       case opcodes.OP_OVERLAP_SCAN_REFS_CONST: {
-        const n = bytecode[++i] as number
+        const n = numAt(bytecode[++i])
         const refIndices = bytecode.slice(i + 1, i + 1 + n)
         i += n
         const constIdx = bytecode[++i]
@@ -62,9 +70,9 @@ export function disassemble(
       }
 
       case opcodes.OP_OR_AND_IN_CONST_2: {
-        const ref1Idx = bytecode[++i] as number
-        const ref2Idx = bytecode[++i] as number
-        const m = bytecode[++i] as number
+        const ref1Idx = numAt(bytecode[++i])
+        const ref2Idx = numAt(bytecode[++i])
+        const m = numAt(bytecode[++i])
         const entriesStart = i + 1
         i += m * 2
         const entries: string[] = []

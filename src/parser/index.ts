@@ -70,7 +70,7 @@ import { Collection } from '../operand/collection.js'
 import { Operand } from '../operand/index.js'
 import { Reference } from '../operand/reference.js'
 import { Value } from '../operand/value.js'
-import { defaultOptions, Options, optionValue } from './options.js'
+import { defaultOptions, Options } from './options.js'
 
 // Input types
 export type Input =
@@ -124,9 +124,7 @@ export class Parser {
     if (options) {
       for (const key of Object.keys(options)) {
         if (key in this.opts) {
-          ;(this.opts as unknown as Record<string, optionValue>)[key] = (
-            options as unknown as Record<string, optionValue>
-          )[key]
+          Reflect.set(this.opts, key, Reflect.get(options, key))
         }
       }
     }
@@ -197,8 +195,11 @@ export class Parser {
 
     let expression: (operands: Evaluable[]) => Evaluable
     let operandParser: (raw: Input) => Evaluable = this.getOperand
-    const operator = (raw as ArrayInput)[0] as string
-    const operands = (raw as ArrayInput).slice(1)
+    const operator = raw[0]
+    if (typeof operator !== 'string') {
+      return this.getOperand(raw)
+    }
+    const operands = raw.slice(1)
 
     /**
      * Simplify the logical expression if possible.

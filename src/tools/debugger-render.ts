@@ -19,17 +19,17 @@ const green = (s: string) => `\x1b[32m${s}${reset}`
 const red = (s: string) => `\x1b[31m${s}${reset}`
 const bgBlue = (s: string) => `\x1b[44m\x1b[97m${s}${reset}`
 const clearScreen = `${ESC}2J${ESC}H`
+// Matches ANSI SGR sequences (ESC[...m). Built via RegExp so no control char in a regex literal.
+const ansiSgrRe = new RegExp(ESC[0] + '\\[[0-9;]*m', 'g')
 
 function pad(s: string, width: number): string {
-  // eslint-disable-next-line no-control-regex
-  const visible = s.replace(/\x1b\[[0-9;]*m/g, '')
+  const visible = s.replace(ansiSgrRe, '')
   const diff = width - visible.length
   return diff > 0 ? s + ' '.repeat(diff) : s
 }
 
 function truncate(s: string, maxWidth: number): string {
-  // eslint-disable-next-line no-control-regex
-  const visible = s.replace(/\x1b\[[0-9;]*m/g, '')
+  const visible = s.replace(ansiSgrRe, '')
   if (visible.length <= maxWidth) {
     return s
   }

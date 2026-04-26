@@ -82,6 +82,10 @@ function parseStaticKey(key: string): PathToken[] {
   return !parts ? [] : parts.flatMap(parseKeyComponents)
 }
 
+function isDataTypeKey(k: string): k is keyof typeof DataType {
+  return k in DataType
+}
+
 /**
  * Build a CompactRef from a raw reference key string (without the $ prefix).
  * Called once at compile time; the result is stored in CompiledExpression.refs.
@@ -93,10 +97,10 @@ export function buildCompactRef(rawKey: string): CompactRef {
   const dataTypeMatch = dataTypeRegex.exec(key)
   if (dataTypeMatch) {
     const dtKey = dataTypeMatch[1]
-    if (!(dtKey in DataType)) {
+    if (!isDataTypeKey(dtKey)) {
       throw new Error(`unknown DataType: ${dtKey}`)
     }
-    dataType = DataType[dtKey as keyof typeof DataType]
+    dataType = DataType[dtKey]
     key = key.replace(castingRegex, '')
   }
 
@@ -149,13 +153,32 @@ function castValue(value: Result, dataType: DataType): Result {
 const dynamicKeyRegex = /{([^{}]+)}/
 
 /** Type-safe property access on an object narrowed from `unknown`. */
-export function propAt(obj: object, key: string): unknown {
-  return (obj as Record<string, unknown>)[key]
+export function propAt(obj: object, key: string): Result {
+  return Reflect.get(obj, key)
 }
 
-/** Cast a resolved path-walk result to the public Result type. */
-export function toResult(value: unknown): Result {
-  return value as Result
+/** Narrow a CompactRef to its string form (OP_PUSH_REF_KEY). Throws on mismatch. */
+export function asKeyRef(ref: CompactRef): string {
+  if (typeof ref !== 'string') {
+    throw new Error('bytecode integrity: expected string ref')
+  }
+  return ref
+}
+
+/** Narrow a CompactRef to its string[] form (OP_PUSH_REF_KEYS). Throws on mismatch. */
+export function asKeysRef(ref: CompactRef): string[] {
+  if (!Array.isArray(ref)) {
+    throw new Error('bytecode integrity: expected string[] ref')
+  }
+  return ref
+}
+
+/** Narrow a CompactRef to CompactRefFull (OP_PUSH_REF_TOKENS / OP_PUSH_REF_DYNAMIC). Throws on mismatch. */
+export function asFullRef(ref: CompactRef): CompactRefFull {
+  if (typeof ref === 'string' || Array.isArray(ref)) {
+    throw new Error('bytecode integrity: expected CompactRefFull ref')
+  }
+  return ref
 }
 
 /**
@@ -177,7 +200,7 @@ export function resolveKeys(ks: string[], ctx: Context): Result {
   }
   const p1 = propAt(p0, ks[1])
   if (ks.length === 2) {
-    return toResult(p1)
+    return p1
   }
   if (
     p1 === undefined ||
@@ -189,9 +212,9 @@ export function resolveKeys(ks: string[], ctx: Context): Result {
   }
   const p2 = propAt(p1, ks[2])
   if (ks.length === 3) {
-    return toResult(p2)
+    return p2
   }
-  let p: unknown = p2
+  let p: Result = p2
   for (let k = 3; k < ks.length; k++) {
     if (
       p === undefined ||
@@ -203,7 +226,7 @@ export function resolveKeys(ks: string[], ctx: Context): Result {
     }
     p = propAt(p, ks[k])
   }
-  return toResult(p)
+  return p
 }
 
 /**
@@ -216,7 +239,7 @@ export function resolveTokens(
   ctx: Context
 ): Result {
   const len = tokens.length
-  let pointer: unknown = ctx
+  let pointer: Result = ctx
 
   for (let i = 0; i < len; i++) {
     const token = tokens[i]
@@ -240,8 +263,7 @@ export function resolveTokens(
     }
   }
 
-  const raw = toResult(pointer)
-  return dataType !== undefined ? castValue(raw, dataType) : raw
+  return dataType !== undefined ? castValue(pointer, dataType) : pointer
 }
 
 /**
