@@ -43,13 +43,10 @@ export class Xor extends Logical {
    * @return {Result}
    */
   evaluate(ctx: Context): Result {
-    let res = null
+    let res: boolean | null = null
     for (const operand of this.operands) {
-      if (res === null) {
-        res = operand.evaluate(ctx) as boolean
-      } else {
-        res = xor(res, operand.evaluate(ctx) as boolean)
-      }
+      const val = Boolean(operand.evaluate(ctx))
+      res = res === null ? val : xor(res, val)
     }
     return res
   }
