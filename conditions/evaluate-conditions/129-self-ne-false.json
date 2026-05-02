@@ -1,0 +1,1 @@
+{"description":"Self-ref: $x != $x when known → false","expression":["!=","$x","$x"],"context":{"x":5},"expected":false}
