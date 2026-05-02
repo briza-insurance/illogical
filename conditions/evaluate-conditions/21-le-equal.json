@@ -1,0 +1,1 @@
+{"description":"Less or equal: 5 <= 5 → true","expression":["<=",5,5],"context":{},"expected":true}
