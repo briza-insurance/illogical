@@ -35,7 +35,7 @@ interface TestCase {
 }
 
 function loadTestCase(filePath: string): TestCase {
-  const raw = JSON.parse(readFileSync(filePath, 'utf8')) as TestCase
+  const raw: TestCase = JSON.parse(readFileSync(filePath, 'utf8'))
   assert.ok(raw.description, `Test case at ${filePath} must have a description`)
   assert.ok(
     Array.isArray(raw.expression),
