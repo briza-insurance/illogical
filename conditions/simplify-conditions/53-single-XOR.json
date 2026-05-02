@@ -1,0 +1,1 @@
+{"description":"XOR with two true operands → false","expression":["XOR",["==",1,1],["==",2,2]],"context":{},"expected":false}

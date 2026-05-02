@@ -1,0 +1,6 @@
+{
+  "description": "One key known, one unknown — returns residual expression",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": { "a": 10 },
+  "expected": ["==", "$b", 20]
+}

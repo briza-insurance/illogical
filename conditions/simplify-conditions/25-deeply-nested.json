@@ -1,0 +1,6 @@
+{
+  "description": "Deeply nested expression — partial evaluation at multiple levels",
+  "expression": ["AND", ["AND", ["==", "$a", 1], ["OR", ["==", "$b", 2], ["==", "$c", 3]]], ["==", "$d", 4]],
+  "context": { "a": 1, "b": 2 },
+  "expected": ["==", "$d", 4]
+}

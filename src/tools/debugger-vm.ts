@@ -10,6 +10,7 @@
 
 import { CompiledExpression } from '../bytecode/compiler.js'
 import {
+  OP_AND,
   OP_DIVIDE,
   OP_EQ,
   OP_GE,
@@ -17,6 +18,7 @@ import {
   OP_IN,
   OP_IN_COLLECTION,
   OP_IN_CONST,
+  OP_IN_SCAN_REFS_CONST,
   OP_JUMP_IF_FALSE,
   OP_JUMP_IF_TRUE,
   OP_LE,
@@ -25,10 +27,13 @@ import {
   OP_MAKE_COLLECTION,
   OP_MULTIPLY,
   OP_NE,
+  OP_NOR,
   OP_NOT,
   OP_NOT_IN,
   OP_NOT_IN_COLLECTION,
   OP_NOT_IN_CONST,
+  OP_NOT_IN_SCAN_REFS_CONST,
+  OP_OR,
   OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
@@ -486,6 +491,31 @@ export function interpretDebug(
         break
       }
 
+      case OP_IN_SCAN_REFS_CONST:
+      case OP_NOT_IN_SCAN_REFS_CONST: {
+        // bytecode layout: N, ref0..refN-1, constIdx (const is [scalar])
+        const n = numAt(bytecode[++i])
+        const refStart = i + 1
+        i += n
+        const constIdx = numAt(bytecode[++i])
+        const target = consts[constIdx][0]
+        let found = false
+        if (target !== null && target !== undefined) {
+          for (let j = 0; j < n; j++) {
+            const v = resolveCompactRef(
+              refs[numAt(bytecode[refStart + j])],
+              ctx
+            )
+            if (v === target) {
+              found = true
+              break
+            }
+          }
+        }
+        stack[++stackTop] = op === OP_IN_SCAN_REFS_CONST ? found : !found
+        break
+      }
+
       case OP_OR_AND_IN_CONST_2: {
         // bytecode layout: ref1Idx, ref2Idx, M, v0, setBIdx0, v1, setBIdx1, ..., vM-1, setBIdxM-1
         const ref1Idx = numAt(bytecode[++i])
@@ -685,6 +715,12 @@ export function interpretDebug(
 
       case OP_POP:
         stackTop--
+        break
+
+      case OP_AND:
+      case OP_OR:
+      case OP_NOR:
+        i++ // skip operand count
         break
     }
 

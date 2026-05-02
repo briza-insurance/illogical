@@ -32,6 +32,7 @@ import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor.js'
 import { ArrayInput, ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import {
+  OP_AND,
   OP_DIVIDE,
   OP_EQ,
   OP_GE,
@@ -39,6 +40,7 @@ import {
   OP_IN,
   OP_IN_COLLECTION,
   OP_IN_CONST,
+  OP_IN_SCAN_REFS_CONST,
   OP_JUMP_IF_FALSE,
   OP_JUMP_IF_TRUE,
   OP_LE,
@@ -47,10 +49,13 @@ import {
   OP_MAKE_COLLECTION,
   OP_MULTIPLY,
   OP_NE,
+  OP_NOR,
   OP_NOT,
   OP_NOT_IN,
   OP_NOT_IN_COLLECTION,
   OP_NOT_IN_CONST,
+  OP_NOT_IN_SCAN_REFS_CONST,
+  OP_OR,
   OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
@@ -144,6 +149,8 @@ interface CompilerState {
   bytecode: Bytecode
   refs: CompactRef[] // side-table of compact refs, indexed by position
   refIndex: Map<string, number> // dedup map: raw key → index into refs
+  refRawKeys: string[] // raw key per ref index (post-transform, for strictKeys/optionalKeys checks)
+  refKeys: string[] // serialized key per ref index (for residual reconstruction, e.g. '$RefA')
   opts: Options
   maps: OperatorMaps
   // CSE: canonical key → local slot index for dynamic collections seen >1 time
@@ -152,6 +159,9 @@ interface CompilerState {
   // Static collection constants table — interned by JSON key, zero allocation at runtime
   consts: ArrayInput[]
   constIndex: Map<string, number>
+  // Side tables for the simplify interpreter
+  overlapRefsEntries: Array<{ pos: number; refIdxs: number[] }>
+  directionEntries: Array<{ pos: number; dir: 0 | 1 }>
 }
 
 function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
@@ -161,7 +171,7 @@ function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
   )
 }
 
-function isPureRefCollection(raw: Input, opts: Options): raw is ArrayInput {
+function isPureRefCollection(raw: Input, opts: Options): raw is string[] {
   return (
     Array.isArray(raw) &&
     raw.length > 0 &&
@@ -178,6 +188,28 @@ function internConst(items: ArrayInput, state: CompilerState): number {
     state.constIndex.set(key, idx)
   }
   return idx
+}
+
+/**
+ * Returns the first context key for a multi-key ref (e.g. 'account' for $account.region),
+ * or undefined for single-key refs (no heuristic needed) and dynamic refs (unknowable statically).
+ * Used by the simplify interpreter to replicate OOP Reference.simplify()'s first-key check.
+ */
+function getFirstCtxKey(ref: CompactRef): string | undefined {
+  if (typeof ref === 'string') {
+    return undefined // single-key ref — OOP checks ctx[key] directly, no first-key shortcut
+  }
+  if (Array.isArray(ref)) {
+    return ref[0] // multi-key path: first element is the top-level context key
+  }
+  if (ref.d) {
+    return undefined // dynamic ref with {placeholder}: can't determine first key statically
+  }
+  const tokens = ref.tokens
+  if (tokens && tokens.length > 0 && tokens[0].kind === 'key') {
+    return tokens[0].value
+  }
+  return undefined
 }
 
 function refOpcode(ref: CompactRef): number {
@@ -200,6 +232,8 @@ function internRef(raw: string, state: CompilerState): number {
     refIndex = state.refs.length
     state.refs.push(buildCompactRef(key))
     state.refIndex.set(key, refIndex)
+    state.refRawKeys.push(key)
+    state.refKeys.push(raw)
   }
   return refIndex
 }
@@ -237,17 +271,8 @@ function emitOperand(raw: Input, state: CompilerState): void {
   }
 
   if (typeof raw === 'string' && opts.referencePredicate(raw)) {
-    const key = opts.referenceTransform(raw)
-    let refIndex = state.refIndex.get(key)
-    if (refIndex === undefined) {
-      refIndex = refs.length
-      const ref = buildCompactRef(key)
-      refs.push(ref)
-      state.refIndex.set(key, refIndex)
-      bytecode.push(refOpcode(ref), refIndex)
-    } else {
-      bytecode.push(refOpcode(refs[refIndex]), refIndex)
-    }
+    const refIndex = internRef(raw, state)
+    bytecode.push(refOpcode(refs[refIndex]), refIndex)
     return
   }
 
@@ -343,6 +368,9 @@ function detectOrAndIn2Pattern(
       return null
     }
 
+    let extA: ReturnType<typeof extractInLikeChild> = null
+    let extB: ReturnType<typeof extractInLikeChild> = null
+
     for (let c = 1; c <= 2; c++) {
       const child = branch[c]
       if (!Array.isArray(child)) {
@@ -353,28 +381,25 @@ function detectOrAndIn2Pattern(
         return null
       }
       const { rawRef, refKey } = extracted
-      if (b === 1) {
-        if (c === 1) {
+      if (c === 1) {
+        extA = extracted
+        if (b === 1) {
           ref1Raw = rawRef
           refKey1 = refKey
-        } else {
-          ref2Raw = rawRef
-          refKey2 = refKey
-        }
-      } else {
-        if (c === 1 && refKey !== refKey1) {
+        } else if (refKey !== refKey1) {
           return null
         }
-        if (c === 2 && refKey !== refKey2) {
+      } else {
+        extB = extracted
+        if (b === 1) {
+          ref2Raw = rawRef
+          refKey2 = refKey
+        } else if (refKey !== refKey2) {
           return null
         }
       }
     }
 
-    const child1 = branch[1] as ArrayInput
-    const child2 = branch[2] as ArrayInput
-    const extA = extractInLikeChild(child1, state)
-    const extB = extractInLikeChild(child2, state)
     if (extA === null || extB === null) {
       return null
     }
@@ -410,6 +435,7 @@ function detectOrAndIn2Pattern(
 function emitShortCircuit(
   arr: ArrayInput,
   jumpOp: typeof OP_JUMP_IF_FALSE | typeof OP_JUMP_IF_TRUE,
+  markerOp: typeof OP_AND | typeof OP_OR | typeof OP_NOR,
   state: CompilerState
 ): void {
   const { bytecode } = state
@@ -430,6 +456,9 @@ function emitShortCircuit(
   for (const slot of jumpSlots) {
     bytecode[slot] = end - slot - 1
   }
+
+  // Emit marker so the simplify interpreter knows the operator and operand count
+  bytecode.push(markerOp, last)
 }
 
 function emitExpression(raw: Input, state: CompilerState): void {
@@ -453,7 +482,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
   // Logical — short-circuit with jump instructions
   // ---------------------------------------------------------------------------
   if (operator === maps.andOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_FALSE, state)
+    emitShortCircuit(arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
 
@@ -472,13 +501,13 @@ function emitExpression(raw: Input, state: CompilerState): void {
       }
       return
     }
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, state)
+    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
 
   if (operator === maps.norOp) {
     // NOR = NOT OR: emit as OR with short-circuit, then negate
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, state)
+    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
     return
   }
@@ -519,14 +548,39 @@ function emitExpression(raw: Input, state: CompilerState): void {
       if (!leftHasDynamic) {
         // fully static collection on left — intern as const, Set-lookup the scalar
         emitExpression(right, state)
+        const opcodePos = bytecode.length
         bytecode.push(constOp, internConst(leftArr, state))
+        state.directionEntries.push({ pos: opcodePos, dir: 0 })
+      } else if (
+        isPureRefCollection(leftArr, state.opts) &&
+        !(typeof right === 'string' && state.opts.referencePredicate(right))
+      ) {
+        // pure-ref collection on left, concrete scalar on right — inline ref scan, no stack alloc
+        const scanOp =
+          operator === maps.inOp
+            ? OP_IN_SCAN_REFS_CONST
+            : OP_NOT_IN_SCAN_REFS_CONST
+        const constIdx = internConst([right], state)
+        const opcodePos = bytecode.length
+        const refIdxs: number[] = []
+        bytecode.push(scanOp, leftArr.length)
+        for (const item of leftArr) {
+          const refIdx = internRef(item, state)
+          bytecode.push(refIdx)
+          refIdxs.push(refIdx)
+        }
+        bytecode.push(constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 0 })
+        state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
-        // dynamic collection on left — inline stack scan
+        // mixed dynamic collection on left — inline stack scan
         for (const item of leftArr) {
           emitOperand(item, state)
         }
         emitExpression(right, state)
+        const opcodePos = bytecode.length
         bytecode.push(collectionOp, leftArr.length)
+        state.directionEntries.push({ pos: opcodePos, dir: 0 })
       }
       return
     }
@@ -541,14 +595,39 @@ function emitExpression(raw: Input, state: CompilerState): void {
       if (!rightHasDynamic) {
         // fully static collection on right — intern as const, Set-lookup the scalar
         emitExpression(left, state)
+        const opcodePos = bytecode.length
         bytecode.push(constOp, internConst(rightArr, state))
+        state.directionEntries.push({ pos: opcodePos, dir: 1 })
+      } else if (
+        isPureRefCollection(rightArr, state.opts) &&
+        !(typeof left === 'string' && state.opts.referencePredicate(left))
+      ) {
+        // pure-ref collection on right, concrete scalar on left — inline ref scan, no stack alloc
+        const scanOp =
+          operator === maps.inOp
+            ? OP_IN_SCAN_REFS_CONST
+            : OP_NOT_IN_SCAN_REFS_CONST
+        const constIdx = internConst([left], state)
+        const opcodePos = bytecode.length
+        const refIdxs: number[] = []
+        bytecode.push(scanOp, rightArr.length)
+        for (const item of rightArr) {
+          const refIdx = internRef(item, state)
+          bytecode.push(refIdx)
+          refIdxs.push(refIdx)
+        }
+        bytecode.push(constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 1 })
+        state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
-        // dynamic collection on right — inline stack scan
+        // mixed dynamic collection on right — inline stack scan
         for (const item of rightArr) {
           emitOperand(item, state)
         }
         emitExpression(left, state)
+        const opcodePos = bytecode.length
         bytecode.push(collectionOp, rightArr.length)
+        state.directionEntries.push({ pos: opcodePos, dir: 1 })
       }
       return
     }
@@ -567,19 +646,27 @@ function emitExpression(raw: Input, state: CompilerState): void {
       const constIdx = internConst(left, state)
       if (isPureRefCollection(right, state.opts)) {
         // dynamic side is all refs — inline ref indices, resolve+check at runtime, no stack alloc
+        const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_SCAN_REFS_CONST, right.length)
+        const refIdxs: number[] = []
         for (const item of right) {
           if (typeof item !== 'string') {
             throw new Error(
               'OVERLAP: expected string ref in pure-ref collection'
             )
           }
-          bytecode.push(internRef(item, state))
+          const refIdx = internRef(item, state)
+          bytecode.push(refIdx)
+          refIdxs.push(refIdx)
         }
         bytecode.push(constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 0 })
+        state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
         emitExpression(right, state)
+        const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 0 })
       }
       return
     }
@@ -590,19 +677,27 @@ function emitExpression(raw: Input, state: CompilerState): void {
       const constIdx = internConst(right, state)
       if (isPureRefCollection(left, state.opts)) {
         // dynamic side is all refs — inline ref indices, resolve+check at runtime, no stack alloc
+        const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_SCAN_REFS_CONST, left.length)
+        const refIdxs: number[] = []
         for (const item of left) {
           if (typeof item !== 'string') {
             throw new Error(
               'OVERLAP: expected string ref in pure-ref collection'
             )
           }
-          bytecode.push(internRef(item, state))
+          const refIdx = internRef(item, state)
+          bytecode.push(refIdx)
+          refIdxs.push(refIdx)
         }
         bytecode.push(constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 1 })
+        state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
         emitExpression(left, state)
+        const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
+        state.directionEntries.push({ pos: opcodePos, dir: 1 })
       }
       return
     }
@@ -653,6 +748,20 @@ export interface CompiledExpression {
   refs: CompactRef[]
   numLocals: number
   consts: ArrayInput[]
+  // opcode → operator string, used by the simplify interpreter for residual reconstruction
+  opNames: Record<number, string>
+  // serialized ref key per ref index (e.g. '$RefA'), used for residual output
+  refKeys: string[]
+  // raw ref key per ref index (post-transform, e.g. 'RefA'), used for strictKeys/optionalKeys checks
+  refRawKeys: string[]
+  // pre-built residual ref arrays for OP_OVERLAP_SCAN_REFS_CONST, keyed by bytecode position
+  overlapRefsResiduals: Array<[number, Input[]]>
+  // bytecode position → direction (0 = collection/const on left, 1 = on right) for IN/OVERLAP opcodes
+  directionMap: Array<[number, 0 | 1]>
+  // First context key per ref index: undefined for single-key refs, string for multi-key refs.
+  // Used by the simplify interpreter to match OOP Reference.simplify() behavior:
+  // if ctx[firstCtxKey] !== undefined, treat undefined sub-fields as concrete rather than unknown.
+  refFirstCtxKeys: (string | undefined)[]
 }
 
 /**
@@ -663,22 +772,70 @@ export function compile(
   raw: ExpressionInput,
   opts: Options
 ): CompiledExpression {
+  const maps = buildOperatorMaps(opts)
   const state: CompilerState = {
     bytecode: [],
     refs: [],
     refIndex: new Map(),
+    refRawKeys: [],
+    refKeys: [],
     opts,
-    maps: buildOperatorMaps(opts),
+    maps,
     collectionCse: new Map(),
     numLocals: 0,
     consts: [],
     constIndex: new Map(),
+    overlapRefsEntries: [],
+    directionEntries: [],
   }
   emitExpression(raw, state)
+
+  // Build reverse map: opcode → operator string for residual reconstruction
+  const opNames: Record<number, string> = {}
+  for (const [str, code] of Object.entries(maps.binary)) {
+    opNames[code] = str
+  }
+  for (const [str, code] of Object.entries(maps.arithmetic)) {
+    opNames[code] = str
+  }
+  opNames[OP_NOT] = maps.notOp
+  opNames[OP_AND] = maps.andOp
+  opNames[OP_OR] = maps.orOp
+  opNames[OP_NOR] = maps.norOp
+  opNames[OP_XOR] = maps.xorOp
+  opNames[OP_PRESENT] = maps.presentOp
+  opNames[OP_UNDEFINED] = maps.undefinedOp
+  opNames[OP_IN_COLLECTION] = maps.inOp
+  opNames[OP_NOT_IN_COLLECTION] = maps.notInOp
+  opNames[OP_IN_CONST] = maps.inOp
+  opNames[OP_NOT_IN_CONST] = maps.notInOp
+  opNames[OP_OVERLAP_CONST] = maps.overlapOp
+  opNames[OP_OVERLAP_SCAN_REFS_CONST] = maps.overlapOp
+  opNames[OP_IN_SCAN_REFS_CONST] = maps.inOp
+  opNames[OP_NOT_IN_SCAN_REFS_CONST] = maps.notInOp
+
+  // Pre-build residual Input[] arrays for OP_OVERLAP_SCAN_REFS_CONST — eliminates per-call allocation in the simplifier
+  const overlapRefsResiduals: Array<[number, Input[]]> =
+    state.overlapRefsEntries.map(({ pos, refIdxs }) => [
+      pos,
+      refIdxs.map((idx) => state.refKeys[idx]),
+    ])
+
+  // Build direction entries as serializable tuple array
+  const directionMap: Array<[number, 0 | 1]> = state.directionEntries.map(
+    ({ pos, dir }) => [pos, dir]
+  )
+
   return {
     bytecode: state.bytecode,
     refs: state.refs,
     numLocals: state.numLocals,
     consts: state.consts,
+    opNames,
+    refKeys: state.refKeys,
+    refRawKeys: state.refRawKeys,
+    overlapRefsResiduals,
+    directionMap,
+    refFirstCtxKeys: state.refs.map(getFirstCtxKey),
   }
 }

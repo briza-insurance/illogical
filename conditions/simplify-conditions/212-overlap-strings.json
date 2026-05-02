@@ -1,0 +1,1 @@
+{"description":"OVERLAP: string arrays overlap → true","expression":["OVERLAP",["red","blue"],["blue","green"]],"context":{},"expected":true}

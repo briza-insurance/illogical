@@ -1,0 +1,1 @@
+{"description":"Nested reference: parent known but child missing → undefined == 5 → false","expression":["==","$a.b",5],"context":{"a":{}},"expected":false}

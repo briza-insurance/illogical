@@ -1,0 +1,1 @@
+{"description":"PRESENT: key exists → true","expression":["PRESENT","$x"],"context":{"x":5},"expected":true}

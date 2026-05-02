@@ -1,0 +1,1 @@
+{"description":"Identity: simple expression with no context → full expression","expression":["==","$x",5],"context":{},"expected":["==","$x",5]}

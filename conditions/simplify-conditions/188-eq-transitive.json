@@ -1,0 +1,1 @@
+{"description":"Transitive: a==b AND b==c → true","expression":["AND",["==","$a","$b"],["==","$b","$c"]],"context":{"a":1,"b":1,"c":1},"expected":true}

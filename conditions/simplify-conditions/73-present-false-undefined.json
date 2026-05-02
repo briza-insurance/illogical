@@ -1,0 +1,1 @@
+{"description":"PRESENT: key absent → residual","expression":["PRESENT","$x"],"context":{},"expected":["PRESENT","$x"]}

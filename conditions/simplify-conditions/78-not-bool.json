@@ -1,0 +1,1 @@
+{"description":"NOT: one true comparison → false","expression":["NOT",["==",1,1]],"context":{},"expected":false}

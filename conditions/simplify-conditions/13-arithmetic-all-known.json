@@ -1,0 +1,6 @@
+{
+  "description": "Arithmetic inside comparison — all operands known, evaluates to (10 == 1) → false",
+  "expression": ["==", ["+", 5, 5], ["/", "$a", 2]],
+  "context": { "a": 2 },
+  "expected": false
+}

@@ -1,0 +1,1 @@
+{"description":"Equality: empty string vs empty string → true","expression":["==","", ""],"context":{},"expected":true}

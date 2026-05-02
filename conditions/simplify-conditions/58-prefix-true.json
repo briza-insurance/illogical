@@ -1,0 +1,1 @@
+{"description":"PREFIX operator: hel in hello → true","expression":["PREFIX","hel","hello"],"context":{},"expected":true}

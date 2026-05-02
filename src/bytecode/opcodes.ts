@@ -54,3 +54,14 @@ export const OP_JUMP_IF_FALSE = 41 // next: offset — peek stack; if false jump
 export const OP_JUMP_IF_TRUE = 42 // next: offset — peek stack; if true jump forward by offset
 export const OP_POP = 43 // pop and discard top of stack
 export const OP_XOR = 44 // pop 2 booleans, push (a || b) && !(a && b)
+
+// Logical marker opcodes — emitted after the short-circuit sequence.
+// The evaluate interpreter skips them (consumes the operand count byte).
+// The simplify interpreter uses them to identify the operator and arity for residual reconstruction.
+export const OP_AND = 53 // next: N — marker for AND with N operands
+export const OP_OR = 54 // next: N — marker for OR with N operands
+export const OP_NOR = 55 // next: N — marker for NOR with N operands
+// next: N, ref0..refN-1, constIdx — resolve each ref inline, check ∈ consts[constIdx], no stack alloc
+export const OP_IN_SCAN_REFS_CONST = 56
+// next: N, ref0..refN-1, constIdx — resolve each ref inline, check ∉ consts[constIdx], no stack alloc
+export const OP_NOT_IN_SCAN_REFS_CONST = 57

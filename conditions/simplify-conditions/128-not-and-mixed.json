@@ -1,0 +1,1 @@
+{"description":"NOT + AND: NOT(A AND B)","expression":["NOT",["AND",["==","$a",1],["==","$b",2]]],"context":{"a":1,"b":2},"expected":false}

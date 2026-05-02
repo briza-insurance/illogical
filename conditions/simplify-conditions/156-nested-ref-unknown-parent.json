@@ -1,0 +1,1 @@
+{"description":"Nested reference: parent unknown → residual","expression":["==","$a.b",5],"context":{},"expected":["==","$a.b",5]}

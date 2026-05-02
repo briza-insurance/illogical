@@ -1,0 +1,1 @@
+{"description":"Arithmetic inside logical: (2+3) > 3 AND (4*2) < 10","expression":["AND",[">",["+",2,3],3],["<",["*",4,2],10]],"context":{},"expected":true}

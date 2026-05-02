@@ -1,0 +1,1 @@
+{"description":"Date comparison: reference known","expression":[">","$date","2023-01-01"],"context":{"date":"2024-06-15"},"expected":true}
