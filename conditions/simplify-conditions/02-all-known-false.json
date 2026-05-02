@@ -1,0 +1,6 @@
+{
+  "description": "All context values known, expression resolves to false",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": { "a": 10, "b": 30 },
+  "expected": false
+}

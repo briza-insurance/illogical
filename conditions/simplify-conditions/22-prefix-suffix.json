@@ -1,0 +1,6 @@
+{
+  "description": "PREFIX and SUFFIX comparison operators",
+  "expression": ["AND", ["PREFIX", "pre", "$a"], ["SUFFIX", "$b", "ing"]],
+  "context": { "a": "prepare", "b": "running" },
+  "expected": true
+}

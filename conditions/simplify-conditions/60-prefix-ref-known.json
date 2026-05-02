@@ -1,0 +1,1 @@
+{"description":"PREFIX operator: reference known","expression":["PREFIX","pre","$word"],"context":{"word":"prepare"},"expected":true}

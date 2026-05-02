@@ -1,0 +1,1 @@
+{"description":"Tautology: true OR anything → true","expression":["OR",["==",1,1],["==","$a",1]],"context":{},"expected":true}

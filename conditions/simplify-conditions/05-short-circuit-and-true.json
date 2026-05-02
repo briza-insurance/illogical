@@ -1,0 +1,6 @@
+{
+  "description": "Short-circuit AND: true AND x → x (residual returned)",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": { "a": 10 },
+  "expected": ["==", "$b", 20]
+}

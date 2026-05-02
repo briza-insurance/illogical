@@ -1,0 +1,1 @@
+{"description":"NOT IN operator: reference not in array","expression":["NOT IN","$x",[1,2,3]],"context":{"x":5},"expected":true}

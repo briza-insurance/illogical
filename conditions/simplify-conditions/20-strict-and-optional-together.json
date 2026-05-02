@@ -1,0 +1,8 @@
+{
+  "description": "Both strictKeys and optionalKeys set — $a in strictKeys → undefined → false AND x → false",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20], ["==", "$c", 30]],
+  "context": {},
+  "strictKeys": ["a"],
+  "optionalKeys": ["c"],
+  "expected": false
+}

@@ -6,6 +6,7 @@
 import { compile, CompiledExpression } from './bytecode/compiler.js'
 import { BytecodeEvaluable } from './bytecode/evaluable.js'
 import { interpret } from './bytecode/interpreter.js'
+import { interpretSimplify } from './bytecode/simplifier.js'
 import { Context, Evaluable } from './common/evaluable.js'
 import { isBoolean, isEvaluable } from './common/type-check.js'
 import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide.js'
@@ -60,7 +61,7 @@ export {
   OPERATOR_SUBTRACT,
   OPERATOR_SUM,
 }
-export type { Context, Evaluable, ExpressionInput }
+export type { Context, Evaluable, ExpressionInput, Input }
 
 const unexpectedResultError =
   'non expression or boolean result should be returned'
@@ -154,6 +155,14 @@ class Engine {
     strictKeys?: string[] | Set<string>,
     optionalKeys?: string[] | Set<string>
   ): Input | boolean {
+    if (this.evaluator === 'bytecode') {
+      return interpretSimplify(
+        this.getCompiled(exp),
+        context,
+        strictKeys,
+        optionalKeys
+      )
+    }
     const result = this.parser
       .parse(exp)
       .simplify(context, strictKeys, optionalKeys)

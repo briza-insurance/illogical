@@ -1,0 +1,1 @@
+{"description":"AND: false short-circuit — second branch dropped","expression":["AND",["==",1,2],["==","$a",1]],"context":{},"expected":false}

@@ -1,0 +1,6 @@
+{
+  "description": "UNDEFINED and PRESENT — $a absent becomes residual, AND with true → residual preserved",
+  "expression": ["AND", ["UNDEFINED", "$a"], ["PRESENT", "$b"]],
+  "context": { "b": 5 },
+  "expected": ["UNDEFINED", "$a"]
+}
