@@ -37,27 +37,31 @@ const CTX_CASE_MAP: Record<string, keyof GeneratedCases> = {
 
 function parseArgs(): {
   expr: string | null
-  ctx: string | null
-  ctxCase: string | null
+  ctx: Context | null
+  ctxCase: keyof GeneratedCases | null
   noTty: boolean
 } {
   const args = process.argv.slice(2)
   let expr: string | null = null
-  let ctx: string | null = null
-  let ctxCase: string | null = null
+  let ctxRaw: string | null = null
+  let ctxCaseRaw: string | null = null
   let noTty = false
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--expr' && args[i + 1]) {
       expr = args[++i]
     } else if (args[i] === '--ctx' && args[i + 1]) {
-      ctx = args[++i]
+      ctxRaw = args[++i]
     } else if (args[i] === '--ctx-case' && args[i + 1]) {
-      ctxCase = args[++i]
+      ctxCaseRaw = args[++i]
     } else if (args[i] === '--no-tty') {
       noTty = true
     }
   }
+
+  const ctxCase: keyof GeneratedCases | null =
+    ctxCaseRaw !== null ? getValidCaseKey(ctxCaseRaw) : null
+  const ctx: Context | null = ctxRaw !== null ? parseCtxArg(ctxRaw) : null
 
   return { expr, ctx, ctxCase, noTty }
 }
@@ -66,12 +70,45 @@ function isExpressionInput(v: unknown): v is ExpressionInput {
   return Array.isArray(v) && v.length > 0 && typeof v[0] === 'string'
 }
 
+function isValidCtxCase(input: string): input is keyof GeneratedCases {
+  return Object.prototype.hasOwnProperty.call(CTX_CASE_MAP, input)
+}
+
+function getValidCaseKey(input: string): keyof GeneratedCases | never {
+  if (!isValidCtxCase(input)) {
+    console.error(
+      `Error: unknown --ctx-case "${input}". Valid values: ${Object.keys(CTX_CASE_MAP).join(', ')}`
+    )
+    process.exit(1)
+  }
+  return CTX_CASE_MAP[input]
+}
+
+function isValidContext(v: unknown): v is Context {
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
+}
+
+function parseCtxArg(raw: string): Context {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    console.error('Error: --ctx is not valid JSON')
+    process.exit(1)
+  }
+  if (!isValidContext(parsed)) {
+    console.error('Error: --ctx must be a JSON object')
+    process.exit(1)
+  }
+  return parsed as Context
+}
+
 function readStdin(): string {
   return fs.readFileSync(0, 'utf-8')
 }
 
 function main() {
-  const { expr: exprArg, ctx: ctxArg, ctxCase, noTty } = parseArgs()
+  const { expr: exprArg, ctx, ctxCase, noTty } = parseArgs()
 
   // Read expression from --expr or stdin (only read stdin when --expr not given,
   // so piping works: cat expr.json | npm run debug-bytecode -- --ctx '{}')
@@ -101,21 +138,9 @@ function main() {
   const expression: ExpressionInput = parsed
 
   if (ctxCase !== null) {
-    const caseKey = CTX_CASE_MAP[ctxCase]
-    if (caseKey === undefined) {
-      console.error(
-        `Error: unknown --ctx-case "${ctxCase}". Valid values: ${Object.keys(CTX_CASE_MAP).join(', ')}`
-      )
-      process.exit(1)
-    }
-    context = generateCases(expression)[caseKey]
-  } else if (ctxArg !== null) {
-    try {
-      context = JSON.parse(ctxArg)
-    } catch {
-      console.error('Error: --ctx is not valid JSON')
-      process.exit(1)
-    }
+    context = generateCases(expression)[ctxCase]
+  } else if (ctx !== null) {
+    context = ctx
   }
 
   // Compile

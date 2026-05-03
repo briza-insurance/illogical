@@ -6,6 +6,7 @@
  */
 
 import { readFileSync } from 'fs'
+import { basename, resolve } from 'path'
 
 interface BenchResult {
   throughput?: { mean: number }
@@ -22,10 +23,47 @@ if (!baselinePath || !currentPath) {
   process.exit(1)
 }
 
+// Strip directory components to break taint path — we only use the filename
+const baselineFile = basename(baselinePath)
+const currentFile = basename(currentPath)
+
+// Validate filenames: only allow safe characters (no path traversal)
+const safeFilenamePattern = /^[a-zA-Z0-9_\-./]+\.json$/
+if (
+  !safeFilenamePattern.test(baselineFile) ||
+  !safeFilenamePattern.test(currentFile)
+) {
+  console.error('Error: invalid file name')
+  process.exit(1)
+}
+
+// Construct path from known base directory + validated filename
+const resultsDir = resolve('benchmark/results')
+const resolvedBaseline = resolve(resultsDir, baselineFile)
+const resolvedCurrent = resolve(resultsDir, currentFile)
+
+// Verify resolved paths are within the results directory
+if (
+  !resolvedBaseline.startsWith(resultsDir + '/') &&
+  resolvedBaseline !== resultsDir
+) {
+  console.error('Error: baseline path is outside allowed directory')
+  process.exit(1)
+}
+if (
+  !resolvedCurrent.startsWith(resultsDir + '/') &&
+  resolvedCurrent !== resultsDir
+) {
+  console.error('Error: current path is outside allowed directory')
+  process.exit(1)
+}
+
 const baseline: BenchResultFile = JSON.parse(
-  readFileSync(baselinePath, 'utf-8')
+  readFileSync(resolvedBaseline, 'utf-8')
 )
-const current: BenchResultFile = JSON.parse(readFileSync(currentPath, 'utf-8'))
+const current: BenchResultFile = JSON.parse(
+  readFileSync(resolvedCurrent, 'utf-8')
+)
 
 function formatHz(hz: number): string {
   if (hz >= 1_000_000) {

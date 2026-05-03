@@ -20,6 +20,8 @@ function isRecord(value: unknown): value is Context {
   return typeof value === 'object' && value !== null
 }
 
+const SAFE_KEY = /^\w+$/
+
 function setNestedValue(
   obj: Record<string, unknown>,
   pathArray: string[],
@@ -28,15 +30,20 @@ function setNestedValue(
   let current = obj
   for (let i = 0; i < pathArray.length - 1; i++) {
     const part = pathArray[i]
-    if (!isRecord(current[part])) {
-      current[part] = {}
-    }
-    const next = current[part]
-    if (isRecord(next)) {
-      current = next
+    if (SAFE_KEY.test(part)) {
+      if (!isRecord(current[part])) {
+        current[part] = {}
+      }
+      const next = current[part]
+      if (isRecord(next)) {
+        current = next
+      }
     }
   }
-  current[pathArray[pathArray.length - 1]] = value
+  const lastKey = pathArray[pathArray.length - 1]
+  if (lastKey !== undefined && SAFE_KEY.test(lastKey)) {
+    current[lastKey] = value
+  }
 }
 
 function extractAllRefs(
