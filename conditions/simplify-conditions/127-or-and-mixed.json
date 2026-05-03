@@ -1,0 +1,1 @@
+{"description":"OR + AND mixed: A OR (B AND C)","expression":["OR",["==","$a",1],["AND",["==","$b",2],["==","$c",3]]],"context":{"a":1},"expected":true}

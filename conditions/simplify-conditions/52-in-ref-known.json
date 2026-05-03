@@ -1,0 +1,1 @@
+{"description":"IN operator: reference in array","expression":["IN","$x",[1,2,3]],"context":{"x":2},"expected":true}

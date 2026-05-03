@@ -1,0 +1,1 @@
+{"description":"NOT: operand is residual → NOT(residual)","expression":["NOT",["==","$a",1]],"context":{},"expected":["NOT",["==","$a",1]]}

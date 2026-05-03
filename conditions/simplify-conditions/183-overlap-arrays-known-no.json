@@ -1,0 +1,1 @@
+{"description":"OVERLAP: arrays known, no overlap → false","expression":["OVERLAP",[1,2],[3,4]],"context":{},"expected":false}

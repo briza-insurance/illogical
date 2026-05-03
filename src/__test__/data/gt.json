@@ -1,0 +1,15 @@
+[
+  { "expression": [">", 1, 0], "context": {}, "expected": true },
+  { "expression": [">", "2023-01-01", "2022-12-31"], "context": {}, "expected": true },
+  { "expression": [">", "2023-01-01", "2023-01-01"], "context": {}, "expected": false },
+  { "expression": [">", "2023-01-01", "2023-01-02"], "context": {}, "expected": false },
+  { "expression": [">", 1, 1], "context": {}, "expected": false },
+  { "expression": [">", 0, 1], "context": {}, "expected": false },
+  { "expression": [">", 1, "0"], "context": {}, "expected": false },
+  { "expression": [">", 1, true], "context": {}, "expected": false },
+  { "expression": [">", 1, false], "context": {}, "expected": false },
+  { "expression": [">", 1, "$null"], "context": { "null": null }, "expected": false },
+  { "expression": [">", 1, "$undef"], "context": {}, "expected": false },
+  { "expression": [">", 1, [0]], "context": {}, "expected": false },
+  { "expression": [">", 1, ["0"]], "context": {}, "expected": false }
+]

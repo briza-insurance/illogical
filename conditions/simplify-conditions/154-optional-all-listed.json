@@ -1,0 +1,1 @@
+{"description":"optionalKeys: all keys listed → all become residuals","expression":["AND",["==","$a",1],["==","$b",2]],"context":{},"optionalKeys":["a","b"],"expected":["AND",["==","$a",1],["==","$b",2]]}

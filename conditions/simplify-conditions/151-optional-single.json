@@ -1,0 +1,1 @@
+{"description":"optionalKeys: single key allowed absent","expression":["AND",["==","$a",1],["==","$b",2]],"context":{},"optionalKeys":["b"],"expected":false}

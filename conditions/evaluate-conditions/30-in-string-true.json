@@ -1,0 +1,1 @@
+{"description":"IN: \"red\" in [\"red\",\"blue\"] → true","expression":["IN","red",["red","blue"]],"context":{},"expected":true}

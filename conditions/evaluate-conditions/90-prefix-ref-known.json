@@ -1,0 +1,1 @@
+{"description":"PREFIX: ref starts with → true","expression":["PREFIX","pre","$word"],"context":{"word":"prepare"},"expected":true}

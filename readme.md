@@ -87,6 +87,11 @@ Customize the engine and the documentation:
 - [Engine Options](./specs/engine.md)
 - [Code Documentation](https://briza-insurance.github.io/illogical/index.html)
 
+Bytecode evaluation and debugging tools:
+
+- [Bytecode Evaluator](./specs/bytecode-evaluator.md)
+- [Debugger Tools](./specs/debugger-tools.md)
+
 ## 📖 Changelog
 
 See [changelog.md](./changelog.md).

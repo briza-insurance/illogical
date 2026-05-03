@@ -1,0 +1,4 @@
+[
+  { "expression": ["NOT", ["==", 1, 2]], "context": {}, "expected": true },
+  { "expression": ["NOT", ["==", 1, 1]], "context": {}, "expected": false }
+]

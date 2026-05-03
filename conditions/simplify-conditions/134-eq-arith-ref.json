@@ -1,0 +1,1 @@
+{"description":"Equality with arithmetic + reference: 2 + $x == 7","expression":["==",["+",2,"$x"],7],"context":{"x":5},"expected":true}

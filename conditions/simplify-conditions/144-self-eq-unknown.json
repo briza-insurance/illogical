@@ -1,0 +1,1 @@
+{"description":"Self-reference equality: $x == $x when unknown → residual","expression":["==","$x","$x"],"context":{},"expected":["==","$x","$x"]}

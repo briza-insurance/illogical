@@ -1,0 +1,1 @@
+{"description":"PREFIX: \"lo\" in \"hello\" → false","expression":["PREFIX","lo","hello"],"context":{},"expected":false}

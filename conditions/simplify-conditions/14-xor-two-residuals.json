@@ -1,0 +1,6 @@
+{
+  "description": "XOR with two unknowns — simplifies to XOR of residuals",
+  "expression": ["XOR", ["==", "$a", 1], ["==", "$b", 2]],
+  "context": {},
+  "expected": ["XOR", ["==", "$a", 1], ["==", "$b", 2]]
+}
