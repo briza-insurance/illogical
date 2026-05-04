@@ -7,7 +7,6 @@
  */
 
 export const OP_PUSH_VALUE = 1 // next: literal — push literal onto stack
-export const OP_PUSH_REF = 2 // next: ref index — push context lookup onto stack (legacy, unused by new compiler)
 export const OP_PUSH_REF_KEY = 6 // next: index into refs (CompactRef string) — ctx[key]
 export const OP_PUSH_REF_KEYS = 7 // next: index into refs (CompactRef string[]) — inline multi-key walk
 export const OP_PUSH_REF_TOKENS = 8 // next: index into refs (CompactRef token/dataType obj) — token walk

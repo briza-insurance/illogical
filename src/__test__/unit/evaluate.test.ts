@@ -40,20 +40,18 @@ const testFiles = readdirSync(EVALUATE_CONDITIONS_DIR, { withFileTypes: true })
 
 const testCases: TestCase[] = testFiles.map(loadTestCase)
 
-// Run all test cases against both evaluators
-for (const mode of ['oop', 'bytecode'] as const) {
-  describe(`Evaluate — ${mode} evaluator`, () => {
-    const engine = new Engine({ evaluator: mode })
+// Run all test cases
+describe('Evaluate', () => {
+  const engine = new Engine()
 
-    for (const tc of testCases) {
-      test(tc.description, () => {
-        const result = engine.evaluate(tc.expression, tc.context)
-        assert.strictEqual(
-          result,
-          tc.expected,
-          `Expected evaluate to return ${tc.expected}, got ${result}`
-        )
-      })
-    }
-  })
-}
+  for (const tc of testCases) {
+    test(tc.description, () => {
+      const result = engine.evaluate(tc.expression, tc.context)
+      assert.strictEqual(
+        result,
+        tc.expected,
+        `Expected evaluate to return ${tc.expected}, got ${result}`
+      )
+    })
+  }
+})

@@ -3,9 +3,7 @@
  * @module illogical/test
  */
 
-import { EvaluableType, Result } from '../common/evaluable.js'
-import { Operand } from '../operand/index.js'
-import { Input } from '../parser/index.js'
+import { Result } from '../common/evaluable.js'
 
 type operandValue = Result | null | undefined
 
@@ -30,53 +28,3 @@ export function permutation(
   }
   return result
 }
-
-class TestOperand extends Operand {
-  type: EvaluableType = EvaluableType.Operand
-  constructor(private readonly value: operandValue) {
-    super()
-  }
-  evaluate() {
-    return this.value
-  }
-  simplify() {
-    return this.value
-  }
-  serialize(): Input {
-    throw new Error('not implemented')
-  }
-  toString() {
-    return `Operand(${JSON.stringify(this.value)})`
-  }
-}
-
-/**
- * Create a primitive operand, evaluating as the passed value.
- * @param value
- */
-export const operand = (value: operandValue): Operand => new TestOperand(value)
-
-class NotSimplifiedOperand extends Operand {
-  type: EvaluableType = EvaluableType.Operand
-  constructor() {
-    super()
-  }
-  evaluate() {
-    return undefined
-  }
-  simplify() {
-    return this
-  }
-  serialize(): Input {
-    throw new Error('not implemented')
-  }
-  toString() {
-    return 'NotSimplified'
-  }
-}
-
-/**
- * Create a primitive operand that cannot be simplified.
- * @param value
- */
-export const notSimplified = (): Operand => new NotSimplifiedOperand()

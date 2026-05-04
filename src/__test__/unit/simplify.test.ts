@@ -60,25 +60,23 @@ const testFiles = readdirSync(SIMPLIFY_CONDITIONS_DIR, { withFileTypes: true })
 
 const testCases: TestCase[] = testFiles.map(loadTestCase)
 
-// Run all test cases against both evaluators
-for (const mode of ['oop', 'bytecode'] as const) {
-  describe(`Simplify — ${mode} evaluator`, () => {
-    const engine = new Engine({ evaluator: mode })
+// Run all test cases
+describe('Simplify', () => {
+  const engine = new Engine()
 
-    for (const tc of testCases) {
-      test(tc.description, () => {
-        const result = engine.simplify(
-          tc.expression,
-          tc.context,
-          tc.strictKeys,
-          tc.optionalKeys
-        )
-        assert.deepStrictEqual(
-          result,
-          tc.expected,
-          `Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
-        )
-      })
-    }
-  })
-}
+  for (const tc of testCases) {
+    test(tc.description, () => {
+      const result = engine.simplify(
+        tc.expression,
+        tc.context,
+        tc.strictKeys,
+        tc.optionalKeys
+      )
+      assert.deepStrictEqual(
+        result,
+        tc.expected,
+        `Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
+      )
+    })
+  }
+})

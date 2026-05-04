@@ -10,8 +10,7 @@
  *   CompactRefFull (tokens)  — OP_PUSH_REF_TOKENS  — token walk + optional cast
  *   CompactRefFull (dynamic) — OP_PUSH_REF_DYNAMIC — runtime {placeholder} substitution
  */
-import { Context, Result } from '../common/evaluable.js';
-import { DataType } from '../operand/reference.js';
+import { Context, DataType, Result } from '../common/evaluable.js';
 export type PathToken = {
     kind: 'key';
     value: string;

@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 import { Result } from '../common/evaluable.js'
-import { Parser } from '../parser/index.js'
+import { defaultOptions } from '../parser/options.js'
 import { compile, CompiledExpression } from './compiler.js'
 import * as opcodes from './opcodes.js'
 
@@ -105,7 +105,6 @@ function disassemble(compiled: CompiledExpression): string[] {
 function main() {
   const args = process.argv.slice(2)
   const shouldDisassemble = args.includes('--disassemble')
-  const parser = new Parser()
 
   try {
     const input = fs.readFileSync(0, 'utf-8')
@@ -114,9 +113,7 @@ function main() {
       process.exit(1)
     }
     const expression = JSON.parse(input)
-    // Validate expression structure before compilation
-    parser.parse(expression)
-    const compiled = compile(expression, parser.options)
+    const compiled = compile(expression, defaultOptions)
 
     const output: CompiledExpression & { disassembled?: string[] } = {
       ...compiled,

@@ -6,7 +6,6 @@
  * element as the literal value to push).
  */
 export declare const OP_PUSH_VALUE = 1;
-export declare const OP_PUSH_REF = 2;
 export declare const OP_PUSH_REF_KEY = 6;
 export declare const OP_PUSH_REF_KEYS = 7;
 export declare const OP_PUSH_REF_TOKENS = 8;

@@ -1,4 +1,4 @@
-import { Evaluable, Result } from './evaluable.js'
+import { Result } from './evaluable.js'
 
 /**
  * Is number predicate.
@@ -44,43 +44,6 @@ export function isObject(value: unknown): value is Record<string, unknown> {
  */
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === 'boolean'
-}
-
-/**
- * Check if a value is a an Evaluable
- * @param {Result | Evaluable} value value to check if is Evaluable
- * @returns {Evaluable}
- */
-export function isEvaluable(value: Result | Evaluable): value is Evaluable {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    typeof value.evaluate === 'function' &&
-    typeof value.simplify === 'function' &&
-    typeof value.serialize === 'function' &&
-    typeof value.toString === 'function'
-  )
-}
-
-/**
- * Ensures all values are results.
- * @param {(Result | Evaluable)[]} values results or evaluables
- * @returns {boolean} type guard
- */
-export function areAllResults(
-  values: (Result | Evaluable)[]
-): values is Result[] {
-  return values.every((value) => !isEvaluable(value))
-}
-
-/**
- * Ensures all values are numbers.
- * @param {Result[]} results results or evaluables
- * @returns {boolean} type guard
- */
-export function areAllNumbers(results: Result[]): results is number[] {
-  return results.every(isNumber)
 }
 
 export function isUndefined(value: unknown): value is undefined {

@@ -64,10 +64,10 @@ import {
   resolveKeys,
   resolveTokens,
 } from '../bytecode/refs.js'
+import { operateWithExpectedDecimals } from '../common/arithmetic.js'
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
 import { toDateNumber } from '../common/util.js'
-import { operateWithExpectedDecimals } from '../expression/arithmetic/operateWithExpectedDecimals.js'
 import { disassemble } from './debugger-disasm.js'
 import { DebugTrace, StepSnapshot } from './types.js'
 

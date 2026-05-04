@@ -7,29 +7,31 @@
  */
 
 import { Result } from '../common/evaluable.js'
-import { OPERATOR as OPERATOR_DIVIDE } from '../expression/arithmetic/divide.js'
-import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply.js'
-import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract.js'
-import { OPERATOR as OPERATOR_SUM } from '../expression/arithmetic/sum.js'
-import { OPERATOR as OPERATOR_EQ } from '../expression/comparison/eq.js'
-import { OPERATOR as OPERATOR_GE } from '../expression/comparison/ge.js'
-import { OPERATOR as OPERATOR_GT } from '../expression/comparison/gt.js'
-import { OPERATOR as OPERATOR_IN } from '../expression/comparison/in.js'
-import { OPERATOR as OPERATOR_LE } from '../expression/comparison/le.js'
-import { OPERATOR as OPERATOR_LT } from '../expression/comparison/lt.js'
-import { OPERATOR as OPERATOR_NE } from '../expression/comparison/ne.js'
-import { OPERATOR as OPERATOR_NOT_IN } from '../expression/comparison/not-in.js'
-import { OPERATOR as OPERATOR_OVERLAP } from '../expression/comparison/overlap.js'
-import { OPERATOR as OPERATOR_PREFIX } from '../expression/comparison/prefix.js'
-import { OPERATOR as OPERATOR_PRESENT } from '../expression/comparison/present.js'
-import { OPERATOR as OPERATOR_SUFFIX } from '../expression/comparison/suffix.js'
-import { OPERATOR as OPERATOR_UNDEFINED } from '../expression/comparison/undefined.js'
-import { OPERATOR as OPERATOR_AND } from '../expression/logical/and.js'
-import { OPERATOR as OPERATOR_NOR } from '../expression/logical/nor.js'
-import { OPERATOR as OPERATOR_NOT } from '../expression/logical/not.js'
-import { OPERATOR as OPERATOR_OR } from '../expression/logical/or.js'
-import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor.js'
-import { ArrayInput, ExpressionInput, Input } from '../parser/index.js'
+import {
+  OPERATOR_AND,
+  OPERATOR_DIVIDE,
+  OPERATOR_EQ,
+  OPERATOR_GE,
+  OPERATOR_GT,
+  OPERATOR_IN,
+  OPERATOR_LE,
+  OPERATOR_LT,
+  OPERATOR_MULTIPLY,
+  OPERATOR_NE,
+  OPERATOR_NOR,
+  OPERATOR_NOT,
+  OPERATOR_NOT_IN,
+  OPERATOR_OR,
+  OPERATOR_OVERLAP,
+  OPERATOR_PREFIX,
+  OPERATOR_PRESENT,
+  OPERATOR_SUBTRACT,
+  OPERATOR_SUFFIX,
+  OPERATOR_SUM,
+  OPERATOR_UNDEFINED,
+  OPERATOR_XOR,
+} from '../operator.js'
+import { ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import {
   OP_AND,
@@ -155,16 +157,15 @@ interface CompilerState {
   maps: OperatorMaps
   // CSE: canonical key → local slot index for dynamic collections seen >1 time
   collectionCse: Map<string, number>
-  numLocals: number
   // Static collection constants table — interned by JSON key, zero allocation at runtime
-  consts: ArrayInput[]
+  consts: Input[][]
   constIndex: Map<string, number>
   // Side tables for the simplify interpreter
   overlapRefsEntries: Array<{ pos: number; refIdxs: number[] }>
   directionEntries: Array<{ pos: number; dir: 0 | 1 }>
 }
 
-function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
+function isStaticCollection(raw: Input, opts: Options): raw is Input[] {
   return (
     Array.isArray(raw) &&
     !raw.some((v) => typeof v === 'string' && opts.referencePredicate(v))
@@ -179,7 +180,7 @@ function isPureRefCollection(raw: Input, opts: Options): raw is string[] {
   )
 }
 
-function internConst(items: ArrayInput, state: CompilerState): number {
+function internConst(items: Input[], state: CompilerState): number {
   const key = JSON.stringify(items)
   let idx = state.constIndex.get(key)
   if (idx === undefined) {
@@ -193,11 +194,11 @@ function internConst(items: ArrayInput, state: CompilerState): number {
 /**
  * Returns the first context key for a multi-key ref (e.g. 'account' for $account.region),
  * or undefined for single-key refs (no heuristic needed) and dynamic refs (unknowable statically).
- * Used by the simplify interpreter to replicate OOP Reference.simplify()'s first-key check.
+ * Used by the simplify interpreter to replicate Reference.simplify()'s first-key check.
  */
 function getFirstCtxKey(ref: CompactRef): string | undefined {
   if (typeof ref === 'string') {
-    return undefined // single-key ref — OOP checks ctx[key] directly, no first-key shortcut
+    return undefined // single-key ref — no first-key shortcut
   }
   if (Array.isArray(ref)) {
     return ref[0] // multi-key path: first element is the top-level context key
@@ -259,7 +260,7 @@ function emitOperand(raw: Input, state: CompilerState): void {
         emitOperand(item, state)
       }
       bytecode.push(OP_MAKE_COLLECTION, raw.length)
-      const slot = state.numLocals++
+      const slot = state.collectionCse.size
       state.collectionCse.set(cseKey, slot)
       bytecode.push(OP_STORE_LOCAL, slot)
       return
@@ -286,9 +287,9 @@ function emitOperand(raw: Input, state: CompilerState): void {
  * Returns null if the child does not match either form.
  */
 function extractInLikeChild(
-  ca: ArrayInput,
+  ca: Input[],
   state: CompilerState
-): { rawRef: string; refKey: string; vals: ArrayInput } | null {
+): { rawRef: string; refKey: string; vals: Input[] } | null {
   const op = ca[0]
   const left = ca[1]
   if (typeof left !== 'string' || !state.opts.referencePredicate(left)) {
@@ -336,7 +337,7 @@ function extractInLikeChild(
  * Returns null if the pattern does not match.
  */
 function detectOrAndIn2Pattern(
-  arr: ArrayInput,
+  arr: Input[],
   state: CompilerState
 ): {
   ref1Raw: string
@@ -433,7 +434,7 @@ function detectOrAndIn2Pattern(
 
 // arr[0] is the operator; operands are arr[1..arr.length-1]
 function emitShortCircuit(
-  arr: ArrayInput,
+  arr: Input[],
   jumpOp: typeof OP_JUMP_IF_FALSE | typeof OP_JUMP_IF_TRUE,
   markerOp: typeof OP_AND | typeof OP_OR | typeof OP_NOR,
   state: CompilerState
@@ -481,12 +482,26 @@ function emitExpression(raw: Input, state: CompilerState): void {
   // ---------------------------------------------------------------------------
   // Logical — short-circuit with jump instructions
   // ---------------------------------------------------------------------------
+
+  // Validate logical operands — arithmetic operators are not allowed
+  const validateLogicalOperands = (operands: Input[]) => {
+    for (const op of operands) {
+      if (Array.isArray(op) && typeof op[0] === 'string') {
+        if (op[0] in maps.arithmetic) {
+          throw new Error('invalid expression')
+        }
+      }
+    }
+  }
+
   if (operator === maps.andOp) {
+    validateLogicalOperands(arr.slice(1))
     emitShortCircuit(arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
 
   if (operator === maps.orOp) {
+    validateLogicalOperands(arr.slice(1))
     const orAnd2 = detectOrAndIn2Pattern(arr, state)
     if (orAnd2 !== null) {
       const { ref1Raw, ref2Raw, entries } = orAnd2
@@ -506,6 +521,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.norOp) {
+    validateLogicalOperands(arr.slice(1))
     // NOR = NOT OR: emit as OR with short-circuit, then negate
     emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
@@ -513,12 +529,14 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.notOp) {
+    validateLogicalOperands([arr[1]])
     emitExpression(arr[1], state)
     bytecode.push(OP_NOT)
     return
   }
 
   if (operator === maps.xorOp) {
+    validateLogicalOperands(arr.slice(1))
     // XOR is associative: chain binary XOR operations
     // (A XOR B) XOR C XOR D ...
     emitExpression(arr[1], state)
@@ -538,7 +556,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
     const left = arr[1]
     const right = arr[2]
     if (Array.isArray(left) && !Array.isArray(right)) {
-      const leftArr: ArrayInput = left
+      const leftArr: Input[] = left
       const leftHasDynamic = leftArr.some(
         (v) => typeof v === 'string' && state.opts.referencePredicate(v)
       )
@@ -585,7 +603,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
       return
     }
     if (Array.isArray(right) && !Array.isArray(left)) {
-      const rightArr: ArrayInput = right
+      const rightArr: Input[] = right
       const rightHasDynamic = rightArr.some(
         (v) => typeof v === 'string' && state.opts.referencePredicate(v)
       )
@@ -746,8 +764,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
 export interface CompiledExpression {
   bytecode: Bytecode
   refs: CompactRef[]
-  numLocals: number
-  consts: ArrayInput[]
+  consts: Input[][]
   // opcode → operator string, used by the simplify interpreter for residual reconstruction
   opNames: Record<number, string>
   // serialized ref key per ref index (e.g. '$RefA'), used for residual output
@@ -759,7 +776,7 @@ export interface CompiledExpression {
   // bytecode position → direction (0 = collection/const on left, 1 = on right) for IN/OVERLAP opcodes
   directionMap: Array<[number, 0 | 1]>
   // First context key per ref index: undefined for single-key refs, string for multi-key refs.
-  // Used by the simplify interpreter to match OOP Reference.simplify() behavior:
+  // Used by the simplify interpreter to match reference simplify behavior:
   // if ctx[firstCtxKey] !== undefined, treat undefined sub-fields as concrete rather than unknown.
   refFirstCtxKeys: (string | undefined)[]
 }
@@ -772,6 +789,23 @@ export function compile(
   raw: ExpressionInput,
   opts: Options
 ): CompiledExpression {
+  // Validate root expression — must be an array with a string operator
+  if (!Array.isArray(raw) || typeof raw[0] !== 'string') {
+    throw new Error('invalid expression')
+  }
+
+  // Validate root operator — arithmetic operators cannot be root operators
+  const rootOp = raw[0]
+  const rootOpStr = typeof rootOp === 'string' ? rootOp : ''
+  if (
+    rootOpStr === '+' ||
+    rootOpStr === '-' ||
+    rootOpStr === '*' ||
+    rootOpStr === '/'
+  ) {
+    throw new Error('invalid expression')
+  }
+
   const maps = buildOperatorMaps(opts)
   const state: CompilerState = {
     bytecode: [],
@@ -782,7 +816,6 @@ export function compile(
     opts,
     maps,
     collectionCse: new Map(),
-    numLocals: 0,
     consts: [],
     constIndex: new Map(),
     overlapRefsEntries: [],
@@ -829,7 +862,6 @@ export function compile(
   return {
     bytecode: state.bytecode,
     refs: state.refs,
-    numLocals: state.numLocals,
     consts: state.consts,
     opNames,
     refKeys: state.refKeys,

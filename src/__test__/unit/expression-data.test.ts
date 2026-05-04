@@ -13,21 +13,19 @@ interface TestCase {
 
 const DATA_DIR = resolve('src/__test__/data')
 
-for (const evaluator of ['oop', 'bytecode'] as const) {
-  const engine = new Engine({ evaluator })
+const engine = new Engine()
 
-  for (const entry of readdirSync(DATA_DIR, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith('.json')) {
-      continue
-    }
-    const file = join(DATA_DIR, entry.name)
-    const cases: TestCase[] = JSON.parse(readFileSync(file, 'utf8'))
-    describe(`[${evaluator}] ${entry.name}`, () => {
-      for (const { expression, context, expected } of cases) {
-        test(`${JSON.stringify(expression)} in ${JSON.stringify(context)} → ${expected}`, () => {
-          assert.strictEqual(engine.evaluate(expression, context), expected)
-        })
-      }
-    })
+for (const entry of readdirSync(DATA_DIR, { withFileTypes: true })) {
+  if (!entry.isFile() || !entry.name.endsWith('.json')) {
+    continue
   }
+  const file = join(DATA_DIR, entry.name)
+  const cases: TestCase[] = JSON.parse(readFileSync(file, 'utf8'))
+  describe(entry.name, () => {
+    for (const { expression, context, expected } of cases) {
+      test(`${JSON.stringify(expression)} in ${JSON.stringify(context)} → ${expected}`, () => {
+        assert.strictEqual(engine.evaluate(expression, context), expected)
+      })
+    }
+  })
 }

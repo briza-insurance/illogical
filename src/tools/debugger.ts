@@ -19,7 +19,8 @@ import {
 } from '../benchmark/generate-cases.js'
 import { compile } from '../bytecode/compiler.js'
 import { Context } from '../common/evaluable.js'
-import { ExpressionInput, Parser } from '../parser/index.js'
+import { ExpressionInput } from '../parser/index.js'
+import { defaultOptions } from '../parser/options.js'
 import { setupKeyboard } from './debugger-input.js'
 import { renderFrame } from './debugger-render.js'
 import { interpretDebug } from './debugger-vm.js'
@@ -144,9 +145,8 @@ function main() {
   }
 
   // Compile
-  const parser = new Parser()
   try {
-    parser.parse(expression)
+    compile(expression, defaultOptions)
   } catch (err) {
     console.error(
       'Error: invalid expression:',
@@ -154,7 +154,7 @@ function main() {
     )
     process.exit(1)
   }
-  const compiled = compile(expression, parser.options)
+  const compiled = compile(expression, defaultOptions)
 
   // Run instrumented VM
   const trace = interpretDebug(compiled, context, expression)

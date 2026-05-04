@@ -9,7 +9,7 @@
  *   node --import tsx benchmark/simplify.ts --cases conditions/synthetic-conditions
  *   node --import tsx benchmark/simplify.ts --cases conditions/sample-conditions --out benchmark/results-baseline.json
  *   node --import tsx benchmark/simplify.ts --engine /other/path/lib/illogical.esm.js
- *   node --import tsx benchmark/simplify.ts --options '{"evaluator":"bytecode"}'
+ *   node --import tsx benchmark/simplify.ts --options '{}'
  */
 
 import { join, resolve } from 'path'

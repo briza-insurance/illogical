@@ -6,6 +6,7 @@
  * and operates on the flat bytecode array directly.
  */
 
+import { operateWithExpectedDecimals } from '../common/arithmetic.js'
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
 import { toDateNumber } from '../common/util.js'
@@ -55,7 +56,6 @@ import {
   OP_UNDEFINED,
   OP_XOR,
 } from './opcodes.js'
-import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
 import {
   asFullRef,
   asKeyRef,

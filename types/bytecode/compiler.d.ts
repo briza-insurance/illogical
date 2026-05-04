@@ -6,15 +6,14 @@
  * the result should be cached and reused across evaluate() calls.
  */
 import { Result } from '../common/evaluable.js';
-import { ArrayInput, ExpressionInput, Input } from '../parser/index.js';
+import { ExpressionInput, Input } from '../parser/index.js';
 import { Options } from '../parser/options.js';
 import { CompactRef } from './refs.js';
 export type Bytecode = (number | Result)[];
 export interface CompiledExpression {
     bytecode: Bytecode;
     refs: CompactRef[];
-    numLocals: number;
-    consts: ArrayInput[];
+    consts: Input[][];
     opNames: Record<number, string>;
     refKeys: string[];
     refRawKeys: string[];

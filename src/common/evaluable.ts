@@ -1,6 +1,3 @@
-import { Input } from '../parser/index.js'
-import { Options } from '../parser/options.js'
-
 /**
  * Valid types for context members
  */
@@ -34,53 +31,10 @@ export type Result =
   | Array<Result>
   | Record<string, unknown>
 
-export enum EvaluableType {
-  Operand = 'Operand',
-  Expression = 'Expression',
-}
-
 /**
- * Evaluable
+ * Data type casting for references.
  */
-export interface Evaluable {
-  type: EvaluableType
-
-  /**
-   * Evaluate in the given context.
-   * @param {Context} ctx
-   * @return {Result}
-   */
-  evaluate(ctx: Context): Result
-
-  /**
-   * Simplifies this Evaluable when possible.
-   *
-   * @param {Context} ctx context for the evaluation
-   * @param {string[] | Set<string>} strictKeys keys to be considered present even if they are not present in the
-   *  context. Passing as a Set is recommended for performance reasons.
-   * @param {string[] | Set<string>} optionalKeys keys to be considered not present unless they are in the context or in
-   *  `strictKeys`; when `strictKeys` is `undefined` and `optionalKeys` is an array, every key that is not in
-   *  `optionalKeys` is considered to be present and thus will be evaluated. Passing as a Set is recommended for
-   *  performance reasons.
-   * @returns {Result | Evaluable} simplified value or itself
-   */
-  simplify(
-    ctx: Context,
-    strictKeys?: string[] | Set<string>,
-    optionalKeys?: string[] | Set<string>
-  ): Result | Evaluable
-
-  /**
-   * Serializes the Evaluable to its input format.
-   *
-   * @param {Options} options parser options
-   */
-  serialize(options: Options): Input
-
-  /**
-   * Get the strict representation of the evaluable expression.
-   */
-  toString(): string
+export enum DataType {
+  Number = 'Number',
+  String = 'String',
 }
-
-export type SimplifyArgs = Parameters<Evaluable['simplify']>

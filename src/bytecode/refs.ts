@@ -11,9 +11,8 @@
  *   CompactRefFull (dynamic) — OP_PUSH_REF_DYNAMIC — runtime {placeholder} substitution
  */
 
-import { Context, Result } from '../common/evaluable.js'
+import { Context, DataType, Result } from '../common/evaluable.js'
 import { toNumber, toString } from '../common/util.js'
-import { DataType } from '../operand/reference.js'
 
 export type PathToken =
   | { kind: 'key'; value: string } // plain key:   address

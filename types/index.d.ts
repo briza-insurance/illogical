@@ -2,46 +2,25 @@
  * Main module.
  * @module illogical
  */
-import { Context, Evaluable } from './common/evaluable.js';
-import { isEvaluable } from './common/type-check.js';
-import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide.js';
-import { OPERATOR as OPERATOR_MULTIPLY } from './expression/arithmetic/multiply.js';
-import { OPERATOR as OPERATOR_SUBTRACT } from './expression/arithmetic/subtract.js';
-import { OPERATOR as OPERATOR_SUM } from './expression/arithmetic/sum.js';
-import { OPERATOR as OPERATOR_EQ } from './expression/comparison/eq.js';
-import { OPERATOR as OPERATOR_GE } from './expression/comparison/ge.js';
-import { OPERATOR as OPERATOR_GT } from './expression/comparison/gt.js';
-import { OPERATOR as OPERATOR_IN } from './expression/comparison/in.js';
-import { OPERATOR as OPERATOR_LE } from './expression/comparison/le.js';
-import { OPERATOR as OPERATOR_LT } from './expression/comparison/lt.js';
-import { OPERATOR as OPERATOR_NE } from './expression/comparison/ne.js';
-import { OPERATOR as OPERATOR_NOT_IN } from './expression/comparison/not-in.js';
-import { OPERATOR as OPERATOR_OVERLAP } from './expression/comparison/overlap.js';
-import { OPERATOR as OPERATOR_PREFIX } from './expression/comparison/prefix.js';
-import { OPERATOR as OPERATOR_PRESENT } from './expression/comparison/present.js';
-import { OPERATOR as OPERATOR_SUFFIX } from './expression/comparison/suffix.js';
-import { OPERATOR as OPERATOR_UNDEFINED } from './expression/comparison/undefined.js';
-import { OPERATOR as OPERATOR_AND } from './expression/logical/and.js';
-import { OPERATOR as OPERATOR_NOR } from './expression/logical/nor.js';
-import { OPERATOR as OPERATOR_NOT } from './expression/logical/not.js';
-import { OPERATOR as OPERATOR_OR } from './expression/logical/or.js';
-import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor.js';
+import { BytecodeEvaluable } from './bytecode/evaluable.js';
+import { Context } from './common/evaluable.js';
+import { isBoolean } from './common/type-check.js';
+import { OPERATOR_AND, OPERATOR_DIVIDE, OPERATOR_EQ, OPERATOR_GE, OPERATOR_GT, OPERATOR_IN, OPERATOR_LE, OPERATOR_LT, OPERATOR_MULTIPLY, OPERATOR_NE, OPERATOR_NOR, OPERATOR_NOT, OPERATOR_NOT_IN, OPERATOR_OR, OPERATOR_OVERLAP, OPERATOR_PREFIX, OPERATOR_PRESENT, OPERATOR_SUBTRACT, OPERATOR_SUFFIX, OPERATOR_SUM, OPERATOR_UNDEFINED, OPERATOR_XOR } from './operator.js';
 import { ExpressionInput, Input } from './parser/index.js';
 import { Options } from './parser/options.js';
 export { defaultOptions } from './parser/options.js';
-export type { EvaluatorMode } from './parser/options.js';
-export { isEvaluable, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
-export type { Context, Evaluable, ExpressionInput, Input };
+export { isBoolean, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
+export type { Context, ExpressionInput, Input, Options };
 /**
- * Condition engine
+ * Condition engine — bytecode-only evaluator.
+ * Expressions are compiled to bytecode and interpreted at runtime.
  */
 declare class Engine {
-    private readonly parser;
-    private readonly evaluator;
+    private readonly parserOptions;
     private readonly bytecodeCache;
     /**
      * @constructor
-     * @param {Options?} options Parser options.
+     * @param {Partial<Options>?} options Parser options.
      */
     constructor(options?: Partial<Options>);
     private getCompiled;
@@ -53,17 +32,11 @@ declare class Engine {
      */
     evaluate(exp: ExpressionInput, ctx: Context): boolean;
     /**
-     * Get expression statement
+     * Parse expression into a bytecode-evaluable wrapper.
      * @param {ExpressionInput} exp Raw expression.
-     * @return {string}
+     * @return {BytecodeEvaluable}
      */
-    statement(exp: ExpressionInput): string;
-    /**
-     * Parse expression.
-     * @param {ExpressionInput} exp Raw expression.
-     * @return {Evaluable}
-     */
-    parse(exp: ExpressionInput): Evaluable;
+    parse(exp: ExpressionInput): BytecodeEvaluable;
     /**
      * Simplifies an expression with values in context.
      *
@@ -79,7 +52,7 @@ declare class Engine {
      *  `strictKeys`; when `strictKeys` is `undefined` and `optionalKeys` is an array, every key that is not in
      *  `optionalKeys` is considered to be present and thus will be evaluated. Passing as a Set is recommended for
      *  performance reasons.
-     * @returns {Inpunt | boolean}
+     * @returns {Input | boolean}
      */
     simplify(exp: ExpressionInput, context: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Input | boolean;
 }

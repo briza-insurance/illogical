@@ -11,26 +11,10 @@
  * other operands are unknown; OR with a true short-circuits likewise.
  */
 
+import { operateWithExpectedDecimals } from '../common/arithmetic.js'
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
 import { toDateNumber } from '../common/util.js'
-
-// Detect Infinity and NaN — these should not be used as concrete values in
-// comparisons when the other operand is residual, matching the OOP simplifier's
-// isInfinite guard in isSimplifiedArithmeticExpression.
-function isUnusableResult(v: number): boolean {
-  return typeof v === 'number' && !isFinite(v)
-}
-
-// Marker for division results that are Infinity or NaN.
-// Used to signal that the original division expression should be preserved
-// when the comparison has a residual operand.
-interface DivByZeroMarker {
-  readonly _r: 4
-  readonly _val: Result // the computed Infinity/NaN value
-  left: Input
-  right: Input
-}
 import { Input } from '../parser/index.js'
 import { CompiledExpression } from './compiler.js'
 import {
@@ -78,8 +62,24 @@ import {
   OP_UNDEFINED,
   OP_XOR,
 } from './opcodes.js'
-import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
 import { resolveCompactRef } from './refs.js'
+
+// Detect Infinity and NaN — these should not be used as concrete values in
+// comparisons when the other operand is residual, matching the reference simplifier's
+// isInfinite guard in isSimplifiedArithmeticExpression.
+function isUnusableResult(v: number): boolean {
+  return typeof v === 'number' && !isFinite(v)
+}
+
+// Marker for division results that are Infinity or NaN.
+// Used to signal that the original division expression should be preserved
+// when the comparison has a residual operand.
+interface DivByZeroMarker {
+  readonly _r: 4
+  readonly _val: Result // the computed Infinity/NaN value
+  left: Input
+  right: Input
+}
 
 const addDecimals = operateWithExpectedDecimals('sum')
 const subtractDecimals = operateWithExpectedDecimals('subtract')
@@ -532,7 +532,7 @@ export function interpretSimplify(
           break
         }
 
-        // First-key heuristic: match OOP Reference.simplify() behavior.
+        // First-key heuristic: match reference simplify behavior.
         // If the top-level context key exists, the ref's parent object is known — treat the
         // (absent) sub-field as concrete undefined rather than preserving it as an unknown.
         // This only applies to multi-key refs (refFirstCtxKeys[idx] is undefined for single-key).
@@ -835,7 +835,7 @@ export function interpretSimplify(
         const rightIsDivZero = isDivByZeroMarker(right)
         if (leftIsDivZero) {
           // Left is a division-by-zero result.
-          // Match OOP isInfinite guard: preserve expression only if right
+          // Match isInfinite guard: preserve expression only if right
           // is a residual. If right is concrete, evaluate directly.
           if (needsReconstruct(right) && !rightIsDivZero) {
             stack[++stackTop] = makeResidual([
@@ -844,7 +844,7 @@ export function interpretSimplify(
               slotSrc(right),
             ])
           } else {
-            // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
+            // Both concrete — evaluate directly
             stack[++stackTop] = relationalCompare(left._val, slotVal(right), op)
           }
         } else if (rightIsDivZero) {
@@ -857,7 +857,7 @@ export function interpretSimplify(
               ['/', right.left, right.right],
             ])
           } else {
-            // Both concrete — evaluate directly (OOP: 10000 > Infinity = false)
+            // Both concrete — evaluate directly
             stack[++stackTop] = relationalCompare(slotVal(left), right._val, op)
           }
         } else if (needsReconstruct(left) || needsReconstruct(right)) {
@@ -1196,7 +1196,7 @@ export function interpretSimplify(
           } else if (op === OP_MULTIPLY) {
             stack[++stackTop] = multiplyDecimals(aVal, bVal)
           } else {
-            // Division — match OOP isInfinite guard: use a marker so
+            // Division — match isInfinite guard: use a marker so
             // comparisons can decide whether to preserve the expression.
             const result = divideDecimals(aVal, bVal)
             if (isUnusableResult(result)) {
@@ -1517,7 +1517,7 @@ export function interpretSimplify(
 
         // If no residuals, resolve immediately
         // "One-hot" XOR: exactly one true → true, otherwise false
-        // This matches the OOP evaluator's behavior.
+        // This matches the reference evaluator's behavior.
         // Use XorState so subsequent chained XORs also see trueCount > 1.
         if (trueCount > 1) {
           stack[++stackTop] = makeXorState([], trueCount)

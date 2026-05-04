@@ -1,3 +1,8 @@
+/**
+ * Decimal-aware arithmetic operations.
+ * Preserves the expected number of decimal places for floating-point arithmetic.
+ */
+
 const getNumDecimals = (num: number) => {
   const numberSplit = num.toString().split('.')
   return numberSplit.length == 2 ? numberSplit[1].length : 0
