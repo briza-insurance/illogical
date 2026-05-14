@@ -2,6 +2,8 @@
  * Main module.
  * @module illogical
  */
+import type { BatchEvaluatorOptions } from './batch/index.js';
+import { BatchEvaluator } from './batch/index.js';
 import { BytecodeEvaluable } from './bytecode/evaluable.js';
 import { Context } from './common/evaluable.js';
 import { isBoolean } from './common/type-check.js';
@@ -11,6 +13,7 @@ import { Options } from './parser/options.js';
 export { defaultOptions } from './parser/options.js';
 export { isBoolean, OPERATOR_EQ, OPERATOR_NE, OPERATOR_GT, OPERATOR_GE, OPERATOR_LT, OPERATOR_LE, OPERATOR_IN, OPERATOR_NOT_IN, OPERATOR_PREFIX, OPERATOR_SUFFIX, OPERATOR_OVERLAP, OPERATOR_UNDEFINED, OPERATOR_PRESENT, OPERATOR_AND, OPERATOR_OR, OPERATOR_NOR, OPERATOR_XOR, OPERATOR_NOT, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, OPERATOR_SUM, };
 export type { Context, ExpressionInput, Input, Options };
+export type { BatchEvaluator, BatchEvaluatorOptions } from './batch/index.js';
 /**
  * Condition engine — bytecode-only evaluator.
  * Expressions are compiled to bytecode and interpreted at runtime.
@@ -55,5 +58,29 @@ declare class Engine {
      * @returns {Input | boolean}
      */
     simplify(exp: ExpressionInput, context: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Input | boolean;
+    /**
+     * Create a BatchEvaluator for evaluating multiple expressions with shared resources.
+     *
+     * The batch evaluator compiles all expressions once, shares refs/consts across them,
+     * and supports incremental evaluation based on trusted dirty keys.
+     *
+     * @param {BatchEvaluatorOptions} options — Expressions map and optional parser options
+     * @returns {BatchEvaluator}
+     *
+     * @example
+     * ```typescript
+     * const batch = engine.createBatchEvaluator({
+     *   expressions: {
+     *     isActive: ['==', '$status', 'active'],
+     *     isPremium: ['==', '$tier', 'premium'],
+     *   },
+     * })
+     *
+     * const results = batch.evaluate({ status: 'active', tier: 'premium' })
+     * // Mode 2: incremental with trusted dirty keys
+     * const updated = batch.evaluate(fullContext, ['status'])
+     * ```
+     */
+    createBatchEvaluator(options: BatchEvaluatorOptions): BatchEvaluator;
 }
 export default Engine;
