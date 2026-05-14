@@ -1,0 +1,1 @@
+{"description":"Deep 3 levels: some unknown → false","expression":["AND",["AND",["AND",["==","$a",1],["==","$b",2]],["==","$c",3]],["==","$d",4]],"context":{"a":1,"b":2,"c":3},"expected":false}

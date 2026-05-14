@@ -1,0 +1,6 @@
+{
+  "description": "NOT expression — simplifies inner, wraps result",
+  "expression": ["NOT", ["==", "$a", 10]],
+  "context": { "a": 10 },
+  "expected": false
+}

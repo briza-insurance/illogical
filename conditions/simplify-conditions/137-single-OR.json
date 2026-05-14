@@ -1,0 +1,1 @@
+{"description":"Single OR operand","expression":["OR",["==",1,1]],"context":{},"expected":true}

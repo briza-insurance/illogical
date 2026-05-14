@@ -1,0 +1,1 @@
+{"description":"Empty context, all refs → full expression","expression":["AND",["==","$a",1],["==","$b",2]],"context":{},"expected":["AND",["==","$a",1],["==","$b",2]]}

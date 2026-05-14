@@ -1,0 +1,1 @@
+{"description":"IN: 2 in [1,2,3] → true","expression":["IN",2,[1,2,3]],"context":{},"expected":true}

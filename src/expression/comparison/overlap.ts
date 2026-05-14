@@ -38,13 +38,10 @@ export class Overlap extends Comparison {
       throw new Error('invalid OVERLAP expression, both operands must be array')
     }
 
-    const leftArray = left as (string | number)[]
-    const rightArray = right as (string | number)[]
-
-    if (leftArray.length === 0 && rightArray.length === 0) {
+    if (left.length === 0 && right.length === 0) {
       return true
     }
-    return leftArray.some((element) => rightArray.includes(element))
+    return left.some((element) => right.includes(element))
   }
 
   /**

@@ -1,0 +1,6 @@
+{
+  "description": "NOR with two unknowns — simplifies to NOR of residuals",
+  "expression": ["NOR", ["==", "$a", 1], ["==", "$b", 2]],
+  "context": {},
+  "expected": ["NOR", ["==", "$a", 1], ["==", "$b", 2]]
+}

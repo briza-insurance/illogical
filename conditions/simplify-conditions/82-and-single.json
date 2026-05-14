@@ -1,0 +1,1 @@
+{"description":"AND: single operand","expression":["AND",["==",1,1]],"context":{},"expected":true}

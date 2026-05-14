@@ -1,0 +1,1 @@
+{"description":"optionalKeys: multiple keys allowed absent — $b forced to undefined → false","expression":["AND",["==","$a",1],["==","$b",2],["==","$c",3]],"context":{},"optionalKeys":["a","c"],"expected":false}

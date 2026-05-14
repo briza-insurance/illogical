@@ -67,7 +67,7 @@ describe('Operand - Reference', () => {
   }
 
   describe('evaluate', () => {
-    const evaluateData = [
+    const evaluateData: [string, unknown][] = [
       // Existing
       ['RefA', 1],
       // Nested
@@ -107,10 +107,7 @@ describe('Operand - Reference', () => {
     ]
     for (const [value, expected] of evaluateData) {
       test(`${value} should evaluate as ${expected}`, () => {
-        assert.strictEqual(
-          new Reference(value as string).evaluate(context),
-          expected
-        )
+        assert.strictEqual(new Reference(value).evaluate(context), expected)
       })
     }
   })

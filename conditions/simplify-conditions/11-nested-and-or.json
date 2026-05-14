@@ -1,0 +1,6 @@
+{
+  "description": "Nested AND/OR — partial evaluation short-circuits the outer AND",
+  "expression": ["AND", ["OR", ["==", "$a", 1], ["==", "$b", 2]], ["==", "$c", 3]],
+  "context": { "a": 1 },
+  "expected": ["==", "$c", 3]
+}

@@ -1,0 +1,1 @@
+{"description":"SUFFIX: ref ends with → true","expression":["SUFFIX","$word","ing"],"context":{"word":"running"},"expected":true}

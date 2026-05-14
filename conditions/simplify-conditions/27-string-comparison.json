@@ -1,0 +1,6 @@
+{
+  "description": "String comparison with date strings",
+  "expression": [">=", "$date", "2024-01-01"],
+  "context": { "date": "2024-06-15" },
+  "expected": true
+}

@@ -1,0 +1,1 @@
+{"description":"Equality: literal vs reference","expression":["==",10,"$x"],"context":{"x":10},"expected":true}

@@ -1,0 +1,1 @@
+{"description":"Equality: \"hello\" == \"world\" → false","expression":["==","hello","world"],"context":{},"expected":false}

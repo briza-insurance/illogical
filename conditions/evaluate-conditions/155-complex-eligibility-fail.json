@@ -1,0 +1,1 @@
+{"description":"Complex: age=17 → false","expression":["AND",[">","$age",18],["IN","$status",["active","premium"]],["NOT IN","$country",["blocked1","blocked2"]],["OR",["==","$premium",true],[">","$age",65]]],"context":{"age":17,"status":"active","country":"US","premium":false},"expected":false}

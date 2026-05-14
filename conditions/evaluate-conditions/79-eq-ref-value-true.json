@@ -1,0 +1,1 @@
+{"description":"Equality: ref == value → true","expression":["==","$x",10],"context":{"x":10},"expected":true}

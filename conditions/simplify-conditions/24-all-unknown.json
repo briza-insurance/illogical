@@ -1,0 +1,6 @@
+{
+  "description": "All keys unknown — returns original expression as residual",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": {},
+  "expected": ["AND", ["==", "$a", 10], ["==", "$b", 20]]
+}

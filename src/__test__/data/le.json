@@ -1,0 +1,15 @@
+[
+  { "expression": ["<=", 0, 1], "context": {}, "expected": true },
+  { "expression": ["<=", 1, 1], "context": {}, "expected": true },
+  { "expression": ["<=", "2023-01-01", "2023-01-01"], "context": {}, "expected": true },
+  { "expression": ["<=", "2023-01-01", "2023-01-02"], "context": {}, "expected": true },
+  { "expression": ["<=", "2023-01-01", "2022-12-31"], "context": {}, "expected": false },
+  { "expression": ["<=", 1, 0], "context": {}, "expected": false },
+  { "expression": ["<=", 0, "1"], "context": {}, "expected": false },
+  { "expression": ["<=", 0, true], "context": {}, "expected": false },
+  { "expression": ["<=", 0, false], "context": {}, "expected": false },
+  { "expression": ["<=", 0, "$null"], "context": { "null": null }, "expected": false },
+  { "expression": ["<=", 0, "$undef"], "context": {}, "expected": false },
+  { "expression": ["<=", 0, [0]], "context": {}, "expected": false },
+  { "expression": ["<=", 0, ["0"]], "context": {}, "expected": false }
+]

@@ -1,0 +1,1 @@
+{"description":"NOR: one known false, one known false → true (NOR of two falses)","expression":["NOR",["==","$a",1],["==",2,3]],"context":{"a":5},"expected":true}

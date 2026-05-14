@@ -1,0 +1,1 @@
+{"description":"NOT IN: ref in ref-array, both known","expression":["NOT IN","$x",["$a","$b"]],"context":{"x":5,"a":1,"b":2},"expected":true}

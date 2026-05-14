@@ -1,0 +1,1 @@
+{"description":"XOR: three unknowns → XOR(residuals)","expression":["XOR",["==","$a",1],["==","$b",2],["==","$c",3]],"context":{},"expected":["XOR",["==","$a",1],["==","$b",2],["==","$c",3]]}

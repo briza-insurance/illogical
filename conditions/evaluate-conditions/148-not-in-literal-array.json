@@ -1,0 +1,1 @@
+{"description":"NOT IN: literal not in literal array → true","expression":["NOT IN","red",["green","blue"]],"context":{},"expected":true}

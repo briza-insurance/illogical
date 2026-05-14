@@ -1,0 +1,1 @@
+{"description":"Date comparison: 2024 > 2023 → true","expression":[">","2024-06-15","2023-01-01"],"context":{},"expected":true}

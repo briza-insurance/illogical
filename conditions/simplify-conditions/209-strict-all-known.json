@@ -1,0 +1,1 @@
+{"description":"strictKeys: all keys known in context, strictKeys redundant","expression":["AND",["==","$a",1],["==","$b",2]],"context":{"a":1,"b":2},"strictKeys":["a","b"],"expected":true}

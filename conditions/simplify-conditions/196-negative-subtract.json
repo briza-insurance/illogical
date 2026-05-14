@@ -1,0 +1,1 @@
+{"description":"Negative result: 3 - 10 == -7 → true","expression":["==",["-",3,10],-7],"context":{},"expected":true}

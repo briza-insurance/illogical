@@ -1,0 +1,1 @@
+{"description":"SUFFIX operator: reference known","expression":["SUFFIX","$word","ing"],"context":{"word":"running"},"expected":true}

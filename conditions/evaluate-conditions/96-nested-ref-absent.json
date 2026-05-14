@@ -1,0 +1,1 @@
+{"description":"Nested ref: a absent → false","expression":["==","$a.b",5],"context":{},"expected":false}

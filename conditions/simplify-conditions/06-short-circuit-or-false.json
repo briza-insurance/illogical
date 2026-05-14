@@ -1,0 +1,6 @@
+{
+  "description": "Short-circuit OR: false OR x → x (residual returned)",
+  "expression": ["OR", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": { "a": 5 },
+  "expected": ["==", "$b", 20]
+}

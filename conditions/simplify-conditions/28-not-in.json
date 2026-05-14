@@ -1,0 +1,6 @@
+{
+  "description": "NOT IN operator",
+  "expression": ["NOT IN", "$status", ["draft", "pending"]],
+  "context": { "status": "published" },
+  "expected": true
+}

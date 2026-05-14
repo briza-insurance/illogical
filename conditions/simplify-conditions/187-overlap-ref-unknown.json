@@ -1,0 +1,1 @@
+{"description":"OVERLAP: one reference unknown → both refs preserved","expression":["OVERLAP","$a","$b"],"context":{"a":[1,2]},"expected":["OVERLAP","$a","$b"]}

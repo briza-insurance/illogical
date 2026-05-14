@@ -1,0 +1,6 @@
+{
+  "description": "XOR with one known true — simplifies to NOT of the residual",
+  "expression": ["XOR", ["==", "$a", 1], ["==", "$b", 2]],
+  "context": { "a": 1 },
+  "expected": ["NOT", ["==", "$b", 2]]
+}

@@ -1,0 +1,1 @@
+{"description":"EQ + PRESENT: x absent → residual","expression":["AND",["PRESENT","$x"],["==","$x",5]],"context":{},"expected":["AND",["PRESENT","$x"],["==","$x",5]]}

@@ -1,0 +1,1 @@
+{"description":"NOR: one known false, one unknown → NOT(residual)","expression":["NOR",["==","$a",1],["==","$b",2]],"context":{"a":5},"expected":["NOT",["==","$b",2]]}

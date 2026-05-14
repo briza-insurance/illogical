@@ -22,7 +22,9 @@ export default defineConfig([
       parser: tsParser,
       ecmaVersion: 2018,
       sourceType: 'module',
-      parserOptions: {},
+      parserOptions: {
+        projectService: true,
+      },
     },
 
     plugins: {
@@ -75,6 +77,8 @@ export default defineConfig([
       '@typescript-eslint/no-unused-expressions': 'error',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error'],
+
+      '@typescript-eslint/no-unsafe-type-assertion': 'error',
 
       '@typescript-eslint/ban-ts-comment': [
         'error',

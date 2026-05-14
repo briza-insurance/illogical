@@ -1,0 +1,1 @@
+{"description":"Three ops: 1 + 2 + 3 == 6 → true","expression":["==",["+",1,2,3],6],"context":{},"expected":true}

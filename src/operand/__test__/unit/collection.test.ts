@@ -8,7 +8,7 @@ import { Value } from '../../value.js'
 
 describe('Operand - Collection', () => {
   describe('evaluate', () => {
-    const evaluateData = [
+    const evaluateData: [(Value | Reference)[], unknown][] = [
       [[new Value(1)], [1]],
       [[new Value('1')], ['1']],
       [[new Value(true)], [true]],
@@ -21,7 +21,7 @@ describe('Operand - Collection', () => {
     for (const [value, expected] of evaluateData) {
       test(`${value} should evaluate as ${expected}`, () => {
         assert.deepStrictEqual(
-          new Collection(value as (Value | Reference)[]).evaluate({
+          new Collection(value).evaluate({
             RefA: 'A',
           }),
           expected
@@ -32,7 +32,8 @@ describe('Operand - Collection', () => {
     const evaluateThrowData = [[1], ['1'], [true], [undefined], [null]]
     for (const value of evaluateThrowData) {
       test(`${value} should throw`, () => {
-        assert.throws(() => new Collection(value as unknown as []).evaluate({}))
+        // @ts-ignore intentionally passing invalid types to test runtime error
+        assert.throws(() => new Collection(value).evaluate({}))
       })
     }
   })
@@ -92,7 +93,7 @@ describe('Operand - Collection', () => {
   })
 
   describe('toString', () => {
-    const toStringData = [
+    const toStringData: [(Value | Reference)[], string][] = [
       [[new Value(1)], '[1]'],
       [[new Value('1')], '["1"]'],
       [[new Value(true)], '[true]'],
@@ -101,10 +102,7 @@ describe('Operand - Collection', () => {
     ]
     for (const [value, expected] of toStringData) {
       test(`${value} should be ${expected}`, () => {
-        assert.strictEqual(
-          new Collection(value as (Value | Reference)[]).toString(),
-          expected
-        )
+        assert.strictEqual(new Collection(value).toString(), expected)
       })
     }
   })

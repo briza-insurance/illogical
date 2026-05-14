@@ -1,0 +1,1 @@
+{"description":"Basic equality: boolean comparison","expression":["==",true,true],"context":{},"expected":true}

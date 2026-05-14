@@ -1,0 +1,1 @@
+{"description":"Complex: country=blocked1 → false","expression":["AND",[">","$age",18],["IN","$status",["active","premium"]],["NOT IN","$country",["blocked1","blocked2"]],["OR",["==","$premium",true],[">","$age",65]]],"context":{"age":30,"status":"active","country":"blocked1","premium":false},"expected":false}

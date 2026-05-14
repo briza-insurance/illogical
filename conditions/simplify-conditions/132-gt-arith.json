@@ -1,0 +1,1 @@
+{"description":"Greater than with arithmetic: 2 + 3 > 4 → true","expression":[">",["+",2,3],4],"context":{},"expected":true}

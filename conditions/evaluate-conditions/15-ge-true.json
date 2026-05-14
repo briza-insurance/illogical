@@ -1,0 +1,1 @@
+{"description":"Greater or equal: 10 >= 5 → true","expression":[">=",10,5],"context":{},"expected":true}

@@ -1,0 +1,1 @@
+{"description":"Chained: 5 > 3 AND 3 < 10 → true","expression":["AND",[">",5,3],["<",3,10]],"context":{},"expected":true}

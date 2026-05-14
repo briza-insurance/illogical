@@ -1,0 +1,1 @@
+{"description":"PRESENT: nested ref absent → false","expression":["PRESENT","$a.b"],"context":{"a":{}},"expected":false}

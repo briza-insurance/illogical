@@ -1,5 +1,17 @@
 # illogical changelog
 
+## 2.1.0
+
+- Introduced bytecode evaluator mode (`evaluator: 'bytecode'`) for improved performance via
+  compiled bytecode interpretation with zero allocations in the hot path.
+- Added `BytecodeEvaluable` class that wraps compiled bytecode alongside the delegate expression.
+- Added `debug-bytecode` CLI tool — a TUI time-travel debugger for stepping through bytecode
+  execution with keyboard navigation.
+- Added `get-bytecode` CLI tool — compiles expressions from stdin and outputs bytecode (with
+  optional `--disassemble` for human-readable form).
+- Added benchmark suite comparing OOP vs bytecode evaluators with report generation.
+- Added `EvaluatorMode` type export (`'oop'` | `'bytecode'`).
+
 ## 2.0.2
 
 - Update readme

@@ -1,0 +1,1 @@
+{"description":"Deep: XOR inside AND, XOR partially known → AND(NOT(residual), ==$c,3)","expression":["AND",["XOR",["==","$a",1],["==","$b",2]],["==","$c",3]],"context":{"a":1},"expected":["AND",["NOT",["==","$b",2]],["==","$c",3]]}

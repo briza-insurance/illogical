@@ -1,0 +1,1 @@
+{"description":"Chained with refs: x > 3 AND x < 10","expression":["AND",[">","$x",3],["<","$x",10]],"context":{"x":5},"expected":true}

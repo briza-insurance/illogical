@@ -1,0 +1,1 @@
+{"description":"NOT IN: boolean value in boolean array","expression":["NOT IN",true,[false,false]],"context":{},"expected":true}

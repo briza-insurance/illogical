@@ -1,0 +1,1 @@
+{"description":"OVERLAP: [\"a\",\"b\"] overlaps [\"b\",\"c\"] → true","expression":["OVERLAP",["a","b"],["b","c"]],"context":{},"expected":true}

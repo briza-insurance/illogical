@@ -1,0 +1,8 @@
+[
+  { "expression": ["PRESENT", "$v"], "context": { "v": 1 }, "expected": true },
+  { "expression": ["PRESENT", "$v"], "context": { "v": "1" }, "expected": true },
+  { "expression": ["PRESENT", "$v"], "context": { "v": true }, "expected": true },
+  { "expression": ["PRESENT", "$v"], "context": { "v": false }, "expected": true },
+  { "expression": ["PRESENT", "$v"], "context": { "v": null }, "expected": false },
+  { "expression": ["PRESENT", "$v"], "context": {}, "expected": false }
+]

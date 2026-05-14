@@ -1,0 +1,1 @@
+{"description":"Array access: arr[1] → false","expression":["==","$arr[1]",5],"context":{"arr":[1,2,3]},"expected":false}

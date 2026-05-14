@@ -1,0 +1,13 @@
+[
+  { "expression": ["==", ["/", 20, 10], 2], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 10, 20, 30], 0.016666666666666666], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 10, -20], -0.5], "context": {}, "expected": true },
+  { "expression": ["==", ["/", -10, 20], -0.5], "context": {}, "expected": true },
+  { "expression": ["==", ["/", -10, -20], 0.5], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 2.8, 1.2], 2.3333333333333335], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 2.333333, 1.111111], 2.0999999099999913], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 0.4, 0.1], 4], "context": {}, "expected": true },
+  { "expression": ["==", ["/", 1.333, 1.333], 1], "context": {}, "expected": true },
+  { "expression": ["==", ["/", "$null", 1], false], "context": { "null": null }, "expected": true },
+  { "expression": ["==", ["/", "$undef", 1], false], "context": {}, "expected": true }
+]

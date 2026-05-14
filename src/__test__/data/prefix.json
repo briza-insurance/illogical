@@ -1,0 +1,14 @@
+[
+  { "expression": ["PREFIX", "a", "abc"], "context": {}, "expected": true },
+  { "expression": ["PREFIX", "a", "a"], "context": {}, "expected": true },
+  { "expression": ["PREFIX", "b", "abc"], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "b", ""], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", 1], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", true], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", false], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", "$null"], "context": { "null": null }, "expected": false },
+  { "expression": ["PREFIX", "a", "$undef"], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", [0]], "context": {}, "expected": false },
+  { "expression": ["PREFIX", "a", ["0"]], "context": {}, "expected": false },
+  { "expression": ["PREFIX", 1, "a"], "context": {}, "expected": false }
+]

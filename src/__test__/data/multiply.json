@@ -1,0 +1,16 @@
+[
+  { "expression": ["==", ["*", 20, 10], 200], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 10, 20, 30], 6000], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 10, -20], -200], "context": {}, "expected": true },
+  { "expression": ["==", ["*", -10, 20], -200], "context": {}, "expected": true },
+  { "expression": ["==", ["*", -10, -20], 200], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 10, 0], 0], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 0, -10], 0], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 0, 0], 0], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 2.8, 1.2], 3.36], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 2.333333, 1.111111], 2.592591962963], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 0.4, 0.1], 0.04], "context": {}, "expected": true },
+  { "expression": ["==", ["*", 1.333, 1.333], 1.776889], "context": {}, "expected": true },
+  { "expression": ["==", ["*", "$null", 1], false], "context": { "null": null }, "expected": true },
+  { "expression": ["==", ["*", "$undef", 1], false], "context": {}, "expected": true }
+]

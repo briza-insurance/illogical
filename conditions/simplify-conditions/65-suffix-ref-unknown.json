@@ -1,0 +1,1 @@
+{"description":"SUFFIX operator: reference unknown","expression":["SUFFIX","$word","ing"],"context":{},"expected":["SUFFIX","$word","ing"]}

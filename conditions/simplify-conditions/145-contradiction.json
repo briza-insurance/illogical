@@ -1,0 +1,1 @@
+{"description":"Contradiction: true AND false → false","expression":["AND",["==",1,1],["==",1,2]],"context":{},"expected":false}

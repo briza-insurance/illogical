@@ -1,0 +1,1 @@
+{"description":"SUFFIX: \"lo\" in \"hello\" → true","expression":["SUFFIX","hello","lo"],"context":{},"expected":true}

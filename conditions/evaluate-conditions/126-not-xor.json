@@ -1,0 +1,1 @@
+{"description":"NOT + XOR: NOT(XOR(true,true))","expression":["NOT",["XOR",["==",1,1],["==",2,2]]],"context":{},"expected":true}

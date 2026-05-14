@@ -1,0 +1,1 @@
+{"description":"NOR: all true → false","expression":["NOR",["==",1,1],["==",2,2]],"context":{},"expected":false}

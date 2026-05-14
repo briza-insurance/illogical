@@ -1,0 +1,11 @@
+[
+  { "expression": ["OVERLAP", [1], [1, 2]], "context": {}, "expected": true },
+  { "expression": ["OVERLAP", [1, 2], [1, 2]], "context": {}, "expected": true },
+  { "expression": ["OVERLAP", ["1", "3"], ["1", "2"]], "context": {}, "expected": true },
+  { "expression": ["OVERLAP", [], []], "context": {}, "expected": true },
+  { "expression": ["OVERLAP", [1, 2, 5], [1, 3]], "context": {}, "expected": true },
+  { "expression": ["OVERLAP", [0], [1, 2]], "context": {}, "expected": false },
+  { "expression": ["OVERLAP", ["0"], ["1", "2"]], "context": {}, "expected": false },
+  { "expression": ["OVERLAP", ["1"], [1, 2]], "context": {}, "expected": false },
+  { "expression": ["OVERLAP", [1], ["1", "2"]], "context": {}, "expected": false }
+]

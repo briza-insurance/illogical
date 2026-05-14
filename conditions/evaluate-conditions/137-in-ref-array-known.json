@@ -1,0 +1,1 @@
+{"description":"IN: ref in ref-array, all known → true","expression":["IN","$x",["$a","$b"]],"context":{"x":2,"a":1,"b":2},"expected":true}

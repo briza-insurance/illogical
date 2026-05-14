@@ -1,0 +1,1 @@
+{"description":"OR: two false comparisons → false","expression":["OR",["==",1,2],["==",3,4]],"context":{},"expected":false}

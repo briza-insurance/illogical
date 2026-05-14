@@ -1,0 +1,6 @@
+{
+  "description": "Various comparison operators — all known, resolves to boolean",
+  "expression": ["AND", [">", "$a", 5], ["<=", "$b", 10], ["IN", "$c", [1, 2, 3]]],
+  "context": { "a": 7, "b": 10, "c": 2 },
+  "expected": true
+}

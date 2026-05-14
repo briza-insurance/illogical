@@ -1,0 +1,1 @@
+{"description":"Mixed depth: OR first unknown, AND known true → true OR x → true","expression":["OR",["==","$a",1],["AND",["==","$b",2],["==","$c",3]]],"context":{"b":2,"c":3},"expected":true}

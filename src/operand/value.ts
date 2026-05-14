@@ -53,6 +53,7 @@ export class Value extends Operand {
    * {@link Evaluable.serialize}
    */
   serialize(): Input {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return this.value as Input
   }
 

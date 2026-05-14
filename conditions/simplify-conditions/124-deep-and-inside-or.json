@@ -1,0 +1,1 @@
+{"description":"Deep: AND inside OR, AND fully known → true OR x → true","expression":["OR",["AND",["==","$a",1],["==","$b",2]],["==","$c",3]],"context":{"a":1,"b":2},"expected":true}

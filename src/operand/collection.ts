@@ -40,7 +40,7 @@ export class Collection extends Operand {
    * @return {boolean}
    */
   evaluate(ctx: Context): Result {
-    return this.items.map((item) => item.evaluate(ctx)) as []
+    return this.items.map((item) => item.evaluate(ctx))
   }
 
   /**

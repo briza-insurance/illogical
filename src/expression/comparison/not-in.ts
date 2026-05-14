@@ -42,14 +42,13 @@ export class NotIn extends Comparison {
     if (!leftArray && !rightArray) {
       throw new Error('invalid NOT IN expression, one operand must be array')
     }
-    if (leftArray) {
-      return (
-        (left as (string | number)[]).indexOf(right as string | number) === -1
-      )
+    if (Array.isArray(left)) {
+      return left.indexOf(right) === -1
     }
-    return (
-      (right as (string | number)[]).indexOf(left as string | number) === -1
-    )
+    if (Array.isArray(right)) {
+      return right.indexOf(left) === -1
+    }
+    return true
   }
 
   /**

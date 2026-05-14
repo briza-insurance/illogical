@@ -112,6 +112,10 @@ const dataTypeRegex = new RegExp(
 
 const isComplexKey = (key: string) => key.indexOf('{') > -1
 
+function isDataTypeKey(k: string): k is keyof typeof DataType {
+  return k in DataType
+}
+
 const castingRegex = /\.\(.+\)$/
 
 /**
@@ -136,7 +140,10 @@ export class Reference extends Operand {
 
     const dataTypeMatch = dataTypeRegex.exec(this.key)
     if (dataTypeMatch) {
-      this.dataType = DataType[dataTypeMatch[1] as keyof typeof DataType]
+      const dtKey = dataTypeMatch[1]
+      if (isDataTypeKey(dtKey)) {
+        this.dataType = DataType[dtKey]
+      }
       this.key = this.key.replace(castingRegex, '')
     }
 

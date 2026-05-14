@@ -4,7 +4,7 @@ import { Evaluable, Result } from './evaluable.js'
  * Is number predicate.
  * @param value Tested value.
  */
-export function isNumber(value: Result): value is number {
+export function isNumber(value: unknown): value is number {
   return typeof value === 'number'
 }
 /**
@@ -19,7 +19,7 @@ export function isInfinite(value: Result): value is typeof Infinity {
  * Is string type predicate.
  * @param value Tested value.
  */
-export function isString(value: Result): value is string {
+export function isString(value: unknown): value is string {
   return typeof value === 'string' || value instanceof String
 }
 

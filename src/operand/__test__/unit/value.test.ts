@@ -9,7 +9,8 @@ describe('Operand - Value', () => {
     const constructorData = [[[1, '2', true]]]
     for (const value of constructorData) {
       test(`arguments ${value} should throw`, () => {
-        assert.throws(() => new Value(value as unknown as Result))
+        // @ts-ignore intentionally passing invalid type to test runtime error
+        assert.throws(() => new Value(value))
       })
     }
   })

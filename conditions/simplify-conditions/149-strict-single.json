@@ -1,0 +1,1 @@
+{"description":"strictKeys: single key forced","expression":["==","$x",5],"context":{},"strictKeys":["x"],"expected":false}

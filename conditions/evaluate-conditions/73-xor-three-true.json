@@ -1,0 +1,1 @@
+{"description":"XOR: true XOR true XOR true → true (standard XOR)","expression":["XOR",["==",1,1],["==",2,2],["==",3,3]],"context":{},"expected":true}

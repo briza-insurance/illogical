@@ -1,0 +1,1 @@
+{"description":"NOT: operand evaluates → boolean result","expression":["NOT",["==","$a",1]],"context":{"a":1},"expected":false}

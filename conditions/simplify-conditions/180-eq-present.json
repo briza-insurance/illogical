@@ -1,0 +1,1 @@
+{"description":"EQ + PRESENT: both known","expression":["AND",["PRESENT","$x"],["==","$x",5]],"context":{"x":5},"expected":true}

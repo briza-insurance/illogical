@@ -1,0 +1,1 @@
+{"description":"Arithmetic: reference in sum, unknown","expression":["==",["+",2,"$x"],7],"context":{},"expected":["==",["+",2,"$x"],7]}

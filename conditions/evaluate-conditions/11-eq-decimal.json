@@ -1,0 +1,1 @@
+{"description":"Equality: 3.14 == 3.14 → true","expression":["==",3.14,3.14],"context":{},"expected":true}

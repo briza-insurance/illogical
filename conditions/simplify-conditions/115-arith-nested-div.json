@@ -1,0 +1,1 @@
+{"description":"Arithmetic nested: (10 / 2) + 3 == 8 → true","expression":["==",["+",["/",10,2],3],8],"context":{},"expected":true}

@@ -1,0 +1,1 @@
+{"description":"Negative gt: -5 < 0 → true","expression":["<",-5,0],"context":{},"expected":true}

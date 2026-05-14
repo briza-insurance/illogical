@@ -1,0 +1,1 @@
+{"description":"strictKeys: multiple keys forced","expression":["AND",["==","$a",1],["==","$b",2]],"context":{},"strictKeys":["a","b"],"expected":false}

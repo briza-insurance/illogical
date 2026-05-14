@@ -1,0 +1,1 @@
+{"description":"Sum: 2 + 3 == 5 → true","expression":["==",["+",2,3],5],"context":{},"expected":true}

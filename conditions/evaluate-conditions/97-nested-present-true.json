@@ -1,0 +1,1 @@
+{"description":"PRESENT: nested ref present → true","expression":["PRESENT","$a.b"],"context":{"a":{"b":5}},"expected":true}

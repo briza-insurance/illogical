@@ -1,0 +1,1 @@
+{"description":"Equality: one known ref, one unknown ref → both refs preserved","expression":["==","$a","$b"],"context":{"a":5},"expected":["==","$a","$b"]}

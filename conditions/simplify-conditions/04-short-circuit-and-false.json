@@ -1,0 +1,6 @@
+{
+  "description": "Short-circuit AND: false AND x → false (irrelevant branch dropped)",
+  "expression": ["AND", ["==", "$a", 10], ["==", "$b", 20]],
+  "context": { "a": 5 },
+  "expected": false
+}

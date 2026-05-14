@@ -1,0 +1,1 @@
+{"description":"XOR: one false, one unknown → residual","expression":["XOR",["==",1,2],["==","$a",1]],"context":{},"expected":["==","$a",1]}

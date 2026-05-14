@@ -1,0 +1,1 @@
+{"description":"OVERLAP: [1,2] overlaps [2,3] → true","expression":["OVERLAP",[1,2],[2,3]],"context":{},"expected":true}
