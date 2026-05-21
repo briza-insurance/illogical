@@ -37,6 +37,9 @@ engine.evaluate(['==', ['-', '2024-02-29', '1y', '1m'], '2023-01-28']) // true
 
 ## Date String Interpolation
 
+`$CurrentDate` and `$CurrentYear` are two reserved references.
+If a condition uses any of the reserved references but the provided context doesn't have values for them, the `engine.evaluate` and `engine.parse` will error out.
+
 ```js
 // assuming $CurrentDate is 2026-05-10 and $CurrentYear is 2026
 engine.evaluate(['<', '2025-12-31', '`$CurrentYear`-01-01']) // true
