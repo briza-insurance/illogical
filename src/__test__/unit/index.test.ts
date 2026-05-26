@@ -1,24 +1,58 @@
 import { strict as assert } from 'node:assert'
 import { describe, it, test } from 'node:test'
 
-import { Context } from '../../common/evaluable.js'
-import { OPERATOR as OPERATOR_SUM } from '../../expression/arithmetic/sum.js'
-import { OPERATOR as OPERATOR_EQ } from '../../expression/comparison/eq.js'
-import { OPERATOR as OPERATOR_GE } from '../../expression/comparison/ge.js'
-import { OPERATOR as OPERATOR_GT } from '../../expression/comparison/gt.js'
-import { OPERATOR as OPERATOR_IN } from '../../expression/comparison/in.js'
-import { OPERATOR as OPERATOR_LE } from '../../expression/comparison/le.js'
-import { OPERATOR as OPERATOR_LT } from '../../expression/comparison/lt.js'
-import { OPERATOR as OPERATOR_NE } from '../../expression/comparison/ne.js'
-import { OPERATOR as OPERATOR_NOT_IN } from '../../expression/comparison/not-in.js'
-import { OPERATOR as OPERATOR_PREFIX } from '../../expression/comparison/prefix.js'
-import { OPERATOR as OPERATOR_SUFFIX } from '../../expression/comparison/suffix.js'
-import { OPERATOR as OPERATOR_AND } from '../../expression/logical/and.js'
+import { Context, Evaluable } from '../../common/evaluable.js'
+import {
+  OPERATOR as OPERATOR_SUM,
+  Sum,
+} from '../../expression/arithmetic/sum.js'
+import {
+  Equal,
+  OPERATOR as OPERATOR_EQ,
+} from '../../expression/comparison/eq.js'
+import {
+  GreaterThanOrEqual,
+  OPERATOR as OPERATOR_GE,
+} from '../../expression/comparison/ge.js'
+import {
+  GreaterThan,
+  OPERATOR as OPERATOR_GT,
+} from '../../expression/comparison/gt.js'
+import { In, OPERATOR as OPERATOR_IN } from '../../expression/comparison/in.js'
+import {
+  LessThanOrEqual,
+  OPERATOR as OPERATOR_LE,
+} from '../../expression/comparison/le.js'
+import {
+  LessThan,
+  OPERATOR as OPERATOR_LT,
+} from '../../expression/comparison/lt.js'
+import {
+  NotEqual,
+  OPERATOR as OPERATOR_NE,
+} from '../../expression/comparison/ne.js'
+import {
+  NotIn,
+  OPERATOR as OPERATOR_NOT_IN,
+} from '../../expression/comparison/not-in.js'
+import {
+  OPERATOR as OPERATOR_PREFIX,
+  Prefix,
+} from '../../expression/comparison/prefix.js'
+import {
+  OPERATOR as OPERATOR_SUFFIX,
+  Suffix,
+} from '../../expression/comparison/suffix.js'
+import { And, OPERATOR as OPERATOR_AND } from '../../expression/logical/and.js'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor.js'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or.js'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor.js'
 import Engine from '../../index.js'
+import { Collection } from '../../operand/collection.js'
+import { Reference } from '../../operand/reference.js'
+import { Value } from '../../operand/value.js'
 import { ExpressionInput, Input } from '../../parser/index.js'
+import { defaultOperatorMapping } from '../../parser/options.js'
 
 for (const evaluator of ['oop', 'bytecode'] as const) {
   describe(`Condition Engine [${evaluator}]`, () => {
@@ -192,31 +226,199 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
     })
 
     describe('parse', () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const parseThrowData = [
+      const parseThrowData: [ExpressionInput, string][] = [
         // Operators with invalid operands
-        [[OPERATOR_EQ]],
-        [[OPERATOR_EQ, 5]],
-        [[OPERATOR_EQ, 5, 5, 5]],
-        [[OPERATOR_NE]],
-        [[OPERATOR_GT]],
-        [[OPERATOR_GE]],
-        [[OPERATOR_LT]],
-        [[OPERATOR_LE]],
-        [[OPERATOR_IN]],
-        [[OPERATOR_NOT_IN]],
-        [[OPERATOR_PREFIX]],
-        [[OPERATOR_SUFFIX]],
-        [[OPERATOR_AND]],
-        [[OPERATOR_OR]],
-        [[OPERATOR_NOR]],
-        [[OPERATOR_XOR]],
-        [[OPERATOR_SUM]],
-      ] as unknown as [ExpressionInput][]
+        [
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          [null] as unknown as ExpressionInput,
+          'invalid expression',
+        ],
+        [
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          ['NOT_VALID_OPERATOR'] as unknown as ExpressionInput,
+          'invalid expression',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_EQ)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_EQ)!, 5],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_EQ)!, 5, 5, 5],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_NE)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_GT)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_GE)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_LT)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_LE)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_IN)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_NOT_IN)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_PREFIX)!],
+          'comparison expression expects left and right operands',
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_SUFFIX)!],
+          'comparison expression expects left and right operands',
+        ],
+        [[defaultOperatorMapping.get(OPERATOR_SUM)!], 'invalid expression'],
+        [[defaultOperatorMapping.get(OPERATOR_SUM)!, 5], 'invalid expression'],
+        // Arithmetic can't be a top level expression
+        [
+          [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 5],
+          'invalid expression',
+        ],
+        // TODO Arithmetic is not throwing when operands are not numbers
+        // [
+        //   [
+        //     defaultOperatorMapping.get(OPERATOR_GT)!,
+        //     [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 'hello', 5],
+        //     10,
+        //   ],
+        //   'operands must be numbers for Sum',
+        // ],
+      ]
 
-      for (const [expression] of parseThrowData) {
+      for (const [expression, message] of parseThrowData) {
         test(`${JSON.stringify(expression)} should throw`, () => {
-          assert.throws(() => engine.parse(expression))
+          assert.throws(() => engine.parse(expression), {
+            message,
+          })
+        })
+      }
+
+      const parseData: [ExpressionInput, Evaluable][] = [
+        [
+          [defaultOperatorMapping.get(OPERATOR_EQ)!, '$a', '$b'],
+          new Equal(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_NE)!, '$a', '$b'],
+          new NotEqual(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_GT)!, '$a', '$b'],
+          new GreaterThan(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_GE)!, '$a', '$b'],
+          new GreaterThanOrEqual(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_LT)!, '$a', '$b'],
+          new LessThan(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_LE)!, '$a', '$b'],
+          new LessThanOrEqual(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_IN)!,
+            '$a',
+            ['option1', 'option2'],
+          ],
+          new In(
+            new Reference('a'),
+            new Collection([new Value('option1'), new Value('option2')])
+          ),
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_NOT_IN)!,
+            '$a',
+            ['option1', 'option2'],
+          ],
+          new NotIn(
+            new Reference('a'),
+            new Collection([new Value('option1'), new Value('option2')])
+          ),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_PREFIX)!, '$a', 'prefix'],
+          new Prefix(new Reference('a'), new Value('prefix')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_SUFFIX)!, '$a', 'suffix'],
+          new Suffix(new Reference('a'), new Value('suffix')),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_AND)!],
+          new Collection([new Value('AND')]),
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_AND)!,
+            [defaultOperatorMapping.get(OPERATOR_EQ)!, '$a', '$b'],
+          ],
+          new Equal(new Reference('a'), new Reference('b')),
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_AND)!,
+            [defaultOperatorMapping.get(OPERATOR_EQ)!, '$a', '$b'],
+            [defaultOperatorMapping.get(OPERATOR_EQ)!, '$a', '$b'],
+          ],
+          new And([
+            new Equal(new Reference('a'), new Reference('b')),
+            new Equal(new Reference('a'), new Reference('b')),
+          ]),
+        ],
+        [
+          [defaultOperatorMapping.get(OPERATOR_OR)!],
+          new Collection([new Value('OR')]),
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 5],
+            10,
+          ],
+          new GreaterThan(new Sum(new Value(5), new Value(5)), new Value(10)),
+        ],
+        // TODO This should be invalid
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, 'not-number', 5],
+            10,
+          ],
+          new GreaterThan(
+            new Sum(new Value('not-number'), new Value(5)),
+            new Value(10)
+          ),
+        ],
+      ]
+
+      for (const [expression, expectedResult] of parseData) {
+        test(`${JSON.stringify(expression)} should result in ${expectedResult}`, () => {
+          const result = engine.parse(expression)
+          assert.deepStrictEqual(result.toString(), expectedResult.toString())
         })
       }
     })
