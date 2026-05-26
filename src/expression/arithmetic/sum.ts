@@ -1,6 +1,7 @@
 import { Evaluable, Result } from '../../common/evaluable.js'
 import { formatDateNumber } from '../../common/util.js'
 import { Operand } from '../../operand/index.js'
+import { dateArithmeticTypeCheck } from './dateArithmeticTypeCheck.js'
 import { Arithmetic } from './index.js'
 import { mutateDateWithDuration } from './mutateDateWithDuration.js'
 import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
@@ -27,6 +28,7 @@ export class Sum extends Arithmetic {
     if (operands.length < 2) {
       throw new Error('sum expression requires at least 2 operands')
     }
+    dateArithmeticTypeCheck(...operands)
     super('+', OPERATOR, operands)
   }
 

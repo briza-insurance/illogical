@@ -47,7 +47,7 @@ import { And, OPERATOR as OPERATOR_AND } from '../../expression/logical/and.js'
 import { OPERATOR as OPERATOR_NOR } from '../../expression/logical/nor.js'
 import { OPERATOR as OPERATOR_OR } from '../../expression/logical/or.js'
 import { OPERATOR as OPERATOR_XOR } from '../../expression/logical/xor.js'
-import Engine from '../../index.js'
+import Engine, { OPERATOR_SUBTRACT } from '../../index.js'
 import { Collection } from '../../operand/collection.js'
 import { Reference } from '../../operand/reference.js'
 import { Value } from '../../operand/value.js'
@@ -288,20 +288,53 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
         ],
         [[defaultOperatorMapping.get(OPERATOR_SUM)!], 'invalid expression'],
         [[defaultOperatorMapping.get(OPERATOR_SUM)!, 5], 'invalid expression'],
-        // Arithmetic can't be a top level expression
         [
+          // Arithmetic can't be a top level expression
           [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 5],
           'invalid expression',
         ],
-        // TODO Arithmetic is not throwing when operands are not numbers
-        // [
-        //   [
-        //     defaultOperatorMapping.get(OPERATOR_GT)!,
-        //     [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 'hello', 5],
-        //     10,
-        //   ],
-        //   'operands must be numbers for Sum',
-        // ],
+        [
+          // Arithmetic can't be a top level expression
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, 'not-number', 5],
+            10,
+          ],
+          // eslint-disable-next-line max-len
+          'sum expression value literals should be all numbers or starting with an iso date string followed by date durations',
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 'hello', 5],
+            10,
+          ],
+          'sum expression value literals should be all numbers',
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, '2025-01-01', '1d', 5],
+            10,
+          ],
+          'sum expression value literals should be all date durations',
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUM)!, '$Ref', '1d', 5],
+            10,
+          ],
+          'sum expression value literals should be all numbers or all date durations',
+        ],
+        [
+          [
+            defaultOperatorMapping.get(OPERATOR_GT)!,
+            [defaultOperatorMapping.get(OPERATOR_SUBTRACT)!, '$Ref', '1d', 5],
+            10,
+          ],
+          'sum expression value literals should be all numbers or all date durations',
+        ],
       ]
 
       for (const [expression, message] of parseThrowData) {
@@ -400,18 +433,6 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
             10,
           ],
           new GreaterThan(new Sum(new Value(5), new Value(5)), new Value(10)),
-        ],
-        // TODO This should be invalid
-        [
-          [
-            defaultOperatorMapping.get(OPERATOR_GT)!,
-            [defaultOperatorMapping.get(OPERATOR_SUM)!, 'not-number', 5],
-            10,
-          ],
-          new GreaterThan(
-            new Sum(new Value('not-number'), new Value(5)),
-            new Value(10)
-          ),
         ],
       ]
 
@@ -1350,7 +1371,13 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
           undefined,
           undefined,
         ],
-        [false, ['>', ['+', null, null], 5], {}, undefined, undefined],
+        [
+          false,
+          ['>', ['+', '$Ref1', '$Ref2'], 5],
+          { Ref1: null, Ref2: null },
+          undefined,
+          undefined,
+        ],
         [
           false,
           [
@@ -1420,7 +1447,13 @@ for (const evaluator of ['oop', 'bytecode'] as const) {
           undefined,
           undefined,
         ],
-        [false, ['>', ['-', null, null], 5], {}, undefined, undefined],
+        [
+          false,
+          ['>', ['-', '$Ref1', '$Ref2'], 5],
+          { Ref1: null, Ref2: null },
+          undefined,
+          undefined,
+        ],
         // MULTIPLY
         [true, ['>', ['*', 2, 3], 5], {}, undefined, undefined],
         [

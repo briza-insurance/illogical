@@ -1,3 +1,6 @@
+import { Operand } from '../operand/index.js'
+import { Reference } from '../operand/reference.js'
+import { Value } from '../operand/value.js'
 import { Evaluable, Result } from './evaluable.js'
 
 /**
@@ -89,4 +92,12 @@ export function isUndefined(value: unknown): value is undefined {
 
 export function isNull(value: unknown): value is null {
   return value === null
+}
+
+export function isReference(operand: Operand): operand is Reference {
+  return operand.constructor.name === 'Reference'
+}
+
+export function isValue(operand: Operand): operand is Value {
+  return operand.constructor.name === 'Value'
 }
