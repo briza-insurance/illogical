@@ -6,6 +6,11 @@ import {
   SimplifyArgs,
 } from '../../common/evaluable.js'
 import { areAllNumbers, areAllResults } from '../../common/type-check.js'
+import {
+  DateDuration,
+  toDateDuration,
+  toDateNumber,
+} from '../../common/util.js'
 import { Operand } from '../../operand/index.js'
 import { ExpressionInput } from '../../parser/index.js'
 import { Options } from '../../parser/options.js'
@@ -51,6 +56,26 @@ export abstract class Arithmetic implements Evaluable {
     }
 
     return presentValues
+  }
+
+  protected getDateCalculationResults(
+    results: Result[]
+  ): [number, ...DateDuration[]] | false {
+    const [date, ...durations] = results
+    const dateNumber = toDateNumber(date)
+    if (isNaN(dateNumber)) {
+      return false
+    }
+
+    const parsedDurations = durations.flatMap((d) => {
+      const parsedDuration = toDateDuration(d)
+      return parsedDuration ? [parsedDuration] : []
+    })
+    if (parsedDurations.length !== durations.length) {
+      return false
+    }
+
+    return [dateNumber, ...parsedDurations]
   }
 
   /**

@@ -34,6 +34,10 @@ describe('Expression - Arithmetic - Subtract', () => {
     [1.222222, operand(2.333333), operand(1.111111)],
     [0.3, operand(0.4), operand(0.1)],
     [0, operand(1.333), operand(1.333)],
+    ['2025-12-27', operand('2026-01-01'), operand('5d')],
+    ['2010-02-28', operand('2010-03-31'), operand('1m')],
+    ['2023-02-28', operand('2024-02-29'), operand('1y')],
+    ['2023-01-28', operand('2024-02-29'), operand('1y'), operand('1m')],
     [false, operand(null), operand(1)],
     [false, operand(undefined), operand(1)],
   ]
@@ -51,6 +55,10 @@ describe('Expression - Arithmetic - Subtract', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
+      [operand('2024-02-29'), operand(1)],
+      [operand(1), operand('2024-02-29')],
+      [operand('2024-02'), operand(1)],
+      [operand('2024-02'), operand('1dd')],
     ]
     for (const operands of failureData) {
       it(`${operands[0]} and ${operands[1]} should throw`, () => {
@@ -73,6 +81,15 @@ describe('Expression - Arithmetic - Subtract', () => {
         new Value(4),
       ],
       ['(5 - -6)', new Value(5), new Value(-6)],
+      ['("2025-01-31" - "3 days")', new Value('2025-01-31'), new Value('3d')],
+      ['("2025-01-31" - "2 months")', new Value('2025-01-31'), new Value('2m')],
+      [
+        '("2025-01-31" - "1 year" - "2 months" - "3 days")',
+        new Value('2025-01-31'),
+        new Value('1y'),
+        new Value('2m'),
+        new Value('3d'),
+      ],
     ]
     for (const [expectedResult, ...values] of toStringData) {
       it(`should stringify into ${expectedResult}`, () => {
@@ -110,6 +127,20 @@ describe('Expression - Arithmetic - Subtract', () => {
           operatorMapping: new Map([[OPERATOR, 'CUSTOM_SUBTRACT']]),
         }),
         ['CUSTOM_SUBTRACT', 10, 20]
+      )
+    })
+
+    it('2025-01-01, 2d and 2y should be serialized to ["CUSTOM_SUM", "2025-01-01", "2d", "2y"]', () => {
+      assert.deepStrictEqual(
+        new Subtract(
+          new Value('2025-01-01'),
+          new Value('2d'),
+          new Value('2y')
+        ).serialize({
+          ...defaultOptions,
+          operatorMapping: new Map([[OPERATOR, 'CUSTOM_SUBTRACT']]),
+        }),
+        ['CUSTOM_SUBTRACT', '2025-01-01', '2d', '2y']
       )
     })
 

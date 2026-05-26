@@ -42,3 +42,30 @@ export const toDateNumber = (value: Result): number => {
   }
   return NaN
 }
+
+export const formatDateNumber = (dateNumber: number) =>
+  new Date(dateNumber).toISOString().split('T')[0]
+
+export type DateDuration = {
+  amount: number
+  unit: 'd' | 'm' | 'y'
+}
+
+export const toDateDuration = (value: Result): DateDuration | undefined => {
+  if (!isString(value)) {
+    return
+  }
+  const isDateDuration = value.match(/^([1-9]\d*)([dmy])$/)
+  if (!isDateDuration) {
+    return
+  }
+  const unit = isDateDuration[2]
+  if (unit !== 'd' && unit !== 'm' && unit !== 'y') {
+    return
+  }
+
+  return {
+    amount: parseInt(isDateDuration[1], 10),
+    unit,
+  }
+}

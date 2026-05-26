@@ -1,0 +1,6 @@
+{
+  "description": "SUBTRACT date: 2024-02-29 - 1y - 1m - 1d > 2023-02-27",
+  "expression": [">", ["-", "2024-02-29", "1y", "1d", "1m"], "$a"],
+  "context": { "a": "2023-01-26" },
+  "expected": true
+}

@@ -1,5 +1,6 @@
 import { Result } from '../common/evaluable.js'
 import { isString } from '../common/type-check.js'
+import { toDateDuration } from '../common/util.js'
 import { Input } from '../parser/index.js'
 import { Operand } from './index.js'
 
@@ -9,6 +10,17 @@ import { Operand } from './index.js'
  * @return {string}
  */
 function printValue(value: Result): string {
+  const dateDuration = toDateDuration(value)
+  if (dateDuration) {
+    switch (dateDuration.unit) {
+      case 'd':
+        return `"${dateDuration.amount} ${dateDuration.amount > 1 ? 'days' : 'day'}"`
+      case 'm':
+        return `"${dateDuration.amount} ${dateDuration.amount > 1 ? 'months' : 'month'}"`
+      case 'y':
+        return `"${dateDuration.amount} ${dateDuration.amount > 1 ? 'years' : 'year'}"`
+    }
+  }
   if (isString(value)) {
     return `"${value}"`
   }

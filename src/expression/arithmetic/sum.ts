@@ -1,6 +1,8 @@
 import { Evaluable, Result } from '../../common/evaluable.js'
+import { formatDateNumber } from '../../common/util.js'
 import { Operand } from '../../operand/index.js'
 import { Arithmetic } from './index.js'
+import { mutateDateWithDuration } from './mutateDateWithDuration.js'
 import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
 
 // Operator key
@@ -29,6 +31,18 @@ export class Sum extends Arithmetic {
   }
 
   operate(results: Result[]): Result {
+    const dateCalculationResults = this.getDateCalculationResults(results)
+    if (dateCalculationResults) {
+      const [dateNumber, ...durations] = dateCalculationResults
+      return formatDateNumber(
+        durations.reduce(
+          (mutated, duration) =>
+            mutateDateWithDuration(mutated, duration, 'sum'),
+          dateNumber
+        )
+      )
+    }
+
     const presentResults = this.getResultValues(results)
 
     if (presentResults === false) {

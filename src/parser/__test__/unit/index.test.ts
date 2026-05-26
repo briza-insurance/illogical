@@ -485,8 +485,34 @@ describe('Condition Engine - Parser', () => {
         new Equal(new Sum(new Value(5), new Value(5)), new Value(10)),
       ],
       [
+        [
+          getOp(OPERATOR_EQ),
+          [getOp(OPERATOR_SUM), '2025-01-29', '2d', '1m'],
+          '2025-02-28',
+        ],
+        new Equal(
+          new Sum(new Value('2025-01-29'), new Value('2d'), new Value('1m')),
+          new Value('2025-02-28')
+        ),
+      ],
+      [
         [getOp(OPERATOR_EQ), [getOp(OPERATOR_SUBTRACT), 5, 5], 0],
         new Equal(new Subtract(new Value(5), new Value(5)), new Value(0)),
+      ],
+      [
+        [
+          getOp(OPERATOR_EQ),
+          [getOp(OPERATOR_SUBTRACT), '2024-02-29', '1y', '1m'],
+          '2023-01-28',
+        ],
+        new Equal(
+          new Subtract(
+            new Value('2024-02-29'),
+            new Value('1y'),
+            new Value('1m')
+          ),
+          new Value('2023-01-28')
+        ),
       ],
       [
         [getOp(OPERATOR_EQ), [getOp(OPERATOR_MULTIPLY), 5, 5], 25],
