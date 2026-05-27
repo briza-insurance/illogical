@@ -13,7 +13,7 @@ interface TestCase {
 
 const DATA_DIR = resolve('src/__test__/data')
 
-for (const evaluator of ['oop'] as const) {
+for (const evaluator of ['oop', 'bytecode'] as const) {
   const engine = new Engine({ evaluator })
 
   for (const entry of readdirSync(DATA_DIR, { withFileTypes: true })) {

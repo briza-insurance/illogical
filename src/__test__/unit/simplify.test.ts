@@ -61,7 +61,7 @@ const testFiles = readdirSync(SIMPLIFY_CONDITIONS_DIR, { withFileTypes: true })
 const testCases: TestCase[] = testFiles.map(loadTestCase)
 
 // Run all test cases against both evaluators
-for (const mode of ['oop'] as const) {
+for (const mode of ['oop', 'bytecode'] as const) {
   describe(`Simplify — ${mode} evaluator`, () => {
     const engine = new Engine({ evaluator: mode })
 

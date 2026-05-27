@@ -13,7 +13,12 @@
 
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
-import { toDateNumber } from '../common/util.js'
+import {
+  formatDateNumber,
+  toDateDuration,
+  toDateNumber,
+} from '../common/util.js'
+import { mutateDateWithDuration } from '../expression/arithmetic/mutateDateWithDuration.js'
 
 // Detect Infinity and NaN — these should not be used as concrete values in
 // comparisons when the other operand is residual, matching the OOP simplifier's
@@ -427,6 +432,24 @@ function arithmeticReduce(
     return values.reduce(multiplyDecimals)
   }
   return values.reduce(divideDecimals)
+}
+
+function dateArithmeticReduce(
+  values: string[],
+  op: typeof OP_SUM | typeof OP_SUBTRACT
+): string {
+  const [date, ...durations] = values
+  return formatDateNumber(
+    durations.reduce(
+      (mutated, duration) =>
+        mutateDateWithDuration(
+          mutated,
+          toDateDuration(duration)!,
+          op === OP_SUM ? 'sum' : 'subtract'
+        ),
+      toDateNumber(date)
+    )
+  )
 }
 
 export function interpretSimplify(
@@ -1183,40 +1206,81 @@ export function interpretSimplify(
             stack[++stackTop] = false
             break
           }
+          const isDateArithmetic = !isNaN(toDateNumber(aVal))
           if (!isNumber(aVal) || !isNumber(bVal)) {
-            throw new Error(
-              `arithmetic operand is not a number: ${!isNumber(aVal) ? aVal : bVal}`
-            )
+            if (op === OP_SUM || op === OP_SUBTRACT) {
+              if (isDateArithmetic) {
+                const duration = toDateDuration(bVal)
+                if (!duration) {
+                  throw new Error(
+                    `arithmetic operand is not a date duration: ${bVal}`
+                  )
+                }
+              } else {
+                throw new Error(
+                  `arithmetic operand is not a number: ${!isNumber(aVal) ? aVal : bVal}`
+                )
+              }
+            } else {
+              throw new Error(
+                `arithmetic operand is not a number: ${!isNumber(aVal) ? aVal : bVal}`
+              )
+            }
           }
           // After the throw above, aVal and bVal are narrowed to number
           if (op === OP_SUM) {
-            stack[++stackTop] = addDecimals(aVal, bVal)
+            stack[++stackTop] =
+              !isDateArithmetic && isNumber(aVal) && isNumber(bVal)
+                ? addDecimals(aVal, bVal)
+                : formatDateNumber(
+                    mutateDateWithDuration(
+                      toDateNumber(aVal),
+                      toDateDuration(bVal)!,
+                      'sum'
+                    )
+                  )
           } else if (op === OP_SUBTRACT) {
-            stack[++stackTop] = subtractDecimals(aVal, bVal)
-          } else if (op === OP_MULTIPLY) {
-            stack[++stackTop] = multiplyDecimals(aVal, bVal)
-          } else {
-            // Division — match OOP isInfinite guard: use a marker so
-            // comparisons can decide whether to preserve the expression.
-            const result = divideDecimals(aVal, bVal)
-            if (isUnusableResult(result)) {
-              // Push marker with original operands for reconstruction
-              const marker: DivByZeroMarker = {
-                _r: 4,
-                _val: result,
-                left: aVal,
-                right: bVal,
-              }
-              stack[++stackTop] = marker
+            stack[++stackTop] =
+              !isDateArithmetic && isNumber(aVal) && isNumber(bVal)
+                ? subtractDecimals(aVal, bVal)
+                : formatDateNumber(
+                    mutateDateWithDuration(
+                      toDateNumber(aVal),
+                      toDateDuration(bVal)!,
+                      'subtract'
+                    )
+                  )
+          } else if (isNumber(aVal) && isNumber(bVal)) {
+            if (op === OP_MULTIPLY) {
+              stack[++stackTop] = multiplyDecimals(aVal, bVal)
             } else {
-              stack[++stackTop] = result
+              // Division — match OOP isInfinite guard: use a marker so
+              // comparisons can decide whether to preserve the expression.
+              const result = divideDecimals(aVal, bVal)
+              if (isUnusableResult(result)) {
+                // Push marker with original operands for reconstruction
+                const marker: DivByZeroMarker = {
+                  _r: 4,
+                  _val: result,
+                  left: aVal,
+                  right: bVal,
+                }
+                stack[++stackTop] = marker
+              } else {
+                stack[++stackTop] = result
+              }
             }
           }
           break
         }
         // N-operand path
-        const values: number[] = new Array(n)
+        const values: Array<number | string> = new Array(n)
         let hasNull = false
+        const firstOperand = slotVal(stack[stackTop - n + 1])
+        const isDateArithmetic =
+          typeof firstOperand !== 'object' &&
+          !isNaN(toDateNumber(firstOperand)) &&
+          (op === OP_SUM || op === OP_SUBTRACT)
         for (let j = n - 1; j >= 0; j--) {
           const v = slotVal(stack[stackTop--])
           if (v === null || v === undefined) {
@@ -1224,17 +1288,38 @@ export function interpretSimplify(
             break
           }
           if (!isNumber(v)) {
-            throw new Error(`arithmetic operand is not a number: ${v}`)
+            if (isDateArithmetic) {
+              const duration = toDateDuration(v)
+              if (!duration && j > 0) {
+                throw new Error(
+                  `arithmetic operand is not a date duration: ${v}`
+                )
+              }
+            } else {
+              throw new Error(`arithmetic operand is not a number: ${v}`)
+            }
           }
           // After the throw above, v is narrowed to number
-          values[j] = v
+          if (isNumber(v) || isString(v)) {
+            values[j] = v
+          }
         }
-        const reduced = hasNull ? false : arithmeticReduce(values, op)
+        // TODO
+        const reduced = hasNull
+          ? false
+          : isDateArithmetic &&
+              (op === OP_SUM || op === OP_SUBTRACT) &&
+              values.every((v) => isString(v))
+            ? dateArithmeticReduce(values, op)
+            : values.every((v) => isNumber(v))
+              ? arithmeticReduce(values, op)
+              : false
         if (hasNull) {
           stack[++stackTop] = false
         } else if (
           op === OP_DIVIDE &&
           reduced !== false &&
+          isNumber(reduced) &&
           isUnusableResult(reduced)
         ) {
           // N-operand division producing Infinity/NaN — create marker
@@ -1246,7 +1331,11 @@ export function interpretSimplify(
             right: values[1],
           }
           stack[++stackTop] = marker
-        } else if (reduced !== false && isUnusableResult(reduced)) {
+        } else if (
+          reduced !== false &&
+          isNumber(reduced) &&
+          isUnusableResult(reduced)
+        ) {
           // Other arithmetic producing Infinity/NaN — preserve expression
           stack[++stackTop] = makeResidual([opNames[op], ...values])
         } else {
