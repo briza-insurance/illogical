@@ -8,7 +8,12 @@
 
 import { Context, Result } from '../common/evaluable.js'
 import { isNumber, isString } from '../common/type-check.js'
-import { toDateNumber } from '../common/util.js'
+import {
+  formatDateNumber,
+  toDateDuration,
+  toDateNumber,
+} from '../common/util.js'
+import { mutateDateWithDuration } from '../expression/arithmetic/mutateDateWithDuration.js'
 import { CompiledExpression } from './compiler.js'
 import {
   OP_AND,
@@ -123,6 +128,24 @@ function relationalCompare(
     return ld <= rd
   }
   return false
+}
+
+function dateArithmeticReduce(
+  values: string[],
+  op: typeof OP_SUM | typeof OP_SUBTRACT
+): Result {
+  const [date, ...durations] = values
+  return formatDateNumber(
+    durations.reduce(
+      (mutated, duration) =>
+        mutateDateWithDuration(
+          mutated,
+          toDateDuration(duration)!,
+          op === OP_SUM ? 'sum' : 'subtract'
+        ),
+      toDateNumber(date)
+    )
+  )
 }
 
 function arithmeticReduce(
@@ -591,24 +614,63 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
             stack[++stackTop] = false
             break
           }
+          const isDateArithmetic = !isNaN(toDateNumber(a))
           if (!isNumber(a) || !isNumber(b)) {
-            throw new Error(
-              `arithmetic operand is not a number: ${!isNumber(a) ? a : b}`
-            )
+            if (op === OP_SUM || op === OP_SUBTRACT) {
+              if (isDateArithmetic) {
+                const duration = toDateDuration(b)
+                if (!duration) {
+                  throw new Error(
+                    `arithmetic operand is not a date duration: ${b}`
+                  )
+                }
+              } else {
+                throw new Error(
+                  `arithmetic operand is not a number: ${!isNumber(a) ? a : b}`
+                )
+              }
+            } else {
+              throw new Error(
+                `arithmetic operand is not a number: ${!isNumber(a) ? a : b}`
+              )
+            }
           }
           if (op === OP_SUM) {
-            stack[++stackTop] = addDecimals(a, b)
+            stack[++stackTop] =
+              !isDateArithmetic && isNumber(a) && isNumber(b)
+                ? addDecimals(a, b)
+                : formatDateNumber(
+                    mutateDateWithDuration(
+                      toDateNumber(a),
+                      toDateDuration(b)!,
+                      'sum'
+                    )
+                  )
           } else if (op === OP_SUBTRACT) {
-            stack[++stackTop] = subtractDecimals(a, b)
-          } else if (op === OP_MULTIPLY) {
-            stack[++stackTop] = multiplyDecimals(a, b)
-          } else {
-            stack[++stackTop] = divideDecimals(a, b)
+            stack[++stackTop] =
+              !isDateArithmetic && isNumber(a) && isNumber(b)
+                ? subtractDecimals(a, b)
+                : formatDateNumber(
+                    mutateDateWithDuration(
+                      toDateNumber(a),
+                      toDateDuration(b)!,
+                      'subtract'
+                    )
+                  )
+          } else if (isNumber(a) && isNumber(b)) {
+            if (op === OP_MULTIPLY) {
+              stack[++stackTop] = multiplyDecimals(a, b)
+            } else {
+              stack[++stackTop] = divideDecimals(a, b)
+            }
           }
           break
         }
-        const values: number[] = new Array(n)
+        const values: Array<string | number> = new Array(n)
         let hasNull = false
+        const isDateArithmetic =
+          !isNaN(toDateNumber(stack[stackTop - n + 1])) &&
+          (op === OP_SUM || op === OP_SUBTRACT)
         for (let j = n - 1; j >= 0; j--) {
           const v = stack[stackTop--]
           if (v === null || v === undefined) {
@@ -616,11 +678,30 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
             break
           }
           if (!isNumber(v)) {
-            throw new Error(`arithmetic operand is not a number: ${v}`)
+            if (isDateArithmetic) {
+              const duration = toDateDuration(v)
+              if (!duration && j > 0) {
+                throw new Error(
+                  `arithmetic operand is not a date duration: ${v}`
+                )
+              }
+            } else {
+              throw new Error(`arithmetic operand is not a number: ${v}`)
+            }
           }
-          values[j] = v
+          if (isNumber(v) || isString(v)) {
+            values[j] = v
+          }
         }
-        stack[++stackTop] = hasNull ? false : arithmeticReduce(values, op)
+        stack[++stackTop] = hasNull
+          ? false
+          : isDateArithmetic &&
+              (op === OP_SUM || op === OP_SUBTRACT) &&
+              values.every((v) => isString(v))
+            ? dateArithmeticReduce(values, op)
+            : values.every((v) => isNumber(v))
+              ? arithmeticReduce(values, op)
+              : false
         break
       }
 

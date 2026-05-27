@@ -1,3 +1,6 @@
+import { Operand } from '../operand/index.js';
+import { Reference } from '../operand/reference.js';
+import { Value } from '../operand/value.js';
 import { Evaluable, Result } from './evaluable.js';
 /**
  * Is number predicate.
@@ -45,3 +48,5 @@ export declare function areAllResults(values: (Result | Evaluable)[]): values is
 export declare function areAllNumbers(results: Result[]): results is number[];
 export declare function isUndefined(value: unknown): value is undefined;
 export declare function isNull(value: unknown): value is null;
+export declare function isReference(operand: Operand): operand is Reference;
+export declare function isValue(operand: Operand): operand is Value;

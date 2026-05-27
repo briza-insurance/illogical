@@ -14,3 +14,9 @@ export declare const toString: (value: Result) => string | undefined;
  * @param value value to be converted to number
  */
 export declare const toDateNumber: (value: Result) => number;
+export declare const formatDateNumber: (dateNumber: number) => string;
+export type DateDuration = {
+    amount: number;
+    unit: 'd' | 'm' | 'y';
+};
+export declare const toDateDuration: (value: Result) => DateDuration | undefined;

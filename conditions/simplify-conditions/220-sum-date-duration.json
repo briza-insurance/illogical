@@ -1,0 +1,6 @@
+{
+  "description": "SUM date: compute from references",
+  "expression": [">", ["+", "$Date", "$Duration", "$DurationB"], "$a"],
+  "context": { "Date": "2024-02-29", "Duration": "1y", "DurationB": "1d" },
+  "expected": [">", "2025-03-01", "$a"]
+}

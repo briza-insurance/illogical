@@ -35,6 +35,10 @@ describe('Expression - Arithmetic - Sum', () => {
     [0, operand(1.333), operand(-1.333)],
     [false, operand(null), operand(1)],
     [false, operand(undefined), operand(1)],
+    ['2026-01-06', operand('2026-01-01'), operand('5d')],
+    ['2026-04-30', operand('2026-01-31'), operand('3m')],
+    ['2026-02-28', operand('2024-02-29'), operand('2y')],
+    ['2026-03-02', operand('2024-02-29'), operand('2y'), operand('2d')],
   ]
 
   describe('evaluate', () => {
@@ -50,6 +54,10 @@ describe('Expression - Arithmetic - Sum', () => {
       [operand('string1'), operand(2)],
       [operand('string1'), operand('string2')],
       [operand(1), operand('string2')],
+      [operand('2024-02-29'), operand(1)],
+      [operand(1), operand('2024-02-29')],
+      [operand('2024-02'), operand(1)],
+      [operand('2024-02'), operand('1dd')],
     ]
     for (const operands of failureData) {
       it(`${operands[0]} and ${operands[1]} should throw`, () => {
@@ -72,6 +80,19 @@ describe('Expression - Arithmetic - Sum', () => {
         new Value(4),
       ],
       ['(5 + -6)', new Value(5), new Value(-6)],
+      ['("2025-01-31" + "3 days")', new Value('2025-01-31'), new Value('3d')],
+      ['("2025-01-31" + "1 day")', new Value('2025-01-31'), new Value('1d')],
+      ['("2025-01-31" + "2 months")', new Value('2025-01-31'), new Value('2m')],
+      ['("2025-01-31" + "1 month")', new Value('2025-01-31'), new Value('1m')],
+      ['("2025-01-31" + "2 years")', new Value('2025-01-31'), new Value('2y')],
+      ['("2025-01-31" + "1 year")', new Value('2025-01-31'), new Value('1y')],
+      [
+        '("2025-01-31" + "1 year" + "2 months" + "3 days")',
+        new Value('2025-01-31'),
+        new Value('1y'),
+        new Value('2m'),
+        new Value('3d'),
+      ],
     ]
     for (const [expectedResult, ...values] of toStringData) {
       it(`should stringify into ${expectedResult}`, () => {
@@ -109,6 +130,20 @@ describe('Expression - Arithmetic - Sum', () => {
           operatorMapping: new Map([[OPERATOR, 'CUSTOM_SUM']]),
         }),
         ['CUSTOM_SUM', 10, 20]
+      )
+    })
+
+    it('2025-01-01, 2d and 2y should be serialized to ["CUSTOM_SUM", "2025-01-01", "2d", "2y"]', () => {
+      assert.deepStrictEqual(
+        new Sum(
+          new Value('2025-01-01'),
+          new Value('2d'),
+          new Value('2y')
+        ).serialize({
+          ...defaultOptions,
+          operatorMapping: new Map([[OPERATOR, 'CUSTOM_SUM']]),
+        }),
+        ['CUSTOM_SUM', '2025-01-01', '2d', '2y']
       )
     })
 

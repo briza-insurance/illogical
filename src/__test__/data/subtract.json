@@ -12,5 +12,7 @@
   { "expression": ["==", ["-", 0.4, 0.1], 0.3], "context": {}, "expected": true },
   { "expression": ["==", ["-", 1.333, 1.333], 0], "context": {}, "expected": true },
   { "expression": ["==", ["-", "$null", 1], false], "context": { "null": null }, "expected": true },
-  { "expression": ["==", ["-", "$undef", 1], false], "context": {}, "expected": true }
+  { "expression": ["==", ["-", "$undef", 1], false], "context": {}, "expected": true },
+  { "expression": ["<", ["-", ["+", "2025-01-29", "2d", "1m"], "1d"] , "2025-02-28"], "context": {}, "expected": true },
+  { "expression": ["==", ["-", "$A", "1y", "1m"], "$B"], "context": {"A": "2024-02-29", "B": "2023-01-28"}, "expected": true }
 ]
