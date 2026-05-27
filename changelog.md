@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 2.2.0
+
+- Enabled date mutation in [Arithmetic Expressions](./specs/arithmetic-expressions.md).
+
 ## 2.1.0
 
 - Introduced bytecode evaluator mode (`evaluator: 'bytecode'`) for improved performance via
