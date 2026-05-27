@@ -3,6 +3,7 @@ import { dirname, join } from 'path'
 import { Bench } from 'tinybench'
 import { fileURLToPath } from 'url'
 
+import { Context } from '../common/evaluable.js'
 import { generateCases, type GeneratedCases } from './generate-cases.js'
 
 export const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -66,12 +67,18 @@ export async function runBench(
   console.log(`\nRunning: ${name}`)
   const bench = new Bench({ time: 50, warmupTime: 20 })
 
+  const contextMap = new Map<string, Context>()
+
   for (const condition of conditions) {
     for (const task of tasks) {
       if (task.ctx !== null && !contextProducesExpected(condition, task.ctx)) {
         continue
       }
-      bench.add(`${name} > ${condition.id} > ${task.name}`, task.fn(condition))
+      const taskName = `${name} > ${condition.id} > ${task.name}`
+      if (task.ctx != null) {
+        contextMap.set(taskName, condition[task.ctx])
+      }
+      bench.add(taskName, task.fn(condition))
     }
   }
 
@@ -96,7 +103,7 @@ export async function runBench(
 
   const results: Record<string, object> = {}
   for (const t of bench.tasks) {
-    results[t.name] = { ...t.result }
+    results[t.name] = { ...t.result, context: contextMap.get(t.name) }
   }
 
   writeFileSync(outputPath, JSON.stringify(results, null, 2))
