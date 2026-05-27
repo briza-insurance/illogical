@@ -1304,7 +1304,6 @@ export function interpretSimplify(
             values[j] = v
           }
         }
-        // TODO
         const reduced = hasNull
           ? false
           : isDateArithmetic &&
