@@ -1,4 +1,5 @@
 import { Context, Evaluable, EvaluableType, Result, SimplifyArgs } from '../../common/evaluable.js';
+import { DateDuration } from '../../common/util.js';
 import { Operand } from '../../operand/index.js';
 import { ExpressionInput } from '../../parser/index.js';
 import { Options } from '../../parser/options.js';
@@ -27,6 +28,7 @@ export declare abstract class Arithmetic implements Evaluable {
      *   array of numbers
      */
     protected getResultValues(results: Result[]): number[] | false;
+    protected getDateCalculationResults(results: Result[]): [number, ...DateDuration[]] | false;
     /**
      * Performs the arithmetic operation on the operands evaluated values.
      * @param {Result[]} results Operand result values.
