@@ -27,8 +27,8 @@ The reference operand must be prefixed with `$` symbol, e.g.: `$name`. This can 
 
 The operand could be an array mixed from [Value](#value) and [Reference](#reference).
 
-| Expression                              | Data Context                        |
-| --------------------------------------- | ----------------------------------- |
-| `['IN', [1, 2], 1]`                     | `{}`                                |
-| `['IN', 'circle', ['$shapeA', $shapeB]` | `{shapeA: 'circle', shapeB: 'box'}` |
-| `['IN', [$number, 5], 5]`               | `{number: 3}`                       |
+| Expression                                 | Data Context                        |
+| ------------------------------------------ | ----------------------------------- |
+| `['IN', [1, 2], 1]`                        | `{}`                                |
+| `['IN', 'circle', ['$shapeA', '$shapeB']]` | `{shapeA: 'circle', shapeB: 'box'}` |
+| `['IN', ['$number', 5], 5]`                | `{number: 3}`                       |
