@@ -137,8 +137,8 @@ Expression format: `["NOT IN",`[Left Operand](./operand-types.md), [Right Operan
 > Valid operand types: number and number[] or string and string[].
 
 ```json
-["IN", 10, [1,2,3,4,5]]
-["IN", ["circle", "square", "triangle"], "oval"]
+["NOT IN", 10, [1,2,3,4,5]]
+["NOT IN", ["circle", "square", "triangle"], "oval"]
 ```
 
 ```js
@@ -204,33 +204,33 @@ engine.evaluate([
 
 ## Undefined
 
-Expression format: `["UNDEFINED",`[Reference Operand](./operand-types.md#reference)`]`.
+Expression format: `["UNDEFINED",`$[Reference Operand](./operand-types.md#reference)`]`.
 
 ```json
 ["UNDEFINED", "$RefA"]
 ```
 
 ```js
-engine.evaluate(['UNDEFINED', 'RefA'], {}) // true
-engine.evaluate(['UNDEFINED', 'RefA'], { RefA: undefined }) // true
-engine.evaluate(['UNDEFINED', 'RefA'], { RefA: 10 }) // false
+engine.evaluate(['UNDEFINED', '$RefA'], {}) // true
+engine.evaluate(['UNDEFINED', '$RefA'], { RefA: undefined }) // true
+engine.evaluate(['UNDEFINED', '$RefA'], { RefA: 10 }) // false
 ```
 
 ## Present
 
 Evaluates as FALSE when the operand is UNDEFINED or NULL.
 
-Expression format: `["PRESENT",`[Reference Operand](./operand-types.md#reference)`]`.
+Expression format: `["PRESENT",`$[Reference Operand](./operand-types.md#reference)`]`.
 
 ```json
 ["PRESENT", "$RefA"]
 ```
 
 ```js
-engine.evaluate(['PRESENT', 'RefA'], {}) // false
-engine.evaluate(['PRESENT', 'RefA'], { RefA: undefined }) // false
-engine.evaluate(['PRESENT', 'RefA'], { RefA: null }) // false
-engine.evaluate(['PRESENT', 'RefA'], { RefA: 10 }) // true
-engine.evaluate(['PRESENT', 'RefA'], { RefA: false }) // true
-engine.evaluate(['PRESENT', 'RefA'], { RefA: 0 }) // true
+engine.evaluate(['PRESENT', '$RefA'], {}) // false
+engine.evaluate(['PRESENT', '$RefA'], { RefA: undefined }) // false
+engine.evaluate(['PRESENT', '$RefA'], { RefA: null }) // false
+engine.evaluate(['PRESENT', '$RefA'], { RefA: 10 }) // true
+engine.evaluate(['PRESENT', '$RefA'], { RefA: false }) // true
+engine.evaluate(['PRESENT', '$RefA'], { RefA: 0 }) // true
 ```
