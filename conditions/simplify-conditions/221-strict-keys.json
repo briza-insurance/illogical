@@ -1,0 +1,8 @@
+{
+  "description": "strictKeys and optionalKeys with type casting",
+  "expression": [">=", "$ref.(Number)", "1"],
+  "context": {},
+  "expected": [">=", "$ref.(Number)", "1"],
+  "strictKeys": ["a"],
+  "optionalKeys": ["ref"]
+}
