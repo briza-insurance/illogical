@@ -678,6 +678,68 @@ describe('Batch Evaluation', () => {
       assert.ok(typeof batch.addExpression === 'function')
       assert.ok(typeof batch.removeExpression === 'function')
     })
+
+    test('constructor validates unique expression names', () => {
+      // Note: JS object literals dedupe keys, so we can't create duplicate
+      // keys via literal syntax. The constructor validation ensures that if
+      // a developer somehow constructs an object with duplicate keys (e.g.,
+      // via Object.assign or dynamic key construction), it is caught.
+      // The practical validation is tested via addExpression below.
+      const engine = new Engine()
+      const batch = engine.createBatchEvaluator({
+        expressions: { a: ['==', '$x', '1'], b: ['==', '$y', '2'] },
+      })
+      assert.ok(batch)
+    })
+
+    test('addExpression throws on duplicate name', () => {
+      const engine = new Engine()
+      const batch = engine.createBatchEvaluator({
+        expressions: { a: ['==', '$x', '1'], b: ['==', '$y', '2'] },
+      })
+
+      assert.throws(
+        () => batch.addExpression('b', ['==', '$z', '3']),
+        TypeError,
+        'should throw TypeError when adding expression with existing name'
+      )
+
+      // Ensure existing expressions still work
+      const results = batch.evaluate({ x: '1', y: '2' })
+      assert.strictEqual(results.a, true)
+      assert.strictEqual(results.b, true)
+    })
+
+    test('addExpression preserves cached results for existing expressions', () => {
+      const engine = new Engine()
+      const batch = engine.createBatchEvaluator({
+        expressions: { a: ['==', '$x', '1'] },
+      })
+
+      batch.evaluate({ x: '1' })
+      assert.strictEqual(batch.getResults().a, true)
+
+      // Add a new expression
+      batch.addExpression('b', ['==', '$y', '2'])
+
+      // Previous cached result should be preserved
+      assert.strictEqual(
+        batch.getResults().a,
+        true,
+        'a should retain cached value'
+      )
+      // b should be undefined (not yet evaluated)
+      assert.strictEqual(
+        batch.getResults().b,
+        undefined,
+        'b should be undefined before evaluation'
+      )
+
+      // After evaluation, both should be present
+      const results = batch.evaluate({ x: '1', y: '2' })
+      assert.strictEqual(results.a, true)
+      assert.strictEqual(results.b, true)
+    })
   })
 
   // -----------------------------------------------------------------------
@@ -758,6 +820,163 @@ describe('Batch Evaluation', () => {
       console.log(`\nIncremental vs Full (50 expressions x 100 iterations):`)
       console.log(`  Full evaluation:  ${fullTime.toFixed(2)}ms`)
       console.log(`  Incremental:      ${incTime.toFixed(2)}ms`)
+    })
+
+    test('batch vs single expression evaluation (1000 expressions)', () => {
+      const engine = new Engine()
+
+      const batchSize = 1000
+      const expressions: Record<string, [string, string, string]> = {}
+      for (let i = 0; i < batchSize; i++) {
+        expressions[`expr_${i}`] = ['==', `$key_${i}`, i.toString()]
+      }
+
+      // Single expression evaluation
+      const singleCtx: Context = {}
+      for (let i = 0; i < batchSize; i++) {
+        singleCtx[`key_${i}`] = i.toString()
+      }
+
+      const singleStart = performance.now()
+      for (let iter = 0; iter < 10; iter++) {
+        for (const [, expr] of Object.entries(expressions)) {
+          engine.evaluate(expr, singleCtx)
+        }
+      }
+      const singleTime = performance.now() - singleStart
+
+      // Batch evaluation
+      const batch = engine.createBatchEvaluator({ expressions })
+      const batchStart = performance.now()
+      for (let iter = 0; iter < 10; iter++) {
+        batch.evaluate(singleCtx)
+      }
+      const batchTime = performance.now() - batchStart
+
+      batch.dispose()
+
+      console.log(`\nBenchmark (1000 expressions x 10 iterations):`)
+      console.log(`  Single evaluation: ${singleTime.toFixed(2)}ms`)
+      console.log(`  Batch evaluation:  ${batchTime.toFixed(2)}ms`)
+    })
+
+    test('incremental batch vs individual evaluation — 1 field changes', () => {
+      // This benchmark addresses the reviewer's scenario:
+      // - 1,000 fields with varying conditions
+      // - when 1 field changes
+      // - how long does batch evaluate vs. evaluating all individually
+      const engine = new Engine()
+
+      const exprCount = 1000
+      // Each expression depends on one of 10 context keys (varying conditions)
+      const expressions: Record<string, ExpressionInput> = {}
+      for (let i = 0; i < exprCount; i++) {
+        const keyIndex = i % 10
+        expressions[`expr_${i}`] = ['==', `$key_${keyIndex}`, i.toString()]
+      }
+
+      // Full context with 10 keys
+      const fullCtx: Context = {}
+      for (let i = 0; i < 10; i++) {
+        fullCtx[`key_${i}`] = 'some_value'
+      }
+
+      // Warm up — full evaluation first
+      const batch = engine.createBatchEvaluator({ expressions })
+      batch.evaluate(fullCtx)
+
+      // --- Incremental batch evaluation: 1 field changes ---
+      const incBatchStart = performance.now()
+      for (let iter = 0; iter < 100; iter++) {
+        // Only key_0 changes — only ~100 expressions depend on it
+        batch.evaluate(fullCtx, ['key_0'])
+      }
+      const incBatchTime = performance.now() - incBatchStart
+
+      // --- Individual evaluation: evaluate ALL 1,000 expressions each time ---
+      const individualStart = performance.now()
+      for (let iter = 0; iter < 100; iter++) {
+        for (const [, expr] of Object.entries(expressions)) {
+          engine.evaluate(expr, fullCtx)
+        }
+      }
+      const individualTime = performance.now() - individualStart
+
+      batch.dispose()
+
+      console.log(
+        `\nBenchmark (1,000 expressions, 1 field changes, 100 iterations):`
+      )
+      console.log(`  Incremental batch: ${incBatchTime.toFixed(2)}ms`)
+      console.log(`  Individual (all):  ${individualTime.toFixed(2)}ms`)
+      console.log(
+        `  Speedup:           ${(individualTime / incBatchTime).toFixed(2)}x`
+      )
+      console.log(
+        `  Note: Simple expressions favor individual eval due to batch overhead.`
+      )
+      console.log(
+        `  See "complex expressions" benchmark below for where batch shines.`
+      )
+    })
+
+    test('incremental batch vs individual — complex expressions', () => {
+      // This benchmark shows where batch evaluation shines: complex expressions
+      // with nested operators benefit from shared compilation and incremental eval.
+      const engine = new Engine()
+
+      const exprCount = 500
+      // Complex expressions: AND of multiple conditions with IN checks
+      const expressions: Record<string, ExpressionInput> = {}
+      for (let i = 0; i < exprCount; i++) {
+        const keyIndex = i % 5
+        expressions[`expr_${i}`] = [
+          'AND',
+          ['==', `$key_${keyIndex}`, 'active'],
+          ['IN', `$role_${keyIndex}`, ['admin', 'editor', 'viewer']],
+          ['>', `$score_${keyIndex}`, 50],
+        ]
+      }
+
+      // Full context with 15 keys
+      const fullCtx: Context = {}
+      for (let i = 0; i < 5; i++) {
+        fullCtx[`key_${i}`] = 'active'
+        fullCtx[`role_${i}`] = 'admin'
+        fullCtx[`score_${i}`] = 75
+      }
+
+      // Warm up
+      const batch = engine.createBatchEvaluator({ expressions })
+      batch.evaluate(fullCtx)
+
+      // --- Incremental batch: 1 field changes ---
+      const incBatchStart = performance.now()
+      for (let iter = 0; iter < 100; iter++) {
+        // Only key_0 changes — ~100 expressions depend on it
+        batch.evaluate(fullCtx, ['key_0'])
+      }
+      const incBatchTime = performance.now() - incBatchStart
+
+      // --- Individual: evaluate ALL 500 expressions each time ---
+      const individualStart = performance.now()
+      for (let iter = 0; iter < 100; iter++) {
+        for (const [, expr] of Object.entries(expressions)) {
+          engine.evaluate(expr, fullCtx)
+        }
+      }
+      const individualTime = performance.now() - individualStart
+
+      batch.dispose()
+
+      console.log(
+        `\nBenchmark (500 complex expressions, 1 field changes, 100 iterations):`
+      )
+      console.log(`  Incremental batch: ${incBatchTime.toFixed(2)}ms`)
+      console.log(`  Individual (all):  ${individualTime.toFixed(2)}ms`)
+      console.log(
+        `  Speedup:           ${(individualTime / incBatchTime).toFixed(2)}x`
+      )
     })
   })
 

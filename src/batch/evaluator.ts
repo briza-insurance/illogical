@@ -60,7 +60,11 @@ export class BatchEvaluator {
   /**
    * Create a new BatchEvaluator.
    *
+   * Validates that all expression names in the initial expressions map are
+   * unique. Throws a `TypeError` if any duplicate names are found.
+   *
    * @param options — Expressions map and optional parser options
+   * @throws TypeError if duplicate expression names are provided
    */
   constructor(options: BatchEvaluatorOptions) {
     this.opts = { ...defaultOptions }
@@ -74,6 +78,11 @@ export class BatchEvaluator {
 
     const expressionsMap = new Map<string, ExpressionInput>()
     for (const [name, expr] of Object.entries(options.expressions)) {
+      if (expressionsMap.has(name)) {
+        throw new TypeError(
+          `Duplicate expression name: '${name}'. Expression names must be unique.`
+        )
+      }
       expressionsMap.set(name, expr)
     }
 
@@ -90,6 +99,20 @@ export class BatchEvaluator {
 
   /**
    * Evaluate expressions against context.
+   *
+   * IMPORTANT — No inter-expression dependencies: Each expression depends only on
+   * context keys (e.g., $status, $tier), not on the results of other expressions.
+   * There is no concept of "expression A must evaluate before expression B."
+   * The dependency graph tracks context-key → expression mappings, not
+   * expression-to-expression relationships.
+   *
+   * This means:
+   *   - The order of expressions in the batch does not matter.
+   *   - The order of keys in `changedKeys` does not matter.
+   *   - All affected expressions are re-evaluated in a single pass.
+   *   - If Q2's expression references `$Q1` as a context key, changing Q1 will
+   *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
+   *     "depend on" Q1's result — it depends on the context key `Q1`.
    *
    * Mode 1 — No changedKeys: full re-evaluation of all expressions.
    *   Context is merged into stored context, all expressions run.
@@ -187,10 +210,22 @@ export class BatchEvaluator {
 
   /**
    * Subscribe to change notifications.
-   * Callback fires only for expressions whose result changed.
+   *
+   * The callback fires only for expressions whose result changed between
+   * evaluations (not for expressions that were re-evaluated but produced
+   * the same result). This makes it ideal for reactive UI updates, logging,
+   * and state synchronization without unnecessary work.
+   *
+   * Typical subscribers:
+   *   - UI components that need to re-render when a computed value changes
+   *     Example: A dashboard widget showing "User Access Level" could subscribe
+   *     and update its display only when the `canAccess` expression result flips.
+   *   - Logging/monitoring systems that track how often expression results change
+   *   - State synchronization layers that push changes to remote services
+   *   - Caches that need to invalidate downstream derived data
    *
    * @param callback — Called with list of changed expressions
-   * @returns Unsubscribe function
+   * @returns Unsubscribe function that removes the callback when invoked
    */
   onChange(callback: ChangeCallback): () => void {
     this.state.onChangeCallbacks.push(callback)
@@ -227,12 +262,22 @@ export class BatchEvaluator {
 
   /**
    * Add a new expression to the batch.
-   * Note: This recompiles the entire batch.
    *
-   * @param name — Expression name
+   * This recompiles the entire batch (Phase 1–3: ref collection, dependency
+   * graph, bytecode compilation). Cached results for existing expressions are
+   * preserved — only the newly added expression starts as dirty and will be
+   * evaluated on the next `evaluate()` call.
+   *
+   * @param name — Expression name (must be unique; throws if already exists)
    * @param expression — Raw expression input
+   * @throws TypeError if an expression with this name already exists
    */
   addExpression(name: string, expression: ExpressionInput): void {
+    if (this.state.originalExpressions.has(name)) {
+      throw new TypeError(
+        `Duplicate expression name: '${name}'. Expression names must be unique.`
+      )
+    }
     this.state.originalExpressions.set(name, expression)
     // Recompile
     this.recompile()
@@ -240,7 +285,10 @@ export class BatchEvaluator {
 
   /**
    * Remove an expression from the batch.
-   * Note: This recompiles the entire batch.
+   *
+   * This recompiles the entire batch (Phase 1–3). The removed expression's
+   * cached result is cleared, and the expression is excluded from future
+   * evaluations. Other expressions' cached results are preserved.
    *
    * @param name — Expression name to remove
    */
