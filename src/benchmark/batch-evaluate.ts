@@ -2,9 +2,12 @@
  * Batch evaluator benchmark runner.
  *
  * Compares:
- * 1. Individual evaluation — each expression compiled and evaluated separately
- * 2. Batch evaluation — all expressions compiled once, shared resources
- * 3. Batch incremental evaluation — only expressions affected by changed keys
+ * 1. Cold individual — compile + evaluate all expressions from scratch
+ * 2. Warm individual — evaluate all expressions (already compiled)
+ * 3. Cold batch — compile + evaluate all expressions as a batch
+ * 4. Warm batch — evaluate all expressions (already compiled)
+ * 5. Incremental batch — evaluate only affected expressions (batch)
+ * 6. Incremental individual — evaluate only affected expressions (one-by-one)
  *
  * Usage:
  *   node --import tsx src/benchmark/batch-evaluate.ts [--out benchmark/results-batch.json]
@@ -22,7 +25,10 @@ import { fileURLToPath } from 'url'
 import { compileBatch } from '../batch/compiler.js'
 import { findAffectedExpressions } from '../batch/dependency-graph.js'
 import { interpretBatch } from '../batch/interpreter.js'
-import { compile as compileSingle } from '../bytecode/compiler.js'
+import {
+  compile as compileSingle,
+  type CompiledExpression,
+} from '../bytecode/compiler.js'
 import { interpret as interpretSingle } from '../bytecode/interpreter.js'
 import { Result } from '../common/evaluable.js'
 import type { Context, ExpressionInput } from '../index.js'
@@ -194,6 +200,28 @@ function evaluateIndividual(
 }
 
 /**
+ * Evaluate a subset of expressions individually.
+ * Only the specified expression names are compiled and evaluated.
+ */
+function evaluateIndividualSubset(
+  expressions: Map<string, ExpressionInput>,
+  context: Context,
+  exprNames: Set<string>,
+  opts: Options
+): Record<string, Result> {
+  const results: Record<string, Result> = {}
+  for (const [name, raw] of expressions) {
+    if (!exprNames.has(name)) {
+      continue
+    }
+    const compiled = compileSingle(raw, opts)
+    const result = interpretSingle(compiled, context)
+    results[name] = result
+  }
+  return results
+}
+
+/**
  * Evaluate expressions as a batch.
  * Compiles once, shares resources across all expressions.
  */
@@ -226,6 +254,17 @@ function evaluateBatchIncremental(
   return interpretBatch(batch, context, affected)
 }
 
+/**
+ * Evaluate expressions as a batch using a pre-compiled batch.
+ * No compilation overhead — only interpretation.
+ */
+function evaluateBatchWarm(
+  batch: ReturnType<typeof compileBatch>,
+  context: Context
+): Record<string, Result> {
+  return interpretBatch(batch, context)
+}
+
 // ---------------------------------------------------------------------------
 // Benchmark runner
 // ---------------------------------------------------------------------------
@@ -253,23 +292,55 @@ async function runBenchmarks() {
     const changedKey =
       contextKeys[Math.floor(Math.random() * contextKeys.length)]
 
-    // --- Individual evaluation ---
-    const benchIndividual = new Bench({ time: 50, warmupTime: 20 })
-    benchIndividual.add(`${tc.name} > individual`, () =>
+    // Pre-compile batch for warm benchmarks
+    const warmBatch = compileBatch(expressions, defaultOptions)
+
+    // --- 1. Cold individual: compile + evaluate all ---
+    const benchColdInd = new Bench({ time: 50, warmupTime: 20 })
+    benchColdInd.add(`${tc.name} > cold-individual`, () =>
       evaluateIndividual(expressions, context, defaultOptions)
     )
-    await benchIndividual.run()
+    await benchColdInd.run()
 
-    // --- Batch evaluation ---
-    const benchBatch = new Bench({ time: 50, warmupTime: 20 })
-    benchBatch.add(`${tc.name} > batch`, () =>
+    // --- 2. Warm individual: evaluate all (pre-compiled) ---
+    // We simulate this by compiling once outside, then evaluating in loop
+    const compiledForWarm: Array<{
+      name: string
+      bytecode: CompiledExpression
+    }> = []
+    for (const [name, raw] of expressions) {
+      compiledForWarm.push({
+        name,
+        bytecode: compileSingle(raw, defaultOptions),
+      })
+    }
+    const benchWarmInd = new Bench({ time: 50, warmupTime: 20 })
+    benchWarmInd.add(`${tc.name} > warm-individual`, () => {
+      const results: Record<string, Result> = {}
+      for (const { name, bytecode } of compiledForWarm) {
+        results[name] = interpretSingle(bytecode, context)
+      }
+      return results
+    })
+    await benchWarmInd.run()
+
+    // --- 3. Cold batch: compile + evaluate all ---
+    const benchColdBatch = new Bench({ time: 50, warmupTime: 20 })
+    benchColdBatch.add(`${tc.name} > cold-batch`, () =>
       evaluateBatch(expressions, context, defaultOptions)
     )
-    await benchBatch.run()
+    await benchColdBatch.run()
 
-    // --- Batch incremental evaluation ---
-    const benchInc = new Bench({ time: 50, warmupTime: 20 })
-    benchInc.add(`${tc.name} > batch-incremental`, () =>
+    // --- 4. Warm batch: evaluate all (pre-compiled) ---
+    const benchWarmBatch = new Bench({ time: 50, warmupTime: 20 })
+    benchWarmBatch.add(`${tc.name} > warm-batch`, () =>
+      evaluateBatchWarm(warmBatch, context)
+    )
+    await benchWarmBatch.run()
+
+    // --- 5. Incremental batch: compile + evaluate affected only ---
+    const benchIncBatch = new Bench({ time: 50, warmupTime: 20 })
+    benchIncBatch.add(`${tc.name} > incremental-batch`, () =>
       evaluateBatchIncremental(
         expressions,
         context,
@@ -277,34 +348,80 @@ async function runBenchmarks() {
         defaultOptions
       )
     )
-    await benchInc.run()
+    await benchIncBatch.run()
+
+    // --- 6. Incremental individual: evaluate affected only (one-by-one) ---
+    // First, find which expressions are affected
+    const tempBatch = compileBatch(expressions, defaultOptions)
+    const affectedExpressions = findAffectedExpressions(
+      tempBatch.dependencyGraph,
+      [changedKey]
+    )
+    const benchIncInd = new Bench({ time: 50, warmupTime: 20 })
+    benchIncInd.add(`${tc.name} > incremental-individual`, () =>
+      evaluateIndividualSubset(
+        expressions,
+        context,
+        affectedExpressions,
+        defaultOptions
+      )
+    )
+    await benchIncInd.run()
 
     // Collect results
-    const toRow = (t: (typeof benchIndividual.tasks)[number]) => {
+    const toRow = (t: (typeof benchColdInd.tasks)[number]) => {
       const r = t.result
-      const lat = r && 'latency' in r ? r.latency : undefined
-      const thr = r && 'throughput' in r ? r.throughput : undefined
+      const stats = 'latency' in r ? r.latency : undefined
+      const thr = 'throughput' in r ? r.throughput : undefined
       return {
         Task: t.name,
-        'p50 (µs)': lat ? (lat.p50 * 1e6).toFixed(1) : 'N/A',
-        'p75 (µs)': lat ? (lat.p75 * 1e6).toFixed(1) : 'N/A',
-        'p99 (µs)': lat ? (lat.p99 * 1e6).toFixed(1) : 'N/A',
-        'avg (µs)': lat ? (lat.mean * 1e6).toFixed(1) : 'N/A',
+        'p50 (µs)': stats ? (stats.p50 * 1e6).toFixed(1) : 'N/A',
+        'p75 (µs)': stats ? (stats.p75 * 1e6).toFixed(1) : 'N/A',
+        'p99 (µs)': stats ? (stats.p99 * 1e6).toFixed(1) : 'N/A',
+        'avg (µs)': stats ? (stats.mean * 1e6).toFixed(1) : 'N/A',
         'ops/sec': thr ? thr.mean.toFixed(0) : 'N/A',
-        margin: lat ? `±${lat.rme.toFixed(2)}%` : 'N/A',
+        margin: stats ? `±${stats.rme.toFixed(2)}%` : 'N/A',
       }
     }
 
-    console.table(benchIndividual.tasks.map(toRow))
-    console.table(benchBatch.tasks.map(toRow))
-    console.table(benchInc.tasks.map(toRow))
+    console.table(benchColdInd.tasks.map(toRow))
+    console.table(benchWarmInd.tasks.map(toRow))
+    console.table(benchColdBatch.tasks.map(toRow))
+    console.table(benchWarmBatch.tasks.map(toRow))
+    console.table(benchIncBatch.tasks.map(toRow))
+    console.table(benchIncInd.tasks.map(toRow))
 
     for (const t of [
-      ...benchIndividual.tasks,
-      ...benchBatch.tasks,
-      ...benchInc.tasks,
+      ...benchColdInd.tasks,
+      ...benchWarmInd.tasks,
+      ...benchColdBatch.tasks,
+      ...benchWarmBatch.tasks,
+      ...benchIncBatch.tasks,
+      ...benchIncInd.tasks,
     ]) {
       allResults[t.name] = { ...t.result }
+    }
+
+    // Print summary comparison
+    const incBatchResult = benchIncBatch.tasks[0].result
+    const incIndResult = benchIncInd.tasks[0].result
+    if (
+      'latency' in incBatchResult &&
+      'latency' in incIndResult &&
+      incBatchResult.latency &&
+      incIndResult.latency
+    ) {
+      const batchTime = incBatchResult.latency.mean
+      const indTime = incIndResult.latency.mean
+      const affectedCount = affectedExpressions.size
+      console.log(
+        `\n  Summary: ${tc.name} — ${affectedCount} of ${tc.numExpressions} expressions affected`
+      )
+      console.log(`  Incremental batch: ${batchTime.toFixed(3)}ms`)
+      console.log(`  Incremental individual: ${indTime.toFixed(3)}ms`)
+      if (indTime > 0) {
+        console.log(`  Speedup: ${(indTime / batchTime).toFixed(2)}x`)
+      }
     }
   }
 
