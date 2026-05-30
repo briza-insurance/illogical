@@ -113,18 +113,6 @@ export interface EvaluatedResult {
 }
 
 /**
- * Callback signature for change notifications.
- * Fired only for expressions whose result changed.
- */
-export type ChangeCallback = (
-  changes: {
-    name: string
-    previous: Result
-    current: Result
-  }[]
-) => void
-
-/**
  * State maintained by the BatchEvaluator across evaluate() calls.
  */
 export interface BatchEvaluatorState {
@@ -136,7 +124,4 @@ export interface BatchEvaluatorState {
 
   /** Cached results from the last evaluation */
   cachedResults: Record<string, Result>
-
-  /** Change callbacks registered via onChange() */
-  onChangeCallbacks: ChangeCallback[]
 }

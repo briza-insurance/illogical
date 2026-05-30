@@ -432,49 +432,29 @@ describe('Batch Evaluation', () => {
       // Full evaluation — all x,y,z > 0 → all true
       batch.evaluate({ x: 1, y: 1, z: 1 })
 
-      // Track which expressions report changes
-      const changedNames: string[] = []
-      batch.onChange((changes) => {
-        for (const c of changes) {
-          changedNames.push(c.name)
-        }
-      })
-
       // x changes from 1 to -1: a flips true→false, c flips true→false
-      changedNames.length = 0
       batch.evaluate({ x: -1, y: 1, z: 1 }, ['x'])
-      assert.deepStrictEqual(
-        changedNames.sort(),
-        ['a', 'c'],
-        'only a and c report changes (depend on x)'
-      )
+      const results1 = batch.getResults()
+      assert.strictEqual(results1.a, false, 'a: -1 > 0 is false')
+      assert.strictEqual(results1.b, true, 'b: 1 > 0 is true')
+      assert.strictEqual(results1.c, false, 'c: AND(false, true) is false')
+      assert.strictEqual(results1.d, true, 'd: 1 > 0 is true')
 
-      // y changes from 1 to -1: b flips true→false, c flips false→false (no change)
-      // c was already false, so onChange won't fire for c
-      // This is expected — onChange only fires on result changes, not evaluations
-      changedNames.length = 0
+      // y changes from 1 to -1: b flips true→false, c stays false
       batch.evaluate({ x: -1, y: -1, z: 1 }, ['y'])
-      assert.deepStrictEqual(
-        changedNames.sort(),
-        ['b'],
-        'only b reports change (c was already false, so no result change)'
-      )
+      const results2 = batch.getResults()
+      assert.strictEqual(results2.a, false, 'a: -1 > 0 is false')
+      assert.strictEqual(results2.b, false, 'b: -1 > 0 is false')
+      assert.strictEqual(results2.c, false, 'c: AND(false, false) is false')
+      assert.strictEqual(results2.d, true, 'd: 1 > 0 is true')
 
       // z changes from 1 to -1: d flips true→false
-      changedNames.length = 0
       batch.evaluate({ x: -1, y: -1, z: -1 }, ['z'])
-      assert.deepStrictEqual(
-        changedNames.sort(),
-        ['d'],
-        'only d reports change (depends on z)'
-      )
-
-      // Verify final results are correct
-      const finalResults = batch.getResults()
-      assert.strictEqual(finalResults.a, false, 'a: -1 > 0 is false')
-      assert.strictEqual(finalResults.b, false, 'b: -1 > 0 is false')
-      assert.strictEqual(finalResults.c, false, 'c: AND(false, false) is false')
-      assert.strictEqual(finalResults.d, false, 'd: -1 > 0 is false')
+      const results3 = batch.getResults()
+      assert.strictEqual(results3.a, false, 'a: -1 > 0 is false')
+      assert.strictEqual(results3.b, false, 'b: -1 > 0 is false')
+      assert.strictEqual(results3.c, false, 'c: AND(false, false) is false')
+      assert.strictEqual(results3.d, false, 'd: -1 > 0 is false')
     })
 
     test('Mode 2: empty changedKeys returns cached results', () => {
@@ -519,36 +499,6 @@ describe('Batch Evaluation', () => {
       // Delete y
       batch.evaluate({ x: '1', y: undefined })
       assert.strictEqual(batch.getResults().b, false)
-    })
-
-    test('onChange callback', () => {
-      const engine = new Engine()
-      const batch = engine.createBatchEvaluator({
-        expressions: {
-          a: ['==', '$x', '1'],
-          b: ['==', '$y', '2'],
-        },
-      })
-
-      const changes: { name: string; previous: unknown; current: unknown }[] =
-        []
-      batch.onChange((changed) => {
-        for (const c of changed) {
-          changes.push({
-            name: c.name,
-            previous: c.previous,
-            current: c.current,
-          })
-        }
-      })
-
-      batch.evaluate({ x: '1', y: '2' })
-      batch.evaluate({ x: '2', y: '2' }, ['x'])
-
-      assert.strictEqual(changes.length, 1)
-      assert.strictEqual(changes[0].name, 'a')
-      assert.strictEqual(changes[0].previous, true)
-      assert.strictEqual(changes[0].current, false)
     })
 
     test('getDependencies', () => {
@@ -672,7 +622,6 @@ describe('Batch Evaluation', () => {
       assert.ok(typeof batch.evaluate === 'function')
       assert.ok(typeof batch.getResults === 'function')
       assert.ok(typeof batch.dispose === 'function')
-      assert.ok(typeof batch.onChange === 'function')
       assert.ok(typeof batch.getDependencies === 'function')
       assert.ok(typeof batch.reset === 'function')
       assert.ok(typeof batch.addExpression === 'function')
@@ -1147,35 +1096,6 @@ describe('Batch Evaluation', () => {
         false,
         'fullCheck should reflect new status'
       )
-    })
-
-    test('onChange reports all changed expressions in transitive cascade', () => {
-      const engine = new Engine()
-      const batch = engine.createBatchEvaluator({
-        expressions: {
-          isActive: ['==', '$status', 'active'],
-          canAccess: [
-            'AND',
-            ['==', '$status', 'active'],
-            ['==', '$tier', 'premium'],
-          ],
-        },
-      })
-
-      const changes: string[] = []
-      batch.onChange((changed) => {
-        for (const c of changed) {
-          changes.push(c.name)
-        }
-      })
-
-      batch.evaluate({ status: 'active', tier: 'premium' })
-
-      // Change status — both isActive and canAccess should change
-      batch.evaluate({ status: 'inactive', tier: 'premium' }, ['status'])
-
-      assert.ok(changes.includes('isActive'), 'isActive should be reported')
-      assert.ok(changes.includes('canAccess'), 'canAccess should be reported')
     })
 
     test('key not in dependency graph returns empty affected set', () => {

@@ -17,7 +17,6 @@ export type {
   DependencyEntry,
   DependencyGraph,
   EvaluatedResult,
-  ChangeCallback,
   BatchEvaluatorState,
 } from './types.js'
 export type { BatchEvaluatorOptions } from './evaluator.js'

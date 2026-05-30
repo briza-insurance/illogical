@@ -9,7 +9,6 @@
  *   evaluate(ctx, changedKeys?) — Mode 1 (no keys) = full eval, Mode 2 (with keys) = incremental
  *   getResults() — Record<string, Result>
  *   dispose() — free internal caches
- *   onChange(callback) — subscribe to change events
  *   getDependencies() — Map<string, string[]> mapping key → expression names
  *   reset() — clear results
  *   addExpression(name, expression) — add a new expression
@@ -22,7 +21,7 @@ import { defaultOptions, Options } from '../parser/options.js'
 import { compileBatch } from './compiler.js'
 import { findAffectedExpressions } from './dependency-graph.js'
 import { interpretBatch } from './interpreter.js'
-import { ChangeCallback, CompiledBatch } from './types.js'
+import { CompiledBatch } from './types.js'
 
 /**
  * Options for creating a BatchEvaluator.
@@ -46,8 +45,6 @@ export interface BatchEvaluatorState {
   lastContext: Context
   /** Cached results from the last evaluation */
   cachedResults: Record<string, Result>
-  /** Change callbacks registered via onChange() */
-  onChangeCallbacks: ChangeCallback[]
 }
 
 /**
@@ -93,7 +90,6 @@ export class BatchEvaluator {
       originalExpressions: expressionsMap,
       lastContext: {},
       cachedResults: {},
-      onChangeCallbacks: [],
     }
   }
 
@@ -128,10 +124,6 @@ export class BatchEvaluator {
    * @returns Record mapping expression names to their Result values
    */
   evaluate(ctx: Context, changedKeys?: string[]): Record<string, Result> {
-    // Capture old results for change comparison
-    const oldResults = { ...this.state.cachedResults }
-    const isFirstEvaluation = Object.keys(oldResults).length === 0
-
     // Merge caller's context into stored context
     this.mergeContext(ctx)
 
@@ -169,23 +161,6 @@ export class BatchEvaluator {
       this.state.cachedResults[name] = value
     }
 
-    // Fire onChange callbacks (skip on first evaluation — no previous state)
-    if (!isFirstEvaluation) {
-      const changes: { name: string; previous: Result; current: Result }[] = []
-      for (const [name, value] of Object.entries(newResults)) {
-        const previous = oldResults[name]
-        if (previous !== value) {
-          changes.push({ name, previous: previous as Result, current: value })
-        }
-      }
-
-      if (changes.length > 0) {
-        for (const callback of this.state.onChangeCallbacks) {
-          callback(changes)
-        }
-      }
-    }
-
     return { ...this.state.cachedResults }
   }
 
@@ -203,38 +178,8 @@ export class BatchEvaluator {
   dispose(): void {
     this.state.cachedResults = {}
     this.state.lastContext = {}
-    this.state.onChangeCallbacks = []
     this.state.originalExpressions.clear()
     this.state.batch.sharedConstSets = []
-  }
-
-  /**
-   * Subscribe to change notifications.
-   *
-   * The callback fires only for expressions whose result changed between
-   * evaluations (not for expressions that were re-evaluated but produced
-   * the same result). This makes it ideal for reactive UI updates, logging,
-   * and state synchronization without unnecessary work.
-   *
-   * Typical subscribers:
-   *   - UI components that need to re-render when a computed value changes
-   *     Example: A dashboard widget showing "User Access Level" could subscribe
-   *     and update its display only when the `canAccess` expression result flips.
-   *   - Logging/monitoring systems that track how often expression results change
-   *   - State synchronization layers that push changes to remote services
-   *   - Caches that need to invalidate downstream derived data
-   *
-   * @param callback — Called with list of changed expressions
-   * @returns Unsubscribe function that removes the callback when invoked
-   */
-  onChange(callback: ChangeCallback): () => void {
-    this.state.onChangeCallbacks.push(callback)
-    return () => {
-      const idx = this.state.onChangeCallbacks.indexOf(callback)
-      if (idx !== -1) {
-        this.state.onChangeCallbacks.splice(idx, 1)
-      }
-    }
   }
 
   /**
