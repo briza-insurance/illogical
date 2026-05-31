@@ -8,32 +8,36 @@
   <div align="center">
     <h3 align="center">illogical</h3>
   </div>
-
-[![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
-[![npm version](https://badge.fury.io/js/@briza%2Fillogical.svg?icon=si%3Anpm)](https://badge.fury.io/js/@briza%2Fillogical)
-[![install size](https://packagephobia.com/badge?p=@briza/illogical)](https://packagephobia.com/result?p=@briza/illogical)
-![zero dependencies](https://img.shields.io/badge/0-dependencies-green)
-![npm downloads](https://img.shields.io/npm/dm/%40briza%2Fillogical)
-
 </div>
 
 <div align="center">
-<p>
-<br />
-JSON DSL for expressing and evaluating business rules. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences.
-</p>
+  <p>
+  **illogical** is a JSON DSL (domain-specific language) for expressing and evaluating business rules in the insurance industry. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences.
+  </p>
+</div>
+
+<div align="center">
+  [![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
+  [![npm version](https://badge.fury.io/js/@briza%2Fillogical.svg?icon=si%3Anpm)](https://badge.fury.io/js/@briza%2Fillogical)
+  [![install size](https://packagephobia.com/badge?p=@briza/illogical)](https://packagephobia.com/result?p=@briza/illogical)
+  ![zero dependencies](https://img.shields.io/badge/0-dependencies-green)
+  ![npm downloads](https://img.shields.io/npm/dm/%40briza%2Fillogical)
 </div>
 
 ---
 
-This project is designed such that business rules can be shared between the front-end and back-end, serialized in JSON.
+## 🚀 Getting Started
 
-## 🚀 Get Started
+Get up and running with illogical in just a few steps.
+
+### Installation
 
 ```sh
 # install illogical
 npm install @briza/illogical
 ```
+
+### Basic Usage
 
 ```js
 // Import the illogical engine
@@ -65,9 +69,11 @@ engine.evaluate(['==', '$age.(String)', '21'], ctx) // true
 engine.evaluate(['AND', ['>', '$age', 20], ['==', '$name', 'peter']]) // true
 ```
 
-## 🖼️ Resources
+## 📚 Documentation
 
-Understand supported expressions:
+### Core Concepts
+
+Explore the supported expressions and their usage:
 
 - [Comparison Expressions](./specs/comparison-expressions.md)
 - [Logical Expressions](./specs/logical-expressions.md)
@@ -75,19 +81,25 @@ Understand supported expressions:
 - [Evaluation Data Context](./specs/evaluation-data-context.md)
 - [Operand Types](./specs/operand-types.md)
 
-Learn about usages:
+### API Reference
+
+Learn how to use the engine and its methods:
 
 - [Evaluate](./specs/evaluate.md)
 - [Statement](./specs/statement.md)
 - [Parse](./specs/parse.md)
 - [Simplify](./specs/simplify.md)
 
+### Customization
+
 Customize the engine and the documentation:
 
 - [Engine Options](./specs/engine.md)
 - [Code Documentation](https://briza-insurance.github.io/illogical/index.html)
 
-Bytecode evaluation and debugging tools:
+### Development Tools
+
+For advanced usage like bytecode evaluation and debugging:
 
 - [Bytecode Evaluator](./specs/bytecode-evaluator.md)
 - [Debugger Tools](./specs/debugger-tools.md)
