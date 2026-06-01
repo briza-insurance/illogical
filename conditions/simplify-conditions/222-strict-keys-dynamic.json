@@ -1,0 +1,8 @@
+{
+  "description": "strictKeys and optionalKeys with dynamic referencing",
+  "expression": [">=", "$ref{refB}", "1"],
+  "context": {},
+  "expected": [">=", "$ref{refB}", "1"],
+  "strictKeys": ["a"],
+  "optionalKeys": ["ref"]
+}
