@@ -84,7 +84,7 @@ import {
   OP_XOR,
 } from './opcodes.js'
 import { operateWithExpectedDecimals } from './operateWithExpectedDecimals.js'
-import { resolveCompactRef } from './refs.js'
+import { getKeyFromCompactRef, resolveCompactRef } from './refs.js'
 
 const addDecimals = operateWithExpectedDecimals('sum')
 const subtractDecimals = operateWithExpectedDecimals('subtract')
@@ -522,7 +522,6 @@ export function interpretSimplify(
       case OP_PUSH_REF_TOKENS:
       case OP_PUSH_REF_DYNAMIC: {
         const idx = numAt(bytecode[i++])
-        const rawKey = refRawKeys[idx]
 
         let val: Result
         if (resolvedRefDirty[idx]) {
@@ -543,13 +542,13 @@ export function interpretSimplify(
         // Ref is absent from context.
         // Check if it should be treated as a concrete undefined (evaluated as undefined)
         // or as a residual expression (preserved for later simplification).
-        if (strictSet?.has(rawKey)) {
+        if (strictSet?.has(getKeyFromCompactRef(refs[idx]))) {
           // strictKeys: force-evaluate as undefined (not a residual)
           stack[++stackTop] = undefined
           break
         }
 
-        if (optionalSet && !optionalSet.has(rawKey)) {
+        if (optionalSet && !optionalSet.has(getKeyFromCompactRef(refs[idx]))) {
           // Key not in optionalKeys: treat as definitely-present but absent → undefined
           stack[++stackTop] = undefined
           break

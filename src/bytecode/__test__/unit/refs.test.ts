@@ -1,7 +1,11 @@
 import { strict as assert } from 'node:assert'
 import { describe, test } from 'node:test'
 
-import { buildCompactRef, resolveCompactRef } from '../../refs.js'
+import {
+  buildCompactRef,
+  getKeyFromCompactRef,
+  resolveCompactRef,
+} from '../../refs.js'
 
 const context = {
   RefA: 1,
@@ -150,4 +154,27 @@ describe('resolveCompactRef', () => {
       })
     }
   })
+})
+
+describe('getKeyFromCompactRef', () => {
+  const cases = [
+    ['RefA', 'RefA'],
+    ['RefB.(Number)', 'RefB'],
+    ['RefC.subA', 'RefC.subA'],
+    ['RefC.subA.(Number)', 'RefC.subA'],
+    ['RefC.`subC.dotKey`.subSubC', 'RefC.`subC.dotKey`.subSubC'],
+    ['RefC.`subC.dotKey`.subSubC.(Number)', 'RefC.`subC.dotKey`.subSubC'],
+    ['RefC.`subC.dotKey`.(Number)', 'RefC.`subC.dotKey`'],
+    ['RefC.`subC.dotKey`[0]', 'RefC.`subC.dotKey`'],
+    ['RefC.`subC.dotKey`[0].(Number)', 'RefC.`subC.dotKey`'],
+    ['RefI[0][1]', 'RefI'],
+    ['RefG[{RefC.sub{RefD}}]', 'RefG'],
+    ['RefG{Ref{RefE}}', 'RefG'],
+  ] as const
+
+  for (const [key, expected] of cases) {
+    test(`${key} → ${expected}`, () => {
+      assert.strictEqual(getKeyFromCompactRef(buildCompactRef(key)), expected)
+    })
+  }
 })

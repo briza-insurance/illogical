@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 2.2.1
+
+- fix the optionalKeys and strictKeys behaviours in the simplify method.
+
 ## 2.2.0
 
 - Enabled date mutation in [Arithmetic Expressions](./specs/arithmetic-expressions.md).

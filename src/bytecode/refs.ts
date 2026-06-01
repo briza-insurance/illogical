@@ -12,6 +12,7 @@
  */
 
 import { Context, Result } from '../common/evaluable.js'
+import { isNumber } from '../common/type-check.js'
 import { toNumber, toString } from '../common/util.js'
 import { DataType } from '../operand/reference.js'
 
@@ -308,4 +309,40 @@ export function resolveCompactRef(ref: CompactRef, ctx: Context): Result {
     return resolveDynamic(ref.k!, ref.t, ctx)
   }
   return resolveTokens(ref.tokens ?? [], ref.t, ctx)
+}
+
+export function getKeyFromCompactRef(ref: CompactRef): string {
+  if (typeof ref === 'string') {
+    return ref
+  }
+  if (Array.isArray(ref)) {
+    return ref.map((ref) => (ref.includes('.') ? `\`${ref}\`` : ref)).join('.')
+  }
+  let tokens = ref.tokens
+  if (ref.d) {
+    let current = ref.k!
+    let match = dynamicKeyRegex.exec(current)
+
+    while (match) {
+      current = current.replace(dynamicKeyRegex, '').replace('[]', '')
+      match = dynamicKeyRegex.exec(current)
+    }
+
+    tokens = parseStaticKey(current)
+  }
+
+  let key = ''
+  for (const token of tokens ?? []) {
+    if (isNumber(token.value)) {
+      return key
+    }
+
+    if (token.value.includes('.')) {
+      key += `${key ? '.' : ''}\`${token.value}\``
+    } else {
+      key += `${key ? '.' : ''}${token.value}`
+    }
+  }
+
+  return key
 }
