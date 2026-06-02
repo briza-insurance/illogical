@@ -15,8 +15,8 @@
     "types/"
   ],
   "author": {
-    "name": "David Horak",
-    "email": "dhorak@briza.com"
+    "name": "Briza, Inc.",
+    "email": "dev@briza.com"
   },
   "license": "MIT",
   "scripts": {
