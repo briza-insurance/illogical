@@ -1,5 +1,5 @@
 {
-  "description": "simplify composition condition",
+  "description": "simplify composition condition return false since optionalKeys is provided with an emtpy array",
   "expression": [
     "AND",
     ["==", "$B", "yes"],
@@ -50,7 +50,6 @@
   "context": {
     "A": "561410-14"
   },
-  "expected": ["==", "$B", "yes"],
-  "strictKeys": [],
+  "expected": false,
   "optionalKeys": []
 }
