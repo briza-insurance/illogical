@@ -10,9 +10,9 @@ jobs:
     name: Continuous integration
     runs-on: ubuntu-latest
     container:
-      image: node:22-slim
+      image: node:24-slim
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install npm modules
         run: npm i
       - name: Scan project for vulnerabilities
