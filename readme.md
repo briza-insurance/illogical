@@ -16,13 +16,11 @@
   </p>
 </div>
 
-<div align="center">
   [![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
   [![npm version](https://badge.fury.io/js/@briza%2Fillogical.svg?icon=si%3Anpm)](https://badge.fury.io/js/@briza%2Fillogical)
   [![install size](https://packagephobia.com/badge?p=@briza/illogical)](https://packagephobia.com/result?p=@briza/illogical)
   ![zero dependencies](https://img.shields.io/badge/0-dependencies-green)
   ![npm downloads](https://img.shields.io/npm/dm/%40briza%2Fillogical)
-</div>
 
 ---
 
