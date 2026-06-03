@@ -1,5 +1,5 @@
 {
-  "description": "simplify composition condition return false since optionalKeys is provided with an emtpy array",
+  "description": "simplify composition conditions",
   "expression": [
     "AND",
     ["==", "$B", "yes"],
