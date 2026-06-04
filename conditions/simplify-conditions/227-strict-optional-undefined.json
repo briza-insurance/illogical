@@ -1,0 +1,8 @@
+{
+  "description": "strictKeys + optionalKeys: undefined",
+  "expression": ["AND", ["UNDEFINED", "$x"], ["UNDEFINED", "$y"]],
+  "context": {},
+  "strictKeys": ["x"],
+  "optionalKeys": ["y"],
+  "expected": ["UNDEFINED", "$y"]
+}

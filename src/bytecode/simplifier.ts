@@ -501,10 +501,8 @@ export function interpretSimplify(
       : optionalKeys
         ? new Set(optionalKeys)
         : undefined
-
   while (i < len) {
     const op = numAt(bytecode[i++])
-
     switch (op) {
       // ---------------------------------------------------------------------
       // Push

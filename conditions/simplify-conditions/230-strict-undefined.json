@@ -1,0 +1,7 @@
+{
+  "description": "strictKeys: undefined",
+  "expression": ["UNDEFINED", "$x"],
+  "context": {},
+  "strictKeys": ["x"],
+  "expected": true
+}
