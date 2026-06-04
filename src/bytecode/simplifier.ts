@@ -1374,6 +1374,8 @@ export function interpretSimplify(
         // Different jump opcodes (41=JUMP_IF_FALSE for AND vs 42=JUMP_IF_TRUE for OR/NOR)
         // indicate different short-circuit sequences.
         if (lastJumpOp !== 41) {
+          // when the parent is OR, lastJumpOp is 42
+          // spillTop = -1 will discard spillBuf
           spillTop = -1
         }
         lastJumpOp = 41
