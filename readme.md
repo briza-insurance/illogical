@@ -10,7 +10,7 @@
   </div>
 
   <p>
-  <em>illogical</em> is a JSON DSL (domain-specific language) for expressing and evaluating business rules in the insurance industry. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences.
+  <strong>illogical</strong> is a JSON DSL (domain-specific language) for expressing and evaluating business rules in the insurance industry. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences.
   </p>
 
   [![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
