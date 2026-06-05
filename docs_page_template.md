@@ -39,7 +39,7 @@ the surrounding text:
 ## Show structured data in a table
 
 Use a table for keyed pairs, such as options, key bindings, or named cases:
-I'
+
 | Option | Description |
 |--------|-------------|
 | `name` | What it does |
