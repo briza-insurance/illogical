@@ -643,6 +643,17 @@ export function compileBatch(
       directionMap,
       refFirstCtxKeys: sharedRefs.map(getFirstCtxKey),
       dirty: false,
+      precompiled: {
+        bytecode: exprState.bytecode,
+        refs: sharedRefs,
+        consts: sharedConsts,
+        opNames,
+        refKeys: sharedRefKeys,
+        refRawKeys: sharedRefRawKeys,
+        overlapRefsResiduals,
+        directionMap,
+        refFirstCtxKeys: sharedRefs.map(getFirstCtxKey),
+      },
     })
   }
 

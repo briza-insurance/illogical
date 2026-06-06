@@ -48,15 +48,7 @@ const results = batch.evaluate({ status: 'active', tier: 'premium' })
 // Get cached results without re-evaluating
 const cached = batch.getResults()
 
-// Subscribe to changes
-const unsub = batch.onChange((changes) => {
-  for (const change of changes) {
-    console.log(`${change.name}: ${change.previous} → ${change.current}`)
-  }
-})
-
 // Clean up when done
-unsub()
 batch.dispose()
 ```
 
@@ -102,36 +94,6 @@ const results = batch.getResults() // → { isActive: true, isPremium: true, can
 ```
 
 **Returns:** `Record<string, Result>`
-
-### `onChange(callback)`
-
-Subscribe to change notifications. The callback fires only for expressions whose result
-**changed** between evaluations (not for expressions that were re-evaluated but produced
-the same result).
-
-Typical subscribers include:
-- **UI components** that need to re-render when a computed value changes. Example: A
-  dashboard widget showing "User Access Level" could subscribe and update its display
-  only when the `canAccess` expression result flips.
-- **Logging/monitoring systems** that track how often expression results change.
-- **State synchronization layers** that push changes to remote services.
-- **Caches** that need to invalidate downstream derived data.
-
-```js
-const unsub = batch.onChange((changes) => {
-  for (const change of changes) {
-    console.log(`${change.name}: ${change.previous} → ${change.current}`)
-  }
-})
-
-// Later, unsubscribe
-unsub()
-```
-
-**Parameters:**
-- `callback`: `(changes: { name: string; previous: Result; current: Result }[]) => void`
-
-**Returns:** `() => void` — An unsubscribe function.
 
 ### `getDependencies()`
 
@@ -229,7 +191,6 @@ When `evaluate(ctx, ['status'])` is called:
 2. The dependency graph is consulted to find all expressions that depend on `'status'`.
 3. Only those expressions are re-evaluated (via `interpretBatch` with a dirty set).
 4. The results are merged into the cached results.
-5. `onChange` callbacks fire only for expressions whose result actually changed.
 
 Expressions that don't depend on the changed keys retain their cached values — they are
 not re-evaluated, saving computation.
@@ -274,7 +235,8 @@ batch and individual evaluation:
 
 - **Simple expressions** (single `==` checks): Individual evaluation is faster due to
   lower overhead. The batch evaluator has per-evaluation costs (dependency graph lookup,
-  topological sort, wrapper function calls) that outweigh the benefits for simple cases.
+  wrapper function calls, temporary object construction) that outweigh the benefits for
+  simple cases.
 
 - **Complex expressions** (nested `AND`/`OR`/`IN`/`>`): Performance is roughly equal.
   The batch evaluator's incremental evaluation helps when few expressions are affected,
@@ -283,14 +245,12 @@ batch and individual evaluation:
 - **Batch evaluation shines in other dimensions:**
   - **Memory**: Shared refs/consts reduce memory usage significantly with many expressions
   - **Predictable timing**: Batch evaluation has more consistent timing per iteration
-  - **Change detection**: `onChange` callbacks fire only for actually-changed results
   - **Scalability**: As expressions become more complex and numerous, batch overhead
     becomes a smaller fraction of total work
 
 **When to use batch evaluation:**
 - You have 100+ expressions that share context keys
 - Expressions are complex (nested operators, multiple conditions)
-- You need to track which expressions changed (`onChange` callbacks)
 - Memory efficiency matters (shared resources)
 - You need incremental evaluation (only re-evaluating affected expressions)
 
@@ -328,7 +288,7 @@ const flags2 = batch.evaluate({ tier: 'enterprise', hasExport: false }, ['tier']
 // Only showProFeatures and showEnterpriseFeatures were re-evaluated (not canExport)
 ```
 
-### Reactive UI Updates
+### Form Validation
 
 ```js
 const engine = new Engine()
@@ -345,25 +305,14 @@ const batch = engine.createBatchEvaluator({
   },
 })
 
-// Subscribe to changes for reactive UI
-batch.onChange((changes) => {
-  for (const change of changes) {
-    if (change.name === 'canSubmit') {
-      submitButton.disabled = !change.current
-    }
-    if (change.name === 'needsVerification') {
-      showVerificationBadge(change.current)
-    }
-  }
-})
-
 // Evaluate as user interacts with the form
-batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 25, tier: 'trial' })
-// → onChange fires: canSubmit=true, needsVerification=true
+const results1 = batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 25, tier: 'trial' })
+// → { canSubmit: true, needsVerification: true }
 
 // User changes age to 15 — only canSubmit changes
-batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 15, tier: 'trial' }, ['age'])
-// → onChange fires: canSubmit: true → false
+const results2 = batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 15, tier: 'trial' }, ['age'])
+// → { canSubmit: false, needsVerification: true }
+// Only canSubmit was re-evaluated (not needsVerification)
 ```
 
 ### Dynamic Expression Management

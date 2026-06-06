@@ -5,7 +5,7 @@
  * and evaluator state used by the BatchEvaluator class.
  */
 
-import { Bytecode } from '../bytecode/compiler.js'
+import { Bytecode, type CompiledExpression } from '../bytecode/compiler.js'
 import { CompactRef } from '../bytecode/refs.js'
 import { Context, Result } from '../common/evaluable.js'
 import { Input } from '../parser/index.js'
@@ -42,6 +42,9 @@ export interface CompiledBatchExpression {
 
   /** Runtime dirty flag — set to true when an affected context key changes */
   dirty: boolean
+
+  /** Pre-built CompiledExpression wrapper — avoids object construction on every evaluation */
+  precompiled: CompiledExpression
 }
 
 // ---------------------------------------------------------------------------

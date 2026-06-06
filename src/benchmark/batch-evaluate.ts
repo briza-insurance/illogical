@@ -200,23 +200,38 @@ function evaluateIndividual(
 }
 
 /**
- * Evaluate a subset of expressions individually.
- * Only the specified expression names are compiled and evaluated.
+ * Evaluate only a subset of expressions in a pre-compiled batch (incremental).
+ * Only expressions affected by changedKeys are re-evaluated.
  */
-function evaluateIndividualSubset(
-  expressions: Map<string, ExpressionInput>,
+function evaluateBatchIncrementalWarm(
+  batch: ReturnType<typeof compileBatch>,
   context: Context,
-  exprNames: Set<string>,
-  opts: Options
+  changedKeys: string[]
+): Record<string, Result> {
+  const affected = findAffectedExpressions(batch.dependencyGraph, changedKeys)
+
+  if (affected.size === 0) {
+    return {}
+  }
+
+  return interpretBatch(batch, context, affected)
+}
+
+/**
+ * Evaluate a subset of pre-compiled expressions individually.
+ * Each expression is already compiled — no compilation overhead.
+ */
+function evaluateIndividualSubsetWarm(
+  compiled: Array<{ name: string; bytecode: CompiledExpression }>,
+  context: Context,
+  exprNames: Set<string>
 ): Record<string, Result> {
   const results: Record<string, Result> = {}
-  for (const [name, raw] of expressions) {
+  for (const { name, bytecode } of compiled) {
     if (!exprNames.has(name)) {
       continue
     }
-    const compiled = compileSingle(raw, opts)
-    const result = interpretSingle(compiled, context)
-    results[name] = result
+    results[name] = interpretSingle(bytecode, context)
   }
   return results
 }
@@ -232,26 +247,6 @@ function evaluateBatch(
 ): Record<string, Result> {
   const batch = compileBatch(expressions, opts)
   return interpretBatch(batch, context)
-}
-
-/**
- * Evaluate only a subset of expressions in a batch (incremental).
- * Only expressions affected by changedKeys are re-evaluated.
- */
-function evaluateBatchIncremental(
-  expressions: Map<string, ExpressionInput>,
-  context: Context,
-  changedKeys: string[],
-  opts: Options
-): Record<string, Result> {
-  const batch = compileBatch(expressions, opts)
-  const affected = findAffectedExpressions(batch.dependencyGraph, changedKeys)
-
-  if (affected.size === 0) {
-    return {}
-  }
-
-  return interpretBatch(batch, context, affected)
 }
 
 /**
@@ -294,6 +289,24 @@ async function runBenchmarks() {
 
     // Pre-compile batch for warm benchmarks
     const warmBatch = compileBatch(expressions, defaultOptions)
+
+    // Pre-compile individual expressions for warm benchmarks
+    const compiledIndividual: Array<{
+      name: string
+      bytecode: CompiledExpression
+    }> = []
+    for (const [name, raw] of expressions) {
+      compiledIndividual.push({
+        name,
+        bytecode: compileSingle(raw, defaultOptions),
+      })
+    }
+
+    // Find affected expressions (same for both batch and individual)
+    const affectedExpressions = findAffectedExpressions(
+      warmBatch.dependencyGraph,
+      [changedKey]
+    )
 
     // --- 1. Cold individual: compile + evaluate all ---
     const benchColdInd = new Bench({ time: 50, warmupTime: 20 })
@@ -338,32 +351,20 @@ async function runBenchmarks() {
     )
     await benchWarmBatch.run()
 
-    // --- 5. Incremental batch: compile + evaluate affected only ---
+    // --- 5. Incremental batch (warm): evaluate affected only, no compilation ---
     const benchIncBatch = new Bench({ time: 50, warmupTime: 20 })
     benchIncBatch.add(`${tc.name} > incremental-batch`, () =>
-      evaluateBatchIncremental(
-        expressions,
-        context,
-        [changedKey],
-        defaultOptions
-      )
+      evaluateBatchIncrementalWarm(warmBatch, context, [changedKey])
     )
     await benchIncBatch.run()
 
-    // --- 6. Incremental individual: evaluate affected only (one-by-one) ---
-    // First, find which expressions are affected
-    const tempBatch = compileBatch(expressions, defaultOptions)
-    const affectedExpressions = findAffectedExpressions(
-      tempBatch.dependencyGraph,
-      [changedKey]
-    )
+    // --- 6. Incremental individual (warm): evaluate affected only, no compilation ---
     const benchIncInd = new Bench({ time: 50, warmupTime: 20 })
     benchIncInd.add(`${tc.name} > incremental-individual`, () =>
-      evaluateIndividualSubset(
-        expressions,
+      evaluateIndividualSubsetWarm(
+        compiledIndividual,
         context,
-        affectedExpressions,
-        defaultOptions
+        affectedExpressions
       )
     )
     await benchIncInd.run()

@@ -6,12 +6,11 @@
  * locals offsets.
  *
  * The existing interpret() function's hot path remains unchanged — we
- * construct a temporary CompiledExpression-compatible object for each
- * expression and call interpret() directly. This avoids duplicating the
- * interpreter's switch statement entirely.
+ * use a pre-built CompiledExpression object for each expression that was
+ * constructed during compileBatch. This avoids object construction overhead
+ * on every evaluation call.
  */
 
-import { CompiledExpression } from '../bytecode/compiler.js'
 import { interpret as interpretOriginal } from '../bytecode/interpreter.js'
 import { Context, Result } from '../common/evaluable.js'
 import { CompiledBatch } from './types.js'
@@ -37,21 +36,9 @@ export function interpretSingle(
     throw new Error(`Expression '${exprName}' not found in batch`)
   }
 
-  // Build a temporary CompiledExpression-compatible object that maps
-  // to the batch's shared resources using the expression's offsets.
-  const compiled: CompiledExpression = {
-    bytecode: expr.bytecode,
-    refs: batch.sharedRefs,
-    consts: batch.sharedConsts,
-    opNames: batch.opNames,
-    refKeys: expr.refFirstCtxKeys.map(() => ''), // not used by interpret, only simplify
-    refRawKeys: [], // not used by interpret
-    overlapRefsResiduals: expr.overlapRefsResiduals,
-    directionMap: expr.directionMap,
-    refFirstCtxKeys: expr.refFirstCtxKeys,
-  }
-
-  return interpretOriginal(compiled, ctx)
+  // Use the pre-built CompiledExpression wrapper — avoids object construction
+  // on every evaluation call
+  return interpretOriginal(expr.precompiled, ctx)
 }
 
 /**
