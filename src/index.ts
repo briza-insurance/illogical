@@ -3,6 +3,8 @@
  * @module illogical
  */
 
+import type { BatchEvaluatorOptions } from './batch/index.js'
+import { BatchEvaluator } from './batch/index.js'
 import { compile, CompiledExpression } from './bytecode/compiler.js'
 import { BytecodeEvaluable } from './bytecode/evaluable.js'
 import { interpret } from './bytecode/interpreter.js'
@@ -63,6 +65,7 @@ export {
   OPERATOR_SUM,
 }
 export type { Context, ExpressionInput, Input, Options }
+export type { BatchEvaluator, BatchEvaluatorOptions } from './batch/index.js'
 
 const unexpectedResultError =
   'non expression or boolean result should be returned'
@@ -149,6 +152,33 @@ class Engine {
       return result
     }
     return result
+  }
+
+  /**
+   * Create a BatchEvaluator for evaluating multiple expressions with shared resources.
+   *
+   * The batch evaluator compiles all expressions once, shares refs/consts across them,
+   * and supports incremental evaluation based on trusted dirty keys.
+   *
+   * @param {BatchEvaluatorOptions} options — Expressions map and optional parser options
+   * @returns {BatchEvaluator}
+   *
+   * @example
+   * ```typescript
+   * const batch = engine.createBatchEvaluator({
+   *   expressions: {
+   *     isActive: ['==', '$status', 'active'],
+   *     isPremium: ['==', '$tier', 'premium'],
+   *   },
+   * })
+   *
+   * const results = batch.evaluate({ status: 'active', tier: 'premium' })
+   * // Mode 2: incremental with trusted dirty keys
+   * const updated = batch.evaluate(fullContext, ['status'])
+   * ```
+   */
+  createBatchEvaluator(options: BatchEvaluatorOptions): BatchEvaluator {
+    return new BatchEvaluator(options)
   }
 }
 

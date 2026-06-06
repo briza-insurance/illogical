@@ -1,7 +1,7 @@
 /**
  * Valid types for context members
  */
-type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
+export type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
 /**
  * Evaluation Context
  * Holds references used during the evaluation process.
@@ -21,4 +21,3 @@ export declare enum DataType {
     Number = "Number",
     String = "String"
 }
-export {};
