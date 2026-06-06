@@ -1,0 +1,7 @@
+{
+  "description": "optionalKeys: present",
+  "expression": ["PRESENT", "$x"],
+  "context": {},
+  "optionalKeys": ["x"],
+  "expected": ["PRESENT", "$x"]
+}

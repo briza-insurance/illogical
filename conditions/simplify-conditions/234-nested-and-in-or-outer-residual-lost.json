@@ -1,0 +1,6 @@
+{
+  "description": "OR(unknown, AND(known-true, unknown)) — outer residual must survive inner AND scope",
+  "expression": ["OR", ["==", "$A", 1], ["AND", ["==", "$B", 1], ["==", "$C", 2]]],
+  "context": { "B": 1 },
+  "expected": ["OR", ["==", "$A", 1], ["==", "$C", 2]]
+}

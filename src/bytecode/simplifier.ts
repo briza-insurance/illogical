@@ -41,6 +41,7 @@ import { CompiledExpression } from './compiler.js'
 import {
   OP_AND,
   OP_DIVIDE,
+  OP_ENTER_SCOPE,
   OP_EQ,
   OP_GE,
   OP_GT,
@@ -379,10 +380,12 @@ let resolvedRefUsedCount = 0
 // can include it in the reconstructed expression.
 const spillBuf: Slot[] = new Array(MAX_STACK)
 let spillTop = -1
-// Track the last jump opcode type to detect transitions between short-circuit
-// sequences. Different jump opcodes (41=JUMP_IF_FALSE vs 42=JUMP_IF_TRUE) indicate
-// different short-circuit sequences (AND vs OR/NOR).
-let lastJumpOp = 0
+// Scope stack for the spill buffer: each OP_ENTER_SCOPE pushes the current
+// spillTop so that OP_AND/OR/NOR can drain only the entries added within their
+// own scope (base+1..spillTop) and restore the outer scope (spillTop = base).
+// This prevents nested AND/OR from stealing residuals accumulated by outer scopes.
+const scopeStack: number[] = new Array(MAX_STACK)
+let scopeStackTop = -1
 
 function relationalCompare(
   left: Result,
@@ -462,7 +465,7 @@ export function interpretSimplify(
     compiled
   stackTop = -1
   spillTop = -1
-  lastJumpOp = 0
+  scopeStackTop = -1
 
   let overlapRefsResiduals = overlapRefsResidualsCache.get(compiled)
   if (overlapRefsResiduals === undefined) {
@@ -1372,13 +1375,6 @@ export function interpretSimplify(
         if (!needsReconstruct(top) && slotVal(top) === false) {
           i += offset
         }
-        // Clear spill buffer when transitioning between short-circuit sequences.
-        // Different jump opcodes (41=JUMP_IF_FALSE for AND vs 42=JUMP_IF_TRUE for OR/NOR)
-        // indicate different short-circuit sequences.
-        if (lastJumpOp !== 41) {
-          spillTop = -1
-        }
-        lastJumpOp = 41
         break
       }
 
@@ -1388,13 +1384,12 @@ export function interpretSimplify(
         if (!needsReconstruct(top) && slotVal(top) === true) {
           i += offset
         }
-        // Clear spill buffer when transitioning between short-circuit sequences.
-        if (lastJumpOp !== 42) {
-          spillTop = -1
-        }
-        lastJumpOp = 42
         break
       }
+
+      case OP_ENTER_SCOPE:
+        scopeStack[++scopeStackTop] = spillTop
+        break
 
       case OP_POP: {
         const popped = stack[stackTop--]
@@ -1409,14 +1404,18 @@ export function interpretSimplify(
       // AND/OR/NOR markers — collect the current stack top plus any residuals
       // that were spilled by OP_POP during the short-circuit sequence, then
       // apply the simplification logic.
+      //
+      // Each of these opcodes pops the scope base that was pushed by the
+      // matching OP_ENTER_SCOPE at the start of the short-circuit block. Only
+      // spill entries above that base (indices base+1..spillTop) belong to this
+      // scope; entries at 0..base belong to outer scopes and are preserved by
+      // restoring spillTop = base after draining.
       case OP_AND: {
         i++ // consume the operand count byte (unused — we use the spill buffer)
         const top = stack[stackTop--]
-        // Fast path: nothing was spilled — all non-top operands were concrete.
-        // The top is either a short-circuit false, the last true, or a lone residual.
-        // Push top directly — slotVal unwrapping happens at the final return point.
-        if (spillTop < 0) {
-          spillTop = -1
+        const base = scopeStack[scopeStackTop--]
+        // Fast path: no entries were spilled in this scope.
+        if (spillTop === base) {
           if (!needsReconstruct(top)) {
             stack[++stackTop] = top
           } else {
@@ -1425,10 +1424,8 @@ export function interpretSimplify(
           break
         }
         const residuals: Input[] = []
-        // Drain spill buffer (residuals from earlier operands that were POP'd)
-        // Check if any spilled operand was false (dominates AND)
         let andDominated = false
-        for (let j = 0; j <= spillTop; j++) {
+        for (let j = base + 1; j <= spillTop; j++) {
           const v = spillBuf[j]
           if (!needsReconstruct(v) && slotVal(v) === false) {
             andDominated = true
@@ -1438,8 +1435,7 @@ export function interpretSimplify(
             residuals.push(slotSrc(v))
           }
         }
-        spillTop = -1 // clear spill buffer
-        // Include the stack top (last operand result)
+        spillTop = base // restore outer scope
         if (!andDominated) {
           if (!needsReconstruct(top) && slotVal(top) === false) {
             andDominated = true
@@ -1462,10 +1458,9 @@ export function interpretSimplify(
       case OP_OR: {
         i++ // consume the operand count byte
         const top = stack[stackTop--]
-        // Fast path: nothing was spilled — all non-top operands were concrete.
-        // Push top directly — slotVal unwrapping happens at the final return point.
-        if (spillTop < 0) {
-          spillTop = -1
+        const base = scopeStack[scopeStackTop--]
+        // Fast path: no entries were spilled in this scope.
+        if (spillTop === base) {
           if (!needsReconstruct(top)) {
             stack[++stackTop] = top
           } else {
@@ -1475,7 +1470,7 @@ export function interpretSimplify(
         }
         const residuals: Input[] = []
         let orDominated = false
-        for (let j = 0; j <= spillTop; j++) {
+        for (let j = base + 1; j <= spillTop; j++) {
           const v = spillBuf[j]
           if (!needsReconstruct(v) && slotVal(v) === true) {
             orDominated = true
@@ -1485,7 +1480,7 @@ export function interpretSimplify(
             residuals.push(slotSrc(v))
           }
         }
-        spillTop = -1
+        spillTop = base // restore outer scope
         if (!orDominated) {
           if (!needsReconstruct(top) && slotVal(top) === true) {
             orDominated = true
@@ -1513,9 +1508,10 @@ export function interpretSimplify(
         // OP_NOT will pass through unchanged.
         i++ // consume the operand count byte
         const top = stack[stackTop--]
+        const base = scopeStack[scopeStackTop--]
         const residuals: Input[] = []
         let dominated = false
-        for (let j = 0; j <= spillTop; j++) {
+        for (let j = base + 1; j <= spillTop; j++) {
           const v = spillBuf[j]
           if (!needsReconstruct(v) && slotVal(v) === true) {
             dominated = true
@@ -1525,7 +1521,7 @@ export function interpretSimplify(
             residuals.push(slotSrc(v))
           }
         }
-        spillTop = -1
+        spillTop = base // restore outer scope
         if (!dominated) {
           if (!needsReconstruct(top) && slotVal(top) === true) {
             dominated = true

@@ -71,3 +71,4 @@ export declare function resolveDynamic(key: string, dataType: DataType | undefin
  * (OP_OVERLAP_SCAN_REFS_CONST, OP_OR_AND_IN_CONST_2).
  */
 export declare function resolveCompactRef(ref: CompactRef, ctx: Context): Result;
+export declare function getKeyFromCompactRef(ref: CompactRef): string;

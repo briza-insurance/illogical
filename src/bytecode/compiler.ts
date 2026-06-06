@@ -34,6 +34,7 @@ import { Options } from '../parser/options.js'
 import {
   OP_AND,
   OP_DIVIDE,
+  OP_ENTER_SCOPE,
   OP_EQ,
   OP_GE,
   OP_GT,
@@ -441,6 +442,8 @@ function emitShortCircuit(
   const { bytecode } = state
   const jumpSlots: number[] = []
   const last = arr.length - 1
+
+  bytecode.push(OP_ENTER_SCOPE)
 
   for (let i = 1; i < last; i++) {
     emitExpression(arr[i], state)
