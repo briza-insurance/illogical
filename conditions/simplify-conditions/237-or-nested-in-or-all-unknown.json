@@ -1,0 +1,10 @@
+{
+  "description": "OR(unknown, OR(unknown, unknown)) — inner OR must not steal outer residuals",
+  "expression": [
+    "OR",
+    ["==", "$A", 1],
+    ["OR", ["==", "$B", 2], ["==", "$C", 3]]
+  ],
+  "context": {},
+  "expected": ["OR", ["==", "$A", 1], ["OR", ["==", "$B", 2], ["==", "$C", 3]]]
+}

@@ -65,3 +65,9 @@ export const OP_NOR = 55 // next: N — marker for NOR with N operands
 export const OP_IN_SCAN_REFS_CONST = 56
 // next: N, ref0..refN-1, constIdx — resolve each ref inline, check ∉ consts[constIdx], no stack alloc
 export const OP_NOT_IN_SCAN_REFS_CONST = 57
+// Marks the entry of a short-circuit AND/OR/NOR scope.
+// Emitted by the compiler at the start of every emitShortCircuit block.
+// The evaluate interpreter treats it as a no-op.
+// The simplify interpreter uses it to push a spill-buffer scope marker so that
+// nested AND/OR/NOR blocks cannot steal residuals accumulated by an outer scope.
+export const OP_ENTER_SCOPE = 58

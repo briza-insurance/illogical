@@ -1,0 +1,8 @@
+{
+  "description": "optionalKeys: multi",
+  "expression": ["OR", ["PRESENT", "$x"], ["PRESENT", "$y"]],
+  "context": {},
+  "strictKeys": ["x"],
+  "optionalKeys": ["y"],
+  "expected": ["PRESENT", "$y"]
+}

@@ -18,6 +18,7 @@ import { CompiledExpression } from './compiler.js'
 import {
   OP_AND,
   OP_DIVIDE,
+  OP_ENTER_SCOPE,
   OP_EQ,
   OP_GE,
   OP_GT,
@@ -745,6 +746,9 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
 
       case OP_POP:
         stackTop--
+        break
+
+      case OP_ENTER_SCOPE:
         break
 
       case OP_AND:

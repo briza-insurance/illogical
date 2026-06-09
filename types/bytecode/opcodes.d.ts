@@ -49,3 +49,4 @@ export declare const OP_OR = 54;
 export declare const OP_NOR = 55;
 export declare const OP_IN_SCAN_REFS_CONST = 56;
 export declare const OP_NOT_IN_SCAN_REFS_CONST = 57;
+export declare const OP_ENTER_SCOPE = 58;

@@ -1,0 +1,7 @@
+{
+  "description": "strictKeys: present",
+  "expression": ["PRESENT", "$x"],
+  "context": {},
+  "strictKeys": ["x"],
+  "expected": false
+}

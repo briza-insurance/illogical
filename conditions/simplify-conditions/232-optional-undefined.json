@@ -1,0 +1,7 @@
+{
+  "description": "optionalKeys: undefined",
+  "expression": ["UNDEFINED", "$x"],
+  "context": {},
+  "optionalKeys": ["x"],
+  "expected": ["UNDEFINED", "$x"]
+}

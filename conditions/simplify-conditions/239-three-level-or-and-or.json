@@ -1,0 +1,11 @@
+{
+  "description": "OR(unknown, AND(known-true, OR(known-false, unknown)), unknown) — 3-level nesting",
+  "expression": [
+    "OR",
+    ["==", "$A", 1],
+    ["AND", ["==", "$B", 1], ["OR", ["==", "$C", 99], ["==", "$D", 4]]],
+    ["==", "$E", 5]
+  ],
+  "context": { "B": 1, "C": 0 },
+  "expected": ["OR", ["==", "$A", 1], ["==", "$D", 4], ["==", "$E", 5]]
+}

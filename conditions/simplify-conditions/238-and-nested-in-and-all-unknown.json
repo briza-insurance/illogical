@@ -1,0 +1,10 @@
+{
+  "description": "AND(unknown, AND(unknown, unknown)) — inner AND must not steal outer residuals",
+  "expression": [
+    "AND",
+    ["==", "$A", 1],
+    ["AND", ["==", "$B", 2], ["==", "$C", 3]]
+  ],
+  "context": {},
+  "expected": ["AND", ["==", "$A", 1], ["AND", ["==", "$B", 2], ["==", "$C", 3]]]
+}
