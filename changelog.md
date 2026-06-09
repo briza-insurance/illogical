@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 2.2.2
+
+- fix the simplify method for deeply nested AND/OR/NOR conditions
+
 ## 2.2.1
 
 - fix the optionalKeys and strictKeys behaviours in the simplify method.
