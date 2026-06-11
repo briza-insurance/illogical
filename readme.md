@@ -13,11 +13,13 @@
   <strong>illogical</strong> is a JSON DSL (domain-specific language) for expressing and evaluating business rules in the insurance industry. Underwriters use illogical to model business rules for their question sets, enabling distributors to render great user experiences.
   </p>
 
-  [![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
-  [![npm version](https://badge.fury.io/js/@briza%2Fillogical.svg?icon=si%3Anpm)](https://badge.fury.io/js/@briza%2Fillogical)
-  [![install size](https://packagephobia.com/badge?p=@briza/illogical)](https://packagephobia.com/result?p=@briza/illogical)
-  ![zero dependencies](https://img.shields.io/badge/0-dependencies-green)
-  ![npm downloads](https://img.shields.io/npm/dm/%40briza%2Fillogical)
+[![build status](https://github.com/briza-insurance/illogical/actions/workflows/test.yml/badge.svg)](https://github.com/briza-insurance/illogical/actions?branch=master)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/briza-insurance/illogical/badge)](https://scorecard.dev/viewer/?uri=github.com/briza-insurance/illogical)
+[![npm version](https://badge.fury.io/js/@briza%2Fillogical.svg?icon=si%3Anpm)](https://badge.fury.io/js/@briza%2Fillogical)
+[![install size](https://packagephobia.com/badge?p=@briza/illogical)](https://packagephobia.com/result?p=@briza/illogical)
+![zero dependencies](https://img.shields.io/badge/0-dependencies-green)
+![npm downloads](https://img.shields.io/npm/dm/%40briza%2Fillogical)
+
 </div>
 
 ---
