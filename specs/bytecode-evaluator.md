@@ -2,7 +2,10 @@
 
 Starting in v2.1, illogical supports a bytecode evaluation mode that compiles expressions to a
 flat bytecode array and interprets them with zero allocations in the hot path. This can provide
-significant performance improvements for high-throughput scenarios.
+significant performance improvements for high-throughput scenarios because it translates numeric
+codes into actions for the computer to perform. Using bytecodes creates intermediate representations
+that are the result of actions you wanted performed, but stored for future use in a way that is
+more efficient for computer use.
 
 ## Switching to Bytecode Mode
 
