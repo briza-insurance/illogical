@@ -1,15 +1,17 @@
 # Arithmetic Expressions
 
+An arithmetic expression combines numeric values, variables, and arithmetic operators in a way that the computer then evaluates to produce a single numeric value.
+
 - [Divide](#division)
 - [Multiply](#multiplication)
 - [Subtract](#subtraction)
 - [Sum](#addition)
 
-Arithmetic Expressions are not supported as root level expressions since they must evaluate to a boolean. But it can be used nested within [Comparisson Expressions](./comparison-expressions.md).
+Arithmetic Expressions are not supported as root level expressions since those must evaluate to a boolean. But arithmetic expressions can be used nested within [Comparisson Expressions](./comparison-expressions.md).
 
 ## Division
 
-The arithmetical operator for division produces the quotient of its operands where the left-most operand is the dividend and the subsequent one is the divisor, done from left to right.
+The arithmetical operator for division calculates how many times one number is contained within another number. The expression denotes the left-most operand as the dividend (the number being divided up) and the subsequent operand as the divisor (the number that we're attempting to repeatedly contain in the dividend).
 
 Expression format: `["/", First Operand, Second Operand, ... , Nth Operand]`.
 
@@ -25,7 +27,7 @@ engine.evaluate(['==', ['/', 100, 10], 10]) // true
 
 ## Multiplication
 
-The arithmetical operator for multiplication produces the product of the operands.
+The arithmetical operator for multiplication produces the product of the operands, evaluating "First operand value added to itself second operand value number of times".
 
 Expression format: `["*", First Operand, Second Operand, ... , Nth Operand]`.
 
