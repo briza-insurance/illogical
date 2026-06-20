@@ -1,6 +1,6 @@
 # Statement
 
-Get expression string representation:
+Returns the expression string representation:
 
 `engine.statement(`[Comparison Expression](./comparison-expressions.md) or [Logical Expression](./logical-expressions.md)`)` => `string`
 

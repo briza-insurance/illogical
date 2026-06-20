@@ -1,4 +1,8 @@
-# Logical Expressions
+# Logical expressions
+
+A logical expression is a programming statement that evaluates the relationship
+between two values. The expression will return a binary Boolean result. Think of
+these like asking a true or false question, such as "Are both of these two values true?"
 
 - [And](#and)
 - [Or](#or)
@@ -56,7 +60,7 @@ engine.evaluate(['NOR', ['==', 5, 1], ['==', 10, 5]]) // true
 
 ## Xor
 
-The logical NOR operator returns the boolean value TRUE if both operands are FALSE and returns FALSE otherwise.
+The logical XOR operator returns the boolean value TRUE if exactly one of the operands is TRUE and returns FALSE otherwise.
 
 Expression format: `["XOR", Left Operand 1, Right Operand 2, ... , Right Operand N]`
 

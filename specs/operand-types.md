@@ -1,10 +1,13 @@
-# Operand Types
+# Operand types
 
-The [Comparison Expression](./comparison-expressions.md) expect operands to be one of the below:
+The [Comparison Expression](./comparison-expressions.md) expect operands to be one of the following:
+- [Value](#value)
+- [Reference](#reference)
+- [Collection](#collection)
 
 ## Value
 
-Simple value types: string, number, boolean.
+Value operands are one of these simple types: string, number, boolean.
 
 ```js
 ;['==', 5, 5][('==', 'circle', 'circle')][('==', true, true)]
@@ -14,7 +17,7 @@ Simple value types: string, number, boolean.
 
 The reference operand value is resolved from the [Evaluation Data Context](./evaluation-data-context.md), where the operands name is used as key in the context.
 
-The reference operand must be prefixed with `$` symbol, e.g.: `$name`. This can be customized via [Reference Predicate Parser Option](./engine.md#reference-predicate).
+The reference operand must be prefixed with the `$` symbol, as in `$name`. This can be customized via [Reference Predicate Parser Option](./engine.md#reference-predicate).
 
 | Expression                    | Data Context                          |
 | ----------------------------- | ------------------------------------- |
@@ -25,7 +28,7 @@ The reference operand must be prefixed with `$` symbol, e.g.: `$name`. This can 
 
 ## Collection
 
-The operand could be an array mixed from [Value](#value) and [Reference](#reference).
+The operand is be an array and can be mixed from [Value](#value) and [Reference](#reference).
 
 | Expression                                 | Data Context                        |
 | ------------------------------------------ | ----------------------------------- |

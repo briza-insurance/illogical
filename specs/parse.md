@@ -1,6 +1,6 @@
 # Parse
 
-Parse the expression into a evaluable object, i.e. it returns the parsed self-evaluable condition expression.
+Parse the expression into a evaluable object. When used, it returns the parsed self-evaluable condition expression.
 
 `engine.parse(`[Comparison Expression](./comparison-expressions.md) or [Logical Expression](./logical-expressions.md)`)` => `evaluable`
 
