@@ -1,7 +1,7 @@
 # Simplify
 
 Simplifies an expression with a given context. This is useful when you already have some of
-the properties of context and wants to try to evaluate the expression.
+the properties of context and want to try to evaluate the expression.
 
 ```js
 engine.simplify(['AND', ['==', '$a', 10], ['==', '$b', 20]], { a: 10 }) // ['==', '$b', 20]
