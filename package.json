@@ -25,9 +25,9 @@
     "build:js": "rollup -c",
     "build": "rm -rf lib types && npm run build:types && npm run build:js",
     "docs": "typedoc src && git checkout docs/.nojekyll",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "node --import tsx --test \"src/__test__/unit/**/*.test.ts\"",
     "test:sample-conditions": "node --import tsx --test --test-reporter=spec \"src/__test__/unit/sample-conditions.test.ts\"",
-    "test:coverage": "node --import tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage.lcov \"src/**/*.test.ts\"",
+    "test:coverage": "node --import tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage.lcov \"src/__test__/unit/**/*.test.ts\"",
     "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
     "lint:fix": "eslint --max-warnings 0 \"src/**/*.{ts,js}\" --fix",
     "prepublishOnly": "npm run test && npm run build",
@@ -54,7 +54,9 @@
     "bench:sample:report:full:simplify": "node --import tsx src/benchmark/report.ts benchmark/results-sample-simplify-oop.json    benchmark/results-sample-simplify-bytecode.json    --op simplify --full --out benchmark/report-sample-simplify-full.md",
     "bench:synthetic:report:full:simplify": "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify-oop.json benchmark/results-synthetic-simplify-bytecode.json --op simplify --full --out benchmark/report-synthetic-simplify-full.md",
     "get-bytecode": "node --import tsx src/bytecode/get-bytecode.ts",
-    "debug-bytecode": "node --import tsx src/tools/debugger.ts"
+    "debug-bytecode": "node --import tsx src/tools/debugger.ts",
+    "test:fuzz": "node --import tsx src/tools/fuzz-runner.ts",
+    "test:fuzz:deep": "FUZZ_RUNS=100000 npm run test:fuzz"
   },
   "repository": {
     "type": "git",
@@ -92,6 +94,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "fast-check": "^4.8.0",
     "license-checker": "^25.0.1",
     "prettier": "^3.6.2",
     "rollup": "^4.52.5",
