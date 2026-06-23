@@ -1,0 +1,30 @@
+{
+  "description": "OR-AND: mixed == and IN, both refs unknown",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["==", "$a", 1],
+      ["IN", "$b", [3]]
+    ],
+    [
+      "AND",
+      ["IN", "$a", [5]],
+      ["==", "$b", 7]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["==", "$a", 1],
+      ["IN", "$b", [3]]
+    ],
+    [
+      "AND",
+      ["IN", "$a", [5]],
+      ["==", "$b", 7]
+    ]
+  ]
+}

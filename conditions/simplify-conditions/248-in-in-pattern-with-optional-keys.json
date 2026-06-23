@@ -1,0 +1,31 @@
+{
+  "description": "OR-AND-IN: both refs unknown with optionalKeys",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["==", "$a", 1],
+      ["==", "$b", 10]
+    ],
+    [
+      "AND",
+      ["==", "$a", 2],
+      ["==", "$b", 20]
+    ]
+  ],
+  "context": {},
+  "optionalKeys": ["a", "b"],
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["==", "$a", 1],
+      ["==", "$b", 10]
+    ],
+    [
+      "AND",
+      ["==", "$a", 2],
+      ["==", "$b", 20]
+    ]
+  ]
+}
