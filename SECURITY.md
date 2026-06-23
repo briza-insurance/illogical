@@ -10,7 +10,7 @@ If you discover a security vulnerability within this project, please report it s
 
 **Do not open a public issue.**
 
-To report a security issue, please email security@briza.com with a description of the issue, the steps you took to create the issue, affected versions, and if known, mitigations for the issue.
+To report a security issue, please use the GitHub Security Advisory feature. Navigate to the **Security** tab of this repository, select **Advisories**, and click **Report a vulnerability** (you can also use this direct link: [https://github.com/briza-insurance/illogical/security/advisories/new](https://github.com/briza-insurance/illogical/security/advisories/new)). Please provide a detailed description of the issue, the steps required to reproduce it, affected versions, and any known mitigations.
 
 ## Vulnerability Disclosure Process
 
