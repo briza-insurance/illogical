@@ -1067,12 +1067,7 @@ export function interpretSimplify(
             const op2 = ref2OpByte === 1 ? inOp : eqOp
             // When reconstructing == with a scalar, use the scalar value
             // When reconstructing IN with a scalar, wrap it in an array
-            let r1Val: Input = aVal
-            if (op1 === eqOp) {
-              r1Val = aVal
-            } else {
-              r1Val = [aVal]
-            }
+            const r1Val: Input = op1 === eqOp ? aVal : [aVal]
             let r2Val: Input = setB
             if (op2 === eqOp && Array.isArray(setB) && setB.length === 1) {
               r2Val = setB[0]
