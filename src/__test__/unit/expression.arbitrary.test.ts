@@ -1,18 +1,17 @@
 import { strict as assert } from 'node:assert'
-import { describe, test } from 'node:test'
+import { describe, it } from 'node:test'
 
 import fc from 'fast-check'
 
 import Engine from '../../index.js'
-import { expressionArbitrary } from './expression.arbitrary.js'
+import { expressionArbitrary } from '../fuzz/expression.arbitrary.js'
 
-describe('Fuzzing: OOP Engine Validity', () => {
+describe('Fuzzing expression generator unit test', () => {
   const engineOOP = new Engine({ evaluator: 'oop' })
 
-  test('oop evaluator and simplifier execute generated expressions without syntax errors', () => {
+  it('should produce valid expressions', () => {
     fc.assert(
       fc.property(expressionArbitrary, (expression) => {
-        // console.log('Checking', JSON.stringify(expression))
         try {
           engineOOP.parse(expression)
         } catch (err: unknown) {

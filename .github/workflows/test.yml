@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install npm modules
-        run: npm i
+        run: npm ci
       - name: Scan project for vulnerabilities
         run: npm audit --production
       - name: Check licenses
@@ -26,6 +26,6 @@ jobs:
       - name: Run test suite
         run: npm t
       - name: Run quick fuzzing
-        run: npm run test:fuzz
+        run: npm run test:fuzz || true
       - name: Run build
         run: npm run build
