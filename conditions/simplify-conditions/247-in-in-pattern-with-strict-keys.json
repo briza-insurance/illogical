@@ -1,0 +1,19 @@
+{
+  "description": "OR-AND-IN: both refs unknown with strictKeys",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["==", "$a", 1],
+      ["==", "$b", 10]
+    ],
+    [
+      "AND",
+      ["==", "$a", 2],
+      ["==", "$b", 20]
+    ]
+  ],
+  "context": {},
+  "strictKeys": ["a", "b"],
+  "expected": false
+}

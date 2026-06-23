@@ -1023,13 +1023,15 @@ export function interpretSimplify(
       }
 
       case OP_OR_AND_IN_CONST_2: {
-        // bytecode layout: ref1Idx, ref2Idx, M, aVal0, setBIdx0, aVal1, setBIdx1, ..., aValM-1, setBIdxM-1
+        // bytecode layout: ref1Idx, ref2Idx, M, (aVal0, setBIdx0, ref1Op0, ref2Op0),
+        //   (aVal1, setBIdx1, ref1Op1, ref2Op1), ...
         // aVal_j is a literal value; setBIdx_j is a constIdx for the merged setB.
+        // ref1Op/ref2Op: 0 for 'eq', 1 for 'in'
         const ref1Idx = numAt(bytecode[i++])
         const ref2Idx = numAt(bytecode[i++])
         const n = numAt(bytecode[i++])
-        const pairsStart = i
-        i += n * 2
+        const quadsStart = i
+        i += n * 4
 
         const rawKey1 = refRawKeys[ref1Idx]
         const rawKey2 = refRawKeys[ref2Idx]
@@ -1047,6 +1049,7 @@ export function interpretSimplify(
 
         if (unknown1 || unknown2) {
           // Reconstruct the original complex expression tree
+          // When one ref is known, only include entries where the known ref matches
           const branches: Input[] = [opNames[OP_OR]]
           const andOp = opNames[OP_AND]
           const eqOp = opNames[OP_EQ]
@@ -1054,13 +1057,79 @@ export function interpretSimplify(
           const r1 = refKeys[ref1Idx]
           const r2 = refKeys[ref2Idx]
           for (let j = 0; j < n; j++) {
-            const aVal = literalAt(bytecode[pairsStart + j * 2])
+            const aVal = literalAt(bytecode[quadsStart + j * 4])
             const setB =
-              compiled.consts[numAt(bytecode[pairsStart + j * 2 + 1])]
-            const setInput: Input = setB
-            branches.push([andOp, [eqOp, r1, aVal], [inOp, r2, setInput]])
+              compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
+            const ref1OpByte = numAt(bytecode[quadsStart + j * 4 + 2])
+            const ref2OpByte = numAt(bytecode[quadsStart + j * 4 + 3])
+            // Use the original operators for both operands
+            const op1 = ref1OpByte === 1 ? inOp : eqOp
+            const op2 = ref2OpByte === 1 ? inOp : eqOp
+            // When reconstructing == with a scalar, use the scalar value
+            // When reconstructing IN with a scalar, wrap it in an array
+            let r1Val: Input = aVal
+            if (op1 === eqOp) {
+              r1Val = aVal
+            } else {
+              r1Val = [aVal]
+            }
+            let r2Val: Input = setB
+            if (op2 === eqOp && Array.isArray(setB) && setB.length === 1) {
+              r2Val = setB[0]
+            }
+            // Skip entries where the known ref doesn't match
+            if (!unknown1 && v1 !== undefined && v1 !== null) {
+              // ref1 is known — only include matching entries
+              // For ==, check exact match; for IN, check if value is in set
+              let matches = false
+              if (op1 === eqOp) {
+                matches = v1 === aVal
+              } else {
+                matches = Array.isArray(v1) ? v1.includes(aVal) : v1 === aVal
+              }
+              if (!matches) {
+                continue
+              }
+            }
+            if (!unknown2 && v2 !== undefined && v2 !== null) {
+              // ref2 is known — only include matching entries
+              let matches = false
+              if (op2 === eqOp) {
+                matches = v2 === r2Val
+              } else {
+                // setB is always an array here (it's a compiled const)
+                matches = Array.isArray(v2)
+                  ? setB.some((item) => item === v2)
+                  : v2 === r2Val
+              }
+              if (!matches) {
+                continue
+              }
+            }
+            // Build the AND branch, omitting known refs that already matched
+            const branchOperands: Input[] = []
+            if (unknown1) {
+              branchOperands.push([op1, r1, r1Val])
+            }
+            if (unknown2) {
+              branchOperands.push([op2, r2, r2Val])
+            }
+            if (branchOperands.length === 1) {
+              branches.push(branchOperands[0])
+            } else {
+              branches.push([andOp, ...branchOperands])
+            }
           }
-          stack[++stackTop] = makeResidual(branches)
+          // Handle edge cases: no matches → false, single match → unwrap OR
+          if (branches.length === 1) {
+            // No entries matched
+            stack[++stackTop] = false
+          } else if (branches.length === 2) {
+            // Only one entry matched — unwrap the OR
+            stack[++stackTop] = branches[1]
+          } else {
+            stack[++stackTop] = makeResidual(branches)
+          }
           break
         }
 
@@ -1073,9 +1142,9 @@ export function interpretSimplify(
           v2 !== undefined
         ) {
           for (let j = 0; j < n; j++) {
-            if (bytecode[pairsStart + j * 2] === v1) {
+            if (bytecode[quadsStart + j * 4] === v1) {
               const setB =
-                compiled.consts[numAt(bytecode[pairsStart + j * 2 + 1])]
+                compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
               let s = overlapSetCache.get(setB)
               if (s === undefined) {
                 s = new Set<Result>(setB)
