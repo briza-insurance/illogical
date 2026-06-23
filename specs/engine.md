@@ -1,6 +1,6 @@
-# Engine Options
+# Engine options
 
-Below described, are individual options object properties which could be used individually. Any missing options will be substituted with the default options.
+The options on this page are available to you when you use the illogical engine. These options are object properties. You can use them individually. If you do not set a property, then the engine will use the default option for that property.
 
 **Usage**
 
@@ -15,9 +15,9 @@ const opts = {
 const engine = new Engine(opts)
 ```
 
-## Reference Predicate
+## Reference predicate
 
-A function used to determine if the operand is a reference type, otherwise evaluated as a static value.
+Determines whether the operand is a reference type. Predicate functions in general determine whether something is true or false and so they return a boolean response. If this reference predicate function determines the operand is not a reference type, the operand is evaluated as a static value.
 
 ```typescript
 referencePredicate: (operand: string) => boolean
@@ -30,22 +30,22 @@ referencePredicate: (operand: string) => boolean
 
 **Default reference predicate:**
 
-> The `$` symbol at the begging of the operand is used to predicate the reference type., E.g. `$State`, `$Country`.
+> The `$` symbol is used as a prefix to an operand name that indicates the reference type, for example `$state` or `$country`. See [Operand types](./operand-types.md) to learn more.
 
-## Reference Transform
+## Reference transform
 
-A function used to transform the operand into the reference annotation stripped form. I.e. remove any annotation used to detect the reference type. E.g. "$Reference" => "Reference".
+Transforms the operand into the reference annotation stripped form by removing any annotation used to detect the reference type. For example, changes "$reference" => "reference".
 
 ```typescript
 referenceTransform: (operand: string) => string
 ```
 
 > **Default reference transform:**
-> It removes the `$` symbol at the begging of the operand name.
+> This transform just removes the `$` symbol from the beginning of the operand name.
 
 ## Operator Mapping
 
-Mapping of the operators. The key is unique operator key, and the value is the key used to represent the given operator in the raw expression.
+This is a map of the operators. The key is the unique operator key, and the value is what is used to represent the given operator in a raw expression.
 
 ```typescript
 operatorMapping: Map<symbol, string>
@@ -81,7 +81,7 @@ operatorMapping: Map<symbol, string>
   [OPERATOR_DIVIDE, '/'],
 ```
 
-> The operator keys are unique symbols which could be imported from the engine package:
+> The operator keys are unique symbols which can be imported from the engine package, like this:
 
 ```js
 import {

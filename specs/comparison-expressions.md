@@ -1,4 +1,8 @@
-# Comparison Expressions
+# Comparison expressions
+
+A comparison expression is a programming statement that evaluates the relationship
+between two values. The expression will return a binary Boolean result. Think of
+these like asking a true or false question, such as "Are these two values equal?"
 
 - [Equal](#equal)
 - [Not Equal](#not-equal)
@@ -16,6 +20,9 @@
 
 ## Equal
 
+Checks whether the two named values (called _operands_) are identical. If identical, returns
+_true_.
+
 Expression format: `["==",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
 > Valid operand types: string, number, boolean.
@@ -28,7 +35,10 @@ Expression format: `["==",`[Left Operand](./operand-types.md), [Right Operand](.
 engine.evaluate(['==', 5, 5]) // true
 ```
 
-## Not Equal
+## Not equal
+
+Checks whether the two named values (called _operands_) are different. If different, returns
+_true_.
 
 Expression format: `["!=",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -42,7 +52,9 @@ Expression format: `["!=",`[Left Operand](./operand-types.md), [Right Operand](.
 engine.evaluate(['!=', 'circle', 'square']) // true
 ```
 
-## Greater Than
+## Greater than
+
+Checks whether the left value is larger than the right value. If larger, returns _true_.
 
 Expression format: `[">",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -60,7 +72,10 @@ engine.evaluate(['>', 10, 5]) // true
 engine.evaluate(['>', '2023-01-01', '2022-12-31']) // true
 ```
 
-## Greater Than or Equal
+## Greater than or equal
+
+Checks whether the left value is larger than or the same as the right value. If either larger or
+the same, returns _true_.
 
 Expression format: `[">=",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -78,7 +93,9 @@ engine.evaluate(['>=', 5, 5]) // true
 engine.evaluate(['>=', '2023-01-01', '2023-01-01']) // true
 ```
 
-## Less Than
+## Less than
+
+Checks whether the left value is smaller than the right value. If larger, returns _true_.
 
 Expression format: `["<",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -96,7 +113,10 @@ engine.evaluate(['<', 5, 10]) // true
 engine.evaluate(['<', '2022-12-31', '2023-01-01']) // true
 ```
 
-## Less Than or Equal
+## Less than or equal
+
+Checks whether the left value is smaller than or the same as the right value. If either smaller or
+the same, returns _true_.
 
 Expression format: `["<=",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -116,6 +136,8 @@ engine.evaluate(['<=', '2023-01-01', '2023-01-01']) // true
 
 ## In
 
+Checks whether the named value exists within a list of values. If found in the list, returns _true_.
+
 Expression format: `["IN",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
 > Valid operand types: number and number[] or string and string[].
@@ -130,7 +152,9 @@ engine.evaluate(['IN', 5, [1, 2, 3, 4, 5]]) // true
 engine.evaluate(['IN', ['circle', 'square', 'triangle'], 'square']) // true
 ```
 
-## Not In
+## Not in
+
+Checks whether the named value is absent from a list of values. If absent from the list, returns _true_.
 
 Expression format: `["NOT IN",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -147,6 +171,8 @@ engine.evaluate(['NOT IN', ['circle', 'square', 'triangle'], 'oval']) // true
 ```
 
 ## Prefix
+
+Checks whether the named value exists as the initial part of the named word. If found, returns _true_.
 
 Expression format: `["PREFIX",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -166,6 +192,8 @@ engine.evaluate(['PREFIX', 'hemi', 'sphere']) // false
 
 ## Suffix
 
+Checks whether the named value exists as the final part of the named word. If found, returns _true_.
+
 Expression format: `["SUFFIX",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
 > Valid operand types: string.
@@ -183,6 +211,10 @@ engine.evaluate(['SUFFIX', 'establish', 'ment']) // false
 ```
 
 ## Overlap
+
+Checks whether any value within one set of values intersects with any value of the other named set.
+Remember that one value alone can constitute a set (of one). If one or more common values are found,
+returns _true_.
 
 Expression format: `["OVERLAP",`[Left Operand](./operand-types.md), [Right Operand](./operand-types.md)`]`.
 
@@ -204,6 +236,8 @@ engine.evaluate([
 
 ## Undefined
 
+Checks whether or not the named reference operand is defined. If it is _not_ defined, returns _true_.
+
 Expression format: `["UNDEFINED",`$[Reference Operand](./operand-types.md#reference)`]`.
 
 ```json
@@ -218,7 +252,8 @@ engine.evaluate(['UNDEFINED', '$RefA'], { RefA: 10 }) // false
 
 ## Present
 
-Evaluates as FALSE when the operand is UNDEFINED or NULL.
+Checks whether the named reference operand exists in a given context. If found, returns _true_. If
+_not_ found, such as when the operand is _UNDEFINED_ or _NULL_, returns _false_.
 
 Expression format: `["PRESENT",`$[Reference Operand](./operand-types.md#reference)`]`.
 

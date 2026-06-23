@@ -1,7 +1,10 @@
 # Debugger Tools
 
 illogical includes developer tooling for debugging bytecode execution and inspecting compiled
-output.
+output. This includes:
+
+- [Bytecode disassembler](#bytecode-disassembler--get-bytecode)
+- [Time-travel debugger](#time-travel-debugger--debug-bytecode)
 
 ## Bytecode Disassembler — `get-bytecode`
 
