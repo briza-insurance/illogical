@@ -1,5 +1,9 @@
 # illogical changelog
 
+## 2.2.3
+
+- fix the simplify method for comparison/containment wrapped in logical conditions
+
 ## 2.2.2
 
 - fix the simplify method for deeply nested AND/OR/NOR conditions
