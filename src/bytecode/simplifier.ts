@@ -1101,18 +1101,27 @@ export function interpretSimplify(
                 continue
               }
             }
-            // Build the AND branch, omitting known refs that already matched
-            const branchOperands: Input[] = []
-            if (unknown1) {
-              branchOperands.push([op1, r1, r1Val])
-            }
-            if (unknown2) {
-              branchOperands.push([op2, r2, r2Val])
-            }
-            if (branchOperands.length === 1) {
-              branches.push(branchOperands[0])
-            } else {
-              branches.push([andOp, ...branchOperands])
+            // Build the AND branch(es), omitting known refs that already matched
+            // Note: if op2 is 'eq' but setB contains multiple distinct elements it means the original tree had
+            // multiple branches that were unified for efficiency during compile. We must explode them back into
+            // distinct branches to restore exact AST representation.
+            const bValsToEmit =
+              op2 === eqOp && Array.isArray(setB) && setB.length > 1
+                ? setB
+                : [r2Val]
+            for (const bVal of bValsToEmit) {
+              const branchOperands: Input[] = []
+              if (unknown1) {
+                branchOperands.push([op1, r1, r1Val])
+              }
+              if (unknown2) {
+                branchOperands.push([op2, r2, bVal])
+              }
+              if (branchOperands.length === 1) {
+                branches.push(branchOperands[0])
+              } else if (branchOperands.length > 1) {
+                branches.push([andOp, ...branchOperands])
+              }
             }
           }
           // Handle edge cases: no matches → false, single match → unwrap OR
