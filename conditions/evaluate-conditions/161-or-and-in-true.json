@@ -1,0 +1,10 @@
+{
+  "description": "OR AND INs → true",
+  "expression": [
+    "OR",
+    ["AND", ["==", "$Ref1", "val1"], ["==", "$Ref2", "val2"]],
+    ["AND", ["==", "$Ref1", "val1"], ["==", "$Ref2", "val3"]]
+  ],
+  "context": { "Ref1": "val1", "Ref2": "val3" },
+  "expected": true
+}
