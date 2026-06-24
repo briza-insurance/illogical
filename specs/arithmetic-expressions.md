@@ -9,6 +9,8 @@ An arithmetic expression combines numeric values, variables, and arithmetic oper
 
 Arithmetic Expressions are not supported as root level expressions since those must evaluate to a boolean. But arithmetic expressions can be used nested within [Comparisson Expressions](./comparison-expressions.md).
 
+> Note: Any non-present operand is discarded. This means that if a reference is missing, the expression will return FALSE. Also, all operands that ARE present must be numbers, otherwise an error is thrown.
+
 ## Division
 
 The arithmetical operator for division calculates how many times one number is contained within another number. The expression denotes the left-most operand as the dividend (the number being divided up) and the subsequent operand as the divisor (the number that we're attempting to repeatedly contain in the dividend).
