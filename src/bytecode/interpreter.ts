@@ -512,13 +512,14 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
       }
 
       case OP_OR_AND_IN_CONST_2: {
-        // bytecode layout: ref1Idx, ref2Idx, M, v0, setBIdx0, v1, setBIdx1, ..., vM-1, setBIdxM-1
+        // bytecode layout: ref1Idx, ref2Idx, M, (v0, setBIdx0, ref1Op0, ref2Op0), (v1, setBIdx1, ref1Op1, ref2Op1), ...
+        // ref1Op/ref2Op: 0 for 'eq', 1 for 'in' (unused at runtime, kept for simplifier)
         // constSets[setBIdx] is pre-built at first interpret() call — plain Set.has lookup.
         const ref1Idx = numAt(bytecode[++i])
         const ref2Idx = numAt(bytecode[++i])
         const m = numAt(bytecode[++i])
         const entriesStart = i + 1
-        i += m * 2
+        i += m * 4
 
         const v1 = resolveCompactRef(refs[ref1Idx], ctx)
         const v2 = resolveCompactRef(refs[ref2Idx], ctx)
@@ -531,9 +532,9 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
           v2 !== null
         ) {
           for (let j = 0; j < m; j++) {
-            if (bytecode[entriesStart + j * 2] === v1) {
+            if (bytecode[entriesStart + j * 4] === v1) {
               found =
-                constSets[numAt(bytecode[entriesStart + j * 2 + 1])].has(v2)
+                constSets[numAt(bytecode[entriesStart + j * 4 + 1])].has(v2)
               break
             }
           }

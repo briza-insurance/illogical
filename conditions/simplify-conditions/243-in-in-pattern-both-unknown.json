@@ -1,0 +1,30 @@
+{
+  "description": "OR-AND-IN: both refs unknown, IN operators preserved",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["IN", "$a", [1]],
+      ["IN", "$b", [3]]
+    ],
+    [
+      "AND",
+      ["IN", "$a", [2]],
+      ["IN", "$b", [4]]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["IN", "$a", [1]],
+      ["IN", "$b", [3]]
+    ],
+    [
+      "AND",
+      ["IN", "$a", [2]],
+      ["IN", "$b", [4]]
+    ]
+  ]
+}
