@@ -144,7 +144,7 @@ describe('detectOrAndIn2Pattern', () => {
     assert.strictEqual(result, null)
   })
 
-  it('handles mixed operators for the same setA value across branches, falling back to IN', () => {
+  it('returns null if there are mixed operators for the same setA value across branches', () => {
     const input = [
       'OR',
       ['AND', ['==', '$Ref1', 1], ['==', '$Ref2', 'val1']],
@@ -153,20 +153,7 @@ describe('detectOrAndIn2Pattern', () => {
 
     const result = detectOrAndIn2Pattern(input, state)
 
-    assert.ok(result)
-
-    assert.deepStrictEqual(result.entries, [
-      [1, 0], // $Ref1=1 -> $Ref2 in ['val1', 'val2', 'val3']
-      [2, 1], // $Ref1=2 -> $Ref2 in ['val2', 'val3']
-    ])
-
-    assert.deepStrictEqual(result.entryOperators, [
-      ['in', 'in'], // aVal=1 uses {eq, in} for Ref1, {eq, in} for Ref2 -> 'in', 'in'
-      ['in', 'in'], // aVal=2 uses {in} for Ref1, {in} for Ref2 -> 'in', 'in'
-    ])
-
-    assert.deepStrictEqual(state.consts[0], ['val1', 'val2', 'val3'])
-    assert.deepStrictEqual(state.consts[1], ['val2', 'val3'])
+    assert.strictEqual(result, null)
   })
 
   it('returns null if the left operand is not a reference', () => {

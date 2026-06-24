@@ -454,14 +454,20 @@ export function detectOrAndIn2Pattern(
     const mergedSetB = [...setBVals].filter((v): v is Input => v !== undefined)
     const constIdx = internConst(mergedSetB, state)
     entries.push([aVal, constIdx])
-    // Determine ref1 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
+    // Determine ref1 operator
     const r1Ops = ref1OpsByAValue.get(aVal)
-    const ref1Op =
-      r1Ops !== undefined && r1Ops.size === 1 && r1Ops.has('eq') ? 'eq' : 'in'
-    // Determine ref2 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
+    if (r1Ops !== undefined && r1Ops.size > 1) {
+      return null // Bail out if operations mixed EQ and IN for the same reference
+    }
+    const ref1Op = r1Ops !== undefined && r1Ops.has('eq') ? 'eq' : 'in'
+
+    // Determine ref2 operator
     const r2Ops = ref2OpsByAValue.get(aVal)
-    const ref2Op =
-      r2Ops !== undefined && r2Ops.size === 1 && r2Ops.has('eq') ? 'eq' : 'in'
+    if (r2Ops !== undefined && r2Ops.size > 1) {
+      return null // Bail out if operations mixed EQ and IN for the same reference
+    }
+    const ref2Op = r2Ops !== undefined && r2Ops.has('eq') ? 'eq' : 'in'
+
     entryOperators.push([ref1Op, ref2Op])
   }
 
