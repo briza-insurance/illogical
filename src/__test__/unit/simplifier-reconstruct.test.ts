@@ -12,16 +12,8 @@ describe('detectOrAndIn2Pattern - simplify reconstruction', () => {
 
         const input: ExpressionInput = [
           'OR',
-          [
-            'AND',
-            ['==', '$Loss1Type', 'property'],
-            ['==', '$Loss1ClaimStatus', 'closed'],
-          ],
-          [
-            'AND',
-            ['==', '$Loss1Type', 'property'],
-            ['==', '$Loss1ClaimStatus', 'declined'],
-          ],
+          ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val2']],
+          ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val3']],
         ]
 
         // Evaluating with empty context invokes the simplify method
@@ -36,30 +28,14 @@ describe('detectOrAndIn2Pattern - simplify reconstruction', () => {
 
         const input: ExpressionInput = [
           'OR',
-          [
-            'AND',
-            ['==', '$Loss1Type', 'property'],
-            ['==', '$Loss1ClaimStatus', 'closed'],
-          ],
-          [
-            'AND',
-            ['IN', '$Loss1Type', ['property', 'home']],
-            ['==', '$Loss1ClaimStatus', 'declined'],
-          ],
+          ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val2']],
+          ['AND', ['IN', '$Ref1', ['val1', 'home']], ['==', '$Ref2', 'val3']],
         ]
 
         const expected: ExpressionInput = [
           'OR',
-          [
-            'AND',
-            ['==', '$Loss1Type', 'property'],
-            ['==', '$Loss1ClaimStatus', 'closed'],
-          ],
-          [
-            'AND',
-            ['IN', '$Loss1Type', ['property', 'home']],
-            ['==', '$Loss1ClaimStatus', 'declined'],
-          ],
+          ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val2']],
+          ['AND', ['IN', '$Ref1', ['val1', 'home']], ['==', '$Ref2', 'val3']],
         ]
 
         const result = engine.simplify(input, {})

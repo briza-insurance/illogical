@@ -67,16 +67,8 @@ describe('detectOrAndIn2Pattern', () => {
   it('handles OR (AND (EQ, EQ)) pattern, grouping target values', () => {
     const input = [
       'OR',
-      [
-        'AND',
-        ['==', '$Loss1Type', 'property'],
-        ['==', '$Loss1ClaimStatus', 'closed'],
-      ],
-      [
-        'AND',
-        ['==', '$Loss1Type', 'property'],
-        ['==', '$Loss1ClaimStatus', 'declined'],
-      ],
+      ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val2']],
+      ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val3']],
     ]
 
     const result = detectOrAndIn2Pattern(input, state)
@@ -84,10 +76,10 @@ describe('detectOrAndIn2Pattern', () => {
     assert.ok(result)
 
     assert.deepStrictEqual(result.entries, [
-      ['property', 0], // $Loss1Type=property -> $Loss1ClaimStatus in ['closed', 'declined']
+      ['val1', 0], // $Ref1=val1 -> $Ref2 in ['val2', 'val3']
     ])
 
-    assert.deepStrictEqual(state.consts[0], ['closed', 'declined'])
+    assert.deepStrictEqual(state.consts[0], ['val2', 'val3'])
   })
 
   it('handles OR (AND (IN, EQ)) pattern with set on left and scalar on right', () => {
@@ -159,16 +151,8 @@ describe('detectOrAndIn2Pattern', () => {
   it('returns null if the left operand is not a reference', () => {
     const input = [
       'OR',
-      [
-        'AND',
-        ['==', 'property', '$Loss1Type'],
-        ['==', '$Loss1ClaimStatus', 'closed'],
-      ],
-      [
-        'AND',
-        ['==', '$Loss1Type', 'property'],
-        ['==', '$Loss1ClaimStatus', 'declined'],
-      ],
+      ['AND', ['==', 'val1', '$Ref1'], ['==', '$Ref2', 'val2']],
+      ['AND', ['==', '$Ref1', 'val1'], ['==', '$Ref2', 'val3']],
     ]
 
     const result = detectOrAndIn2Pattern(input, state)
