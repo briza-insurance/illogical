@@ -1,0 +1,6 @@
+{
+  "description": "SUM date: missing reference → false",
+  "expression": [">", ["+", "2024-02-29", "$a"], "2025-02-27"],
+  "context": {},
+  "expected": false
+}
