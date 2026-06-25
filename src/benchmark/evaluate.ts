@@ -30,13 +30,14 @@ const outputPath = resolve(getArg('--out') ?? join(__dirname, 'results.json'))
 const enginePath = resolve(
   getArg('--engine') ?? join(__dirname, '../../lib/illogical.esm.js')
 )
+const filterArg = getArg('--filter')
 
 const engineOptions = getArg('--options')
 
 const { default: Engine } = await import(enginePath)
 const engine = new Engine(engineOptions ? JSON.parse(engineOptions) : undefined)
 
-const conditions = loadConditions(engine, casesRoot)
+const conditions = loadConditions(engine, casesRoot, filterArg)
 
 const tasks: Array<{
   name: string
