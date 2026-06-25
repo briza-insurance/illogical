@@ -1,0 +1,13 @@
+[
+  "OR",
+  [
+    "AND",
+    ["==", "$Loss1Type", "property"],
+    ["==", "$Loss1ClaimStatus", "closed"]
+  ],
+  [
+    "AND",
+    ["==", "$Loss1Type", "property"],
+    ["==", "$Loss1ClaimStatus", "declined"]
+  ]
+]

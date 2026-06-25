@@ -25,7 +25,7 @@
     "build:js": "rollup -c",
     "build": "rm -rf lib types && npm run build:types && npm run build:js",
     "docs": "typedoc src && git checkout docs/.nojekyll",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "bash -c 'node --import tsx --test \"${@:-src/**/*.test.ts}\"' --",
     "test:sample-conditions": "node --import tsx --test --test-reporter=spec \"src/__test__/unit/sample-conditions.test.ts\"",
     "test:coverage": "node --import tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage.lcov \"src/**/*.test.ts\"",
     "lint": "eslint --max-warnings 0 \"src/**/*.{ts,js}\"",
@@ -53,6 +53,7 @@
     "bench:synthetic:report:simplify": "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify-oop.json benchmark/results-synthetic-simplify-bytecode.json --op simplify --out benchmark/report-synthetic-simplify.md",
     "bench:sample:report:full:simplify": "node --import tsx src/benchmark/report.ts benchmark/results-sample-simplify-oop.json    benchmark/results-sample-simplify-bytecode.json    --op simplify --full --out benchmark/report-sample-simplify-full.md",
     "bench:synthetic:report:full:simplify": "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify-oop.json benchmark/results-synthetic-simplify-bytecode.json --op simplify --full --out benchmark/report-synthetic-simplify-full.md",
+    "bench:full:report:test-case": "sh -c 'FILTER=$(echo \"$@\" | sed -n \"s/.*--filter \\([^ ]*\\).*/\\1/p\"); if [ -z \"$FILTER\" ]; then FILTER=\"tmp\"; fi; node --import tsx src/benchmark/simplify.ts --cases conditions/sample-conditions \"$@\" --out benchmark/results-simplify-${FILTER}-oop.json && node --import tsx src/benchmark/simplify.ts --cases conditions/sample-conditions \"$@\" --options '\\''{\"evaluator\":\"bytecode\"}'\\'' --out benchmark/results-simplify-${FILTER}-bytecode.json && node --import tsx src/benchmark/report.ts benchmark/results-simplify-${FILTER}-oop.json benchmark/results-simplify-${FILTER}-bytecode.json --op simplify --out benchmark/report-simplify-${FILTER}.md && echo \"\\nReport written to benchmark/report-simplify-${FILTER}.md\" && node --import tsx src/benchmark/evaluate.ts --cases conditions/sample-conditions \"$@\" --out benchmark/results-evaluate-${FILTER}-oop.json && node --import tsx src/benchmark/evaluate.ts --cases conditions/sample-conditions \"$@\" --options '\\''{\"evaluator\":\"bytecode\"}'\\'' --out benchmark/results-evaluate-${FILTER}-bytecode.json && node --import tsx src/benchmark/report.ts benchmark/results-evaluate-${FILTER}-oop.json benchmark/results-evaluate-${FILTER}-bytecode.json --op evaluate --out benchmark/report-evaluate-${FILTER}.md && echo \"\\nReport written to benchmark/report-evaluate-${FILTER}.md\"' -- ",
     "get-bytecode": "node --import tsx src/bytecode/get-bytecode.ts",
     "debug-bytecode": "node --import tsx src/tools/debugger.ts"
   },

@@ -74,11 +74,11 @@ export function disassemble(
         const ref2Idx = numAt(bytecode[++i])
         const m = numAt(bytecode[++i])
         const entriesStart = i + 1
-        i += m * 2
+        i += m * 4
         const entries: string[] = []
         for (let j = 0; j < m; j++) {
-          const aVal = bytecode[entriesStart + j * 2]
-          const setBIdx = bytecode[entriesStart + j * 2 + 1]
+          const aVal = bytecode[entriesStart + j * 4]
+          const setBIdx = bytecode[entriesStart + j * 4 + 1]
           entries.push(`(${JSON.stringify(aVal)}->${setBIdx})`)
         }
         text = `${pcStart}: ${name} ref1=${ref1Idx} ref2=${ref2Idx} m=${m} entries=[${entries.join(' ')}]`

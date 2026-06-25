@@ -20,9 +20,20 @@ interface Engine {
   }
 }
 
-export function loadConditions(engine: Engine, casesRoot: string) {
-  return readdirSync(casesRoot, { withFileTypes: true })
-    .filter((e) => e.isDirectory())
+export function loadConditions(
+  engine: Engine,
+  casesRoot: string,
+  filter?: string
+) {
+  let entries = readdirSync(casesRoot, { withFileTypes: true }).filter((e) =>
+    e.isDirectory()
+  )
+
+  if (filter) {
+    entries = entries.filter((e) => e.name.includes(filter))
+  }
+
+  return entries
     .map((e) => {
       const dir = join(casesRoot, e.name)
       const expression = JSON.parse(

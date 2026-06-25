@@ -146,7 +146,7 @@ function buildOperatorMaps(opts: Options): OperatorMaps {
   }
 }
 
-interface CompilerState {
+export interface CompilerState {
   bytecode: Bytecode
   refs: CompactRef[] // side-table of compact refs, indexed by position
   refIndex: Map<string, number> // dedup map: raw key → index into refs
@@ -341,7 +341,7 @@ function extractInLikeChild(
  * relevant setB indices, instead of a linear scan through N setA Sets.
  * Returns null if the pattern does not match.
  */
-function detectOrAndIn2Pattern(
+export function detectOrAndIn2Pattern(
   arr: ArrayInput,
   state: CompilerState
 ): {

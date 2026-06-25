@@ -1,0 +1,30 @@
+{
+  "description": "OR AND INs with mixed operators fallback to IN",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "closed"]
+    ],
+    [
+      "AND",
+      ["IN", "$Loss1Type", ["property", "home"]],
+      ["==", "$Loss1ClaimStatus", "declined"]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "closed"]
+    ],
+    [
+      "AND",
+      ["IN", "$Loss1Type", ["property", "home"]],
+      ["==", "$Loss1ClaimStatus", "declined"]
+    ]
+  ]
+}

@@ -520,19 +520,19 @@ export function interpretDebug(
       }
 
       case OP_OR_AND_IN_CONST_2: {
-        // bytecode layout: ref1Idx, ref2Idx, M, v0, setBIdx0, v1, setBIdx1, ..., vM-1, setBIdxM-1
+        // bytecode layout: ref1Idx, ref2Idx, M, (aVal0, setBIdx0, ref1Op0, ref2Op0), ...
         const ref1Idx = numAt(bytecode[++i])
         const ref2Idx = numAt(bytecode[++i])
         const m = numAt(bytecode[++i])
         const entriesStart = i + 1
-        i += m * 2
+        i += m * 4
 
         let idxMap = invertedIndexes!.get(entriesStart)
         if (idxMap === undefined) {
           idxMap = new Map<Result, number[]>()
           for (let j = 0; j < m; j++) {
-            const aVal = bytecode[entriesStart + j * 2]
-            const setBIdx = numAt(bytecode[entriesStart + j * 2 + 1])
+            const aVal = bytecode[entriesStart + j * 4]
+            const setBIdx = numAt(bytecode[entriesStart + j * 4 + 1])
             let list = idxMap.get(aVal)
             if (list === undefined) {
               list = []

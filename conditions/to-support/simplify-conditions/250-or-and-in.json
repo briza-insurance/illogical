@@ -1,0 +1,30 @@
+{
+  "description": "OR AND INs → remain unchanged",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "closed"]
+    ],
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "declined"]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "closed"]
+    ],
+    [
+      "AND",
+      ["==", "$Loss1Type", "property"],
+      ["==", "$Loss1ClaimStatus", "declined"]
+    ]
+  ]
+}
