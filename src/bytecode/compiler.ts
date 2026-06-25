@@ -362,10 +362,10 @@ export function detectOrAndIn2Pattern(
 
   // Inverted index: each distinct setA value → merged setB values across all branches containing it
   const setBValsByAValue = new Map<Result, Set<Result>>()
-  // Track which operators were used for each setA value (for ref1 and ref2 operand reconstruction)
-  // Instead of Sets, we use bitmasks: 1 for 'eq', 2 for 'in'. Mixed = 3
-  const ref1OpsByAValue = new Map<Result, number>()
-  const ref2OpsByAValue = new Map<Result, number>()
+  // Track which operators were used for each setA value (for ref1 operand reconstruction)
+  const ref1OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
+  // Track which operators were used for each setA value (for ref2 operand reconstruction)
+  const ref2OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
 
   for (let b = 1; b <= nBranches; b++) {
     const branch = arr[b]
@@ -416,21 +416,26 @@ export function detectOrAndIn2Pattern(
     }
 
     // For each value in setA, union-merge all setB values
-    const op1Bit = extA.operator === 'eq' ? 1 : 2
-    const op2Bit = extB.operator === 'eq' ? 1 : 2
     for (const aVal of extA.vals) {
       let setBVals = setBValsByAValue.get(aVal)
       if (setBVals === undefined) {
         setBVals = new Set<Result>()
         setBValsByAValue.set(aVal, setBVals)
       }
-
-      const r1Ops = ref1OpsByAValue.get(aVal) ?? 0
-      ref1OpsByAValue.set(aVal, r1Ops | op1Bit)
-
-      const r2Ops = ref2OpsByAValue.get(aVal) ?? 0
-      ref2OpsByAValue.set(aVal, r2Ops | op2Bit)
-
+      // Track ref1 operator
+      let r1Ops = ref1OpsByAValue.get(aVal)
+      if (r1Ops === undefined) {
+        r1Ops = new Set<'eq' | 'in'>()
+        ref1OpsByAValue.set(aVal, r1Ops)
+      }
+      r1Ops.add(extA.operator)
+      // Track ref2 operator
+      let r2Ops = ref2OpsByAValue.get(aVal)
+      if (r2Ops === undefined) {
+        r2Ops = new Set<'eq' | 'in'>()
+        ref2OpsByAValue.set(aVal, r2Ops)
+      }
+      r2Ops.add(extB.operator)
       for (const bVal of extB.vals) {
         setBVals.add(bVal)
       }
@@ -449,21 +454,14 @@ export function detectOrAndIn2Pattern(
     const mergedSetB = [...setBVals].filter((v): v is Input => v !== undefined)
     const constIdx = internConst(mergedSetB, state)
     entries.push([aVal, constIdx])
-    // Determine ref1 operator
+    // Determine ref1 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
     const r1Ops = ref1OpsByAValue.get(aVal)
-    if (r1Ops === 3) {
-      // 3 means both bit 1 ('eq') and bit 2 ('in') are set
-      return null // Bail out if operations mixed EQ and IN for the same reference
-    }
-    const ref1Op = r1Ops === 1 ? 'eq' : 'in'
-
-    // Determine ref2 operator
+    const ref1Op =
+      r1Ops !== undefined && r1Ops.size === 1 && r1Ops.has('eq') ? 'eq' : 'in'
+    // Determine ref2 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
     const r2Ops = ref2OpsByAValue.get(aVal)
-    if (r2Ops === 3) {
-      return null // Bail out if operations mixed EQ and IN for the same reference
-    }
-    const ref2Op = r2Ops === 1 ? 'eq' : 'in'
-
+    const ref2Op =
+      r2Ops !== undefined && r2Ops.size === 1 && r2Ops.has('eq') ? 'eq' : 'in'
     entryOperators.push([ref1Op, ref2Op])
   }
 

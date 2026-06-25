@@ -105,7 +105,6 @@ const overlapRefsResidualsCache = new WeakMap<
   Map<number, Input[]>
 >()
 const directionMapCache = new WeakMap<CompiledExpression, Map<number, 0 | 1>>()
-const constSetsCache = new WeakMap<CompiledExpression, Array<Set<Result>>>()
 
 // Read a numeric operand from a bytecode slot — opcodes and index operands are always numbers.
 // Throws if the slot contains a non-number (guards against compiler bugs).
@@ -462,15 +461,8 @@ export function interpretSimplify(
   strictKeys?: string[] | Set<string>,
   optionalKeys?: string[] | Set<string>
 ): Input {
-  const {
-    bytecode,
-    refs,
-    opNames,
-    refKeys,
-    refRawKeys,
-    refFirstCtxKeys,
-    consts,
-  } = compiled
+  const { bytecode, refs, opNames, refKeys, refRawKeys, refFirstCtxKeys } =
+    compiled
   stackTop = -1
   spillTop = -1
   scopeStackTop = -1
@@ -484,14 +476,6 @@ export function interpretSimplify(
   if (directionMap === undefined) {
     directionMap = new Map(compiled.directionMap)
     directionMapCache.set(compiled, directionMap)
-  }
-  let constSets = constSetsCache.get(compiled)
-  if (constSets === undefined) {
-    constSets = new Array(consts.length)
-    for (let j = 0; j < consts.length; j++) {
-      constSets[j] = new Set<Result>(consts[j])
-    }
-    constSetsCache.set(compiled, constSets)
   }
 
   // Reset the ref cache (only clear slots used in the previous call)
@@ -1117,27 +1101,18 @@ export function interpretSimplify(
                 continue
               }
             }
-            // Build the AND branch(es), omitting known refs that already matched
-            // Note: if op2 is 'eq' but setB contains multiple distinct elements it means the original tree had
-            // multiple branches that were unified for efficiency during compile. We must explode them back into
-            // distinct branches to restore exact AST representation.
-            const bValsToEmit =
-              op2 === eqOp && Array.isArray(setB) && setB.length > 1
-                ? setB
-                : [r2Val]
-            for (const bVal of bValsToEmit) {
-              const branchOperands: Input[] = []
-              if (unknown1) {
-                branchOperands.push([op1, r1, r1Val])
-              }
-              if (unknown2) {
-                branchOperands.push([op2, r2, bVal])
-              }
-              if (branchOperands.length === 1) {
-                branches.push(branchOperands[0])
-              } else if (branchOperands.length > 1) {
-                branches.push([andOp, ...branchOperands])
-              }
+            // Build the AND branch, omitting known refs that already matched
+            const branchOperands: Input[] = []
+            if (unknown1) {
+              branchOperands.push([op1, r1, r1Val])
+            }
+            if (unknown2) {
+              branchOperands.push([op2, r2, r2Val])
+            }
+            if (branchOperands.length === 1) {
+              branches.push(branchOperands[0])
+            } else {
+              branches.push([andOp, ...branchOperands])
             }
           }
           // Handle edge cases: no matches → false, single match → unwrap OR
@@ -1163,7 +1138,14 @@ export function interpretSimplify(
         ) {
           for (let j = 0; j < n; j++) {
             if (bytecode[quadsStart + j * 4] === v1) {
-              found = constSets[numAt(bytecode[quadsStart + j * 4 + 1])].has(v2)
+              const setB =
+                compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
+              let s = overlapSetCache.get(setB)
+              if (s === undefined) {
+                s = new Set<Result>(setB)
+                overlapSetCache.set(setB, s)
+              }
+              found = s.has(v2)
               break
             }
           }
