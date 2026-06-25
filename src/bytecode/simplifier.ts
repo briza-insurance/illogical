@@ -105,6 +105,7 @@ const overlapRefsResidualsCache = new WeakMap<
   Map<number, Input[]>
 >()
 const directionMapCache = new WeakMap<CompiledExpression, Map<number, 0 | 1>>()
+const constSetsCache = new WeakMap<CompiledExpression, Array<Set<Result>>>()
 
 // Read a numeric operand from a bytecode slot — opcodes and index operands are always numbers.
 // Throws if the slot contains a non-number (guards against compiler bugs).
@@ -461,8 +462,15 @@ export function interpretSimplify(
   strictKeys?: string[] | Set<string>,
   optionalKeys?: string[] | Set<string>
 ): Input {
-  const { bytecode, refs, opNames, refKeys, refRawKeys, refFirstCtxKeys } =
-    compiled
+  const {
+    bytecode,
+    refs,
+    opNames,
+    refKeys,
+    refRawKeys,
+    refFirstCtxKeys,
+    consts,
+  } = compiled
   stackTop = -1
   spillTop = -1
   scopeStackTop = -1
@@ -476,6 +484,14 @@ export function interpretSimplify(
   if (directionMap === undefined) {
     directionMap = new Map(compiled.directionMap)
     directionMapCache.set(compiled, directionMap)
+  }
+  let constSets = constSetsCache.get(compiled)
+  if (constSets === undefined) {
+    constSets = new Array(consts.length)
+    for (let j = 0; j < consts.length; j++) {
+      constSets[j] = new Set<Result>(consts[j])
+    }
+    constSetsCache.set(compiled, constSets)
   }
 
   // Reset the ref cache (only clear slots used in the previous call)
@@ -1147,14 +1163,7 @@ export function interpretSimplify(
         ) {
           for (let j = 0; j < n; j++) {
             if (bytecode[quadsStart + j * 4] === v1) {
-              const setB =
-                compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
-              let s = overlapSetCache.get(setB)
-              if (s === undefined) {
-                s = new Set<Result>(setB)
-                overlapSetCache.set(setB, s)
-              }
-              found = s.has(v2)
+              found = constSets[numAt(bytecode[quadsStart + j * 4 + 1])].has(v2)
               break
             }
           }
