@@ -24,3 +24,9 @@ jobs:
         run: npm run build
       - name: Run Deep Fuzzing (100k runs)
         run: npm run test:fuzz:deep
+      - name: Upload Fuzzing Report
+        uses: actions/upload-artifact@v7
+        if: always() # Ensure it uploads even if tests crash
+        with:
+          name: fuzz-reports
+          path: ./fuzz-*-report.json

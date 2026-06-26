@@ -1,6 +1,7 @@
 import fc from 'fast-check'
 
-import type { Context, ExpressionInput } from '../../index.js'
+import { ContextValue } from '../../common/evaluable.js'
+import type { Context, ExpressionInput, Input } from '../../index.js'
 import Engine from '../../index.js'
 
 const engineOOP = new Engine({ evaluator: 'oop' })
@@ -226,7 +227,40 @@ const { condition: inputArbitrary } = fc.letrec<Tree>(
 
 export const expressionArbitrary: fc.Arbitrary<ExpressionInput> = inputArbitrary
 
-export const contextArbitrary: fc.Arbitrary<Context> = fc.dictionary(
-  referenceArbitrary.map((ref) => ref.slice(1)),
-  fc.oneof(primitiveArbitrary, arrayNumberStringArbitrary)
+export const extractReferences = (expr: ExpressionInput): string[] => {
+  const refs = new Set<string>()
+  const walk = (node: Input) => {
+    if (typeof node === 'string' && node.startsWith('$')) {
+      refs.add(node.slice(1))
+    } else if (Array.isArray(node)) {
+      node.forEach(walk)
+    }
+  }
+  walk(expr)
+  return Array.from(refs)
+}
+
+export const expressionAndContextArbitrary = expressionArbitrary.chain(
+  (expression) => {
+    const refs = extractReferences(expression)
+
+    const refArbs = refs.reduce<Record<string, fc.Arbitrary<ContextValue>>>(
+      (acc, ref) => {
+        acc[ref] = fc.option(
+          fc.oneof(primitiveArbitrary, arrayNumberStringArbitrary),
+          { nil: undefined }
+        )
+        return acc
+      },
+      {}
+    )
+
+    return fc.record(refArbs).map((contextBase) => {
+      const context: Context = {}
+      for (const [key, value] of Object.entries(contextBase)) {
+        context[key] = value
+      }
+      return { expression, context }
+    })
+  }
 )
