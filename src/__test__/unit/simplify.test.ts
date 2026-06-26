@@ -76,7 +76,7 @@ for (const mode of ['oop', 'bytecode'] as const) {
         assert.deepStrictEqual(
           result,
           tc.expected,
-          `Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
+          `[${mode}] Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
         )
       })
     }

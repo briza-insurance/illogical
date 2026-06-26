@@ -146,7 +146,7 @@ function buildOperatorMaps(opts: Options): OperatorMaps {
   }
 }
 
-interface CompilerState {
+export interface CompilerState {
   bytecode: Bytecode
   refs: CompactRef[] // side-table of compact refs, indexed by position
   refIndex: Map<string, number> // dedup map: raw key → index into refs
@@ -289,7 +289,12 @@ function emitOperand(raw: Input, state: CompilerState): void {
 function extractInLikeChild(
   ca: ArrayInput,
   state: CompilerState
-): { rawRef: string; refKey: string; vals: ArrayInput } | null {
+): {
+  rawRef: string
+  refKey: string
+  vals: ArrayInput
+  operator: 'eq' | 'in'
+} | null {
   const op = ca[0]
   const left = ca[1]
   if (typeof left !== 'string' || !state.opts.referencePredicate(left)) {
@@ -304,7 +309,7 @@ function extractInLikeChild(
     if (!isStaticCollection(right, state.opts)) {
       return null
     }
-    return { rawRef, refKey, vals: right }
+    return { rawRef, refKey, vals: right, operator: 'in' }
   }
 
   // == (EQ): scalar equality treated as single-element IN
@@ -316,7 +321,7 @@ function extractInLikeChild(
     if (Array.isArray(right)) {
       return null
     }
-    return { rawRef, refKey, vals: [right] }
+    return { rawRef, refKey, vals: [right], operator: 'eq' }
   }
 
   return null
@@ -336,13 +341,14 @@ function extractInLikeChild(
  * relevant setB indices, instead of a linear scan through N setA Sets.
  * Returns null if the pattern does not match.
  */
-function detectOrAndIn2Pattern(
+export function detectOrAndIn2Pattern(
   arr: ArrayInput,
   state: CompilerState
 ): {
   ref1Raw: string
   ref2Raw: string
   entries: Array<[Result, number]>
+  entryOperators: Array<['eq' | 'in', 'eq' | 'in']>
 } | null {
   const nBranches = arr.length - 1
   if (nBranches < 2) {
@@ -356,6 +362,10 @@ function detectOrAndIn2Pattern(
 
   // Inverted index: each distinct setA value → merged setB values across all branches containing it
   const setBValsByAValue = new Map<Result, Set<Result>>()
+  // Track which operators were used for each setA value (for ref1 operand reconstruction)
+  const ref1OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
+  // Track which operators were used for each setA value (for ref2 operand reconstruction)
+  const ref2OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
 
   for (let b = 1; b <= nBranches; b++) {
     const branch = arr[b]
@@ -412,6 +422,20 @@ function detectOrAndIn2Pattern(
         setBVals = new Set<Result>()
         setBValsByAValue.set(aVal, setBVals)
       }
+      // Track ref1 operator
+      let r1Ops = ref1OpsByAValue.get(aVal)
+      if (r1Ops === undefined) {
+        r1Ops = new Set<'eq' | 'in'>()
+        ref1OpsByAValue.set(aVal, r1Ops)
+      }
+      r1Ops.add(extA.operator)
+      // Track ref2 operator
+      let r2Ops = ref2OpsByAValue.get(aVal)
+      if (r2Ops === undefined) {
+        r2Ops = new Set<'eq' | 'in'>()
+        ref2OpsByAValue.set(aVal, r2Ops)
+      }
+      r2Ops.add(extB.operator)
       for (const bVal of extB.vals) {
         setBVals.add(bVal)
       }
@@ -424,12 +448,24 @@ function detectOrAndIn2Pattern(
 
   // Build entries: one (literal aVal, mergedSetBIdx) per distinct setA value
   const entries: Array<[Result, number]> = []
+  // Track operators per entry: [ref1Op, ref2Op]
+  const entryOperators: Array<['eq' | 'in', 'eq' | 'in']> = []
   for (const [aVal, setBVals] of setBValsByAValue) {
     const mergedSetB = [...setBVals].filter((v): v is Input => v !== undefined)
-    entries.push([aVal, internConst(mergedSetB, state)])
+    const constIdx = internConst(mergedSetB, state)
+    entries.push([aVal, constIdx])
+    // Determine ref1 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
+    const r1Ops = ref1OpsByAValue.get(aVal)
+    const ref1Op =
+      r1Ops !== undefined && r1Ops.size === 1 && r1Ops.has('eq') ? 'eq' : 'in'
+    // Determine ref2 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
+    const r2Ops = ref2OpsByAValue.get(aVal)
+    const ref2Op =
+      r2Ops !== undefined && r2Ops.size === 1 && r2Ops.has('eq') ? 'eq' : 'in'
+    entryOperators.push([ref1Op, ref2Op])
   }
 
-  return { ref1Raw, ref2Raw, entries }
+  return { ref1Raw, ref2Raw, entries, entryOperators }
 }
 
 // arr[0] is the operator; operands are arr[1..arr.length-1]
@@ -492,15 +528,23 @@ function emitExpression(raw: Input, state: CompilerState): void {
   if (operator === maps.orOp) {
     const orAnd2 = detectOrAndIn2Pattern(arr, state)
     if (orAnd2 !== null) {
-      const { ref1Raw, ref2Raw, entries } = orAnd2
+      const { ref1Raw, ref2Raw, entries, entryOperators } = orAnd2
       const { bytecode } = state
       const ref1Idx = internRef(ref1Raw, state)
       const ref2Idx = internRef(ref2Raw, state)
-      // Emit: OP_OR_AND_IN_CONST_2 ref1Idx ref2Idx M v0 setBIdx0 v1 setBIdx1 ... vM-1 setBIdxM-1
+      // Emit: OP_OR_AND_IN_CONST_2 ref1Idx ref2Idx M (aVal0 setBIdx0 ref1Op0 ref2Op0) ...
       // M is the number of distinct setA values across all branches (after inverted-index merge).
+      // ref1Op/ref2Op: 0 for 'eq', 1 for 'in'
       bytecode.push(OP_OR_AND_IN_CONST_2, ref1Idx, ref2Idx, entries.length)
-      for (const [aVal, mergedSetBIdx] of entries) {
-        bytecode.push(aVal, mergedSetBIdx)
+      for (let j = 0; j < entries.length; j++) {
+        const [aVal, mergedSetBIdx] = entries[j]
+        const [ref1Op, ref2Op] = entryOperators[j]
+        bytecode.push(
+          aVal,
+          mergedSetBIdx,
+          ref1Op === 'in' ? 1 : 0,
+          ref2Op === 'in' ? 1 : 0
+        )
       }
       return
     }

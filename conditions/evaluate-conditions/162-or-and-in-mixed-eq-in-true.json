@@ -1,0 +1,10 @@
+{
+  "description": "OR AND INs with mixed operators → true",
+  "expression": [
+    "OR",
+    ["AND", ["==", "$Ref1", "val1"], ["==", "$Ref2", "val2"]],
+    ["AND", ["IN", "$Ref1", ["val1", "val3"]], ["==", "$Ref2", "val4"]]
+  ],
+  "context": { "Ref1": "val3", "Ref2": "val4" },
+  "expected": true
+}

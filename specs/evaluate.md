@@ -1,6 +1,6 @@
 # Evaluate
 
-Evaluate comparison or logical expression as TRUE or FALSE result:
+Evaluates a comparison or logical expression. Returns TRUE or FALSE.
 
 `engine.evaluate(`[Comparison Expression](./comparison-expressions.md) or [Logical Expression](./logical-expressions.md), [Evaluation Data Context](./evaluation-data-context.md)`)` => `boolean`
 

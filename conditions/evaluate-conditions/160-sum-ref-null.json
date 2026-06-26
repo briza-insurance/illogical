@@ -1,0 +1,6 @@
+{
+  "description": "SUM: null Ref → false",
+  "expression": ["==", ["+", 1, "$Ref1", 2], 3],
+  "context": { "Ref1": null },
+  "expected": false
+}

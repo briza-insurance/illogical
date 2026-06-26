@@ -1,0 +1,38 @@
+{
+  "description": "simplify remain unchanged",
+  "expression": [
+    "AND",
+    ["==", "$Location1PropertyBuildingCoverage", true],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Location1BuildingOwnership", "owner"],
+        ["==", "$Location1PropertyBuildingCoverage", true]
+      ],
+      [
+        "AND",
+        ["==", "$Location1BuildingOwnership", "condo-commercial-unit-owner"],
+        ["==", "$Location1PropertyBuildingCoverage", true]
+      ]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "AND",
+    ["==", "$Location1PropertyBuildingCoverage", true],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Location1BuildingOwnership", "owner"],
+        ["==", "$Location1PropertyBuildingCoverage", true]
+      ],
+      [
+        "AND",
+        ["==", "$Location1BuildingOwnership", "condo-commercial-unit-owner"],
+        ["==", "$Location1PropertyBuildingCoverage", true]
+      ]
+    ]
+  ]
+}

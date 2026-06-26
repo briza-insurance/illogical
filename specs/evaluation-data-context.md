@@ -1,13 +1,13 @@
-# Evaluation Data Context
+# Evaluation data context
 
-The evaluation data context is used to provide the expression with variable references, i.e. this allows for the dynamic expressions. The data context is object with properties used as the references keys, and its values as reference values.
+The evaluation data context is used to provide the expression with variable references. This enables dynamic expressions. The data context is an object with properties used as the reference keys, and object values as reference values.
 
 > Valid reference values: object, string, number, boolean, string[], number[].
 
-To reference the nested reference, please use "." delimiter, e.g.:
+To reference the nested reference, use the "." delimiter:
 `$address.city`
 
-If the key of the nested reference includes the "." delimiter, please wrap the whole key with backticks `` ` ``, e.g.:
+If the key of the nested reference includes the "." delimiter, wrap the entire key with backticks `` ` ``:
 `` $address.`city.code` `` can reference the object
 
 ```javascript
@@ -18,7 +18,7 @@ If the key of the nested reference includes the "." delimiter, please wrap the w
 }
 ```
 
-``$address.`city.code`[0]`` can reference the object
+``$address.`city.code`[0]`` can reference the object when the value of the nested reference is an array, like this:
 
 ```javascript
 {
@@ -28,25 +28,23 @@ If the key of the nested reference includes the "." delimiter, please wrap the w
 }
 ```
 
-when the value of the nested reference is an array.
-
-## Accessing Array Element
+## Accessing array element
 
 `$options[1]`
 
-## Accessing Array Element via Reference
+## Accessing array element via reference
 
 `$options[{index}]`
 
 - The **index** reference is resolved within the data context as an array index.
 
-## Nested Referencing
+## Nested referencing
 
 `$address.{segment}`
 
 - The **segment** reference is resolved within the data context as a property key.
 
-## Composite Reference Key
+## Composite reference key
 
 `$shape{shapeType}`
 
@@ -54,13 +52,13 @@ when the value of the nested reference is an array.
 - E.g. **shapeType** is resolved as "**B**" and would compose the **$shapeB** outer reference.
 - This resolution could be n-nested.
 
-## Data Type Casting
+## Data type casting
 
 `$payment.amount.(Type)`
 
 Cast the given data context into the desired data type before being used as an operand in the evaluation.
 
-> Note: If the conversion is invalid, then a warning message is being logged.
+> Note: If the conversion is invalid, then a warning message is logged.
 
 Supported data type conversions:
 
