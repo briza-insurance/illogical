@@ -57,6 +57,14 @@ describe('Fuzzing Tests', () => {
     sampleTests: {},
   }
 
+  const finalResults: {
+    type: 'simplify' | 'evaluate'
+    expression: ExpressionInput
+    context: Context
+    result?: unknown
+    error?: string
+  }[] = []
+
   const VALID_OPERATORS = new Set(defaultOperatorMapping.values())
 
   const extractOperators = (
@@ -109,6 +117,13 @@ describe('Fuzzing Tests', () => {
           if (typeof result === 'boolean') {
             assert.strictEqual(typeof result, 'boolean')
             simplifyMetrics.successes++
+
+            finalResults.push({
+              type: 'simplify',
+              expression,
+              context,
+              result,
+            })
           } else {
             // If partially simplified, the result must be a valid expression.
             try {
@@ -118,8 +133,24 @@ describe('Fuzzing Tests', () => {
               )
               assert.ok(simplifiedResult !== undefined)
               simplifyMetrics.successes++
+
+              finalResults.push({
+                type: 'simplify',
+                expression,
+                context,
+                result,
+              })
             } catch (e: unknown) {
               const matchedError = isExpectedError(e)
+
+              const errorMsg = e instanceof Error ? e.message : String(e)
+              finalResults.push({
+                type: 'simplify',
+                expression,
+                context,
+                error: errorMsg,
+              })
+
               if (matchedError) {
                 simplifyMetrics.expectedErrors[matchedError] =
                   (simplifyMetrics.expectedErrors[matchedError] || 0) + 1
@@ -133,14 +164,21 @@ describe('Fuzzing Tests', () => {
           }
         } catch (e) {
           const matchedError = isExpectedError(e)
+          const errorMsg = e instanceof Error ? e.message : String(e)
+
+          finalResults.push({
+            type: 'simplify',
+            expression,
+            context,
+            error: errorMsg,
+          })
+
           if (matchedError) {
             simplifyMetrics.expectedErrors[matchedError] =
               (simplifyMetrics.expectedErrors[matchedError] || 0) + 1
           } else {
             simplifyMetrics.unexpectedErrors++
-            assert.fail(
-              `Unexpected error: ${e instanceof Error ? e.message : String(e)}`
-            )
+            assert.fail(`Unexpected error: ${errorMsg}`)
           }
 
           ops.forEach((op) => {
@@ -148,7 +186,7 @@ describe('Fuzzing Tests', () => {
               simplifyMetrics.sampleTests[op] = {
                 expression,
                 context,
-                error: e instanceof Error ? e.message : String(e),
+                error: errorMsg,
               }
             }
           })
@@ -179,16 +217,30 @@ describe('Fuzzing Tests', () => {
 
           assert.strictEqual(typeof result, 'boolean')
           evaluateMetrics.successes++
+
+          finalResults.push({
+            type: 'evaluate',
+            expression,
+            context,
+            result,
+          })
         } catch (e) {
           const matchedError = isExpectedError(e)
+          const errorMsg = e instanceof Error ? e.message : String(e)
+
+          finalResults.push({
+            type: 'evaluate',
+            expression,
+            context,
+            error: errorMsg,
+          })
+
           if (matchedError) {
             evaluateMetrics.expectedErrors[matchedError] =
               (evaluateMetrics.expectedErrors[matchedError] || 0) + 1
           } else {
             evaluateMetrics.unexpectedErrors++
-            assert.fail(
-              `Unexpected error: ${e instanceof Error ? e.message : String(e)}`
-            )
+            assert.fail(`Unexpected error: ${errorMsg}`)
           }
 
           ops.forEach((op) => {
@@ -196,7 +248,7 @@ describe('Fuzzing Tests', () => {
               evaluateMetrics.sampleTests[op] = {
                 expression,
                 context,
-                error: e instanceof Error ? e.message : String(e),
+                error: errorMsg,
               }
             }
           })
@@ -208,22 +260,13 @@ describe('Fuzzing Tests', () => {
 
   after(() => {
     const cwd = process.cwd()
-    const simplifyReportPath = path.join(cwd, 'fuzz-simplify-report.json')
-    const evaluateReportPath = path.join(cwd, 'fuzz-evaluate-report.json')
+    const errorsPath = path.join(cwd, 'fuzz-results.json')
 
-    fs.writeFileSync(
-      simplifyReportPath,
-      JSON.stringify(simplifyMetrics, null, 2)
-    )
-    fs.writeFileSync(
-      evaluateReportPath,
-      JSON.stringify(evaluateMetrics, null, 2)
-    )
+    fs.writeFileSync(errorsPath, JSON.stringify(finalResults, null, 2))
 
-    console.log(`Fuzzing metrics extracted to:`)
-    console.log(`- ${simplifyReportPath}`)
+    console.log(`Simplify report:`)
     console.log(JSON.stringify(simplifyMetrics, null, 2))
-    console.log(`- ${evaluateReportPath}`)
+    console.log(`Evaluate report:`)
     console.log(JSON.stringify(evaluateMetrics, null, 2))
   })
 })

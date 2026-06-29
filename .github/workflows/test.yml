@@ -26,6 +26,6 @@ jobs:
       - name: Run test suite
         run: npm t
       - name: Run quick fuzzing
-        run: npm run test:fuzz || true
+        run: npm run test:fuzz
       - name: Run build
         run: npm run build

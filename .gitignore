@@ -22,4 +22,4 @@ coverage.lcov
 .DS_Store
 
 benchmark/results-*
-fuzz-*-report.json
+fuzz-results.json
