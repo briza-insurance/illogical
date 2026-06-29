@@ -14,6 +14,7 @@ const floatArbitrary = fc
 
 const stringArbitrary = fc.stringMatching(/^[a-zA-Z]+$/)
 const dateArbitrary = fc.stringMatching(/^[1-2][0-9]{3}-[0-9]{2}-[0-9]{2}$/)
+const dateDurationArbitrary = fc.stringMatching(/^-?[0-9](m|d|y)$/)
 
 export const primitiveArbitrary = fc.oneof(
   fc.boolean(),
@@ -97,7 +98,7 @@ const { condition: inputArbitrary } = fc.letrec<Tree>(
             '<=' as const
           ),
           fc.oneof(dateArbitrary, referenceArbitrary),
-          fc.oneof(dateArbitrary, referenceArbitrary)
+          fc.oneof(dateArbitrary, referenceArbitrary, dateDurationArbitrary)
         )
         .map(([op, left, right]): ExpressionInput => [op, left, right]),
       fc
