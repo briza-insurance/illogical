@@ -4,7 +4,7 @@ import { Options } from '../parser/options.js'
 /**
  * Valid types for context members
  */
-type ContextValue =
+export type ContextValue =
   | Record<string, unknown>
   | string
   | number

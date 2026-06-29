@@ -1,0 +1,26 @@
+name: Weekly Fuzzing
+
+on:
+  schedule:
+    # Change cron below to run once a week, every Monday at 2 AM (UTC)
+    - cron: '0 2 * * 1' # Run at 2 AM every Monday
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  fuzz:
+    name: Deep Fuzzing
+    runs-on: ubuntu-latest
+    container:
+      image: node:24-slim
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Build
+        run: npm run build
+      - name: Run Deep Fuzzing (100k runs)
+        run: npm run test:fuzz:deep

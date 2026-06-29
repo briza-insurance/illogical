@@ -3,7 +3,7 @@ import { Options } from '../parser/options.js';
 /**
  * Valid types for context members
  */
-type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
+export type ContextValue = Record<string, unknown> | string | number | boolean | null | undefined | ContextValue[];
 /**
  * Evaluation Context
  * Holds references used during the evaluation process.
@@ -56,4 +56,3 @@ export interface Evaluable {
     toString(): string;
 }
 export type SimplifyArgs = Parameters<Evaluable['simplify']>;
-export {};
