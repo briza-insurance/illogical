@@ -24,7 +24,6 @@
     "build:types": "tsc --project tsconfig.build.json --emitDeclarationOnly",
     "build:js": "rollup -c",
     "build": "rm -rf lib types && npm run build:types && npm run build:js",
-    "docs": "typedoc src && git checkout docs/.nojekyll",
     "test": "bash -c 'node --import tsx --test \"${@:-src/__test__/unit/**/*.test.ts}\"' --",
     "test:sample-conditions": "node --import tsx --test --test-reporter=spec \"src/__test__/unit/sample-conditions.test.ts\"",
     "test:coverage": "node --import tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage.lcov \"src/__test__/unit/**/*.test.ts\"",

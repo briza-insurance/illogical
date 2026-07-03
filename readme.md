@@ -104,10 +104,7 @@ Learn how to use the engine and its methods:
 
 ### Customization
 
-Customize the engine and the documentation:
-
-- [Engine Options](./specs/engine.md)
-- [Code Documentation](https://briza-insurance.github.io/illogical/index.html)
+Customize the [engine options](./specs/engine.md).
 
 ### Development Tools
 
