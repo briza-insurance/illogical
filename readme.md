@@ -28,6 +28,8 @@
 
 Get up and running with illogical in just a few steps.
 
+Read the [Background](#background) section to quickly understand what illogical is and why it exists. 
+
 ### Installation
 
 ```sh
@@ -69,6 +71,18 @@ engine.evaluate(['AND', ['>', '$age', 20], ['==', '$name', 'peter']]) // true
 
 ## 📚 Documentation
 
+### Background
+
+**illogical** is a JSON DSL (domain-specific language) for expressing and evaluating business rules in the insurance industry.
+
+Domain-specific languages exist to streamline work in a given domain by providing the means of performing tasks in a way that is quicker to learn and implement. This lets you optimize your custom solution and tailor it for use by distinct user groups or within unique contexts.
+
+Developers of software for insurance underwriters can enable illogical quickly and easily to make the underwriter's task of writing question sets for programmatic use more efficient by eliminating the need to learn and understand the programming language(s) in use.
+
+The way it works is that underwriters use the illogical JSON DSL to express their underwriting models, specifically their question sets and business rules. Then, the JavaScript functions in illogical parse what has been written for use within an application.
+
+Another way to think about this is that illogical is used to define machine-readable business rules for underwriting models and question sets that brokers and distribution partners can easily consume. This is much more efficient than the traditional use of spreadsheets, documents, PDFs, email exchanges, and other non-machine-readable formats that then must be translated before being used. illogical speeds up the integration process, gets your rules to market faster, and does so with significantly reduced submission errors and a lower total cost of ownership.
+
 ### Core Concepts
 
 Explore the supported expressions and their usage:
@@ -90,10 +104,7 @@ Learn how to use the engine and its methods:
 
 ### Customization
 
-Customize the engine and the documentation:
-
-- [Engine Options](./specs/engine.md)
-- [Code Documentation](https://briza-insurance.github.io/illogical/index.html)
+Customize the [engine options](./specs/engine.md).
 
 ### Development Tools
 
