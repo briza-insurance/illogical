@@ -3,7 +3,7 @@ import { isString } from '../../common/type-check.js'
 import { Comparison } from '../comparison/index.js'
 
 // Operator key
-export const OPERATOR = Symbol('PREFIX')
+export const OPERATOR = Symbol('SUFFIX')
 
 /**
  * Suffix comparison expression
