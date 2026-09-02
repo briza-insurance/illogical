@@ -74,6 +74,12 @@ class Engine {
   private readonly evaluator: 'oop' | 'bytecode'
   private readonly bytecodeCache: WeakMap<ExpressionInput, CompiledExpression> =
     new WeakMap()
+  // Separate cache for the simplify compiler output. Simplify must preserve the
+  // nested structure verbatim, so it compiles with the OR_AND_IN merge disabled
+  // (see `compile`'s `simplify` flag), which yields different bytecode than the
+  // evaluate path and therefore cannot share `bytecodeCache`.
+  private readonly simplifyCache: WeakMap<ExpressionInput, CompiledExpression> =
+    new WeakMap()
 
   /**
    * @constructor
@@ -90,6 +96,20 @@ class Engine {
       this.parser.parse(exp) // validates root operator and expression structure
       compiled = compile(exp, this.parser.options)
       this.bytecodeCache.set(exp, compiled)
+    }
+    return compiled
+  }
+
+  /**
+   * Compile for simplify: preserves the original nested structure so the
+   * simplify interpreter can reproduce the input verbatim (no OR_AND_IN merge).
+   */
+  private getSimplifiedCompiled(exp: ExpressionInput): CompiledExpression {
+    let compiled = this.simplifyCache.get(exp)
+    if (compiled === undefined) {
+      this.parser.parse(exp) // validates root operator and expression structure
+      compiled = compile(exp, this.parser.options, true)
+      this.simplifyCache.set(exp, compiled)
     }
     return compiled
   }
@@ -157,7 +177,7 @@ class Engine {
   ): Input | boolean {
     if (this.evaluator === 'bytecode') {
       return interpretSimplify(
-        this.getCompiled(exp),
+        this.getSimplifiedCompiled(exp),
         context,
         strictKeys,
         optionalKeys

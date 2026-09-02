@@ -1,0 +1,38 @@
+{
+  "description": "AND OR EQs → remain unchanged",
+  "expression": [
+    "AND",
+    ["AND", ["==", "$LossHasAny", "yes"], ["==", "$Loss1Type", "property"]],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "closed"]
+      ],
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "declined"]
+      ]
+    ]
+  ],
+  "context": {},
+  "expected": [
+    "AND",
+    ["AND", ["==", "$LossHasAny", "yes"], ["==", "$Loss1Type", "property"]],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "closed"]
+      ],
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "declined"]
+      ]
+    ]
+  ]
+}
