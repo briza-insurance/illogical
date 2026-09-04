@@ -1,0 +1,1 @@
+{"description":"Arithmetic 4-operand multiply missing refs both sides => true","expression":["==",["*",1,2,"$A"],["*","$B",3,4,5]],"context":{},"expected":true}

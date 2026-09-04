@@ -1,0 +1,1 @@
+{"description":"Arithmetic 3-operand sum missing ref vs concrete number => false","expression":["==",["+","$A",1,2],["+",1,2,3]],"context":{},"expected":false}

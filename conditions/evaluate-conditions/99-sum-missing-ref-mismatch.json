@@ -1,0 +1,1 @@
+{"description":"Arithmetic 3-operand sum missing middle ref: ==(missing-ref sum, concrete), (missing middle-ref sum) with {} => true","expression":["==",["+","$A",0],["+",0,"$0",0]],"context":{},"expected":true}
