@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 2.2.4
+
+- Fix bytecode simplify dropping operands in nested OR/AND composition
+- Fix bytecode OOP mismatch on multi-operand arithmetic with missing refs
+- Dependency updates
+
 ## 2.2.3
 
 - fix the simplify method for comparison/containment wrapped in logical conditions
