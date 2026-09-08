@@ -1,0 +1,1 @@
+{"description":"Arithmetic 3-operand sums missing refs both sides => true","expression":["==",["+",1,"$A",2],["+",1,2,"$B"]],"context":{},"expected":true}

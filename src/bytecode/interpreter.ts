@@ -512,7 +512,8 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
       }
 
       case OP_OR_AND_IN_CONST_2: {
-        // bytecode layout: ref1Idx, ref2Idx, M, (v0, setBIdx0, ref1Op0, ref2Op0), (v1, setBIdx1, ref1Op1, ref2Op1), ...
+        // bytecode layout: ref1Idx, ref2Idx, M,
+        //   (aVal0, setBIdx0, ref1Op0, ref2Op0), (aVal1, setBIdx1, ref1Op1, ref2Op1), ...
         // ref1Op/ref2Op: 0 for 'eq', 1 for 'in' (unused at runtime, kept for simplifier)
         // constSets[setBIdx] is pre-built at first interpret() call — plain Set.has lookup.
         const ref1Idx = numAt(bytecode[++i])
@@ -669,9 +670,15 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
           break
         }
         const values: Array<string | number> = new Array(n)
+        // Fixed destination slot for the single result value: the bottom-most
+        // operand slot. The operands occupy [stackTop - n + 1 .. stackTop].
+        // Writing here (instead of to stack[++stackTop]) keeps the result in a
+        // stable slot even when the loop below breaks early on a missing
+        // operand, so the next opcode never reads a stale operand value.
+        const resultSlot = stackTop - n + 1
         let hasNull = false
         const isDateArithmetic =
-          !isNaN(toDateNumber(stack[stackTop - n + 1])) &&
+          !isNaN(toDateNumber(stack[resultSlot])) &&
           (op === OP_SUM || op === OP_SUBTRACT)
         for (let j = n - 1; j >= 0; j--) {
           const v = stack[stackTop--]
@@ -695,7 +702,7 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
             values[j] = v
           }
         }
-        stack[++stackTop] = hasNull
+        const result = hasNull
           ? false
           : isDateArithmetic &&
               (op === OP_SUM || op === OP_SUBTRACT) &&
@@ -704,6 +711,8 @@ export function interpret(compiled: CompiledExpression, ctx: Context): Result {
             : values.every((v) => isNumber(v))
               ? arithmeticReduce(values, op)
               : false
+        stack[resultSlot] = result
+        stackTop = resultSlot
         break
       }
 
