@@ -163,6 +163,14 @@ export interface CompilerState {
   // Side tables for the simplify interpreter
   overlapRefsEntries: Array<{ pos: number; refIdxs: number[] }>
   directionEntries: Array<{ pos: number; dir: 0 | 1 }>
+  // When true, the compiler preserves the original nested structure for the
+  // simplify interpreter instead of applying the OR(AND(ref1, ref2), …)
+  // OR_AND_IN merge optimization. That optimization collapses branches that
+  // share ref1's value into a single merged ref2 set, which is lossy for
+  // structural reconstruction — simplify must be able to reproduce the input
+  // verbatim, so it skips the merge and lets the short-circuit path preserve
+  // each branch. evaluate() keeps the optimization for its performance gain.
+  simplify: boolean
 }
 
 function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
@@ -526,7 +534,9 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.orOp) {
-    const orAnd2 = detectOrAndIn2Pattern(arr, state)
+    // Skip the merge when compiling for simplify so the nested structure can
+    // be reconstructed verbatim (the merge collapses branches by ref1 value).
+    const orAnd2 = state.simplify ? null : detectOrAndIn2Pattern(arr, state)
     if (orAnd2 !== null) {
       const { ref1Raw, ref2Raw, entries, entryOperators } = orAnd2
       const { bytecode } = state
@@ -817,7 +827,8 @@ export interface CompiledExpression {
  */
 export function compile(
   raw: ExpressionInput,
-  opts: Options
+  opts: Options,
+  simplify = false
 ): CompiledExpression {
   const maps = buildOperatorMaps(opts)
   const state: CompilerState = {
@@ -834,6 +845,7 @@ export function compile(
     constIndex: new Map(),
     overlapRefsEntries: [],
     directionEntries: [],
+    simplify,
   }
   emitExpression(raw, state)
 

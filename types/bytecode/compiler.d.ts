@@ -45,6 +45,7 @@ export interface CompilerState {
         pos: number;
         dir: 0 | 1;
     }>;
+    simplify: boolean;
 }
 /**
  * Check whether an OR expression matches the pattern:
@@ -82,5 +83,5 @@ export interface CompiledExpression {
  * Compile a raw ExpressionInput into bytecode.
  * The result should be cached and reused across evaluate() calls.
  */
-export declare function compile(raw: ExpressionInput, opts: Options): CompiledExpression;
+export declare function compile(raw: ExpressionInput, opts: Options, simplify?: boolean): CompiledExpression;
 export {};

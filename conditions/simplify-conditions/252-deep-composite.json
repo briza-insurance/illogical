@@ -1,0 +1,38 @@
+{
+  "description": "deep OR/AND/OR composite with context -> simplify preserves structure (bytecode must match OOP)",
+  "expression": [
+    "OR",
+    [
+      "AND",
+      [
+        "OR",
+        ["==", "$A", 18],
+        ["AND", ["==", "$E", 5], ["==", "$F", "yes"]]
+      ],
+      ["==", "$D", 1],
+      ["==", "$X", 2],
+      ["==", "$Y", 3]
+    ],
+    ["==", "$A", "yes"],
+    [
+      "OR",
+      ["==", "$C", "yes"],
+      ["AND", ["==", "$B", "no"], ["IN", "$A", [13, 14]]]
+    ]
+  ],
+  "context": {
+    "A": 15,
+    "E": 5
+  },
+  "expected": [
+    "OR",
+    [
+      "AND",
+      ["==", "$F", "yes"],
+      ["==", "$D", 1],
+      ["==", "$X", 2],
+      ["==", "$Y", 3]
+    ],
+    ["==", "$C", "yes"]
+  ]
+}

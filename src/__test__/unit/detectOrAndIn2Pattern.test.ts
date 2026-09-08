@@ -39,6 +39,7 @@ describe('detectOrAndIn2Pattern', () => {
       constIndex: new Map(),
       overlapRefsEntries: [],
       directionEntries: [],
+      simplify: false,
     }
   })
 
