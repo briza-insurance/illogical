@@ -26,9 +26,15 @@ export class BytecodeEvaluable implements Evaluable {
   ): Result | Input {
     return interpretSimplify(this.compiled, ctx, strictKeys, optionalKeys)
   }
+  /**
+   * TODO: Implement against complied bytecode instead of OOP fallback
+   */
   serialize(options: Options): Input {
     return this.delegate.serialize(options)
   }
+  /**
+   * TODO: Implement against complied bytecode instead of OOP fallback
+   */
   toString(): string {
     return this.delegate.toString()
   }
