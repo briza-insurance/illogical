@@ -1,8 +1,5 @@
-import * as fs from 'fs'
-
 import { Result } from '../common/evaluable.js'
-import { Parser } from '../parser/index.js'
-import { compile, CompiledExpression } from './compiler.js'
+import { CompiledExpression } from './compiler.js'
 import * as opcodes from './opcodes.js'
 
 const opcodeNames = Object.fromEntries(
