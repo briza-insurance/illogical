@@ -34,6 +34,8 @@ export const OP_OVERLAP_SCAN_REFS_CONST = 51
 // Inverted-index form: M entries of (literal setA value, constIdx of merged setB).
 // At runtime: resolve ref1, look up matching entries by value (O(1) via cached Map),
 // for each match check ref2 ∈ mergedSetB. Refs resolved once; setBs union-merged per setA value.
+// TODO: remove?
+// @deprecated this OP generates bytecode that breaks simplification / structural reconstruction
 export const OP_OR_AND_IN_CONST_2 = 52
 export const OP_PREFIX = 18 // pop 2, push right.startsWith(left)
 export const OP_SUFFIX = 19 // pop 2, push left.endsWith(right)

@@ -57,7 +57,6 @@ import {
   OP_NOT_IN_CONST,
   OP_NOT_IN_SCAN_REFS_CONST,
   OP_OR,
-  OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
   OP_OVERLAP_SCAN_REFS_CONST,
@@ -163,14 +162,6 @@ export interface CompilerState {
   // Side tables for the simplify interpreter
   overlapRefsEntries: Array<{ pos: number; refIdxs: number[] }>
   directionEntries: Array<{ pos: number; dir: 0 | 1 }>
-  // When true, the compiler preserves the original nested structure for the
-  // simplify interpreter instead of applying the OR(AND(ref1, ref2), …)
-  // OR_AND_IN merge optimization. That optimization collapses branches that
-  // share ref1's value into a single merged ref2 set, which is lossy for
-  // structural reconstruction — simplify must be able to reproduce the input
-  // verbatim, so it skips the merge and lets the short-circuit path preserve
-  // each branch. evaluate() keeps the optimization for its performance gain.
-  simplify: boolean
 }
 
 function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
@@ -534,30 +525,6 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.orOp) {
-    // Skip the merge when compiling for simplify so the nested structure can
-    // be reconstructed verbatim (the merge collapses branches by ref1 value).
-    const orAnd2 = state.simplify ? null : detectOrAndIn2Pattern(arr, state)
-    if (orAnd2 !== null) {
-      const { ref1Raw, ref2Raw, entries, entryOperators } = orAnd2
-      const { bytecode } = state
-      const ref1Idx = internRef(ref1Raw, state)
-      const ref2Idx = internRef(ref2Raw, state)
-      // Emit: OP_OR_AND_IN_CONST_2 ref1Idx ref2Idx M (aVal0 setBIdx0 ref1Op0 ref2Op0) ...
-      // M is the number of distinct setA values across all branches (after inverted-index merge).
-      // ref1Op/ref2Op: 0 for 'eq', 1 for 'in'
-      bytecode.push(OP_OR_AND_IN_CONST_2, ref1Idx, ref2Idx, entries.length)
-      for (let j = 0; j < entries.length; j++) {
-        const [aVal, mergedSetBIdx] = entries[j]
-        const [ref1Op, ref2Op] = entryOperators[j]
-        bytecode.push(
-          aVal,
-          mergedSetBIdx,
-          ref1Op === 'in' ? 1 : 0,
-          ref2Op === 'in' ? 1 : 0
-        )
-      }
-      return
-    }
     emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
@@ -827,8 +794,7 @@ export interface CompiledExpression {
  */
 export function compile(
   raw: ExpressionInput,
-  opts: Options,
-  simplify = false
+  opts: Options
 ): CompiledExpression {
   const maps = buildOperatorMaps(opts)
   const state: CompilerState = {
@@ -845,7 +811,6 @@ export function compile(
     constIndex: new Map(),
     overlapRefsEntries: [],
     directionEntries: [],
-    simplify,
   }
   emitExpression(raw, state)
 
