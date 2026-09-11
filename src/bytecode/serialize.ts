@@ -5,7 +5,6 @@
  */
 
 import { Input } from '../parser/index.js'
-import { Options } from '../parser/options.js'
 import { CompiledExpression } from './compiler.js'
 import {
   OP_AND,
@@ -355,6 +354,7 @@ export function serialize(compiled: CompiledExpression): Input {
         break
       }
 
+      /* node:coverage ignore next 2 */
       default:
         throw new Error(`unknown opcode: ${op}`)
     }
