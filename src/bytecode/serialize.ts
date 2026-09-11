@@ -79,10 +79,7 @@ let scopeStackTop = -1
 /**
  * Serializes a compiled bytecode expression back into its ExpressionInput structure.
  */
-export function serialize(
-  compiled: CompiledExpression,
-  options: Options
-): Input {
+export function serialize(compiled: CompiledExpression): Input {
   const { bytecode, opNames, refKeys } = compiled
   stackTop = -1
   spillTop = -1

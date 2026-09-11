@@ -5,7 +5,6 @@ import {
   Result,
 } from '../common/evaluable.js'
 import { Input } from '../parser/index.js'
-import { Options } from '../parser/options.js'
 import { CompiledExpression } from './compiler.js'
 import { interpret } from './interpreter.js'
 import { serialize } from './serialize.js'
@@ -28,8 +27,8 @@ export class BytecodeEvaluable implements Evaluable {
     return interpretSimplify(this.compiled, ctx, strictKeys, optionalKeys)
   }
 
-  serialize(options: Options): Input {
-    return serialize(this.compiled, options)
+  serialize(): Input {
+    return serialize(this.compiled)
   }
   /**
    * TODO: Implement against complied bytecode instead of OOP fallback
