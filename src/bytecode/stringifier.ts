@@ -108,7 +108,7 @@ function formatCollectionItem(item: unknown): string {
 }
 
 export function stringify(compiled: CompiledExpression): string {
-  const { bytecode, refKeys } = compiled
+  const { bytecode, refKeys, opNames } = compiled
   stackTop = -1
   spillTop = -1
   scopeStackTop = -1
@@ -417,6 +417,10 @@ export function stringify(compiled: CompiledExpression): string {
       case OP_NOR: {
         i++ // consume operand count byte
         const top = stack[stackTop--]
+        if (top === `"${opNames[op]}"`) {
+          stack[++stackTop] = `[${top}]`
+          break
+        }
         const base = scopeStack[scopeStackTop--]
         const operands: string[] = []
         for (let j = base + 1; j <= spillTop; j++) {
@@ -424,6 +428,10 @@ export function stringify(compiled: CompiledExpression): string {
         }
         spillTop = base
         operands.push(top)
+        if (operands.length === 1) {
+          stack[++stackTop] = operands[0]
+          break
+        }
         const opName = op === OP_AND ? 'AND' : op === OP_OR ? 'OR' : 'NOR'
         stack[++stackTop] = `(${operands.join(` ${opName} `)})`
         break

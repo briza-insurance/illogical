@@ -331,6 +331,9 @@ export function serialize(compiled: CompiledExpression): Input {
       case OP_NOR: {
         i++ // consume operand count byte
         const top = stack[stackTop--]
+        if (top === opNames[op]) {
+          return [opNames[op]]
+        }
         const base = scopeStack[scopeStackTop--]
         const operands: Input[] = []
         for (let j = base + 1; j <= spillTop; j++) {
@@ -338,6 +341,9 @@ export function serialize(compiled: CompiledExpression): Input {
         }
         spillTop = base
         operands.push(top)
+        if (operands.length === 1) {
+          return operands[0]
+        }
         stack[++stackTop] = [opNames[op], ...operands]
         break
       }
