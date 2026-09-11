@@ -129,7 +129,7 @@ class Engine {
     if (this.evaluator === 'oop') {
       return this.parser.parse(exp)
     }
-    return new BytecodeEvaluable(this.getCompiled(exp), this.parser.parse(exp))
+    return new BytecodeEvaluable(this.getCompiled(exp))
   }
 
   /**

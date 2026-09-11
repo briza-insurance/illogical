@@ -7,15 +7,13 @@ import {
 import { Input } from '../parser/index.js'
 import { CompiledExpression } from './compiler.js'
 import { interpret } from './interpreter.js'
-import { serialize } from './serialize.js'
+import { serialize } from './serializer.js'
 import { interpretSimplify } from './simplifier.js'
+import { stringify } from './stringifier.js'
 
 export class BytecodeEvaluable implements Evaluable {
   readonly type = EvaluableType.Expression
-  constructor(
-    private readonly compiled: CompiledExpression,
-    private readonly delegate: Evaluable
-  ) {}
+  constructor(private readonly compiled: CompiledExpression) {}
   evaluate(ctx: Context): Result {
     return interpret(this.compiled, ctx)
   }
@@ -30,10 +28,7 @@ export class BytecodeEvaluable implements Evaluable {
   serialize(): Input {
     return serialize(this.compiled)
   }
-  /**
-   * TODO: Implement against complied bytecode instead of OOP fallback
-   */
   toString(): string {
-    return this.delegate.toString()
+    return stringify(this.compiled)
   }
 }
