@@ -1,8 +1,5 @@
-import * as fs from 'fs'
-
 import { Result } from '../common/evaluable.js'
-import { Parser } from '../parser/index.js'
-import { compile, CompiledExpression } from './compiler.js'
+import { CompiledExpression } from './compiler.js'
 import * as opcodes from './opcodes.js'
 
 const opcodeNames = Object.fromEntries(
@@ -19,7 +16,7 @@ function numAt(v: number | Result): number {
   return v
 }
 
-function disassemble(compiled: CompiledExpression): string[] {
+export function disassemble(compiled: CompiledExpression): string[] {
   const { bytecode, refs } = compiled
   const result: string[] = []
   let i = 0
@@ -68,23 +65,6 @@ function disassemble(compiled: CompiledExpression): string[] {
           )
           break
         }
-        case opcodes.OP_OR_AND_IN_CONST_2: {
-          const ref1Idx = numAt(bytecode[++i])
-          const ref2Idx = numAt(bytecode[++i])
-          const m = numAt(bytecode[++i])
-          const entriesStart = i + 1
-          i += m * 2
-          const entries: string[] = []
-          for (let j = 0; j < m; j++) {
-            const aVal = bytecode[entriesStart + j * 2]
-            const setBIdx = bytecode[entriesStart + j * 2 + 1]
-            entries.push(`(${JSON.stringify(aVal)}->${setBIdx})`)
-          }
-          result.push(
-            `${pc}: ${name} ref1=${ref1Idx} ref2=${ref2Idx} m=${m} entries=[${entries.join(' ')}]`
-          )
-          break
-        }
         default:
           result.push(`${pc}: ${name}`)
       }
@@ -95,41 +75,3 @@ function disassemble(compiled: CompiledExpression): string[] {
   }
   return result
 }
-
-/**
- * CLI tool to compile an illogical expression into bytecode.
- * Reads the expression from stdin and prints the compiled result as JSON.
- *
- * Usage: cat expression.json | npm run get-bytecode [-- --disassemble] | jq
- */
-function main() {
-  const args = process.argv.slice(2)
-  const shouldDisassemble = args.includes('--disassemble')
-  const parser = new Parser()
-
-  try {
-    const input = fs.readFileSync(0, 'utf-8')
-    if (!input || input.trim() === '') {
-      console.error('Error: No input provided on stdin.')
-      process.exit(1)
-    }
-    const expression = JSON.parse(input)
-    // Validate expression structure before compilation
-    parser.parse(expression)
-    const compiled = compile(expression, parser.options)
-
-    const output: CompiledExpression & { disassembled?: string[] } = {
-      ...compiled,
-    }
-    if (shouldDisassemble) {
-      output.disassembled = disassemble(compiled)
-    }
-
-    process.stdout.write(JSON.stringify(output, null, 2) + '\n')
-  } catch (err) {
-    console.error('Error:', err instanceof Error ? err.message : String(err))
-    process.exit(1)
-  }
-}
-
-main()

@@ -1,0 +1,43 @@
+{
+  "description": "AND with OR",
+  "expression": [
+    "AND",
+    ["==", "$LossHasAny", "yes"],
+    ["==", "$Loss1Type", "property"],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "closed"]
+      ],
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "declined"]
+      ]
+    ]
+  ],
+  "strictKeys": ["NonRelevantId"],
+  "context": {
+    "NumberOfLocations": 1
+  },
+  "expected": [
+    "AND",
+    ["==", "$LossHasAny", "yes"],
+    ["==", "$Loss1Type", "property"],
+    [
+      "OR",
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "closed"]
+      ],
+      [
+        "AND",
+        ["==", "$Loss1Type", "property"],
+        ["==", "$Loss1ClaimStatus", "declined"]
+      ]
+    ]
+  ]
+}
