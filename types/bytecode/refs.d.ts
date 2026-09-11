@@ -68,7 +68,7 @@ export declare function resolveDynamic(key: string, dataType: DataType | undefin
 /**
  * Resolve any CompactRef against a context.
  * Used in ops that embed ref indices but weren't split by kind
- * (OP_OVERLAP_SCAN_REFS_CONST, OP_OR_AND_IN_CONST_2).
+ * (OP_OVERLAP_SCAN_REFS_CONST).
  */
 export declare function resolveCompactRef(ref: CompactRef, ctx: Context): Result;
 export declare function getKeyFromCompactRef(ref: CompactRef): string;

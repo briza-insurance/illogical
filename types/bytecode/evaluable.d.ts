@@ -9,6 +9,12 @@ export declare class BytecodeEvaluable implements Evaluable {
     constructor(compiled: CompiledExpression, delegate: Evaluable);
     evaluate(ctx: Context): Result;
     simplify(ctx: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Result | Input;
+    /**
+     * TODO: Implement against complied bytecode instead of OOP fallback
+     */
     serialize(options: Options): Input;
+    /**
+     * TODO: Implement against complied bytecode instead of OOP fallback
+     */
     toString(): string;
 }
