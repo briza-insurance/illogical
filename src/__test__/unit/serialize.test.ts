@@ -34,6 +34,15 @@ const testCases: { expression: ExpressionInput }[] = [
   {
     expression: ['==', ['admin', 'manager'], '$tags'],
   },
+  {
+    expression: ['==', '$Address.state', 'NY'],
+  },
+  {
+    expression: ['==', '$Address.{prop}', 'NY'],
+  },
+  {
+    expression: ['==', '$Limit.(Number)', 1000],
+  },
 
   // Comparison: Not Equal
   {
