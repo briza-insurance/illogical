@@ -23,6 +23,12 @@ const testCases: { expression: ExpressionInput }[] = [
   {
     expression: ['==', null, null],
   },
+  {
+    expression: ['==', '$tags', ['admin', 'manager']],
+  },
+  {
+    expression: ['==', ['admin', 'manager'], '$tags'],
+  },
 
   // Comparison: Not Equal
   {
@@ -30,6 +36,9 @@ const testCases: { expression: ExpressionInput }[] = [
   },
   {
     expression: ['!=', '$Ref1', 10],
+  },
+  {
+    expression: ['!=', [1, 2], '$list'],
   },
 
   // Comparison: Greater Than / Greater Than Or Equal
@@ -56,7 +65,37 @@ const testCases: { expression: ExpressionInput }[] = [
     expression: ['IN', 'active', ['$status1', '$status2']],
   },
   {
+    expression: ['IN', '$role', '$allowedRoles'],
+  },
+  {
+    expression: ['IN', 'admin', '$allowedRoles'],
+  },
+  {
+    expression: ['IN', [1, 2], '$nestedList'],
+  },
+  {
+    expression: ['IN', ['$ref1', '$ref2'], 'ref3'],
+  },
+  {
     expression: ['NOT IN', '$country', ['US', 'CA', 'MX']],
+  },
+  {
+    expression: ['NOT IN', 'active', ['$status1', '$status2']],
+  },
+  {
+    expression: ['NOT IN', '$role', ['$status1', '$status2']],
+  },
+  {
+    expression: ['NOT IN', ['basic', 'trial'], '$tier'],
+  },
+  {
+    expression: ['NOT IN', ['$role1', '$role2'], '$tier'],
+  },
+  {
+    expression: ['NOT IN', '$tier', '$allowedTiers'],
+  },
+  {
+    expression: ['NOT IN', ['$ref1', '$ref2'], 'ref3'],
   },
 
   // Comparison: Prefix / Suffix
@@ -72,7 +111,19 @@ const testCases: { expression: ExpressionInput }[] = [
     expression: ['OVERLAP', '$userTags', ['admin', 'moderator']],
   },
   {
+    // isStaticCollection left + isPureRefCollection right
     expression: ['OVERLAP', ['a', 'b'], ['$c', '$d']],
+  },
+  {
+    // isStaticCollection left + not isPureRefCollection right
+    expression: ['OVERLAP', ['a', 'b'], ['$c', 'd']],
+  },
+  {
+    // isStaticCollection right + isPureRefCollection left
+    expression: ['OVERLAP', ['$a', '$b'], ['c', 'd']],
+  },
+  {
+    expression: ['==', ['$a', '$b'], ['$c', '$d']],
   },
 
   // Comparison: In
@@ -177,10 +228,23 @@ const testCases: { expression: ExpressionInput }[] = [
       ['NOT', ['IN', '$tier', ['basic', 'trial']]],
     ],
   },
+
+  // Nested AND with OR
+  {
+    expression: [
+      'AND',
+      ['==', '$Question1', 'val1'],
+      ['==', '$Question2', 'val2'],
+      [
+        'OR',
+        ['AND', ['==', '$Question2', 'val2'], ['==', '$Question3', 'val3']],
+        ['AND', ['==', '$Question2', 'val2'], ['==', '$Question3', 'val4']],
+      ],
+    ],
+  },
 ]
 
-// TODO: uncomment oop
-for (const mode of [/*'oop',*/ 'bytecode'] as const) {
+for (const mode of ['oop', 'bytecode'] as const) {
   describe('Serialize', () => {
     const engine = new Engine({ evaluator: mode })
 
@@ -189,7 +253,6 @@ for (const mode of [/*'oop',*/ 'bytecode'] as const) {
         const evaluable = engine.parse(tc.expression)
 
         const serialized = evaluable.serialize(defaultOptions)
-        console.log('serialized', serialized)
 
         assert.deepStrictEqual(
           JSON.stringify(serialized),
