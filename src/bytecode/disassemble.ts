@@ -65,23 +65,6 @@ export function disassemble(compiled: CompiledExpression): string[] {
           )
           break
         }
-        case opcodes.OP_OR_AND_IN_CONST_2: {
-          const ref1Idx = numAt(bytecode[++i])
-          const ref2Idx = numAt(bytecode[++i])
-          const m = numAt(bytecode[++i])
-          const entriesStart = i + 1
-          i += m * 2
-          const entries: string[] = []
-          for (let j = 0; j < m; j++) {
-            const aVal = bytecode[entriesStart + j * 2]
-            const setBIdx = bytecode[entriesStart + j * 2 + 1]
-            entries.push(`(${JSON.stringify(aVal)}->${setBIdx})`)
-          }
-          result.push(
-            `${pc}: ${name} ref1=${ref1Idx} ref2=${ref2Idx} m=${m} entries=[${entries.join(' ')}]`
-          )
-          break
-        }
         default:
           result.push(`${pc}: ${name}`)
       }
