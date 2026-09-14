@@ -81,8 +81,6 @@ describe('Dependency graph', () => {
           defaultOptions
         )
 
-        console.log(JSON.stringify(Array.from(graph.entries()), null, 2))
-
         // simple string ref: status -> expr1 (deduplicated to 1 entry)
         assert.deepEqual(graph.get('status'), [
           { exprName: 'expr1', refIdx: 0 },
