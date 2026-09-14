@@ -45,6 +45,8 @@
     "bench:synthetic:report:simplify":        "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify.json --op simplify --out benchmark/report-synthetic-simplify.md",
     "bench:sample:report:full:simplify":      "node --import tsx src/benchmark/report.ts benchmark/results-sample-simplify.json --op simplify --full --out benchmark/report-sample-simplify-full.md",
     "bench:synthetic:report:full:simplify":   "node --import tsx src/benchmark/report.ts benchmark/results-synthetic-simplify.json --op simplify --full --out benchmark/report-synthetic-simplify-full.md",
+    "bench:batch":                            "node --import tsx src/benchmark/batch-evaluate.ts --out benchmark/results-batch.json",
+    "bench:batch:report":                     "node --import tsx src/benchmark/report-batch.ts benchmark/results-batch.json --out benchmark/report-batch.md",
     "get-bytecode": "node --import tsx src/bytecode/get-bytecode.ts",
     "debug-bytecode": "node --import tsx src/tools/debugger.ts"
   },
