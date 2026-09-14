@@ -32,7 +32,6 @@ import {
   OP_NOT_IN_CONST,
   OP_NOT_IN_SCAN_REFS_CONST,
   OP_OR,
-  OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
   OP_OVERLAP_SCAN_REFS_CONST,
@@ -238,39 +237,6 @@ export function serialize(compiled: CompiledExpression): Input {
         stack[++stackTop] = collectionOnLeft
           ? [opNames[op], constArr, scalar]
           : [opNames[op], scalar, constArr]
-        break
-      }
-
-      case OP_OR_AND_IN_CONST_2: {
-        const ref1Idx = numAt(bytecode[i++])
-        const ref2Idx = numAt(bytecode[i++])
-        const n = numAt(bytecode[i++])
-        const quadsStart = i
-        i += n * 4
-
-        const branches: Input[] = [opNames[OP_OR]]
-        const andOp = opNames[OP_AND]
-        const eqOp = opNames[OP_EQ]
-        const inOp = opNames[OP_IN]
-        const r1 = refKeys[ref1Idx]
-        const r2 = refKeys[ref2Idx]
-
-        for (let j = 0; j < n; j++) {
-          const aVal = literalAt(bytecode[quadsStart + j * 4])
-          const setB = compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
-          const ref1OpByte = numAt(bytecode[quadsStart + j * 4 + 2])
-          const ref2OpByte = numAt(bytecode[quadsStart + j * 4 + 3])
-          const op1 = ref1OpByte === 1 ? inOp : eqOp
-          const op2 = ref2OpByte === 1 ? inOp : eqOp
-          const r1Val: Input = op1 === eqOp ? aVal : [aVal]
-          let r2Val: Input = setB
-          if (op2 === eqOp && Array.isArray(setB) && setB.length === 1) {
-            r2Val = setB[0]
-          }
-          branches.push([andOp, [op1, r1, r1Val], [op2, r2, r2Val]])
-        }
-
-        stack[++stackTop] = branches
         break
       }
 
