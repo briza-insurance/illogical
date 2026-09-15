@@ -9,6 +9,7 @@
  */
 
 import { CompiledExpression } from '../bytecode/compiler.js'
+import * as opcodes from '../bytecode/opcodes.js'
 import {
   OP_AND,
   OP_DIVIDE,
@@ -35,7 +36,6 @@ import {
   OP_NOT_IN_CONST,
   OP_NOT_IN_SCAN_REFS_CONST,
   OP_OR,
-  OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
   OP_OVERLAP_SCAN_REFS_CONST,
@@ -55,7 +55,6 @@ import {
   OP_UNDEFINED,
   OP_XOR,
 } from '../bytecode/opcodes.js'
-import * as opcodes from '../bytecode/opcodes.js'
 import {
   asFullRef,
   asKeyRef,
@@ -516,60 +515,6 @@ export function interpretDebug(
           }
         }
         stack[++stackTop] = op === OP_IN_SCAN_REFS_CONST ? found : !found
-        break
-      }
-
-      case OP_OR_AND_IN_CONST_2: {
-        // bytecode layout: ref1Idx, ref2Idx, M, (aVal0, setBIdx0, ref1Op0, ref2Op0), ...
-        const ref1Idx = numAt(bytecode[++i])
-        const ref2Idx = numAt(bytecode[++i])
-        const m = numAt(bytecode[++i])
-        const entriesStart = i + 1
-        i += m * 4
-
-        let idxMap = invertedIndexes!.get(entriesStart)
-        if (idxMap === undefined) {
-          idxMap = new Map<Result, number[]>()
-          for (let j = 0; j < m; j++) {
-            const aVal = bytecode[entriesStart + j * 4]
-            const setBIdx = numAt(bytecode[entriesStart + j * 4 + 1])
-            let list = idxMap.get(aVal)
-            if (list === undefined) {
-              list = []
-              idxMap.set(aVal, list)
-            }
-            list.push(setBIdx)
-          }
-          invertedIndexes!.set(entriesStart, idxMap)
-        }
-
-        const v1 = resolveCompactRef(refs[ref1Idx], ctx)
-        const v2 = resolveCompactRef(refs[ref2Idx], ctx)
-
-        let found = false
-        if (
-          v1 !== undefined &&
-          v1 !== null &&
-          v2 !== undefined &&
-          v2 !== null
-        ) {
-          const setBIndices = idxMap.get(v1)
-          if (setBIndices !== undefined) {
-            for (let j = 0; j < setBIndices.length; j++) {
-              const setBIdx = setBIndices[j]
-              let s2 = constSets![setBIdx]
-              if (s2 === undefined) {
-                s2 = new Set<Result>(consts[setBIdx])
-                constSets![setBIdx] = s2
-              }
-              if (s2.has(v2)) {
-                found = true
-                break
-              }
-            }
-          }
-        }
-        stack[++stackTop] = found
         break
       }
 
