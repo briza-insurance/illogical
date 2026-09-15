@@ -18,56 +18,56 @@
 
 | Task | p50 | p75 | p99 | avg | ops/sec | margin |
 |------|-----|-----|-----|-----|---------|--------|
-| cold-individual | 17.8µs | 18.1µs | 96.9µs | 19.9µs | 54.51K ops/s | ±2.35% |
-| warm-individual | 0.4µs | 0.4µs | 0.4µs | 0.4µs | 2.79M ops/s | ±0.61% |
-| cold-batch | 10.0µs | 10.3µs | 18.8µs | 11.0µs | 103.49K ops/s | ±5.16% |
-| warm-batch | 0.4µs | 0.5µs | 0.5µs | 0.4µs | 2.31M ops/s | ±0.56% |
-| incremental-batch | 0.2µs | 0.2µs | 0.3µs | 0.2µs | 4.17M ops/s | ±0.49% |
-| incremental-individual | 0.2µs | 0.2µs | 0.2µs | 0.2µs | 5.48M ops/s | ±0.33% |
+| cold-individual | 45.9µs | 48.8µs | 145.7µs | 49.8µs | 21.71K ops/s | ±3.21% |
+| warm-individual | 0.4µs | 0.4µs | 0.5µs | 0.4µs | 2.62M ops/s | ±0.30% |
+| cold-batch | 17.2µs | 17.6µs | 31.8µs | 19.6µs | 57.11K ops/s | ±6.31% |
+| warm-batch | 0.5µs | 0.5µs | 0.5µs | 0.5µs | 2.09M ops/s | ±0.37% |
+| incremental-batch | 0.3µs | 0.3µs | 1.1µs | 0.3µs | 3.58M ops/s | ±0.80% |
+| incremental-individual | 0.2µs | 0.2µs | 0.2µs | 0.2µs | 4.80M ops/s | ±0.48% |
 
 ## medium (100 expressions, 30 keys, simple complexity)
 
 | Task | p50 | p75 | p99 | avg | ops/sec | margin |
 |------|-----|-----|-----|-----|---------|--------|
-| cold-individual | 184.9µs | 187.5µs | 409.7µs | 197.8µs | 5.22K ops/s | ±3.12% |
-| warm-individual | 4.7µs | 4.9µs | 5.5µs | 4.9µs | 209.13K ops/s | ±0.93% |
-| cold-batch | 158.2µs | 179.3µs | 655.1µs | 195.0µs | 5.83K ops/s | ±7.43% |
-| warm-batch | 5.7µs | 5.8µs | 6.3µs | 5.8µs | 173.56K ops/s | ±0.78% |
-| incremental-batch | 0.3µs | 0.3µs | 0.3µs | 0.3µs | 3.75M ops/s | ±0.75% |
-| incremental-individual | 0.8µs | 0.8µs | 0.9µs | 0.8µs | 1.21M ops/s | ±0.43% |
+| cold-individual | 353.0µs | 368.4µs | 981.4µs | 394.5µs | 2.70K ops/s | ±8.65% |
+| warm-individual | 5.8µs | 8.2µs | 10.0µs | 7.2µs | 152.06K ops/s | ±3.72% |
+| cold-batch | 229.5µs | 231.8µs | 2.960ms | 278.2µs | 4.26K ops/s | ±19.04% |
+| warm-batch | 6.7µs | 6.8µs | 7.7µs | 6.9µs | 148.50K ops/s | ±3.90% |
+| incremental-batch | 0.5µs | 0.5µs | 0.6µs | 0.5µs | 2.00M ops/s | ±2.40% |
+| incremental-individual | 0.7µs | 0.8µs | 0.8µs | 0.8µs | 1.34M ops/s | ±0.11% |
 
 ## large (1000 expressions, 100 keys, simple complexity)
 
 | Task | p50 | p75 | p99 | avg | ops/sec | margin |
 |------|-----|-----|-----|-----|---------|--------|
-| cold-individual | 2.069ms | 2.085ms | 2.179ms | 1.989ms | 505 ops/s | ±1.50% |
-| warm-individual | 57.3µs | 58.1µs | 68.4µs | 57.9µs | 17.36K ops/s | ±0.75% |
-| cold-batch | 13.557ms | 15.006ms | 19.660ms | 14.047ms | 73 ops/s | ±3.78% |
-| warm-batch | 69.2µs | 70.3µs | 82.5µs | 70.3µs | 14.32K ops/s | ±0.86% |
-| incremental-batch | 1.8µs | 1.8µs | 2.1µs | 1.8µs | 549.02K ops/s | ±0.76% |
-| incremental-individual | 7.5µs | 7.5µs | 8.1µs | 7.5µs | 133.02K ops/s | ±0.52% |
+| cold-individual | 3.577ms | 3.605ms | 4.630ms | 3.751ms | 269 ops/s | ±2.46% |
+| warm-individual | 79.1µs | 79.9µs | 87.9µs | 81.0µs | 12.56K ops/s | ±3.44% |
+| cold-batch | 15.381ms | 17.941ms | 23.407ms | 14.834ms | 74 ops/s | ±7.43% |
+| warm-batch | 104.5µs | 106.4µs | 123.9µs | 111.7µs | 9.45K ops/s | ±10.22% |
+| incremental-batch | 1.4µs | 1.5µs | 1.9µs | 1.5µs | 684.56K ops/s | ±0.78% |
+| incremental-individual | 5.3µs | 5.4µs | 6.4µs | 5.3µs | 188.28K ops/s | ±0.13% |
 
 ## medium-complex (100 expressions, 20 keys, complex complexity)
 
 | Task | p50 | p75 | p99 | avg | ops/sec | margin |
 |------|-----|-----|-----|-----|---------|--------|
-| cold-individual | 218.0µs | 219.8µs | 592.4µs | 240.9µs | 4.40K ops/s | ±4.95% |
-| warm-individual | 7.0µs | 7.1µs | 7.6µs | 7.1µs | 141.22K ops/s | ±0.65% |
-| cold-batch | 170.4µs | 173.0µs | 834.6µs | 219.0µs | 5.48K ops/s | ±9.62% |
-| warm-batch | 8.4µs | 8.5µs | 9.6µs | 8.5µs | 118.65K ops/s | ±0.78% |
-| incremental-batch | 1.1µs | 1.1µs | 1.2µs | 1.1µs | 918.75K ops/s | ±0.55% |
-| incremental-individual | 1.3µs | 1.3µs | 1.4µs | 1.3µs | 781.19K ops/s | ±0.61% |
+| cold-individual | 443.6µs | 460.1µs | 2.063ms | 481.5µs | 2.20K ops/s | ±9.97% |
+| warm-individual | 7.9µs | 8.0µs | 8.6µs | 8.0µs | 125.89K ops/s | ±1.00% |
+| cold-batch | 284.9µs | 298.8µs | 3.979ms | 387.9µs | 3.32K ops/s | ±26.17% |
+| warm-batch | 9.2µs | 9.3µs | 11.1µs | 9.3µs | 108.36K ops/s | ±1.24% |
+| incremental-batch | 1.3µs | 1.3µs | 1.5µs | 1.3µs | 753.47K ops/s | ±1.01% |
+| incremental-individual | 1.4µs | 1.4µs | 1.5µs | 1.4µs | 725.19K ops/s | ±2.56% |
 
 ## large-complex (500 expressions, 50 keys, complex complexity)
 
 | Task | p50 | p75 | p99 | avg | ops/sec | margin |
 |------|-----|-----|-----|-----|---------|--------|
-| cold-individual | 1.163ms | 1.495ms | 1.664ms | 1.258ms | 814 ops/s | ±4.13% |
-| warm-individual | 39.9µs | 40.3µs | 46.3µs | 40.4µs | 24.92K ops/s | ±0.77% |
-| cold-batch | 3.840ms | 4.479ms | 6.039ms | 4.011ms | 257 ops/s | ±4.42% |
-| warm-batch | 47.3µs | 47.9µs | 56.4µs | 48.4µs | 20.87K ops/s | ±1.19% |
-| incremental-batch | 2.2µs | 2.2µs | 2.4µs | 2.2µs | 462.06K ops/s | ±0.82% |
-| incremental-individual | 4.4µs | 4.4µs | 4.6µs | 4.4µs | 228.71K ops/s | ±0.65% |
+| cold-individual | 2.198ms | 2.243ms | 4.081ms | 2.363ms | 435 ops/s | ±5.28% |
+| warm-individual | 43.9µs | 44.7µs | 56.1µs | 44.8µs | 22.50K ops/s | ±1.50% |
+| cold-batch | 3.385ms | 6.840ms | 10.196ms | 4.800ms | 243 ops/s | ±11.05% |
+| warm-batch | 56.8µs | 57.4µs | 64.1µs | 59.0µs | 17.46K ops/s | ±5.56% |
+| incremental-batch | 4.3µs | 4.4µs | 5.1µs | 4.4µs | 230.00K ops/s | ±0.76% |
+| incremental-individual | 5.7µs | 5.8µs | 6.2µs | 5.8µs | 173.37K ops/s | ±0.06% |
 
 ## Incremental Comparison
 
@@ -75,11 +75,11 @@ When 1 field changes, how long does it take to evaluate only the affected expres
 
 | Scenario | Affected | Incremental Batch | Incremental Individual | Winner |
 |----------|----------|-------------------|------------------------|--------|
-| small | 6 | 0.2µs | 0.2µs | individual 0.76x |
-| medium | 8 | 0.3µs | 0.8µs | **batch 3.07x** |
-| large | 15 | 1.8µs | 7.5µs | **batch 4.09x** |
-| medium-complex | 13 | 1.1µs | 1.3µs | **batch 1.21x** |
-| large-complex | 22 | 2.2µs | 4.4µs | **batch 2.01x** |
+| small | 6 | 0.3µs | 0.2µs | individual 0.72x |
+| medium | 8 | 0.5µs | 0.8µs | **batch 1.47x** |
+| large | 15 | 1.5µs | 5.3µs | **batch 3.58x** |
+| medium-complex | 13 | 1.3µs | 1.4µs | tie |
+| large-complex | 22 | 4.4µs | 5.8µs | **batch 1.32x** |
 
 ---
 
