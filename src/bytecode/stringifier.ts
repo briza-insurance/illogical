@@ -32,7 +32,6 @@ import {
   OP_NOT_IN_CONST,
   OP_NOT_IN_SCAN_REFS_CONST,
   OP_OR,
-  OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
   OP_OVERLAP_SCAN_REFS_CONST,
@@ -322,45 +321,6 @@ export function stringify(compiled: CompiledExpression): string {
           op === OP_IN_CONST
             ? `(${scalar} in ${constStr})`
             : `(${scalar} not in ${constStr})`
-        break
-      }
-
-      case OP_OR_AND_IN_CONST_2: {
-        const ref1Idx = numAt(bytecode[i++])
-        const ref2Idx = numAt(bytecode[i++])
-        const n = numAt(bytecode[i++])
-        const quadsStart = i
-        i += n * 4
-
-        const r1Str = formatRef(refKeys[ref1Idx])
-        const r2Str = formatRef(refKeys[ref2Idx])
-        const branches: string[] = []
-
-        for (let j = 0; j < n; j++) {
-          const aVal = literalAt(bytecode[quadsStart + j * 4])
-          const setB = compiled.consts[numAt(bytecode[quadsStart + j * 4 + 1])]
-          const ref1OpByte = numAt(bytecode[quadsStart + j * 4 + 2])
-          const ref2OpByte = numAt(bytecode[quadsStart + j * 4 + 3])
-
-          const branch1 =
-            ref1OpByte === 1
-              ? `(${r1Str} in [${formatValue(aVal)}])`
-              : `(${r1Str} == ${formatValue(aVal)})`
-
-          let branch2: string
-          if (ref2OpByte === 1) {
-            branch2 = `(${r2Str} in ${formatValue(setB)})`
-          } else if (Array.isArray(setB) && setB.length === 1) {
-            branch2 = `(${r2Str} == ${formatValue(setB[0])})`
-          } else {
-            branch2 = `(${r2Str} == ${formatValue(setB)})`
-          }
-
-          branches.push(`(${branch1} AND ${branch2})`)
-        }
-
-        stack[++stackTop] =
-          branches.length === 1 ? branches[0] : `(${branches.join(' OR ')})`
         break
       }
 

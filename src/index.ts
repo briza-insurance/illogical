@@ -88,7 +88,6 @@ class Engine {
   private getCompiled(exp: ExpressionInput): CompiledExpression {
     let compiled = this.bytecodeCache.get(exp)
     if (compiled === undefined) {
-      this.parser.parse(exp) // validates root operator and expression structure
       compiled = compile(exp, this.parser.options)
       this.bytecodeCache.set(exp, compiled)
     }

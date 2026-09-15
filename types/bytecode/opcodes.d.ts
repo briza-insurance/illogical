@@ -27,7 +27,6 @@ export declare const OP_NOT_IN_COLLECTION = 46;
 export declare const OP_IN_CONST = 49;
 export declare const OP_NOT_IN_CONST = 50;
 export declare const OP_OVERLAP_SCAN_REFS_CONST = 51;
-export declare const OP_OR_AND_IN_CONST_2 = 52;
 export declare const OP_PREFIX = 18;
 export declare const OP_SUFFIX = 19;
 export declare const OP_OVERLAP = 20;
