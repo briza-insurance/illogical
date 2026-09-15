@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 2.2.5
+
+- Further improvements to Bytecode implementation
+  - Adding serialize and toString support
+  - Removing fallback from OOP
+
 ## 2.2.4
 
 - Fix bytecode simplify dropping operands in nested OR/AND composition
