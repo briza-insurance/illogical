@@ -9,13 +9,25 @@ import {
 } from '../../evaluator.js'
 
 describe('BatchEvaluator', () => {
+  it('throws Error for invalid operator', () => {
+    assert.throws(
+      () =>
+        new BatchEvaluator({
+          expressions: {
+            expr1: ['$eq', '$a', 10],
+          },
+        }),
+      new Error('invalid expression with name expr1')
+    )
+  })
+
   describe('mergeContext', () => {
     it('properly merges context after evaluation with updated, new, and removed keys', () => {
       const evaluator = new BatchEvaluator({
         expressions: {
-          expr1: ['$eq', '$a', 10],
-          expr2: ['$eq', '$b', 'val-b'],
-          expr3: ['$eq', '$c', true],
+          expr1: ['==', '$a', 10],
+          expr2: ['==', '$b', 'val-b'],
+          expr3: ['==', '$c', true],
         },
       })
 
@@ -329,6 +341,17 @@ describe('BatchEvaluator', () => {
           },
         },
         context: { address: { state: 'NY' }, state: 'NJ' },
+        expectedResults: { exp1: true, exp2: true },
+      },
+      {
+        name: 'reserved properties still work',
+        options: {
+          expressions: {
+            exp1: ['==', '$constructor', 'yes'],
+            exp2: ['==', '$prototype', 'yes'],
+          },
+        },
+        context: { constructor: 'yes', prototype: 'yes' },
         expectedResults: { exp1: true, exp2: true },
       },
     ]

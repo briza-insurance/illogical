@@ -88,7 +88,7 @@ export class BatchEvaluator {
     this.state = {
       batch,
       originalExpressions: expressionsMap,
-      lastContext: {},
+      lastContext: Object.create(null),
       cachedResults: {},
     }
   }
@@ -177,7 +177,7 @@ export class BatchEvaluator {
    */
   dispose(): void {
     this.state.cachedResults = {}
-    this.state.lastContext = {}
+    this.state.lastContext = Object.create(null)
     this.state.originalExpressions.clear()
     this.state.batch.sharedConstSets = []
   }
@@ -266,13 +266,19 @@ export class BatchEvaluator {
    */
   private mergeContext(ctx: Context): void {
     for (const key of Object.keys(ctx)) {
+      if (key === '__proto__') {
+        continue
+      }
       const newVal = ctx[key]
       if (newVal === undefined) {
-        if (key in this.state.lastContext) {
-          delete this.state.lastContext[key]
-        }
+        delete this.state.lastContext[key]
       } else {
-        this.state.lastContext[key] = newVal as ContextValue
+        Object.defineProperty(this.state.lastContext, key, {
+          value: newVal as ContextValue,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        })
       }
     }
   }

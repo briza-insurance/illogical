@@ -9,7 +9,7 @@
  *   node --import tsx benchmark/report-batch.ts benchmark/results-batch.json --out benchmark/report-batch.md
  */
 
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -27,12 +27,17 @@ const positional = args.filter(
     i !== outFlagIdx && i !== outFlagIdx + 1 && !args[i].startsWith('--')
 )
 
-const [resultsPath] = positional
-
-if (!resultsPath) {
+if (positional.length === 0) {
   console.error(
     'Usage: node --import tsx benchmark/report-batch.ts <results.json> [--out <report.md>]'
   )
+  process.exit(1)
+}
+
+const resultsPath = resolve(positional[0])
+
+if (!existsSync(resultsPath)) {
+  console.error(`File not found: ${resultsPath}`)
   process.exit(1)
 }
 
