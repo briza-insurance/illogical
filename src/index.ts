@@ -3,6 +3,7 @@
  * @module illogical
  */
 
+import { BatchEvaluator, BatchEvaluatorOptions } from './batch/index.js'
 import { compile, CompiledExpression } from './bytecode/compiler.js'
 import { BytecodeEvaluable } from './bytecode/evaluable.js'
 import { interpret } from './bytecode/interpreter.js'
@@ -172,6 +173,36 @@ class Engine {
       return result
     }
     throw new Error(unexpectedResultError)
+  }
+
+  /**
+   * Create a BatchEvaluator for evaluating multiple expressions with shared resources.
+   *
+   * The batch evaluator compiles all expressions once, shares refs/consts across them,
+   * and supports incremental evaluation based on trusted dirty keys.
+   *
+   * @param {BatchEvaluatorOptions} options — Expressions map and optional parser options
+   * @returns {BatchEvaluator}
+   *
+   * @example
+   * ```typescript
+   * const batch = engine.createBatchEvaluator({
+   *   expressions: {
+   *     isActive: ['==', '$status', 'active'],
+   *     isPremium: ['==', '$tier', 'premium'],
+   *   },
+   * })
+   *
+   * const results = batch.evaluate({ status: 'active', tier: 'premium' })
+   * // Mode 2: incremental with trusted dirty keys
+   * const updated = batch.evaluate(fullContext, ['status'])
+   * ```
+   */
+  createBatchEvaluator(options: BatchEvaluatorOptions): BatchEvaluator {
+    if (this.evaluator === 'oop') {
+      throw new Error('Batch evaluation is not supported in OOP mode.')
+    }
+    return new BatchEvaluator(options)
   }
 }
 

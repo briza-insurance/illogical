@@ -57,3 +57,21 @@ for (const mode of ['oop', 'bytecode'] as const) {
     }
   })
 }
+
+describe('Evaluate — batch evaluator', () => {
+  const engine = new Engine({ evaluator: 'bytecode' })
+
+  for (const tc of testCases) {
+    test(tc.description, () => {
+      const batch = engine.createBatchEvaluator({
+        expressions: { result: tc.expression },
+      })
+      const results = batch.evaluate(tc.context)
+      assert.strictEqual(
+        results.result,
+        tc.expected,
+        `Expected batch evaluation for "${tc.description}" to return ${tc.expected}, got ${results.result}`
+      )
+    })
+  }
+})
