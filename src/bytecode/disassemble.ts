@@ -1,3 +1,4 @@
+import { CompiledBatchExpression } from '../batch/types.js'
 import { Result } from '../common/evaluable.js'
 import { CompiledExpression } from './compiler.js'
 import * as opcodes from './opcodes.js'
@@ -16,7 +17,9 @@ function numAt(v: number | Result): number {
   return v
 }
 
-export function disassemble(compiled: CompiledExpression): string[] {
+export function disassemble(
+  compiled: CompiledExpression | CompiledBatchExpression
+): string[] {
   const { bytecode, refs } = compiled
   const result: string[] = []
   let i = 0
