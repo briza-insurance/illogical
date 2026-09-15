@@ -265,21 +265,24 @@ export class BatchEvaluator {
    * Handles deletion via undefined sentinel.
    */
   private mergeContext(ctx: Context): void {
-    for (const key of Object.keys(ctx)) {
+    const map = new Map<string, ContextValue>(
+      Object.entries(this.state.lastContext)
+    )
+
+    for (const [key, newVal] of Object.entries(ctx)) {
       if (key === '__proto__') {
         continue
       }
-      const newVal = ctx[key]
       if (newVal === undefined) {
-        delete this.state.lastContext[key]
+        map.delete(key)
       } else {
-        Object.defineProperty(this.state.lastContext, key, {
-          value: newVal as ContextValue,
-          writable: true,
-          enumerable: true,
-          configurable: true,
-        })
+        map.set(key, newVal as ContextValue)
       }
     }
+
+    this.state.lastContext = Object.assign(
+      Object.create(null),
+      Object.fromEntries(map)
+    )
   }
 }
