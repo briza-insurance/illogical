@@ -28,6 +28,7 @@ export class BytecodeEvaluable implements Evaluable {
   serialize(): Input {
     return serialize(this.compiled)
   }
+
   toString(): string {
     return stringify(this.compiled)
   }

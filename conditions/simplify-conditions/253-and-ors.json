@@ -2,20 +2,12 @@
   "description": "AND with OR",
   "expression": [
     "AND",
-    ["==", "$LossHasAny", "yes"],
-    ["==", "$Loss1Type", "property"],
+    ["==", "$RefA", "val1"],
+    ["==", "$RefB", "val2"],
     [
       "OR",
-      [
-        "AND",
-        ["==", "$Loss1Type", "property"],
-        ["==", "$Loss1ClaimStatus", "closed"]
-      ],
-      [
-        "AND",
-        ["==", "$Loss1Type", "property"],
-        ["==", "$Loss1ClaimStatus", "declined"]
-      ]
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val3"]],
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val4"]]
     ]
   ],
   "strictKeys": ["NonRelevantId"],
@@ -24,20 +16,12 @@
   },
   "expected": [
     "AND",
-    ["==", "$LossHasAny", "yes"],
-    ["==", "$Loss1Type", "property"],
+    ["==", "$RefA", "val1"],
+    ["==", "$RefB", "val2"],
     [
       "OR",
-      [
-        "AND",
-        ["==", "$Loss1Type", "property"],
-        ["==", "$Loss1ClaimStatus", "closed"]
-      ],
-      [
-        "AND",
-        ["==", "$Loss1Type", "property"],
-        ["==", "$Loss1ClaimStatus", "declined"]
-      ]
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val3"]],
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val4"]]
     ]
   ]
 }
