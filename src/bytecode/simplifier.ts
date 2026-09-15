@@ -107,7 +107,7 @@ const directionMapCache = new WeakMap<CompiledExpression, Map<number, 0 | 1>>()
 
 // Read a numeric operand from a bytecode slot — opcodes and index operands are always numbers.
 // Throws if the slot contains a non-number (guards against compiler bugs).
-function numAt(v: number | Result): number {
+export function numAt(v: number | Result): number {
   if (typeof v !== 'number') {
     throw new Error(
       `bytecode integrity error: expected number, got ${typeof v}`
@@ -116,9 +116,26 @@ function numAt(v: number | Result): number {
   return v
 }
 
+// Read a literal value from a bytecode slot — stored literals are string|number|boolean|null.
+// Throws if the slot contains undefined, an array, or an object (guards against compiler bugs).
+// Returns string|number|boolean|null, which is a subtype of Input.
+export function literalAt(
+  v: number | Result
+): string | number | boolean | null {
+  if (
+    typeof v === 'string' ||
+    typeof v === 'number' ||
+    typeof v === 'boolean' ||
+    v === null
+  ) {
+    return v
+  }
+  throw new Error(`bytecode integrity error: expected literal, got ${typeof v}`)
+}
+
 // Retrieve a required entry from a map — throws if the key is missing.
 // Eliminates the Map.get() undefined return in contexts where the entry is compiler-guaranteed.
-function requireMapEntry<K, V>(map: ReadonlyMap<K, V>, key: K): V {
+export function requireMapEntry<K, V>(map: ReadonlyMap<K, V>, key: K): V {
   const v = map.get(key)
   if (v === undefined) {
     throw new Error(
@@ -264,7 +281,7 @@ function isInput(v: unknown): v is Input {
 }
 
 // Extract the serialized Input form of a slot for residual reconstruction.
-function slotSrc(v: Slot): Input {
+export function slotSrc(v: Slot): Input {
   if (typeof v !== 'object' || v === null) {
     // v is a primitive: undefined | null | string | number | boolean
     // In residual paths this should always be a valid Input — guard against null/undefined.

@@ -7,6 +7,8 @@
  */
 
 import { Result } from '../common/evaluable.js'
+import { isNumber } from '../common/type-check.js'
+import { toDateDuration, toDateNumber } from '../common/util.js'
 import { OPERATOR as OPERATOR_DIVIDE } from '../expression/arithmetic/divide.js'
 import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply.js'
 import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract.js'
@@ -87,6 +89,8 @@ export type Bytecode = (number | Result)[]
 interface OperatorMaps {
   binary: Record<string, number>
   arithmetic: Record<string, number>
+  sumOp: string
+  subtractOp: string
   presentOp: string
   undefinedOp: string
   andOp: string
@@ -98,6 +102,9 @@ interface OperatorMaps {
   notInOp: string
   overlapOp: string
   eqOp: string
+  rootAllowed: Set<string>
+  comparisonOps: Set<string>
+  logicalOps: Set<string>
 }
 
 function getOperator(m: Map<symbol, string>, op: symbol): string {
@@ -111,26 +118,49 @@ function getOperator(m: Map<symbol, string>, op: symbol): string {
 function buildOperatorMaps(opts: Options): OperatorMaps {
   const m = opts.operatorMapping
   const get = (op: symbol) => getOperator(m, op)
+
+  const binary: Record<string, number> = {
+    [get(OPERATOR_EQ)]: OP_EQ,
+    [get(OPERATOR_NE)]: OP_NE,
+    [get(OPERATOR_GT)]: OP_GT,
+    [get(OPERATOR_GE)]: OP_GE,
+    [get(OPERATOR_LT)]: OP_LT,
+    [get(OPERATOR_LE)]: OP_LE,
+    [get(OPERATOR_IN)]: OP_IN,
+    [get(OPERATOR_NOT_IN)]: OP_NOT_IN,
+    [get(OPERATOR_PREFIX)]: OP_PREFIX,
+    [get(OPERATOR_SUFFIX)]: OP_SUFFIX,
+    [get(OPERATOR_OVERLAP)]: OP_OVERLAP,
+  }
+
+  const arithmetic: Record<string, number> = {
+    [get(OPERATOR_SUM)]: OP_SUM,
+    [get(OPERATOR_SUBTRACT)]: OP_SUBTRACT,
+    [get(OPERATOR_MULTIPLY)]: OP_MULTIPLY,
+    [get(OPERATOR_DIVIDE)]: OP_DIVIDE,
+  }
+
+  const comparisonOps = new Set<string>([
+    ...Object.keys(binary),
+    get(OPERATOR_PRESENT),
+    get(OPERATOR_UNDEFINED),
+  ])
+
+  const logicalOps = new Set<string>([
+    get(OPERATOR_AND),
+    get(OPERATOR_OR),
+    get(OPERATOR_NOR),
+    get(OPERATOR_NOT),
+    get(OPERATOR_XOR),
+  ])
+
+  const rootAllowed = new Set<string>([...comparisonOps, ...logicalOps])
+
   return {
-    binary: {
-      [get(OPERATOR_EQ)]: OP_EQ,
-      [get(OPERATOR_NE)]: OP_NE,
-      [get(OPERATOR_GT)]: OP_GT,
-      [get(OPERATOR_GE)]: OP_GE,
-      [get(OPERATOR_LT)]: OP_LT,
-      [get(OPERATOR_LE)]: OP_LE,
-      [get(OPERATOR_IN)]: OP_IN,
-      [get(OPERATOR_NOT_IN)]: OP_NOT_IN,
-      [get(OPERATOR_PREFIX)]: OP_PREFIX,
-      [get(OPERATOR_SUFFIX)]: OP_SUFFIX,
-      [get(OPERATOR_OVERLAP)]: OP_OVERLAP,
-    },
-    arithmetic: {
-      [get(OPERATOR_SUM)]: OP_SUM,
-      [get(OPERATOR_SUBTRACT)]: OP_SUBTRACT,
-      [get(OPERATOR_MULTIPLY)]: OP_MULTIPLY,
-      [get(OPERATOR_DIVIDE)]: OP_DIVIDE,
-    },
+    binary,
+    arithmetic,
+    sumOp: get(OPERATOR_SUM),
+    subtractOp: get(OPERATOR_SUBTRACT),
     presentOp: get(OPERATOR_PRESENT),
     undefinedOp: get(OPERATOR_UNDEFINED),
     andOp: get(OPERATOR_AND),
@@ -142,6 +172,9 @@ function buildOperatorMaps(opts: Options): OperatorMaps {
     notInOp: get(OPERATOR_NOT_IN),
     overlapOp: get(OPERATOR_OVERLAP),
     eqOp: get(OPERATOR_EQ),
+    rootAllowed,
+    comparisonOps,
+    logicalOps,
   }
 }
 
@@ -238,6 +271,38 @@ function internRef(raw: string, state: CompilerState): number {
   return refIndex
 }
 
+function isLogicalOrComparison(op: Input, maps: OperatorMaps): boolean {
+  if (!Array.isArray(op) || op.length === 0 || typeof op[0] !== 'string') {
+    return false
+  }
+  const operator = op[0]
+  if (maps.comparisonOps.has(operator)) {
+    return true
+  }
+  if (maps.logicalOps.has(operator)) {
+    const operands = op.slice(1)
+    const isExpr = (child: Input): boolean =>
+      Array.isArray(child) &&
+      child.length > 0 &&
+      typeof child[0] === 'string' &&
+      (maps.comparisonOps.has(child[0]) ||
+        maps.logicalOps.has(child[0]) ||
+        child[0] in maps.arithmetic)
+
+    if (operands.length === 0 || !operands.some(isExpr)) {
+      return false
+    }
+    if (
+      (operator === maps.andOp || operator === maps.orOp) &&
+      operands.length === 1
+    ) {
+      return isLogicalOrComparison(operands[0], maps)
+    }
+    return true
+  }
+  return false
+}
+
 function emitOperand(raw: Input, state: CompilerState): void {
   const { bytecode, refs, opts } = state
 
@@ -279,196 +344,9 @@ function emitOperand(raw: Input, state: CompilerState): void {
   bytecode.push(OP_PUSH_VALUE, raw)
 }
 
-/**
- * Return the ref key and static value array for a branch child that is either:
- *   IN(ref, [v1, v2, ...])  — ref ∈ static collection
- *   ==(ref, scalar)         — ref === scalar, treated as IN with [scalar]
- * Returns null if the child does not match either form.
- */
-function extractInLikeChild(
-  ca: ArrayInput,
-  state: CompilerState
-): {
-  rawRef: string
-  refKey: string
-  vals: ArrayInput
-  operator: 'eq' | 'in'
-} | null {
-  const op = ca[0]
-  const left = ca[1]
-  if (typeof left !== 'string' || !state.opts.referencePredicate(left)) {
-    return null
-  }
-  // left is narrowed to string by the guard above
-  const rawRef = left
-  const refKey = state.opts.referenceTransform(rawRef)
-
-  if (op === state.maps.inOp) {
-    const right = ca[2]
-    if (!isStaticCollection(right, state.opts)) {
-      return null
-    }
-    return { rawRef, refKey, vals: right, operator: 'in' }
-  }
-
-  // == (EQ): scalar equality treated as single-element IN
-  if (op === state.maps.eqOp) {
-    const right = ca[2]
-    if (typeof right === 'string' && state.opts.referencePredicate(right)) {
-      return null
-    }
-    if (Array.isArray(right)) {
-      return null
-    }
-    return { rawRef, refKey, vals: [right], operator: 'eq' }
-  }
-
-  return null
-}
-
-/**
- * Check whether an OR expression matches the pattern:
- *   OR( AND(IN-like(ref1, set1), IN-like(ref2, set2)), ... )
- * where IN-like is either IN(ref, staticSet) or ==(ref, scalar),
- * and every branch uses the exact same two refs in the same order.
- *
- * Builds an inverted index: for each unique value in any setA, union-merges all
- * setB values across branches where that setA value appears, and emits one
- * (literal value, mergedSetBIdx) entry per distinct setA value.
- *
- * This lets the interpreter do a single O(1) Map lookup on ref1 to find all
- * relevant setB indices, instead of a linear scan through N setA Sets.
- * Returns null if the pattern does not match.
- */
-export function detectOrAndIn2Pattern(
-  arr: ArrayInput,
-  state: CompilerState
-): {
-  ref1Raw: string
-  ref2Raw: string
-  entries: Array<[Result, number]>
-  entryOperators: Array<['eq' | 'in', 'eq' | 'in']>
-} | null {
-  const nBranches = arr.length - 1
-  if (nBranches < 2) {
-    return null
-  }
-
-  let ref1Raw: string | null = null
-  let ref2Raw: string | null = null
-  let refKey1: string | null = null
-  let refKey2: string | null = null
-
-  // Inverted index: each distinct setA value → merged setB values across all branches containing it
-  const setBValsByAValue = new Map<Result, Set<Result>>()
-  // Track which operators were used for each setA value (for ref1 operand reconstruction)
-  const ref1OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
-  // Track which operators were used for each setA value (for ref2 operand reconstruction)
-  const ref2OpsByAValue = new Map<Result, Set<'eq' | 'in'>>()
-
-  for (let b = 1; b <= nBranches; b++) {
-    const branch = arr[b]
-    if (!Array.isArray(branch)) {
-      return null
-    }
-    if (branch[0] !== state.maps.andOp) {
-      return null
-    }
-    if (branch.length !== 3) {
-      return null
-    }
-
-    let extA: ReturnType<typeof extractInLikeChild> = null
-    let extB: ReturnType<typeof extractInLikeChild> = null
-
-    for (let c = 1; c <= 2; c++) {
-      const child = branch[c]
-      if (!Array.isArray(child)) {
-        return null
-      }
-      const extracted = extractInLikeChild(child, state)
-      if (extracted === null) {
-        return null
-      }
-      const { rawRef, refKey } = extracted
-      if (c === 1) {
-        extA = extracted
-        if (b === 1) {
-          ref1Raw = rawRef
-          refKey1 = refKey
-        } else if (refKey !== refKey1) {
-          return null
-        }
-      } else {
-        extB = extracted
-        if (b === 1) {
-          ref2Raw = rawRef
-          refKey2 = refKey
-        } else if (refKey !== refKey2) {
-          return null
-        }
-      }
-    }
-
-    if (extA === null || extB === null) {
-      return null
-    }
-
-    // For each value in setA, union-merge all setB values
-    for (const aVal of extA.vals) {
-      let setBVals = setBValsByAValue.get(aVal)
-      if (setBVals === undefined) {
-        setBVals = new Set<Result>()
-        setBValsByAValue.set(aVal, setBVals)
-      }
-      // Track ref1 operator
-      let r1Ops = ref1OpsByAValue.get(aVal)
-      if (r1Ops === undefined) {
-        r1Ops = new Set<'eq' | 'in'>()
-        ref1OpsByAValue.set(aVal, r1Ops)
-      }
-      r1Ops.add(extA.operator)
-      // Track ref2 operator
-      let r2Ops = ref2OpsByAValue.get(aVal)
-      if (r2Ops === undefined) {
-        r2Ops = new Set<'eq' | 'in'>()
-        ref2OpsByAValue.set(aVal, r2Ops)
-      }
-      r2Ops.add(extB.operator)
-      for (const bVal of extB.vals) {
-        setBVals.add(bVal)
-      }
-    }
-  }
-
-  if (ref1Raw === null || ref2Raw === null) {
-    return null
-  }
-
-  // Build entries: one (literal aVal, mergedSetBIdx) per distinct setA value
-  const entries: Array<[Result, number]> = []
-  // Track operators per entry: [ref1Op, ref2Op]
-  const entryOperators: Array<['eq' | 'in', 'eq' | 'in']> = []
-  for (const [aVal, setBVals] of setBValsByAValue) {
-    const mergedSetB = [...setBVals].filter((v): v is Input => v !== undefined)
-    const constIdx = internConst(mergedSetB, state)
-    entries.push([aVal, constIdx])
-    // Determine ref1 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
-    const r1Ops = ref1OpsByAValue.get(aVal)
-    const ref1Op =
-      r1Ops !== undefined && r1Ops.size === 1 && r1Ops.has('eq') ? 'eq' : 'in'
-    // Determine ref2 operator: if all branches used 'eq', preserve 'eq'; otherwise use 'in'
-    const r2Ops = ref2OpsByAValue.get(aVal)
-    const ref2Op =
-      r2Ops !== undefined && r2Ops.size === 1 && r2Ops.has('eq') ? 'eq' : 'in'
-    entryOperators.push([ref1Op, ref2Op])
-  }
-
-  return { ref1Raw, ref2Raw, entries, entryOperators }
-}
-
 // arr[0] is the operator; operands are arr[1..arr.length-1]
 function emitShortCircuit(
+  opts: Options,
   arr: ArrayInput,
   jumpOp: typeof OP_JUMP_IF_FALSE | typeof OP_JUMP_IF_TRUE,
   markerOp: typeof OP_AND | typeof OP_OR | typeof OP_NOR,
@@ -481,14 +359,14 @@ function emitShortCircuit(
   bytecode.push(OP_ENTER_SCOPE)
 
   for (let i = 1; i < last; i++) {
-    emitExpression(arr[i], state)
+    emitExpression(opts, arr[i], state)
     bytecode.push(jumpOp)
     jumpSlots.push(bytecode.length)
     bytecode.push(0) // placeholder — backpatched below
     bytecode.push(OP_POP) // discard result before evaluating next operand
   }
 
-  emitExpression(arr[last], state)
+  emitExpression(opts, arr[last], state)
 
   const end = bytecode.length
   for (const slot of jumpSlots) {
@@ -499,7 +377,52 @@ function emitShortCircuit(
   bytecode.push(markerOp, last)
 }
 
-function emitExpression(raw: Input, state: CompilerState): void {
+function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
+  const [first, ...rest] = operands
+
+  const isReference = (v: Input) =>
+    typeof v === 'string' && opts.referencePredicate(v)
+
+  const isValue = (v: Input) =>
+    (!Array.isArray(v) && !isReference(v)) || v === null
+
+  const restAreAllReferences = rest.every((op) => isReference(op))
+  const values = rest.filter((op) => isValue(op))
+  const valuesAreAllDurations = values.every((op) => !!toDateDuration(op))
+  const valuesAreAllNumbers = values.every((op) => isNumber(op))
+  if (isReference(first)) {
+    if (
+      !restAreAllReferences &&
+      !valuesAreAllDurations &&
+      !valuesAreAllNumbers
+    ) {
+      throw new Error(
+        'sum expression value literals should be all numbers or all date durations'
+      )
+    }
+  } else if (isValue(first)) {
+    if (isNumber(first)) {
+      if (!restAreAllReferences && !valuesAreAllNumbers) {
+        throw new Error('sum expression value literals should be all numbers')
+      }
+    } else {
+      if (!isNaN(toDateNumber(first))) {
+        if (!restAreAllReferences && !valuesAreAllDurations) {
+          throw new Error(
+            'sum expression value literals should be all date durations'
+          )
+        }
+      } else {
+        throw new Error(
+          'sum expression value literals should be all numbers or starting ' +
+            'with an iso date string followed by date durations'
+        )
+      }
+    }
+  }
+}
+
+function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   const { bytecode, maps } = state
 
   if (!Array.isArray(raw)) {
@@ -519,35 +442,88 @@ function emitExpression(raw: Input, state: CompilerState): void {
   // ---------------------------------------------------------------------------
   // Logical — short-circuit with jump instructions
   // ---------------------------------------------------------------------------
+
+  const isLogicalOp = maps.logicalOps.has(operator)
+
+  if (isLogicalOp) {
+    const operands = arr.slice(1)
+    const isExpr = (op: Input): boolean =>
+      Array.isArray(op) &&
+      op.length > 0 &&
+      typeof op[0] === 'string' &&
+      (maps.comparisonOps.has(op[0]) ||
+        maps.logicalOps.has(op[0]) ||
+        op[0] in maps.arithmetic)
+
+    // Logical expressions without operands or with no expression operands are treated as collections
+    if (operands.length === 0 || !operands.some(isExpr)) {
+      emitOperand(raw, state)
+      return
+    }
+
+    // AND / OR with a single operand collapse to the inner expression
+    const collapsible = operator === maps.andOp || operator === maps.orOp
+    if (collapsible && operands.length === 1) {
+      emitExpression(opts, operands[0], state)
+      return
+    }
+
+    // logicalIfValidOperands: all operands must be Logical or Comparison
+    if (!operands.every((op) => isLogicalOrComparison(op, maps))) {
+      throw new Error('invalid expression')
+    }
+  }
+
+  // Validate logical operands — arithmetic operators are not allowed
+  const validateLogicalOperands = (operands: Input[]) => {
+    if (operands.length < 2) {
+      throw new Error('logical expression must have at least two operands')
+    }
+    for (const op of operands) {
+      if (Array.isArray(op) && typeof op[0] === 'string') {
+        if (op[0] in maps.arithmetic) {
+          throw new Error('invalid expression')
+        }
+      }
+    }
+  }
+
   if (operator === maps.andOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_FALSE, OP_AND, state)
+    validateLogicalOperands(arr.slice(1))
+    emitShortCircuit(opts, arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
 
   if (operator === maps.orOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_OR, state)
+    validateLogicalOperands(arr.slice(1))
+    emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
 
   if (operator === maps.norOp) {
+    validateLogicalOperands(arr.slice(1))
     // NOR = NOT OR: emit as OR with short-circuit, then negate
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_NOR, state)
+    emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
     return
   }
 
   if (operator === maps.notOp) {
-    emitExpression(arr[1], state)
+    if (arr.length !== 2) {
+      throw new Error('logical NOT expression must have exactly one operand')
+    }
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_NOT)
     return
   }
 
   if (operator === maps.xorOp) {
+    validateLogicalOperands(arr.slice(1))
     // XOR is associative: chain binary XOR operations
     // (A XOR B) XOR C XOR D ...
-    emitExpression(arr[1], state)
+    emitExpression(opts, arr[1], state)
     for (let i = 2; i <= nOperands; i++) {
-      emitExpression(arr[i], state)
+      emitExpression(opts, arr[i], state)
       bytecode.push(OP_XOR)
     }
     return
@@ -571,7 +547,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         operator === maps.inOp ? OP_IN_COLLECTION : OP_NOT_IN_COLLECTION
       if (!leftHasDynamic) {
         // fully static collection on left — intern as const, Set-lookup the scalar
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const opcodePos = bytecode.length
         bytecode.push(constOp, internConst(leftArr, state))
         state.directionEntries.push({ pos: opcodePos, dir: 0 })
@@ -601,7 +577,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         for (const item of leftArr) {
           emitOperand(item, state)
         }
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const opcodePos = bytecode.length
         bytecode.push(collectionOp, leftArr.length)
         state.directionEntries.push({ pos: opcodePos, dir: 0 })
@@ -618,7 +594,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         operator === maps.inOp ? OP_IN_COLLECTION : OP_NOT_IN_COLLECTION
       if (!rightHasDynamic) {
         // fully static collection on right — intern as const, Set-lookup the scalar
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const opcodePos = bytecode.length
         bytecode.push(constOp, internConst(rightArr, state))
         state.directionEntries.push({ pos: opcodePos, dir: 1 })
@@ -648,7 +624,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         for (const item of rightArr) {
           emitOperand(item, state)
         }
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const opcodePos = bytecode.length
         bytecode.push(collectionOp, rightArr.length)
         state.directionEntries.push({ pos: opcodePos, dir: 1 })
@@ -687,7 +663,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         state.directionEntries.push({ pos: opcodePos, dir: 0 })
         state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
         state.directionEntries.push({ pos: opcodePos, dir: 0 })
@@ -718,7 +694,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         state.directionEntries.push({ pos: opcodePos, dir: 1 })
         state.overlapRefsEntries.push({ pos: opcodePos, refIdxs })
       } else {
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const opcodePos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
         state.directionEntries.push({ pos: opcodePos, dir: 1 })
@@ -729,8 +705,11 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator in maps.binary) {
-    emitExpression(arr[1], state)
-    emitExpression(arr[2], state)
+    if (arr.length !== 3) {
+      throw new Error('comparison expression expects left and right operands')
+    }
+    emitExpression(opts, arr[1], state)
+    emitExpression(opts, arr[2], state)
     bytecode.push(maps.binary[operator])
     return
   }
@@ -739,13 +718,13 @@ function emitExpression(raw: Input, state: CompilerState): void {
   // Unary comparison
   // ---------------------------------------------------------------------------
   if (operator === maps.presentOp) {
-    emitExpression(arr[1], state)
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_PRESENT)
     return
   }
 
   if (operator === maps.undefinedOp) {
-    emitExpression(arr[1], state)
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_UNDEFINED)
     return
   }
@@ -754,8 +733,11 @@ function emitExpression(raw: Input, state: CompilerState): void {
   // Arithmetic — N operands
   // ---------------------------------------------------------------------------
   if (operator in maps.arithmetic) {
+    if (operator === maps.sumOp || operator === maps.subtractOp) {
+      dateArithmeticTypeCheck(opts, ...arr.slice(1))
+    }
     for (let i = 1; i <= nOperands; i++) {
-      emitExpression(arr[i], state)
+      emitExpression(opts, arr[i], state)
     }
     bytecode.push(maps.arithmetic[operator], nOperands)
     return
@@ -796,7 +778,19 @@ export function compile(
   raw: ExpressionInput,
   opts: Options
 ): CompiledExpression {
+  // Validate root expression — must be an array with a string operator
+  if (!Array.isArray(raw) || typeof raw[0] !== 'string') {
+    throw new Error('invalid expression')
+  }
+
+  const rootOp = raw[0]
   const maps = buildOperatorMaps(opts)
+
+  // Validate root operator — arithmetic or unknown operators cannot be root operators
+  if (!maps.rootAllowed.has(rootOp)) {
+    throw new Error('invalid expression')
+  }
+
   const state: CompilerState = {
     bytecode: [],
     refs: [],
@@ -812,7 +806,7 @@ export function compile(
     overlapRefsEntries: [],
     directionEntries: [],
   }
-  emitExpression(raw, state)
+  emitExpression(opts, raw, state)
 
   // Build reverse map: opcode → operator string for residual reconstruction
   const opNames: Record<number, string> = {}

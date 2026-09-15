@@ -87,7 +87,6 @@ class Engine {
   private getCompiled(exp: ExpressionInput): CompiledExpression {
     let compiled = this.bytecodeCache.get(exp)
     if (compiled === undefined) {
-      this.parser.parse(exp) // validates root operator and expression structure
       compiled = compile(exp, this.parser.options)
       this.bytecodeCache.set(exp, compiled)
     }
@@ -129,7 +128,7 @@ class Engine {
     if (this.evaluator === 'oop') {
       return this.parser.parse(exp)
     }
-    return new BytecodeEvaluable(this.getCompiled(exp), this.parser.parse(exp))
+    return new BytecodeEvaluable(this.getCompiled(exp))
   }
 
   /**
