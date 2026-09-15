@@ -39,18 +39,12 @@ declare class Engine {
     private readonly parser;
     private readonly evaluator;
     private readonly bytecodeCache;
-    private readonly simplifyCache;
     /**
      * @constructor
      * @param {Options?} options Parser options.
      */
     constructor(options?: Partial<Options>);
     private getCompiled;
-    /**
-     * Compile for simplify: preserves the original nested structure so the
-     * simplify interpreter can reproduce the input verbatim (no OR_AND_IN merge).
-     */
-    private getSimplifiedCompiled;
     /**
      * Evaluate the expression.
      * @param {ExpressionInput} exp Raw expression.

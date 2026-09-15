@@ -30,11 +30,6 @@ export const OP_IN_CONST = 49 // next: constIdx — pop scalar, Set-lookup in co
 export const OP_NOT_IN_CONST = 50 // next: constIdx — pop scalar, Set-lookup in consts[constIdx], push !membership
 // next: N, ref0..refN-1, constIdx — resolve each ref inline against Set, no stack alloc
 export const OP_OVERLAP_SCAN_REFS_CONST = 51
-// next: ref1Idx, ref2Idx, M, v0, setBIdx0, v1, setBIdx1, ..., vM-1, setBIdxM-1
-// Inverted-index form: M entries of (literal setA value, constIdx of merged setB).
-// At runtime: resolve ref1, look up matching entries by value (O(1) via cached Map),
-// for each match check ref2 ∈ mergedSetB. Refs resolved once; setBs union-merged per setA value.
-export const OP_OR_AND_IN_CONST_2 = 52
 export const OP_PREFIX = 18 // pop 2, push right.startsWith(left)
 export const OP_SUFFIX = 19 // pop 2, push left.endsWith(right)
 export const OP_OVERLAP = 20 // pop 2, push array intersection check

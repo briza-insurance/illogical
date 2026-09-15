@@ -1,0 +1,27 @@
+{
+  "description": "AND with OR",
+  "expression": [
+    "AND",
+    ["==", "$RefA", "val1"],
+    ["==", "$RefB", "val2"],
+    [
+      "OR",
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val3"]],
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val4"]]
+    ]
+  ],
+  "strictKeys": ["NonRelevantId"],
+  "context": {
+    "NumberOfLocations": 1
+  },
+  "expected": [
+    "AND",
+    ["==", "$RefA", "val1"],
+    ["==", "$RefB", "val2"],
+    [
+      "OR",
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val3"]],
+      ["AND", ["==", "$RefB", "val2"], ["==", "$RefC", "val4"]]
+    ]
+  ]
+}
