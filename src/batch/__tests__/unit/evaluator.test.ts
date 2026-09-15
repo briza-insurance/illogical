@@ -320,6 +320,17 @@ describe('BatchEvaluator', () => {
           expFalseBothFalse: false,
         },
       },
+      {
+        name: 'nested property and reference with same name',
+        options: {
+          expressions: {
+            exp1: ['==', '$address.state', 'NY'],
+            exp2: ['==', '$state', 'NJ'],
+          },
+        },
+        context: { address: { state: 'NY' }, state: 'NJ' },
+        expectedResults: { exp1: true, exp2: true },
+      },
     ]
 
     for (const {

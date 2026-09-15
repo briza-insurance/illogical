@@ -88,7 +88,7 @@ describe('Dependency graph', () => {
 
         // multi-key ref produces entries for all segment keys
         assert.deepEqual(graph.get('user'), [{ exprName: 'expr2', refIdx: 1 }])
-        // TODO: Verify in v2 what happens if a key is both a top-level key and part of a multi-key ref
+
         assert.deepEqual(graph.get('profile'), [
           { exprName: 'expr2', refIdx: 1 },
         ])

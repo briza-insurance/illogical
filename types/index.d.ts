@@ -2,6 +2,7 @@
  * Main module.
  * @module illogical
  */
+import { BatchEvaluator, BatchEvaluatorOptions } from './batch/index.js';
 import { Context, Evaluable } from './common/evaluable.js';
 import { isEvaluable } from './common/type-check.js';
 import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide.js';
@@ -82,5 +83,29 @@ declare class Engine {
      * @returns {Inpunt | boolean}
      */
     simplify(exp: ExpressionInput, context: Context, strictKeys?: string[] | Set<string>, optionalKeys?: string[] | Set<string>): Input | boolean;
+    /**
+     * Create a BatchEvaluator for evaluating multiple expressions with shared resources.
+     *
+     * The batch evaluator compiles all expressions once, shares refs/consts across them,
+     * and supports incremental evaluation based on trusted dirty keys.
+     *
+     * @param {BatchEvaluatorOptions} options — Expressions map and optional parser options
+     * @returns {BatchEvaluator}
+     *
+     * @example
+     * ```typescript
+     * const batch = engine.createBatchEvaluator({
+     *   expressions: {
+     *     isActive: ['==', '$status', 'active'],
+     *     isPremium: ['==', '$tier', 'premium'],
+     *   },
+     * })
+     *
+     * const results = batch.evaluate({ status: 'active', tier: 'premium' })
+     * // Mode 2: incremental with trusted dirty keys
+     * const updated = batch.evaluate(fullContext, ['status'])
+     * ```
+     */
+    createBatchEvaluator(options: BatchEvaluatorOptions): BatchEvaluator;
 }
 export default Engine;

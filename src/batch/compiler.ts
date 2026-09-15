@@ -38,7 +38,6 @@ import {
   OP_NOT_IN_CONST,
   OP_NOT_IN_SCAN_REFS_CONST,
   OP_OR,
-  OP_OR_AND_IN_CONST_2,
   OP_OVERLAP,
   OP_OVERLAP_CONST,
   OP_OVERLAP_SCAN_REFS_CONST,
@@ -774,13 +773,6 @@ function extractRefIndices(bytecode: Bytecode): number[] {
         i++ // skip constIdx
         break
       }
-      case OP_OR_AND_IN_CONST_2: {
-        i += 3 // ref1Idx, ref2Idx, M
-        i++
-        const m = bcNum(bytecode, i)
-        i += m * 2
-        break
-      }
       default:
         i++
     }
@@ -818,16 +810,6 @@ function extractConstIndices(bytecode: Bytecode): number[] {
         const n = bcNum(bytecode, ++i)
         i += n
         indices.add(bcNum(bytecode, i))
-        break
-      }
-      case OP_OR_AND_IN_CONST_2: {
-        i += 3 // ref1Idx, ref2Idx, M
-        i++
-        const m = bcNum(bytecode, i)
-        for (let j = 0; j < m; j++) {
-          i += 2
-          indices.add(bcNum(bytecode, i))
-        }
         break
       }
       default:
