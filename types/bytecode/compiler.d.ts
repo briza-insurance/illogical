@@ -13,6 +13,8 @@ export type Bytecode = (number | Result)[];
 interface OperatorMaps {
     binary: Record<string, number>;
     arithmetic: Record<string, number>;
+    sumOp: string;
+    subtractOp: string;
     presentOp: string;
     undefinedOp: string;
     andOp: string;
@@ -24,6 +26,9 @@ interface OperatorMaps {
     notInOp: string;
     overlapOp: string;
     eqOp: string;
+    rootAllowed: Set<string>;
+    comparisonOps: Set<string>;
+    logicalOps: Set<string>;
 }
 export interface CompilerState {
     bytecode: Bytecode;
