@@ -16,6 +16,7 @@ import { Bytecode } from '../bytecode/compiler.js'
 import {
   OP_AND,
   OP_DIVIDE,
+  OP_ENTER_SCOPE,
   OP_EQ,
   OP_GE,
   OP_GT,
@@ -59,6 +60,8 @@ import {
 } from '../bytecode/opcodes.js'
 import { buildCompactRef, CompactRef } from '../bytecode/refs.js'
 import { Result } from '../common/evaluable.js'
+import { isNumber } from '../common/type-check.js'
+import { toDateDuration, toDateNumber } from '../common/util.js'
 import { OPERATOR as OPERATOR_DIVIDE } from '../expression/arithmetic/divide.js'
 import { OPERATOR as OPERATOR_MULTIPLY } from '../expression/arithmetic/multiply.js'
 import { OPERATOR as OPERATOR_SUBTRACT } from '../expression/arithmetic/subtract.js'
@@ -81,31 +84,7 @@ import { OPERATOR as OPERATOR_NOR } from '../expression/logical/nor.js'
 import { OPERATOR as OPERATOR_NOT } from '../expression/logical/not.js'
 import { OPERATOR as OPERATOR_OR } from '../expression/logical/or.js'
 import { OPERATOR as OPERATOR_XOR } from '../expression/logical/xor.js'
-// import {
-//   OPERATOR_AND,
-//   OPERATOR_DIVIDE,
-//   OPERATOR_EQ,
-//   OPERATOR_GE,
-//   OPERATOR_GT,
-//   OPERATOR_IN,
-//   OPERATOR_LE,
-//   OPERATOR_LT,
-//   OPERATOR_MULTIPLY,
-//   OPERATOR_NE,
-//   OPERATOR_NOR,
-//   OPERATOR_NOT,
-//   OPERATOR_NOT_IN,
-//   OPERATOR_OR,
-//   OPERATOR_OVERLAP,
-//   OPERATOR_PREFIX,
-//   OPERATOR_PRESENT,
-//   OPERATOR_SUBTRACT,
-//   OPERATOR_SUFFIX,
-//   OPERATOR_SUM,
-//   OPERATOR_UNDEFINED,
-//   OPERATOR_XOR,
-// } from '../operator.js'
-import { ExpressionInput, Input } from '../parser/index.js'
+import { ArrayInput, ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import { buildDependencyGraph } from './dependency-graph.js'
 import { CompiledBatch, CompiledBatchExpression } from './types.js'
@@ -117,6 +96,8 @@ import { CompiledBatch, CompiledBatchExpression } from './types.js'
 interface OperatorMaps {
   binary: Record<string, number>
   arithmetic: Record<string, number>
+  sumOp: string
+  subtractOp: string
   presentOp: string
   undefinedOp: string
   andOp: string
@@ -128,6 +109,9 @@ interface OperatorMaps {
   notInOp: string
   overlapOp: string
   eqOp: string
+  rootAllowed: Set<string>
+  comparisonOps: Set<string>
+  logicalOps: Set<string>
 }
 
 interface CompilerState {
@@ -140,7 +124,7 @@ interface CompilerState {
   maps: OperatorMaps
   collectionCse: Map<string, number>
   numLocals: number
-  consts: Input[][]
+  consts: ArrayInput[]
   constIndex: Map<string, number>
   overlapRefsEntries: Array<{ pos: number; refIdxs: number[] }>
   directionEntries: Array<{ pos: number; dir: 0 | 1 }>
@@ -161,26 +145,49 @@ function getOperator(m: Map<symbol, string>, op: symbol): string {
 function buildOperatorMaps(opts: Options): OperatorMaps {
   const m = opts.operatorMapping
   const get = (op: symbol) => getOperator(m, op)
+
+  const binary: Record<string, number> = {
+    [get(OPERATOR_EQ)]: OP_EQ,
+    [get(OPERATOR_NE)]: OP_NE,
+    [get(OPERATOR_GT)]: OP_GT,
+    [get(OPERATOR_GE)]: OP_GE,
+    [get(OPERATOR_LT)]: OP_LT,
+    [get(OPERATOR_LE)]: OP_LE,
+    [get(OPERATOR_IN)]: OP_IN,
+    [get(OPERATOR_NOT_IN)]: OP_NOT_IN,
+    [get(OPERATOR_PREFIX)]: OP_PREFIX,
+    [get(OPERATOR_SUFFIX)]: OP_SUFFIX,
+    [get(OPERATOR_OVERLAP)]: OP_OVERLAP,
+  }
+
+  const arithmetic: Record<string, number> = {
+    [get(OPERATOR_SUM)]: OP_SUM,
+    [get(OPERATOR_SUBTRACT)]: OP_SUBTRACT,
+    [get(OPERATOR_MULTIPLY)]: OP_MULTIPLY,
+    [get(OPERATOR_DIVIDE)]: OP_DIVIDE,
+  }
+
+  const comparisonOps = new Set<string>([
+    ...Object.keys(binary),
+    get(OPERATOR_PRESENT),
+    get(OPERATOR_UNDEFINED),
+  ])
+
+  const logicalOps = new Set<string>([
+    get(OPERATOR_AND),
+    get(OPERATOR_OR),
+    get(OPERATOR_NOR),
+    get(OPERATOR_NOT),
+    get(OPERATOR_XOR),
+  ])
+
+  const rootAllowed = new Set<string>([...comparisonOps, ...logicalOps])
+
   return {
-    binary: {
-      [get(OPERATOR_EQ)]: OP_EQ,
-      [get(OPERATOR_NE)]: OP_NE,
-      [get(OPERATOR_GT)]: OP_GT,
-      [get(OPERATOR_GE)]: OP_GE,
-      [get(OPERATOR_LT)]: OP_LT,
-      [get(OPERATOR_LE)]: OP_LE,
-      [get(OPERATOR_IN)]: OP_IN,
-      [get(OPERATOR_NOT_IN)]: OP_NOT_IN,
-      [get(OPERATOR_PREFIX)]: OP_PREFIX,
-      [get(OPERATOR_SUFFIX)]: OP_SUFFIX,
-      [get(OPERATOR_OVERLAP)]: OP_OVERLAP,
-    },
-    arithmetic: {
-      [get(OPERATOR_SUM)]: OP_SUM,
-      [get(OPERATOR_SUBTRACT)]: OP_SUBTRACT,
-      [get(OPERATOR_MULTIPLY)]: OP_MULTIPLY,
-      [get(OPERATOR_DIVIDE)]: OP_DIVIDE,
-    },
+    binary,
+    arithmetic,
+    sumOp: get(OPERATOR_SUM),
+    subtractOp: get(OPERATOR_SUBTRACT),
     presentOp: get(OPERATOR_PRESENT),
     undefinedOp: get(OPERATOR_UNDEFINED),
     andOp: get(OPERATOR_AND),
@@ -192,10 +199,13 @@ function buildOperatorMaps(opts: Options): OperatorMaps {
     notInOp: get(OPERATOR_NOT_IN),
     overlapOp: get(OPERATOR_OVERLAP),
     eqOp: get(OPERATOR_EQ),
+    rootAllowed,
+    comparisonOps,
+    logicalOps,
   }
 }
 
-function isStaticCollection(raw: Input, opts: Options): raw is Input[] {
+function isStaticCollection(raw: Input, opts: Options): raw is ArrayInput {
   return (
     Array.isArray(raw) &&
     !raw.some((v) => typeof v === 'string' && opts.referencePredicate(v))
@@ -208,6 +218,17 @@ function isPureRefCollection(raw: Input, opts: Options): raw is string[] {
     raw.length > 0 &&
     raw.every((v) => typeof v === 'string' && opts.referencePredicate(v))
   )
+}
+
+function internConst(items: ArrayInput, state: CompilerState): number {
+  const key = JSON.stringify(items)
+  let idx = state.constIndex.get(key)
+  if (idx === undefined) {
+    idx = state.consts.length
+    state.consts.push(items)
+    state.constIndex.set(key, idx)
+  }
+  return idx
 }
 
 function getFirstCtxKey(ref: CompactRef): string | undefined {
@@ -253,15 +274,36 @@ function internRef(raw: string, state: CompilerState): number {
   return refIndex
 }
 
-function internConst(items: Input[], state: CompilerState): number {
-  const key = JSON.stringify(items)
-  let idx = state.constIndex.get(key)
-  if (idx === undefined) {
-    idx = state.consts.length
-    state.consts.push(items)
-    state.constIndex.set(key, idx)
+function isLogicalOrComparison(op: Input, maps: OperatorMaps): boolean {
+  if (!Array.isArray(op) || op.length === 0 || typeof op[0] !== 'string') {
+    return false
   }
-  return idx
+  const operator = op[0]
+  if (maps.comparisonOps.has(operator)) {
+    return true
+  }
+  if (maps.logicalOps.has(operator)) {
+    const operands = op.slice(1)
+    const isExpr = (child: Input): boolean =>
+      Array.isArray(child) &&
+      child.length > 0 &&
+      typeof child[0] === 'string' &&
+      (maps.comparisonOps.has(child[0]) ||
+        maps.logicalOps.has(child[0]) ||
+        child[0] in maps.arithmetic)
+
+    if (operands.length === 0 || !operands.some(isExpr)) {
+      return false
+    }
+    if (
+      (operator === maps.andOp || operator === maps.orOp) &&
+      operands.length === 1
+    ) {
+      return isLogicalOrComparison(operands[0], maps)
+    }
+    return true
+  }
+  return false
 }
 
 function emitOperand(raw: Input, state: CompilerState): void {
@@ -283,7 +325,7 @@ function emitOperand(raw: Input, state: CompilerState): void {
         emitOperand(item, state)
       }
       bytecode.push(OP_MAKE_COLLECTION, raw.length)
-      const slot = state.collectionCse.size
+      const slot = state.numLocals++
       state.collectionCse.set(cseKey, slot)
       bytecode.push(OP_STORE_LOCAL, slot)
       return
@@ -303,7 +345,8 @@ function emitOperand(raw: Input, state: CompilerState): void {
 }
 
 function emitShortCircuit(
-  arr: Input[],
+  opts: Options,
+  arr: ArrayInput,
   jumpOp: typeof OP_JUMP_IF_FALSE | typeof OP_JUMP_IF_TRUE,
   markerOp: typeof OP_AND | typeof OP_OR | typeof OP_NOR,
   state: CompilerState
@@ -312,15 +355,17 @@ function emitShortCircuit(
   const jumpSlots: number[] = []
   const last = arr.length - 1
 
+  bytecode.push(OP_ENTER_SCOPE)
+
   for (let i = 1; i < last; i++) {
-    emitExpression(arr[i], state)
+    emitExpression(opts, arr[i], state)
     bytecode.push(jumpOp)
     jumpSlots.push(bytecode.length)
     bytecode.push(0)
     bytecode.push(OP_POP)
   }
 
-  emitExpression(arr[last], state)
+  emitExpression(opts, arr[last], state)
   const end = bytecode.length
   for (const slot of jumpSlots) {
     bytecode[slot] = end - slot - 1
@@ -328,7 +373,52 @@ function emitShortCircuit(
   bytecode.push(markerOp, last)
 }
 
-function emitExpression(raw: Input, state: CompilerState): void {
+function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
+  const [first, ...rest] = operands
+
+  const isReference = (v: Input) =>
+    typeof v === 'string' && opts.referencePredicate(v)
+
+  const isValue = (v: Input) =>
+    (!Array.isArray(v) && !isReference(v)) || v === null
+
+  const restAreAllReferences = rest.every((op) => isReference(op))
+  const values = rest.filter((op) => isValue(op))
+  const valuesAreAllDurations = values.every((op) => !!toDateDuration(op))
+  const valuesAreAllNumbers = values.every((op) => isNumber(op))
+  if (isReference(first)) {
+    if (
+      !restAreAllReferences &&
+      !valuesAreAllDurations &&
+      !valuesAreAllNumbers
+    ) {
+      throw new Error(
+        'sum expression value literals should be all numbers or all date durations'
+      )
+    }
+  } else if (isValue(first)) {
+    if (isNumber(first)) {
+      if (!restAreAllReferences && !valuesAreAllNumbers) {
+        throw new Error('sum expression value literals should be all numbers')
+      }
+    } else {
+      if (!isNaN(toDateNumber(first))) {
+        if (!restAreAllReferences && !valuesAreAllDurations) {
+          throw new Error(
+            'sum expression value literals should be all date durations'
+          )
+        }
+      } else {
+        throw new Error(
+          'sum expression value literals should be all numbers or starting ' +
+            'with an iso date string followed by date durations'
+        )
+      }
+    }
+  }
+}
+
+function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   const { bytecode, maps } = state
 
   if (!Array.isArray(raw)) {
@@ -345,29 +435,88 @@ function emitExpression(raw: Input, state: CompilerState): void {
     return
   }
 
-  // Logical
+  // ---------------------------------------------------------------------------
+  // Logical — short-circuit with jump instructions
+  // ---------------------------------------------------------------------------
+
+  const isLogicalOp = maps.logicalOps.has(operator)
+
+  if (isLogicalOp) {
+    const operands = arr.slice(1)
+    const isExpr = (op: Input): boolean =>
+      Array.isArray(op) &&
+      op.length > 0 &&
+      typeof op[0] === 'string' &&
+      (maps.comparisonOps.has(op[0]) ||
+        maps.logicalOps.has(op[0]) ||
+        op[0] in maps.arithmetic)
+
+    // Logical expressions without operands or with no expression operands are treated as collections
+    if (operands.length === 0 || !operands.some(isExpr)) {
+      emitOperand(raw, state)
+      return
+    }
+
+    // AND / OR with a single operand collapse to the inner expression
+    const collapsible = operator === maps.andOp || operator === maps.orOp
+    if (collapsible && operands.length === 1) {
+      emitExpression(opts, operands[0], state)
+      return
+    }
+
+    // logicalIfValidOperands: all operands must be Logical or Comparison
+    if (!operands.every((op) => isLogicalOrComparison(op, maps))) {
+      throw new Error('invalid expression')
+    }
+  }
+
+  // Validate logical operands — arithmetic operators are not allowed
+  const validateLogicalOperands = (operands: Input[]) => {
+    if (operands.length < 2) {
+      throw new Error('logical expression must have at least two operands')
+    }
+    for (const op of operands) {
+      if (Array.isArray(op) && typeof op[0] === 'string') {
+        if (op[0] in maps.arithmetic) {
+          throw new Error('invalid expression')
+        }
+      }
+    }
+  }
+
   if (operator === maps.andOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_FALSE, OP_AND, state)
+    validateLogicalOperands(arr.slice(1))
+    emitShortCircuit(opts, arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
+
   if (operator === maps.orOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_OR, state)
+    validateLogicalOperands(arr.slice(1))
+    emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
+
   if (operator === maps.norOp) {
-    emitShortCircuit(arr, OP_JUMP_IF_TRUE, OP_NOR, state)
+    validateLogicalOperands(arr.slice(1))
+    emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
     return
   }
+
   if (operator === maps.notOp) {
-    emitExpression(arr[1], state)
+    if (arr.length !== 2) {
+      throw new Error('logical NOT expression must have exactly one operand')
+    }
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_NOT)
     return
   }
+
   if (operator === maps.xorOp) {
-    emitExpression(arr[1], state)
+    validateLogicalOperands(arr.slice(1))
+    emitExpression(opts, arr[1], state)
     for (let i = 2; i <= nOperands; i++) {
-      emitExpression(arr[i], state)
+      emitExpression(opts, arr[i], state)
       bytecode.push(OP_XOR)
     }
     return
@@ -378,7 +527,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
     const left = arr[1],
       right = arr[2]
     if (Array.isArray(left) && !Array.isArray(right)) {
-      const leftArr: Input[] = left
+      const leftArr: ArrayInput = left
       const leftHasDynamic = leftArr.some(
         (v) => typeof v === 'string' && state.opts.referencePredicate(v)
       )
@@ -386,7 +535,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
       const collectionOp =
         operator === maps.inOp ? OP_IN_COLLECTION : OP_NOT_IN_COLLECTION
       if (!leftHasDynamic) {
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const pos = bytecode.length
         bytecode.push(constOp, internConst(leftArr, state))
         state.directionEntries.push({ pos, dir: 0 })
@@ -414,7 +563,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         for (const item of leftArr) {
           emitOperand(item, state)
         }
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const pos = bytecode.length
         bytecode.push(collectionOp, leftArr.length)
         state.directionEntries.push({ pos, dir: 0 })
@@ -422,7 +571,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
       return
     }
     if (Array.isArray(right) && !Array.isArray(left)) {
-      const rightArr: Input[] = right
+      const rightArr: ArrayInput = right
       const rightHasDynamic = rightArr.some(
         (v) => typeof v === 'string' && state.opts.referencePredicate(v)
       )
@@ -430,7 +579,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
       const collectionOp =
         operator === maps.inOp ? OP_IN_COLLECTION : OP_NOT_IN_COLLECTION
       if (!rightHasDynamic) {
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const pos = bytecode.length
         bytecode.push(constOp, internConst(rightArr, state))
         state.directionEntries.push({ pos, dir: 1 })
@@ -458,7 +607,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         for (const item of rightArr) {
           emitOperand(item, state)
         }
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const pos = bytecode.length
         bytecode.push(collectionOp, rightArr.length)
         state.directionEntries.push({ pos, dir: 1 })
@@ -481,6 +630,11 @@ function emitExpression(raw: Input, state: CompilerState): void {
         bytecode.push(OP_OVERLAP_SCAN_REFS_CONST, right.length)
         const refIdxs: number[] = []
         for (const item of right) {
+          if (typeof item !== 'string') {
+            throw new Error(
+              'OVERLAP: expected string ref in pure-ref collection'
+            )
+          }
           const refIdx = internRef(item, state)
           bytecode.push(refIdx)
           refIdxs.push(refIdx)
@@ -489,7 +643,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         state.directionEntries.push({ pos, dir: 0 })
         state.overlapRefsEntries.push({ pos, refIdxs })
       } else {
-        emitExpression(right, state)
+        emitExpression(opts, right, state)
         const pos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
         state.directionEntries.push({ pos, dir: 0 })
@@ -506,6 +660,11 @@ function emitExpression(raw: Input, state: CompilerState): void {
         bytecode.push(OP_OVERLAP_SCAN_REFS_CONST, left.length)
         const refIdxs: number[] = []
         for (const item of left) {
+          if (typeof item !== 'string') {
+            throw new Error(
+              'OVERLAP: expected string ref in pure-ref collection'
+            )
+          }
           const refIdx = internRef(item, state)
           bytecode.push(refIdx)
           refIdxs.push(refIdx)
@@ -514,7 +673,7 @@ function emitExpression(raw: Input, state: CompilerState): void {
         state.directionEntries.push({ pos, dir: 1 })
         state.overlapRefsEntries.push({ pos, refIdxs })
       } else {
-        emitExpression(left, state)
+        emitExpression(opts, left, state)
         const pos = bytecode.length
         bytecode.push(OP_OVERLAP_CONST, constIdx)
         state.directionEntries.push({ pos, dir: 1 })
@@ -524,26 +683,32 @@ function emitExpression(raw: Input, state: CompilerState): void {
   }
 
   if (operator in maps.binary) {
-    emitExpression(arr[1], state)
-    emitExpression(arr[2], state)
+    if (arr.length !== 3) {
+      throw new Error('comparison expression expects left and right operands')
+    }
+    emitExpression(opts, arr[1], state)
+    emitExpression(opts, arr[2], state)
     bytecode.push(maps.binary[operator])
     return
   }
 
   if (operator === maps.presentOp) {
-    emitExpression(arr[1], state)
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_PRESENT)
     return
   }
   if (operator === maps.undefinedOp) {
-    emitExpression(arr[1], state)
+    emitExpression(opts, arr[1], state)
     bytecode.push(OP_UNDEFINED)
     return
   }
 
   if (operator in maps.arithmetic) {
+    if (operator === maps.sumOp || operator === maps.subtractOp) {
+      dateArithmeticTypeCheck(opts, ...arr.slice(1))
+    }
     for (let i = 1; i <= nOperands; i++) {
-      emitExpression(arr[i], state)
+      emitExpression(opts, arr[i], state)
     }
     bytecode.push(maps.arithmetic[operator], nOperands)
     return
@@ -574,11 +739,18 @@ export function compileBatch(
   const sharedRefIndex = new Map<string, number>()
   const sharedRefRawKeys: string[] = []
   const sharedRefKeys: string[] = []
-  const sharedConsts: Input[][] = []
+  const sharedConsts: ArrayInput[] = []
   const sharedConstIndex = new Map<string, number>()
 
-  // First pass: collect all refs (for dependency graph and deduplication)
-  for (const [, raw] of expressions) {
+  // First pass: validate root expressions and collect all refs (for dependency graph and deduplication)
+  for (const [key, raw] of expressions) {
+    if (!Array.isArray(raw) || typeof raw[0] !== 'string') {
+      throw new Error(`invalid expression with name ${key}`)
+    }
+    const rootOp = raw[0]
+    if (!maps.rootAllowed.has(rootOp)) {
+      throw new Error(`invalid expression with name ${key}`)
+    }
     collectAllRefs(
       raw,
       sharedRefIndex,
@@ -641,7 +813,7 @@ export function compileBatch(
       directionEntries: [],
     }
 
-    emitExpression(raw, exprState)
+    emitExpression(opts, raw, exprState)
 
     // Pre-build residual arrays
     const overlapRefsResiduals: Array<[number, Input[]]> =
@@ -761,15 +933,12 @@ function extractRefIndices(bytecode: Bytecode): number[] {
         indices.add(bcNum(bytecode, i))
         break
       case OP_IN_SCAN_REFS_CONST:
-      case OP_NOT_IN_SCAN_REFS_CONST: {
-        const n = bcNum(bytecode, ++i)
-        i += n
-        i++ // skip constIdx
-        break
-      }
+      case OP_NOT_IN_SCAN_REFS_CONST:
       case OP_OVERLAP_SCAN_REFS_CONST: {
         const n = bcNum(bytecode, ++i)
-        i += n
+        for (let j = 0; j < n; j++) {
+          indices.add(bcNum(bytecode, ++i))
+        }
         i++ // skip constIdx
         break
       }

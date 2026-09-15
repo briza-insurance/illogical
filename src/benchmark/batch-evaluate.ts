@@ -107,10 +107,10 @@ function generateRandomExpression(
   contextKeys: string[],
   complexity: 'simple' | 'complex' = 'simple'
 ): ExpressionInput {
-  const simpleOps = ['==', '!=', '>', '>=', '<', '<=', 'in']
+  const simpleOps = ['==', '!=', '>', '>=', '<', '<=', 'IN']
   const op = simpleOps[rng.nextInt(simpleOps.length)]
 
-  if (op === 'in') {
+  if (op === 'IN') {
     const key = contextKeys[rng.nextInt(contextKeys.length)]
     const constVals = [1, 2, 3, 4, 5]
     return [
@@ -128,13 +128,10 @@ function generateRandomExpression(
     const innerOp = simpleOps[rng.nextInt(simpleOps.length)]
     const innerKey = contextKeys[rng.nextInt(contextKeys.length)]
     const innerVal =
-      innerOp === 'in'
+      innerOp === 'IN'
         ? [1, 2, 3].map(() => rng.nextInt(5) + 1)
-        : contextKeys[rng.nextInt(contextKeys.length)]
-    const inner: ExpressionInput =
-      innerOp === 'in'
-        ? [innerOp, `$${innerKey}`, innerVal]
-        : ([innerOp, `$${innerKey}`, innerVal] as ExpressionInput)
+        : `$${contextKeys[rng.nextInt(contextKeys.length)]}`
+    const inner: ExpressionInput = [innerOp, `$${innerKey}`, innerVal]
     return ['AND', inner, [op, `$${key1}`, `$${key2}`]] as ExpressionInput
   }
 
@@ -372,6 +369,18 @@ async function runBenchmarks() {
     // Collect results
     const toRow = (t: (typeof benchColdInd.tasks)[number]) => {
       const r = t.result
+      if (r.state === 'errored') {
+        const msg = r.error instanceof Error ? r.error.message : String(r.error)
+        return {
+          Task: t.name,
+          'p50 (µs)': 'ERROR',
+          'p75 (µs)': 'ERROR',
+          'p99 (µs)': 'ERROR',
+          'avg (µs)': 'ERROR',
+          'ops/sec': 'ERROR',
+          margin: msg,
+        }
+      }
       const stats = 'latency' in r ? r.latency : undefined
       const thr = 'throughput' in r ? r.throughput : undefined
       return {
@@ -392,15 +401,29 @@ async function runBenchmarks() {
     console.table(benchIncBatch.tasks.map(toRow))
     console.table(benchIncInd.tasks.map(toRow))
 
-    for (const t of [
+    const allTasks = [
       ...benchColdInd.tasks,
       ...benchWarmInd.tasks,
       ...benchColdBatch.tasks,
       ...benchWarmBatch.tasks,
       ...benchIncBatch.tasks,
       ...benchIncInd.tasks,
-    ]) {
-      allResults[t.name] = { ...t.result }
+    ]
+
+    for (const t of allTasks) {
+      if (t.result.state === 'errored') {
+        console.error(`Task "${t.name}" failed:`, t.result.error)
+        const err = t.result.error
+        allResults[t.name] = {
+          ...t.result,
+          error:
+            err instanceof Error
+              ? { name: err.name, message: err.message, stack: err.stack }
+              : err,
+        }
+      } else {
+        allResults[t.name] = { ...t.result }
+      }
     }
 
     // Print summary comparison
@@ -428,6 +451,15 @@ async function runBenchmarks() {
 
   writeFileSync(outputPath, JSON.stringify(allResults, null, 2))
   console.log(`\nResults written to ${outputPath}`)
+
+  const failedTasks = Object.entries(allResults).filter(
+    ([, res]) => (res as { state?: string }).state === 'errored'
+  )
+  if (failedTasks.length > 0) {
+    throw new Error(
+      `Benchmark completed with ${failedTasks.length} failed task(s): ${failedTasks.map(([name]) => name).join(', ')}`
+    )
+  }
 }
 
 runBenchmarks().catch((err) => {
