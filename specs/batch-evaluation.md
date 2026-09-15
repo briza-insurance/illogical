@@ -1,7 +1,7 @@
 # Batch Evaluation
 
-Starting in v3.x, illogical supports **batch evaluation** — a high-performance mode for
-evaluating many expressions against the same context. Instead of compiling and evaluating
+illogical supports **batch evaluation** — a high-performance mode for evaluating
+many expressions against the same context. Instead of compiling and evaluating
 each expression independently, batch evaluation:
 
 1. Compiles all expressions **once**, sharing resources (refs, consts, locals) across them.
@@ -10,6 +10,7 @@ each expression independently, batch evaluation:
 3. Tracks a **dependency graph** mapping context keys to the expressions that depend on them.
 
 This is ideal for scenarios like:
+
 - **UI state management**: Compute derived values (permissions, visibility, validation)
   from a shared context and update only when relevant keys change.
 - **Rule engines**: Evaluate hundreds of business rules against the same data model.
@@ -31,14 +32,12 @@ const batch = engine.createBatchEvaluator({
   expressions: {
     isActive: ['==', '$status', 'active'],
     isPremium: ['==', '$tier', 'premium'],
-    canAccess: [
-      'AND',
-      ['==', '$status', 'active'],
-      ['==', '$tier', 'premium'],
-    ],
+    canAccess: ['AND', ['==', '$status', 'active'], ['==', '$tier', 'premium']],
   },
   // Optional parser options
-  options: { /* ... */ },
+  options: {
+    /* ... */
+  },
 })
 
 // Evaluate all expressions
@@ -58,13 +57,14 @@ batch.dispose()
 
 Evaluate expressions against the given context. Supports two modes:
 
-| Mode | `changedKeys` | Behavior |
-|------|---------------|----------|
-| **Mode 1** (full) | `undefined` or omitted | Re-evaluate **all** expressions. Context is merged into stored context. |
-| **Mode 2** (incremental) | Array of key names | Re-evaluate **only** expressions affected by the given keys. |
-| **Mode 2** (cached) | Empty array `[]` | No-op. Return cached results without any evaluation. |
+| Mode                     | `changedKeys`          | Behavior                                                                |
+| ------------------------ | ---------------------- | ----------------------------------------------------------------------- |
+| **Mode 1** (full)        | `undefined` or omitted | Re-evaluate **all** expressions. Context is merged into stored context. |
+| **Mode 2** (incremental) | Array of key names     | Re-evaluate **only** expressions affected by the given keys.            |
+| **Mode 2** (cached)      | Empty array `[]`       | No-op. Return cached results without any evaluation.                    |
 
 **Parameters:**
+
 - `ctx` (`Context`): The full evaluation context. Values can be any type. Use `undefined` as a value to delete a key from the stored context.
 - `changedKeys` (`string[] | undefined`): Optional list of context keys that have changed. In Mode 2, only expressions that reference these keys are re-evaluated.
 
@@ -76,6 +76,7 @@ not on the output of other expressions. The dependency graph tracks context-key 
 mappings, not expression-to-expression relationships.
 
 This means:
+
 - The order of expressions in the batch does not matter.
 - The order of keys in `changedKeys` does not matter.
 - There is no concept of "expression A must evaluate before expression B."
@@ -122,6 +123,7 @@ batch.addExpression('isVip', ['==', '$tier', 'vip'])
 ```
 
 **Parameters:**
+
 - `name`: Expression name (must be unique)
 - `expression`: Raw expression input
 
@@ -137,6 +139,7 @@ batch.removeExpression('isPremium')
 ```
 
 **Parameters:**
+
 - `name`: Expression name to remove
 
 ### `dispose()`
@@ -153,7 +156,7 @@ compiled in three phases:
 
 1. **Phase 1 — Ref & Const Collection**: All expressions are scanned to collect unique
    context references (`$status`, `$tier`, etc.) and constant arrays (e.g., `['admin',
-   'editor']`). These are deduplicated into shared arrays (`sharedRefs[]`, `sharedConsts[]`).
+'editor']`). These are deduplicated into shared arrays (`sharedRefs[]`, `sharedConsts[]`).
 
 2. **Phase 2 — Dependency Graph**: A graph is built mapping each context key to the
    expressions that reference it. This enables incremental evaluation — when a key
@@ -166,10 +169,12 @@ compiled in three phases:
 ### Dependency Graph
 
 The dependency graph is a `Map<string, DependencyEntry[]>` where:
+
 - **Key**: A context key (without the `$` prefix)
 - **Value**: An array of `{ exprName, refIdx }` entries for expressions that reference that key
 
 For example, given:
+
 ```js
 {
   isActive: ['==', '$status', 'active'],
@@ -178,6 +183,7 @@ For example, given:
 ```
 
 The dependency graph would be:
+
 ```
 status → [{ exprName: 'isActive', refIdx: 0 }, { exprName: 'canAccess', refIdx: 0 }]
 tier   → [{ exprName: 'canAccess', refIdx: 1 }]
@@ -213,23 +219,23 @@ compilation is a one-time cost paid at creation or when expressions are added/re
 
 ### Shared Resources
 
-| Resource | Benefit |
-|----------|---------|
-| `sharedRefs[]` | Each unique context reference is compiled once, not once per expression |
-| `sharedConsts[]` | Identical constant arrays (e.g., `['admin', 'editor']`) are stored once |
-| `sharedConstSets[]` | Lazy-built Sets for fast `IN` / `NOT IN` / `OVERLAP` lookups |
-| Locals pool | Each expression gets a locals offset range, enabling zero-copy shared evaluation |
+| Resource            | Benefit                                                                          |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `sharedRefs[]`      | Each unique context reference is compiled once, not once per expression          |
+| `sharedConsts[]`    | Identical constant arrays (e.g., `['admin', 'editor']`) are stored once          |
+| `sharedConstSets[]` | Lazy-built Sets for fast `IN` / `NOT IN` / `OVERLAP` lookups                     |
+| Locals pool         | Each expression gets a locals offset range, enabling zero-copy shared evaluation |
 
 ### Benchmark Comparison
 
 Benchmarks were run with Node.js v22 on a Mac M2. Results show the trade-offs between
 batch and individual evaluation:
 
-| Scenario | Expressions | Incremental Batch | Individual (all) | Speedup |
-|----------|-------------|-------------------|------------------|---------|
-| Simple, 1 field changes | 1,000 | 26ms | 12ms | 0.45x |
-| Complex, 1 field changes | 500 | 14ms | 14ms | 1.0x |
-| Full evaluation | 1,000 | 25ms | 8ms | 0.32x |
+| Scenario                 | Expressions | Incremental Batch | Individual (all) | Speedup |
+| ------------------------ | ----------- | ----------------- | ---------------- | ------- |
+| Simple, 1 field changes  | 1,000       | 26ms              | 12ms             | 0.45x   |
+| Complex, 1 field changes | 500         | 14ms              | 14ms             | 1.0x    |
+| Full evaluation          | 1,000       | 25ms              | 8ms              | 0.32x   |
 
 **Key takeaways:**
 
@@ -249,12 +255,14 @@ batch and individual evaluation:
     becomes a smaller fraction of total work
 
 **When to use batch evaluation:**
+
 - You have 100+ expressions that share context keys
 - Expressions are complex (nested operators, multiple conditions)
 - Memory efficiency matters (shared resources)
 - You need incremental evaluation (only re-evaluating affected expressions)
 
 **When individual evaluation is sufficient:**
+
 - Few expressions (< 50)
 - Simple expressions (single comparisons)
 - One-off evaluation (no repeated context changes)
@@ -283,7 +291,9 @@ const flags = batch.evaluate({ tier: 'pro', hasExport: false })
 // → { showProFeatures: true, showEnterpriseFeatures: false, canExport: true }
 
 // Incremental: only tier changed
-const flags2 = batch.evaluate({ tier: 'enterprise', hasExport: false }, ['tier'])
+const flags2 = batch.evaluate({ tier: 'enterprise', hasExport: false }, [
+  'tier',
+])
 // → showProFeatures: true, showEnterpriseFeatures: true, canExport: true
 // Only showProFeatures and showEnterpriseFeatures were re-evaluated (not canExport)
 ```
@@ -306,11 +316,19 @@ const batch = engine.createBatchEvaluator({
 })
 
 // Evaluate as user interacts with the form
-const results1 = batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 25, tier: 'trial' })
+const results1 = batch.evaluate({
+  name: 'Alice',
+  email: 'alice@example.com',
+  age: 25,
+  tier: 'trial',
+})
 // → { canSubmit: true, needsVerification: true }
 
 // User changes age to 15 — only canSubmit changes
-const results2 = batch.evaluate({ name: 'Alice', email: 'alice@example.com', age: 15, tier: 'trial' }, ['age'])
+const results2 = batch.evaluate(
+  { name: 'Alice', email: 'alice@example.com', age: 15, tier: 'trial' },
+  ['age']
+)
 // → { canSubmit: false, needsVerification: true }
 // Only canSubmit was re-evaluated (not needsVerification)
 ```
@@ -331,7 +349,11 @@ batch.evaluate({ status: 'active' })
 
 // Add more expressions dynamically
 batch.addExpression('isPremium', ['==', '$tier', 'premium'])
-batch.addExpression('canAccess', ['AND', ['==', '$status', 'active'], ['==', '$tier', 'premium']])
+batch.addExpression('canAccess', [
+  'AND',
+  ['==', '$status', 'active'],
+  ['==', '$tier', 'premium'],
+])
 
 const results = batch.evaluate({ status: 'active', tier: 'premium' })
 // → { isActive: true, isPremium: true, canAccess: true }
