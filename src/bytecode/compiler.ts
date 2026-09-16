@@ -119,63 +119,94 @@ function buildOperatorMaps(opts: Options): OperatorMaps {
   const m = opts.operatorMapping
   const get = (op: symbol) => getOperator(m, op)
 
+  const eqOp = get(OPERATOR_EQ)
+  const neOp = get(OPERATOR_NE)
+  const gtOp = get(OPERATOR_GT)
+  const geOp = get(OPERATOR_GE)
+  const ltOp = get(OPERATOR_LT)
+  const leOp = get(OPERATOR_LE)
+  const inOp = get(OPERATOR_IN)
+  const notInOp = get(OPERATOR_NOT_IN)
+  const prefixOp = get(OPERATOR_PREFIX)
+  const suffixOp = get(OPERATOR_SUFFIX)
+  const overlapOp = get(OPERATOR_OVERLAP)
+
+  const sumOp = get(OPERATOR_SUM)
+  const subtractOp = get(OPERATOR_SUBTRACT)
+  const multiplyOp = get(OPERATOR_MULTIPLY)
+  const divideOp = get(OPERATOR_DIVIDE)
+
+  const presentOp = get(OPERATOR_PRESENT)
+  const undefinedOp = get(OPERATOR_UNDEFINED)
+
+  const andOp = get(OPERATOR_AND)
+  const orOp = get(OPERATOR_OR)
+  const norOp = get(OPERATOR_NOR)
+  const notOp = get(OPERATOR_NOT)
+  const xorOp = get(OPERATOR_XOR)
+
   const binary: Record<string, number> = {
-    [get(OPERATOR_EQ)]: OP_EQ,
-    [get(OPERATOR_NE)]: OP_NE,
-    [get(OPERATOR_GT)]: OP_GT,
-    [get(OPERATOR_GE)]: OP_GE,
-    [get(OPERATOR_LT)]: OP_LT,
-    [get(OPERATOR_LE)]: OP_LE,
-    [get(OPERATOR_IN)]: OP_IN,
-    [get(OPERATOR_NOT_IN)]: OP_NOT_IN,
-    [get(OPERATOR_PREFIX)]: OP_PREFIX,
-    [get(OPERATOR_SUFFIX)]: OP_SUFFIX,
-    [get(OPERATOR_OVERLAP)]: OP_OVERLAP,
+    [eqOp]: OP_EQ,
+    [neOp]: OP_NE,
+    [gtOp]: OP_GT,
+    [geOp]: OP_GE,
+    [ltOp]: OP_LT,
+    [leOp]: OP_LE,
+    [inOp]: OP_IN,
+    [notInOp]: OP_NOT_IN,
+    [prefixOp]: OP_PREFIX,
+    [suffixOp]: OP_SUFFIX,
+    [overlapOp]: OP_OVERLAP,
   }
 
   const arithmetic: Record<string, number> = {
-    [get(OPERATOR_SUM)]: OP_SUM,
-    [get(OPERATOR_SUBTRACT)]: OP_SUBTRACT,
-    [get(OPERATOR_MULTIPLY)]: OP_MULTIPLY,
-    [get(OPERATOR_DIVIDE)]: OP_DIVIDE,
+    [sumOp]: OP_SUM,
+    [subtractOp]: OP_SUBTRACT,
+    [multiplyOp]: OP_MULTIPLY,
+    [divideOp]: OP_DIVIDE,
   }
 
   const comparisonOps = new Set<string>([
     ...Object.keys(binary),
-    get(OPERATOR_PRESENT),
-    get(OPERATOR_UNDEFINED),
+    presentOp,
+    undefinedOp,
   ])
 
-  const logicalOps = new Set<string>([
-    get(OPERATOR_AND),
-    get(OPERATOR_OR),
-    get(OPERATOR_NOR),
-    get(OPERATOR_NOT),
-    get(OPERATOR_XOR),
-  ])
+  const logicalOps = new Set<string>([andOp, orOp, norOp, notOp, xorOp])
 
   const rootAllowed = new Set<string>([...comparisonOps, ...logicalOps])
 
   return {
     binary,
     arithmetic,
-    sumOp: get(OPERATOR_SUM),
-    subtractOp: get(OPERATOR_SUBTRACT),
-    presentOp: get(OPERATOR_PRESENT),
-    undefinedOp: get(OPERATOR_UNDEFINED),
-    andOp: get(OPERATOR_AND),
-    orOp: get(OPERATOR_OR),
-    norOp: get(OPERATOR_NOR),
-    notOp: get(OPERATOR_NOT),
-    xorOp: get(OPERATOR_XOR),
-    inOp: get(OPERATOR_IN),
-    notInOp: get(OPERATOR_NOT_IN),
-    overlapOp: get(OPERATOR_OVERLAP),
-    eqOp: get(OPERATOR_EQ),
+    sumOp,
+    subtractOp,
+    presentOp,
+    undefinedOp,
+    andOp,
+    orOp,
+    norOp,
+    notOp,
+    xorOp,
+    inOp,
+    notInOp,
+    overlapOp,
+    eqOp,
     rootAllowed,
     comparisonOps,
     logicalOps,
   }
+}
+
+const operatorMapsCache = new WeakMap<Options, OperatorMaps>()
+
+function getOrCreateOperatorMaps(opts: Options): OperatorMaps {
+  let maps = operatorMapsCache.get(opts)
+  if (!maps) {
+    maps = buildOperatorMaps(opts)
+    operatorMapsCache.set(opts, maps)
+  }
+  return maps
 }
 
 export interface CompilerState {
@@ -784,7 +815,7 @@ export function compile(
   }
 
   const rootOp = raw[0]
-  const maps = buildOperatorMaps(opts)
+  const maps = getOrCreateOperatorMaps(opts)
 
   // Validate root operator — arithmetic or unknown operators cannot be root operators
   if (!maps.rootAllowed.has(rootOp)) {
