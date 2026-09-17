@@ -72,6 +72,8 @@ const unexpectedResultError =
 class Engine {
   private readonly parser: Parser
   private readonly evaluator: 'oop' | 'bytecode'
+  private readonly bytecodeCache: WeakMap<ExpressionInput, CompiledExpression> =
+    new WeakMap()
 
   /**
    * @constructor
@@ -83,7 +85,12 @@ class Engine {
   }
 
   private getCompiled(exp: ExpressionInput): CompiledExpression {
-    return compile(exp, this.parser.options)
+    let compiled = this.bytecodeCache.get(exp)
+    if (compiled === undefined) {
+      compiled = compile(exp, this.parser.options)
+      this.bytecodeCache.set(exp, compiled)
+    }
+    return compiled
   }
 
   /**
