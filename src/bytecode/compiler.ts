@@ -209,6 +209,44 @@ function getOrCreateOperatorMaps(opts: Options): OperatorMaps {
   return maps
 }
 
+const opNamesReverseMapCache = new WeakMap<
+  OperatorMaps,
+  Record<number, string>
+>()
+
+function getOrCreateReverseOpNames(maps: OperatorMaps): Record<number, string> {
+  let opNames = opNamesReverseMapCache.get(maps)
+  if (!opNames) {
+    // Build reverse map: opcode → operator string for residual reconstruction
+    opNames = {}
+    for (const [str, code] of Object.entries(maps.binary)) {
+      opNames[code] = str
+    }
+    for (const [str, code] of Object.entries(maps.arithmetic)) {
+      opNames[code] = str
+    }
+    opNames[OP_NOT] = maps.notOp
+    opNames[OP_AND] = maps.andOp
+    opNames[OP_OR] = maps.orOp
+    opNames[OP_NOR] = maps.norOp
+    opNames[OP_XOR] = maps.xorOp
+    opNames[OP_PRESENT] = maps.presentOp
+    opNames[OP_UNDEFINED] = maps.undefinedOp
+    opNames[OP_IN_COLLECTION] = maps.inOp
+    opNames[OP_NOT_IN_COLLECTION] = maps.notInOp
+    opNames[OP_IN_CONST] = maps.inOp
+    opNames[OP_NOT_IN_CONST] = maps.notInOp
+    opNames[OP_OVERLAP_CONST] = maps.overlapOp
+    opNames[OP_OVERLAP_SCAN_REFS_CONST] = maps.overlapOp
+    opNames[OP_IN_SCAN_REFS_CONST] = maps.inOp
+    opNames[OP_NOT_IN_SCAN_REFS_CONST] = maps.notInOp
+
+    opNamesReverseMapCache.set(maps, opNames)
+  }
+
+  return opNames
+}
+
 export interface CompilerState {
   bytecode: Bytecode
   refs: CompactRef[] // side-table of compact refs, indexed by position
@@ -453,6 +491,16 @@ function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
   }
 }
 
+const isExpression =
+  (maps: OperatorMaps) =>
+  (op: Input): boolean =>
+    Array.isArray(op) &&
+    op.length > 0 &&
+    typeof op[0] === 'string' &&
+    (maps.comparisonOps.has(op[0]) ||
+      maps.logicalOps.has(op[0]) ||
+      op[0] in maps.arithmetic)
+
 function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   const { bytecode, maps } = state
 
@@ -463,6 +511,7 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
 
   const arr = raw
   const operator = arr[0]
+  const operands = arr.slice(1)
   const nOperands = arr.length - 1
 
   if (typeof operator !== 'string') {
@@ -477,14 +526,7 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   const isLogicalOp = maps.logicalOps.has(operator)
 
   if (isLogicalOp) {
-    const operands = arr.slice(1)
-    const isExpr = (op: Input): boolean =>
-      Array.isArray(op) &&
-      op.length > 0 &&
-      typeof op[0] === 'string' &&
-      (maps.comparisonOps.has(op[0]) ||
-        maps.logicalOps.has(op[0]) ||
-        op[0] in maps.arithmetic)
+    const isExpr = isExpression(maps)
 
     // Logical expressions without operands or with no expression operands are treated as collections
     if (operands.length === 0 || !operands.some(isExpr)) {
@@ -520,19 +562,19 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.andOp) {
-    validateLogicalOperands(arr.slice(1))
+    validateLogicalOperands(operands)
     emitShortCircuit(opts, arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
 
   if (operator === maps.orOp) {
-    validateLogicalOperands(arr.slice(1))
+    validateLogicalOperands(operands)
     emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
 
   if (operator === maps.norOp) {
-    validateLogicalOperands(arr.slice(1))
+    validateLogicalOperands(operands)
     // NOR = NOT OR: emit as OR with short-circuit, then negate
     emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
@@ -549,7 +591,7 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.xorOp) {
-    validateLogicalOperands(arr.slice(1))
+    validateLogicalOperands(operands)
     // XOR is associative: chain binary XOR operations
     // (A XOR B) XOR C XOR D ...
     emitExpression(opts, arr[1], state)
@@ -765,10 +807,10 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   // ---------------------------------------------------------------------------
   if (operator in maps.arithmetic) {
     if (operator === maps.sumOp || operator === maps.subtractOp) {
-      dateArithmeticTypeCheck(opts, ...arr.slice(1))
+      dateArithmeticTypeCheck(opts, ...operands)
     }
-    for (let i = 1; i <= nOperands; i++) {
-      emitExpression(opts, arr[i], state)
+    for (const operand of operands) {
+      emitExpression(opts, operand, state)
     }
     bytecode.push(maps.arithmetic[operator], nOperands)
     return
@@ -839,29 +881,7 @@ export function compile(
   }
   emitExpression(opts, raw, state)
 
-  // Build reverse map: opcode → operator string for residual reconstruction
-  const opNames: Record<number, string> = {}
-  for (const [str, code] of Object.entries(maps.binary)) {
-    opNames[code] = str
-  }
-  for (const [str, code] of Object.entries(maps.arithmetic)) {
-    opNames[code] = str
-  }
-  opNames[OP_NOT] = maps.notOp
-  opNames[OP_AND] = maps.andOp
-  opNames[OP_OR] = maps.orOp
-  opNames[OP_NOR] = maps.norOp
-  opNames[OP_XOR] = maps.xorOp
-  opNames[OP_PRESENT] = maps.presentOp
-  opNames[OP_UNDEFINED] = maps.undefinedOp
-  opNames[OP_IN_COLLECTION] = maps.inOp
-  opNames[OP_NOT_IN_COLLECTION] = maps.notInOp
-  opNames[OP_IN_CONST] = maps.inOp
-  opNames[OP_NOT_IN_CONST] = maps.notInOp
-  opNames[OP_OVERLAP_CONST] = maps.overlapOp
-  opNames[OP_OVERLAP_SCAN_REFS_CONST] = maps.overlapOp
-  opNames[OP_IN_SCAN_REFS_CONST] = maps.inOp
-  opNames[OP_NOT_IN_SCAN_REFS_CONST] = maps.notInOp
+  const opNames = getOrCreateReverseOpNames(maps)
 
   // Pre-build residual Input[] arrays for OP_OVERLAP_SCAN_REFS_CONST — eliminates per-call allocation in the simplifier
   const overlapRefsResiduals: Array<[number, Input[]]> =
