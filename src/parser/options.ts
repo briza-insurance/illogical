@@ -26,13 +26,6 @@ export type optionValue =
   | ((operand: string) => string | boolean)
   | Map<symbol, string>
 
-/**
- * Engine evaluator mode.
- * - `'oop'` (default): evaluates expressions using the classic OOP evaluable tree.
- * - `'bytecode'`: compiles expressions to bytecode and interprets them.
- */
-export type EvaluatorMode = 'oop' | 'bytecode'
-
 // Parser options
 export interface Options {
   /**
@@ -73,12 +66,6 @@ export interface Options {
    * is the key used to represent the  given operator in the raw expression.
    */
   operatorMapping: Map<symbol, string>
-
-  /**
-   * Evaluator mode used by the engine.
-   * Defaults to `'oop'` when not specified.
-   */
-  evaluator?: EvaluatorMode
 }
 
 /**

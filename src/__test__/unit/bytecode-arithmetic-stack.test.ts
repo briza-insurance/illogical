@@ -3,23 +3,6 @@ import { test } from 'node:test'
 
 import Engine, { type Context, type ExpressionInput } from '../../index.js'
 
-/**
- * Regression tests for a bytecode OOP evaluation mismatch on multi-operand
- * (3+) arithmetic expressions containing missing references.
- *
- * Reported case:
- *   evaluate ["==",["+","$A",0],["+",0,"$0",0]] with {}
- *     OOP          -> true
- *     bytecode     -> false   (mismatch)
- *
- * The documented behavior is that arithmetic ignores non-present operands for
- * the calculation but returns false if any reference is missing. Both operands
- * here evaluate to false, so `false == false` is true.
- *
- * Every case must evaluate identically under both the `oop` and `bytecode`
- * evaluators.
- */
-
 interface Case {
   description: string
   expression: ExpressionInput
@@ -74,35 +57,14 @@ const CASES: Case[] = [
   },
 ]
 
-const oop = new Engine({ evaluator: 'oop' })
-const bytecode = new Engine({ evaluator: 'bytecode' })
+const engine = new Engine()
 
 for (const tc of CASES) {
-  test(`oop: ${tc.description}`, () => {
+  test(`${tc.description}`, () => {
     assert.strictEqual(
-      oop.evaluate(tc.expression, tc.context),
+      engine.evaluate(tc.expression, tc.context),
       tc.expected,
-      `Expected ${tc.expected}, got ${oop.evaluate(tc.expression, tc.context)}`
-    )
-  })
-
-  test(`bytecode: ${tc.description}`, () => {
-    assert.strictEqual(
-      bytecode.evaluate(tc.expression, tc.context),
-      tc.expected,
-      `Expected ${tc.expected}, got ${bytecode.evaluate(tc.expression, tc.context)}`
-    )
-  })
-
-  test(`agreement: ${tc.description}`, () => {
-    const a = oop.evaluate(tc.expression, tc.context)
-    const b = bytecode.evaluate(tc.expression, tc.context)
-    assert.strictEqual(
-      a,
-      b,
-      `Evaluators disagree on ${JSON.stringify(tc.expression)} with ${JSON.stringify(
-        tc.context
-      )}: oop=${a}, bytecode=${b}`
+      `Expected ${tc.expected}, got ${engine.evaluate(tc.expression, tc.context)}`
     )
   })
 }
