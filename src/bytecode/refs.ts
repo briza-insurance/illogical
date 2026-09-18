@@ -43,8 +43,6 @@ export type CompactRef = string | string[] | CompactRefFull
 // ---------------------------------------------------------------------------
 // Regex — parsed once at compile time
 // ---------------------------------------------------------------------------
-const keyWithArrayIndexRegex =
-  /^(?<currentKey>[^[\]]+?)(?<indexes>(?:\[\d+])+)?$/
 const arrayIndexRegex = /\[(\d+)]/g
 const parseKeyRegex = /(`[^[\]]+`(\[\d+\])*|[^`.]+)/g
 
@@ -59,50 +57,90 @@ function parseBacktickWrappedKey(key: string): string {
 
 function parseKeyComponents(key: string): PathToken[] {
   const unwrapped = parseBacktickWrappedKey(key)
-  const tokens: PathToken[] = []
-  const match = keyWithArrayIndexRegex.exec(unwrapped)
-  if (match) {
-    tokens.push({
-      kind: 'key',
-      value: parseBacktickWrappedKey(match.groups?.currentKey ?? unwrapped),
-    })
-    const rawIndexes = match.groups?.indexes
-    if (rawIndexes) {
-      for (const idxMatch of rawIndexes.matchAll(arrayIndexRegex)) {
-        tokens.push({ kind: 'index', value: parseInt(idxMatch[1]) })
-      }
-    }
-  } else {
-    tokens.push({ kind: 'key', value: unwrapped })
+  const firstBracket = unwrapped.indexOf('[')
+  if (firstBracket <= 0) {
+    return [{ kind: 'key', value: unwrapped }]
   }
-  return tokens
+
+  const rawIndexes = unwrapped.slice(firstBracket)
+  arrayIndexRegex.lastIndex = 0
+  let idxMatch: RegExpExecArray | null
+  const indexTokens: PathToken[] = []
+  let lastMatchedIndex = 0
+  while ((idxMatch = arrayIndexRegex.exec(rawIndexes)) !== null) {
+    if (idxMatch.index !== lastMatchedIndex) {
+      return [{ kind: 'key', value: unwrapped }]
+    }
+    lastMatchedIndex = arrayIndexRegex.lastIndex
+    indexTokens.push({ kind: 'index', value: parseInt(idxMatch[1], 10) })
+  }
+
+  if (lastMatchedIndex !== rawIndexes.length) {
+    return [{ kind: 'key', value: unwrapped }]
+  }
+
+  const keyName = unwrapped.slice(0, firstBracket)
+  return [
+    { kind: 'key', value: parseBacktickWrappedKey(keyName) },
+    ...indexTokens,
+  ]
 }
 
 function parseStaticKey(key: string): PathToken[] {
+  if (!key) {
+    return []
+  }
+  if (!key.includes('`') && !key.includes('[')) {
+    if (!key.includes('.')) {
+      return [{ kind: 'key', value: key }]
+    }
+    const parts = key.split('.')
+    const tokens: PathToken[] = []
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      if (part.length > 0) {
+        tokens.push({ kind: 'key', value: part })
+      }
+    }
+    return tokens
+  }
+
   const parts = key.match(parseKeyRegex)
-  return !parts ? [] : parts.flatMap(parseKeyComponents)
+  if (!parts) {
+    return []
+  }
+  const tokens: PathToken[] = []
+  for (let i = 0; i < parts.length; i++) {
+    const comp = parseKeyComponents(parts[i])
+    for (let j = 0; j < comp.length; j++) {
+      tokens.push(comp[j])
+    }
+  }
+  return tokens
 }
 
 function isDataTypeKey(k: string): k is keyof typeof DataType {
   return k in DataType
 }
 
-/**
- * Build a CompactRef from a raw reference key string (without the $ prefix).
- * Called once at compile time; the result is stored in CompiledExpression.refs.
- */
-export function buildCompactRef(rawKey: string): CompactRef {
+const COMPACT_REF_CACHE_MAX = 4096
+const compactRefCache = new Map<string, CompactRef>()
+
+function buildCompactRefUncached(rawKey: string): CompactRef {
   let key = rawKey
   let dataType: DataType | undefined
 
-  const dataTypeMatch = dataTypeRegex.exec(key)
-  if (dataTypeMatch) {
-    const dtKey = dataTypeMatch[1]
-    if (!isDataTypeKey(dtKey)) {
-      throw new Error(`unknown DataType: ${dtKey}`)
+  // Avoid regex if we don't have a potential dataType cast at the end
+  if (key.endsWith(')')) {
+    const dataTypeMatch = dataTypeRegex.exec(key)
+    if (dataTypeMatch) {
+      const dtKey = dataTypeMatch[1]
+      if (!isDataTypeKey(dtKey)) {
+        throw new Error(`unknown DataType: ${dtKey}`)
+      }
+      dataType = DataType[dtKey]
+      key = key.replace(castingRegex, '')
     }
-    dataType = DataType[dtKey]
-    key = key.replace(castingRegex, '')
   }
 
   const hasDynamic = key.indexOf('{') > -1
@@ -113,6 +151,24 @@ export function buildCompactRef(rawKey: string): CompactRef {
       full.t = dataType
     }
     return full
+  }
+
+  // Pure key-only path with no dataType, backticks, or brackets -> string or string[]
+  if (!dataType && !key.includes('`') && !key.includes('[')) {
+    if (!key.includes('.')) {
+      return key
+    }
+    const parts = key.split('.')
+    let hasEmpty = false
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i].length === 0) {
+        hasEmpty = true
+        break
+      }
+    }
+    if (!hasEmpty) {
+      return parts
+    }
   }
 
   const tokens = parseStaticKey(key)
@@ -131,6 +187,23 @@ export function buildCompactRef(rawKey: string): CompactRef {
     full.t = dataType
   }
   return full
+}
+
+/**
+ * Build a CompactRef from a raw reference key string (without the $ prefix).
+ * Called once at compile time; the result is stored in CompiledExpression.refs.
+ */
+export function buildCompactRef(rawKey: string): CompactRef {
+  const cached = compactRefCache.get(rawKey)
+  if (cached !== undefined) {
+    return cached
+  }
+  const ref = buildCompactRefUncached(rawKey)
+  if (compactRefCache.size >= COMPACT_REF_CACHE_MAX) {
+    compactRefCache.clear()
+  }
+  compactRefCache.set(rawKey, ref)
+  return ref
 }
 
 // ---------------------------------------------------------------------------
