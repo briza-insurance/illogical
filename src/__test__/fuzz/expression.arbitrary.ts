@@ -4,7 +4,7 @@ import { ContextValue } from '../../common/evaluable.js'
 import type { Context, ExpressionInput, Input } from '../../index.js'
 import Engine from '../../index.js'
 
-const engineOOP = new Engine({ evaluator: 'oop' })
+const engine = new Engine()
 
 const integerArbitrary = fc.integer({ min: -1000, max: 1000 })
 
@@ -46,7 +46,7 @@ const numberArbitrary = fc.oneof(integerArbitrary, floatArbitrary)
  */
 export const isValidExp = (exp: ExpressionInput) => {
   try {
-    engineOOP.parse(exp)
+    engine.parse(exp)
     return true
   } catch {
     console.log('INVALID', JSON.stringify(exp, null, 2))

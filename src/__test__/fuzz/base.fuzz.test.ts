@@ -27,7 +27,7 @@ interface FuzzingMetrics {
 }
 
 describe('Fuzzing Tests', () => {
-  const engineOOP = new Engine({ evaluator: 'oop' })
+  const engine = new Engine()
 
   const EXPECTED_ERRORS = new Set<string>([
     'operands must be numbers for Sum',
@@ -104,7 +104,7 @@ describe('Fuzzing Tests', () => {
             (simplifyMetrics.operatorCounts[op] || 0) + 1
         })
         try {
-          const result = engineOOP.simplify(expression, context)
+          const result = engine.simplify(expression, context)
 
           ops.forEach((op) => {
             if (!simplifyMetrics.sampleTests[op]) {
@@ -127,7 +127,7 @@ describe('Fuzzing Tests', () => {
           } else {
             // If partially simplified, the result must be a valid expression.
             try {
-              const simplifiedResult = engineOOP.parse(
+              const simplifiedResult = engine.parse(
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
                 result as ExpressionInput
               )
@@ -207,7 +207,7 @@ describe('Fuzzing Tests', () => {
             (evaluateMetrics.operatorCounts[op] || 0) + 1
         })
         try {
-          const result = engineOOP.evaluate(expression, context)
+          const result = engine.evaluate(expression, context)
 
           ops.forEach((op) => {
             if (!evaluateMetrics.sampleTests[op]) {

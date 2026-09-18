@@ -7,13 +7,13 @@ import Engine from '../../index.js'
 import { expressionArbitrary } from '../fuzz/expression.arbitrary.js'
 
 describe('Fuzzing expression generator unit test', () => {
-  const engineOOP = new Engine({ evaluator: 'oop' })
+  const engine = new Engine()
 
   it('should produce valid expressions', () => {
     fc.assert(
       fc.property(expressionArbitrary, (expression) => {
         try {
-          engineOOP.parse(expression)
+          engine.parse(expression)
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : String(err)
           assert.fail(
