@@ -446,20 +446,36 @@ function emitShortCircuit(
   bytecode.push(markerOp, last)
 }
 
-function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
-  const [first, ...rest] = operands
+function dateArithmeticTypeCheck(opts: Options, operands: Input[]): void {
+  const first = operands[0]
 
-  const isReference = (v: Input) =>
-    typeof v === 'string' && opts.referencePredicate(v)
+  let restAreAllReferences = true
+  let valuesAreAllDurations = true
+  let valuesAreAllNumbers = true
 
-  const isValue = (v: Input) =>
-    (!Array.isArray(v) && !isReference(v)) || v === null
+  for (let i = 1; i < operands.length; i++) {
+    const op = operands[i]
+    const isReference = typeof op === 'string' && opts.referencePredicate(op)
+    if (!isReference) {
+      restAreAllReferences = false
+      const isValue = (!Array.isArray(op) && !isReference) || op === null
+      if (isValue) {
+        if (!toDateDuration(op)) {
+          valuesAreAllDurations = false
+        }
+        if (!isNumber(op)) {
+          valuesAreAllNumbers = false
+        }
+      }
+    }
+  }
 
-  const restAreAllReferences = rest.every((op) => isReference(op))
-  const values = rest.filter((op) => isValue(op))
-  const valuesAreAllDurations = values.every((op) => !!toDateDuration(op))
-  const valuesAreAllNumbers = values.every((op) => isNumber(op))
-  if (isReference(first)) {
+  const isFirstReference =
+    typeof first === 'string' && opts.referencePredicate(first)
+  const isFirstValue =
+    (!Array.isArray(first) && !isFirstReference) || first === null
+
+  if (isFirstReference) {
     if (
       !restAreAllReferences &&
       !valuesAreAllDurations &&
@@ -469,7 +485,7 @@ function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
         'sum expression value literals should be all numbers or all date durations'
       )
     }
-  } else if (isValue(first)) {
+  } else if (isFirstValue) {
     if (isNumber(first)) {
       if (!restAreAllReferences && !valuesAreAllNumbers) {
         throw new Error('sum expression value literals should be all numbers')
@@ -486,6 +502,19 @@ function dateArithmeticTypeCheck(opts: Options, ...operands: Input[]) {
           'sum expression value literals should be all numbers or starting ' +
             'with an iso date string followed by date durations'
         )
+      }
+    }
+  }
+}
+
+function validateLogicalOperands(operands: Input[], maps: OperatorMaps): void {
+  if (operands.length < 2) {
+    throw new Error('logical expression must have at least two operands')
+  }
+  for (const op of operands) {
+    if (Array.isArray(op) && typeof op[0] === 'string') {
+      if (op[0] in maps.arithmetic) {
+        throw new Error('invalid expression')
       }
     }
   }
@@ -547,34 +576,20 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
     }
   }
 
-  // Validate logical operands — arithmetic operators are not allowed
-  const validateLogicalOperands = (operands: Input[]) => {
-    if (operands.length < 2) {
-      throw new Error('logical expression must have at least two operands')
-    }
-    for (const op of operands) {
-      if (Array.isArray(op) && typeof op[0] === 'string') {
-        if (op[0] in maps.arithmetic) {
-          throw new Error('invalid expression')
-        }
-      }
-    }
-  }
-
   if (operator === maps.andOp) {
-    validateLogicalOperands(operands)
+    validateLogicalOperands(operands, maps)
     emitShortCircuit(opts, arr, OP_JUMP_IF_FALSE, OP_AND, state)
     return
   }
 
   if (operator === maps.orOp) {
-    validateLogicalOperands(operands)
+    validateLogicalOperands(operands, maps)
     emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_OR, state)
     return
   }
 
   if (operator === maps.norOp) {
-    validateLogicalOperands(operands)
+    validateLogicalOperands(operands, maps)
     // NOR = NOT OR: emit as OR with short-circuit, then negate
     emitShortCircuit(opts, arr, OP_JUMP_IF_TRUE, OP_NOR, state)
     bytecode.push(OP_NOT)
@@ -591,7 +606,7 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   }
 
   if (operator === maps.xorOp) {
-    validateLogicalOperands(operands)
+    validateLogicalOperands(operands, maps)
     // XOR is associative: chain binary XOR operations
     // (A XOR B) XOR C XOR D ...
     emitExpression(opts, arr[1], state)
@@ -807,7 +822,7 @@ function emitExpression(opts: Options, raw: Input, state: CompilerState): void {
   // ---------------------------------------------------------------------------
   if (operator in maps.arithmetic) {
     if (operator === maps.sumOp || operator === maps.subtractOp) {
-      dateArithmeticTypeCheck(opts, ...operands)
+      dateArithmeticTypeCheck(opts, operands)
     }
     for (const operand of operands) {
       emitExpression(opts, operand, state)
