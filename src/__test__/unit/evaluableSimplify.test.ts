@@ -63,37 +63,35 @@ const testFiles = readdirSync(SIMPLIFY_CONDITIONS_DIR, { withFileTypes: true })
 const testCases: TestCase[] = testFiles.map(loadTestCase)
 
 // Run all test cases against both evaluators
-for (const mode of ['oop', 'bytecode'] as const) {
-  describe(`Simplify — ${mode} evaluator`, () => {
-    const engine = new Engine({ evaluator: mode })
+describe(`Simplify`, () => {
+  const engine = new Engine()
 
-    for (const tc of testCases) {
-      test(tc.description, () => {
-        const parsed = engine.parse(tc.expression)
-        const parsedResult = parsed.simplify(
-          tc.context,
-          tc.strictKeys,
-          tc.optionalKeys
-        )
-        const result = engine.simplify(
-          tc.expression,
-          tc.context,
-          tc.strictKeys,
-          tc.optionalKeys
-        )
-        assert.deepStrictEqual(
-          isEvaluable(parsedResult)
-            ? parsedResult.serialize(defaultOptions)
-            : parsedResult,
-          isEvaluable(result) ? result.serialize(defaultOptions) : result,
-          `[${mode}] Engine simplify should match Evaluable simplify`
-        )
-        assert.deepStrictEqual(
-          result,
-          tc.expected,
-          `[${mode}] Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
-        )
-      })
-    }
-  })
-}
+  for (const tc of testCases) {
+    test(tc.description, () => {
+      const parsed = engine.parse(tc.expression)
+      const parsedResult = parsed.simplify(
+        tc.context,
+        tc.strictKeys,
+        tc.optionalKeys
+      )
+      const result = engine.simplify(
+        tc.expression,
+        tc.context,
+        tc.strictKeys,
+        tc.optionalKeys
+      )
+      assert.deepStrictEqual(
+        isEvaluable(parsedResult)
+          ? parsedResult.serialize(defaultOptions)
+          : parsedResult,
+        isEvaluable(result) ? result.serialize(defaultOptions) : result,
+        'Engine simplify should match Evaluable simplify'
+      )
+      assert.deepStrictEqual(
+        result,
+        tc.expected,
+        `Expected simplify to return ${JSON.stringify(tc.expected)}, got ${JSON.stringify(result)}`
+      )
+    })
+  }
+})

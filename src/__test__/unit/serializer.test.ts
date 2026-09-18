@@ -9,27 +9,25 @@ import Engine, {
 import { Options } from '../../parser/options.js'
 import { testCases } from '../data/test-cases.js'
 
-for (const mode of ['oop', 'bytecode'] as const) {
-  describe('Serialize', () => {
-    const engine = new Engine({ evaluator: mode })
+describe('Serialize', () => {
+  const engine = new Engine()
 
-    for (const tc of testCases) {
-      test(`[${mode}] serializing: ${JSON.stringify(tc.expression)}`, () => {
-        const evaluable = engine.parse(tc.expression)
+  for (const tc of testCases) {
+    test(`serializing: ${JSON.stringify(tc.expression)}`, () => {
+      const evaluable = engine.parse(tc.expression)
 
-        const serialized = evaluable.serialize(defaultOptions)
+      const serialized = evaluable.serialize(defaultOptions)
 
-        assert.deepStrictEqual(
-          JSON.stringify(serialized),
-          tc.serializeOverride
-            ? JSON.stringify(tc.serializeOverride)
-            : JSON.stringify(tc.expression),
-          `[${mode}] Expected serialize to return ${JSON.stringify(tc.expression)}, got ${JSON.stringify(serialized)}`
-        )
-      })
-    }
-  })
-}
+      assert.deepStrictEqual(
+        JSON.stringify(serialized),
+        tc.serializeOverride
+          ? JSON.stringify(tc.serializeOverride)
+          : JSON.stringify(tc.expression),
+        `Expected serialize to return ${JSON.stringify(tc.expression)}, got ${JSON.stringify(serialized)}`
+      )
+    })
+  }
+})
 
 const updateRefSymbol = (
   expression: ExpressionInput | Input
@@ -61,44 +59,41 @@ const isExpressionInput = (
   exp: ExpressionInput | Input
 ): exp is ExpressionInput => Array.isArray(exp)
 
-for (const mode of ['oop', 'bytecode'] as const) {
-  describe('Serialize with custom options', () => {
-    const options: Partial<Options> = {
-      evaluator: mode,
-      referencePredicate,
-      referenceTransform,
-      referenceSerialization,
+describe('Serialize with custom options', () => {
+  const options: Partial<Options> = {
+    referencePredicate,
+    referenceTransform,
+    referenceSerialization,
+  }
+
+  const engine = new Engine(options)
+
+  for (const tc of testCases) {
+    const updatedExpression = updateRefSymbol(tc.expression)
+    const updatedOverride = tc.serializeOverride
+      ? updateRefSymbol(tc.serializeOverride)
+      : undefined
+
+    if (!isExpressionInput(updatedExpression)) {
+      assert.fail('Unexpected non ExpressionInput')
     }
 
-    const engine = new Engine(options)
+    test(`serializing: ${JSON.stringify(updatedExpression)}`, () => {
+      const evaluable = engine.parse(updatedExpression)
 
-    for (const tc of testCases) {
-      const updatedExpression = updateRefSymbol(tc.expression)
-      const updatedOverride = tc.serializeOverride
-        ? updateRefSymbol(tc.serializeOverride)
-        : undefined
-
-      if (!isExpressionInput(updatedExpression)) {
-        assert.fail('Unexpected non ExpressionInput')
-      }
-
-      test(`[${mode}] serializing: ${JSON.stringify(updatedExpression)}`, () => {
-        const evaluable = engine.parse(updatedExpression)
-
-        const serialized = evaluable.serialize({
-          ...defaultOptions,
-          ...options,
-        })
-
-        assert.deepStrictEqual(
-          JSON.stringify(serialized),
-          updatedOverride
-            ? JSON.stringify(updatedOverride)
-            : JSON.stringify(updatedExpression),
-          `[${mode}] Expected serialize to return ` +
-            `${JSON.stringify(updatedExpression)}, got ${JSON.stringify(serialized)}`
-        )
+      const serialized = evaluable.serialize({
+        ...defaultOptions,
+        ...options,
       })
-    }
-  })
-}
+
+      assert.deepStrictEqual(
+        JSON.stringify(serialized),
+        updatedOverride
+          ? JSON.stringify(updatedOverride)
+          : JSON.stringify(updatedExpression),
+        `Expected serialize to return ` +
+          `${JSON.stringify(updatedExpression)}, got ${JSON.stringify(serialized)}`
+      )
+    })
+  }
+})

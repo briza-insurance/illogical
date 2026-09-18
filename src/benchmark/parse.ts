@@ -9,7 +9,7 @@
  *   node --import tsx benchmark/parse.ts --cases conditions/synthetic-conditions
  *   node --import tsx benchmark/parse.ts --cases conditions/sample-conditions --out benchmark/results-baseline.json
  *   node --import tsx benchmark/parse.ts --engine /other/path/lib/illogical.esm.js
- *   node --import tsx benchmark/parse.ts --options '{"evaluator":"bytecode"}'
+ *   node --import tsx benchmark/parse.ts --options '{ ... }'
  */
 
 import { join, resolve } from 'path'

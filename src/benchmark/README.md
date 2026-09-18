@@ -1,6 +1,6 @@
 # Benchmarking Guide
 
-This directory contains scripts to benchmark the performance of the Illogical engine, both for the OOP evaluator and the Bytecode evaluator. The scripts allow you to measure execution speed (throughputs and latencies) and generate comparison reports.
+This directory contains scripts to benchmark the performance of the Illogical engine. The scripts allow you to measure execution speed (throughputs and latencies) and generate comparison reports.
 
 ## Running a Single Scenario
 
@@ -16,7 +16,7 @@ npm run bench:full:report:test-case -- --filter 249-and-or-eqs
 
 Let's assume you want to benchmark the `simplify-249` test case from the `sample-conditions` folder.
 
-#### 1. Baseline (OOP Engine)
+#### 1. Baseline
 
 Generate the baseline result using the default Object-Oriented evaluator:
 
@@ -24,19 +24,19 @@ Generate the baseline result using the default Object-Oriented evaluator:
 node --import tsx src/benchmark/simplify.ts \
   --cases conditions/sample-conditions \
   --filter simplify-249 \
-  --out benchmark/results-simplify-249-oop.json
+  --out benchmark/results-simplify-249-baseline.json
 ```
 
-#### 2. Comparison (Bytecode Engine)
+#### 2. Comparison (custom options)
 
-Generate the results for the Bytecode evaluator:
+Generate the results for the version to compare:
 
 ```bash
 node --import tsx src/benchmark/simplify.ts \
   --cases conditions/sample-conditions \
   --filter simplify-249 \
-  --options '{"evaluator":"bytecode"}' \
-  --out benchmark/results-simplify-249-bytecode.json
+  --options '{ ...custom options... }' \
+  --out benchmark/results-simplify-249-custom.json
 ```
 
 #### 3. Generating a Markdown Report
@@ -45,8 +45,8 @@ Compare the resulting JSON files using the `report.ts` script to generate a read
 
 ```bash
 node --import tsx src/benchmark/report.ts \
-  benchmark/results-simplify-249-oop.json \
-  benchmark/results-simplify-249-bytecode.json \
+  benchmark/results-simplify-249-baseline.json \
+  benchmark/results-simplify-249-custom.json \
   --op simplify \
   --out benchmark/report-simplify-249.md
 ```

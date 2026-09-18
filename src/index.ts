@@ -3,10 +3,6 @@
  * @module illogical
  */
 
-import { compile, CompiledExpression } from './bytecode/compiler.js'
-import { BytecodeEvaluable } from './bytecode/evaluable.js'
-import { interpret } from './bytecode/interpreter.js'
-import { interpretSimplify } from './bytecode/simplifier.js'
 import { Context, Evaluable } from './common/evaluable.js'
 import { isBoolean, isEvaluable } from './common/type-check.js'
 import { OPERATOR as OPERATOR_DIVIDE } from './expression/arithmetic/divide.js'
@@ -35,31 +31,30 @@ import { ExpressionInput, Input, Parser } from './parser/index.js'
 import { Options } from './parser/options.js'
 
 export { defaultOptions } from './parser/options.js'
-export type { EvaluatorMode } from './parser/options.js'
 export {
   isEvaluable,
-  OPERATOR_EQ,
-  OPERATOR_NE,
-  OPERATOR_GT,
-  OPERATOR_GE,
-  OPERATOR_LT,
-  OPERATOR_LE,
-  OPERATOR_IN,
-  OPERATOR_NOT_IN,
-  OPERATOR_PREFIX,
-  OPERATOR_SUFFIX,
-  OPERATOR_OVERLAP,
-  OPERATOR_UNDEFINED,
-  OPERATOR_PRESENT,
   OPERATOR_AND,
-  OPERATOR_OR,
-  OPERATOR_NOR,
-  OPERATOR_XOR,
-  OPERATOR_NOT,
   OPERATOR_DIVIDE,
+  OPERATOR_EQ,
+  OPERATOR_GE,
+  OPERATOR_GT,
+  OPERATOR_IN,
+  OPERATOR_LE,
+  OPERATOR_LT,
   OPERATOR_MULTIPLY,
+  OPERATOR_NE,
+  OPERATOR_NOR,
+  OPERATOR_NOT,
+  OPERATOR_NOT_IN,
+  OPERATOR_OR,
+  OPERATOR_OVERLAP,
+  OPERATOR_PREFIX,
+  OPERATOR_PRESENT,
   OPERATOR_SUBTRACT,
+  OPERATOR_SUFFIX,
   OPERATOR_SUM,
+  OPERATOR_UNDEFINED,
+  OPERATOR_XOR,
 }
 export type { Context, Evaluable, ExpressionInput, Input }
 
@@ -71,9 +66,6 @@ const unexpectedResultError =
  */
 class Engine {
   private readonly parser: Parser
-  private readonly evaluator: 'oop' | 'bytecode'
-  private readonly bytecodeCache: WeakMap<ExpressionInput, CompiledExpression> =
-    new WeakMap()
 
   /**
    * @constructor
@@ -81,16 +73,6 @@ class Engine {
    */
   constructor(options?: Partial<Options>) {
     this.parser = new Parser(options)
-    this.evaluator = options?.evaluator ?? 'oop'
-  }
-
-  private getCompiled(exp: ExpressionInput): CompiledExpression {
-    let compiled = this.bytecodeCache.get(exp)
-    if (compiled === undefined) {
-      compiled = compile(exp, this.parser.options)
-      this.bytecodeCache.set(exp, compiled)
-    }
-    return compiled
   }
 
   /**
@@ -100,10 +82,7 @@ class Engine {
    * @return {boolean}
    */
   evaluate(exp: ExpressionInput, ctx: Context): boolean {
-    const result =
-      this.evaluator === 'oop'
-        ? this.parser.parse(exp).evaluate(ctx)
-        : interpret(this.getCompiled(exp), ctx)
+    const result = this.parser.parse(exp).evaluate(ctx)
     if (isBoolean(result)) {
       return result
     }
@@ -125,10 +104,7 @@ class Engine {
    * @return {Evaluable}
    */
   parse(exp: ExpressionInput): Evaluable {
-    if (this.evaluator === 'oop') {
-      return this.parser.parse(exp)
-    }
-    return new BytecodeEvaluable(this.getCompiled(exp))
+    return this.parser.parse(exp)
   }
 
   /**
@@ -154,14 +130,6 @@ class Engine {
     strictKeys?: string[] | Set<string>,
     optionalKeys?: string[] | Set<string>
   ): Input | boolean {
-    if (this.evaluator === 'bytecode') {
-      return interpretSimplify(
-        this.getCompiled(exp),
-        context,
-        strictKeys,
-        optionalKeys
-      )
-    }
     const result = this.parser
       .parse(exp)
       .simplify(context, strictKeys, optionalKeys)
