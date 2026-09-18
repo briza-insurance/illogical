@@ -30,6 +30,7 @@ import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor.js'
 import { ExpressionInput, Input, Parser } from './parser/index.js'
 import { Options } from './parser/options.js'
 
+export { BatchEngine } from './batch/batch.js'
 export { defaultOptions } from './parser/options.js'
 export {
   isEvaluable,
