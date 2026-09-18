@@ -8,9 +8,9 @@
 
 | | Count |
 |---|---|
-| Faster (>+5%) | 561 |
+| Faster (>+5%) | 562 |
 | Slower (>-5%) | 15 |
-| Unchanged | 40 |
+| Unchanged | 39 |
 
 ---
 
@@ -20,69 +20,69 @@
 
 | Group | Case | Baseline | Improved | Delta | Multiplier |
 |-------|------|----------|----------|-------|------------|
-| or-n3412-r101-001 | complete-false | 4.91K ops/s | 158.84K ops/s | +3133.2% | 32.33x |
-| or-n3412-r101-001 | full-execution-false | 5.16K ops/s | 165.48K ops/s | +3105.1% | 32.05x |
-| or-n1968-r105-001 | full-execution-false | 9.05K ops/s | 281.08K ops/s | +3004.4% | 31.04x |
-| or-n1968-r105-001 | complete-false | 8.93K ops/s | 264.80K ops/s | +2864.1% | 29.64x |
-| or-n1968-r105-001 | empty-context | 74.91K ops/s | 1.62M ops/s | +2059.0% | 21.59x |
-| or-n1968-r105-001 | partial-false | 75.11K ops/s | 1.59M ops/s | +2018.3% | 21.18x |
-| or-n1968-r105-001 | partial-true | 74.55K ops/s | 1.51M ops/s | +1921.9% | 20.22x |
-| or-n3412-r101-001 | full-execution-true | 7.35K ops/s | 125.78K ops/s | +1611.8% | 17.12x |
-| or-n3412-r101-001 | empty-context | 45.18K ops/s | 738.78K ops/s | +1535.3% | 16.35x |
-| or-n3412-r101-001 | partial-false | 44.96K ops/s | 730.31K ops/s | +1524.3% | 16.24x |
-| or-n1968-r105-001 | full-execution-true | 12.91K ops/s | 206.61K ops/s | +1500.2% | 16.00x |
-| or-n3412-r101-001 | partial-true | 44.24K ops/s | 704.81K ops/s | +1493.3% | 15.93x |
-| or-n3412-r101-001 | complete-true | 41.10K ops/s | 415.53K ops/s | +911.1% | 10.11x |
-| in-n122-r1-001 | complete-false | 1.10M ops/s | 9.25M ops/s | +740.3% | 8.40x |
-| in-n122-r1-001 | full-execution-false | 1.11M ops/s | 9.28M ops/s | +737.5% | 8.38x |
-| in-n122-r1-001 | partial-true | 1.18M ops/s | 9.26M ops/s | +682.9% | 7.83x |
-| in-n122-r1-001 | full-execution-true | 1.20M ops/s | 9.25M ops/s | +672.3% | 7.72x |
-| in-n122-r1-001 | complete-true | 1.20M ops/s | 9.15M ops/s | +662.0% | 7.62x |
-| or-n3730-r105-001 | full-execution-false | 7.22K ops/s | 52.10K ops/s | +621.2% | 7.21x |
-| or-n3730-r105-001 | complete-false | 7.28K ops/s | 51.64K ops/s | +609.4% | 7.09x |
+| or-n3412-r101-001 | full-execution-false | 5.18K ops/s | 177.65K ops/s | +3329.2% | 34.29x |
+| or-n3412-r101-001 | complete-false | 5.15K ops/s | 168.26K ops/s | +3168.2% | 32.68x |
+| or-n1968-r105-001 | full-execution-false | 9.20K ops/s | 262.13K ops/s | +2747.9% | 28.48x |
+| or-n1968-r105-001 | complete-false | 9.09K ops/s | 252.96K ops/s | +2681.6% | 27.82x |
+| or-n1968-r105-001 | empty-context | 74.18K ops/s | 1.59M ops/s | +2042.6% | 21.43x |
+| or-n1968-r105-001 | partial-false | 75.21K ops/s | 1.56M ops/s | +1972.6% | 20.73x |
+| or-n1968-r105-001 | partial-true | 74.48K ops/s | 1.50M ops/s | +1915.8% | 20.16x |
+| or-n3412-r101-001 | full-execution-true | 7.55K ops/s | 130.76K ops/s | +1632.4% | 17.32x |
+| or-n1968-r105-001 | full-execution-true | 13.15K ops/s | 212.04K ops/s | +1512.5% | 16.13x |
+| or-n3412-r101-001 | empty-context | 44.87K ops/s | 688.29K ops/s | +1433.9% | 15.34x |
+| or-n3412-r101-001 | partial-false | 44.88K ops/s | 676.12K ops/s | +1406.6% | 15.07x |
+| or-n3412-r101-001 | partial-true | 44.84K ops/s | 652.32K ops/s | +1354.9% | 14.55x |
+| or-n3412-r101-001 | complete-true | 41.71K ops/s | 378.51K ops/s | +807.4% | 9.07x |
+| in-n122-r1-001 | full-execution-false | 1.07M ops/s | 9.09M ops/s | +750.8% | 8.51x |
+| in-n122-r1-001 | complete-false | 1.09M ops/s | 8.91M ops/s | +719.5% | 8.20x |
+| or-n3730-r105-001 | complete-false | 7.05K ops/s | 51.40K ops/s | +629.0% | 7.29x |
+| or-n3730-r105-001 | full-execution-false | 7.10K ops/s | 51.63K ops/s | +626.9% | 7.27x |
+| in-n122-r1-001 | partial-true | 1.19M ops/s | 8.60M ops/s | +624.4% | 7.24x |
+| in-n122-r1-001 | full-execution-true | 1.18M ops/s | 8.53M ops/s | +621.1% | 7.21x |
+| in-n122-r1-001 | empty-context | 1.18M ops/s | 8.15M ops/s | +593.6% | 6.94x |
 
 ### Top 20 Least Improved
 
 | Group | Case | Baseline | Improved | Delta | Multiplier |
 |-------|------|----------|----------|-------|------------|
-| 249-and-or-eqs | complete-false | 10.05M ops/s | 6.12M ops/s | -39.1% | 0.61x |
-| 251-or-and-in-mixed-eq-in | complete-true | 6.96M ops/s | 4.57M ops/s | -34.3% | 0.66x |
-| 251-or-and-in-mixed-eq-in | partial-true | 6.84M ops/s | 4.56M ops/s | -33.4% | 0.67x |
-| 250-or-and-in | complete-true | 6.87M ops/s | 4.58M ops/s | -33.3% | 0.67x |
-| 250-or-and-in | partial-true | 6.85M ops/s | 4.58M ops/s | -33.1% | 0.67x |
-| 250-or-and-in | complete-false | 6.27M ops/s | 4.21M ops/s | -32.8% | 0.67x |
-| 249-and-or-eqs | complete-true | 3.70M ops/s | 2.74M ops/s | -26.1% | 0.74x |
-| 249-and-or-eqs | partial-true | 3.62M ops/s | 2.74M ops/s | -24.1% | 0.76x |
-| 251-or-and-in-mixed-eq-in | complete-false | 5.19M ops/s | 3.95M ops/s | -24.0% | 0.76x |
-| 251-or-and-in-mixed-eq-in | full-execution-true | 4.11M ops/s | 3.34M ops/s | -18.9% | 0.81x |
-| 250-or-and-in | full-execution-true | 3.82M ops/s | 3.15M ops/s | -17.8% | 0.82x |
-| 250-or-and-in | full-execution-false | 3.79M ops/s | 3.15M ops/s | -16.8% | 0.83x |
-| 249-and-or-eqs | full-execution-true | 2.57M ops/s | 2.15M ops/s | -16.3% | 0.84x |
-| 249-and-or-eqs | full-execution-false | 2.55M ops/s | 2.17M ops/s | -15.1% | 0.85x |
-| 251-or-and-in-mixed-eq-in | full-execution-false | 3.50M ops/s | 2.99M ops/s | -14.5% | 0.85x |
-| overlap-n105-r100-001 | partial-false | 8.56M ops/s | 8.62M ops/s | +0.7% | 1.01x |
-| overlap-n105-r100-020 | partial-false | 8.58M ops/s | 8.68M ops/s | +1.1% | 1.01x |
-| overlap-n105-r100-004 | partial-false | 8.56M ops/s | 8.65M ops/s | +1.1% | 1.01x |
-| overlap-n105-r100-006 | partial-false | 8.53M ops/s | 8.66M ops/s | +1.5% | 1.02x |
-| 250-or-and-in | partial-false | 1.70M ops/s | 1.74M ops/s | +1.8% | 1.02x |
+| 249-and-or-eqs | complete-false | 10.57M ops/s | 6.12M ops/s | -42.1% | 0.58x |
+| 251-or-and-in-mixed-eq-in | partial-true | 7.10M ops/s | 4.47M ops/s | -37.0% | 0.63x |
+| 250-or-and-in | partial-true | 7.08M ops/s | 4.49M ops/s | -36.5% | 0.64x |
+| 250-or-and-in | complete-false | 6.37M ops/s | 4.06M ops/s | -36.2% | 0.64x |
+| 250-or-and-in | complete-true | 7.09M ops/s | 4.54M ops/s | -36.0% | 0.64x |
+| 251-or-and-in-mixed-eq-in | complete-true | 7.05M ops/s | 4.52M ops/s | -35.9% | 0.64x |
+| 251-or-and-in-mixed-eq-in | complete-false | 5.31M ops/s | 3.80M ops/s | -28.4% | 0.72x |
+| 251-or-and-in-mixed-eq-in | full-execution-true | 4.30M ops/s | 3.13M ops/s | -27.3% | 0.73x |
+| 249-and-or-eqs | complete-true | 3.74M ops/s | 2.78M ops/s | -25.7% | 0.74x |
+| 249-and-or-eqs | partial-true | 3.69M ops/s | 2.77M ops/s | -24.8% | 0.75x |
+| 250-or-and-in | full-execution-true | 3.88M ops/s | 3.10M ops/s | -20.0% | 0.80x |
+| 250-or-and-in | full-execution-false | 3.84M ops/s | 3.08M ops/s | -19.8% | 0.80x |
+| 251-or-and-in-mixed-eq-in | full-execution-false | 3.57M ops/s | 2.89M ops/s | -18.9% | 0.81x |
+| 249-and-or-eqs | full-execution-true | 2.61M ops/s | 2.19M ops/s | -15.9% | 0.84x |
+| 249-and-or-eqs | full-execution-false | 2.54M ops/s | 2.18M ops/s | -14.0% | 0.86x |
+| overlap-n105-r100-023 | empty-context | 8.53M ops/s | 8.37M ops/s | -1.9% | 0.98x |
+| 250-or-and-in | empty-context | 1.69M ops/s | 1.66M ops/s | -1.8% | 0.98x |
+| 251-or-and-in-mixed-eq-in | empty-context | 1.65M ops/s | 1.64M ops/s | -0.9% | 0.99x |
+| 250-or-and-in | partial-false | 1.67M ops/s | 1.66M ops/s | -0.8% | 0.99x |
+| 251-or-and-in-mixed-eq-in | partial-false | 1.64M ops/s | 1.62M ops/s | -0.7% | 0.99x |
 
 ### Regressions
 
 | Group | Case | Baseline | Improved | Delta | Multiplier |
 |-------|------|----------|----------|-------|------------|
-| 249-and-or-eqs | complete-false | 10.05M ops/s | 6.12M ops/s | -39.1% | 0.61x |
-| 251-or-and-in-mixed-eq-in | complete-true | 6.96M ops/s | 4.57M ops/s | -34.3% | 0.66x |
-| 251-or-and-in-mixed-eq-in | partial-true | 6.84M ops/s | 4.56M ops/s | -33.4% | 0.67x |
-| 250-or-and-in | complete-true | 6.87M ops/s | 4.58M ops/s | -33.3% | 0.67x |
-| 250-or-and-in | partial-true | 6.85M ops/s | 4.58M ops/s | -33.1% | 0.67x |
-| 250-or-and-in | complete-false | 6.27M ops/s | 4.21M ops/s | -32.8% | 0.67x |
-| 249-and-or-eqs | complete-true | 3.70M ops/s | 2.74M ops/s | -26.1% | 0.74x |
-| 249-and-or-eqs | partial-true | 3.62M ops/s | 2.74M ops/s | -24.1% | 0.76x |
-| 251-or-and-in-mixed-eq-in | complete-false | 5.19M ops/s | 3.95M ops/s | -24.0% | 0.76x |
-| 251-or-and-in-mixed-eq-in | full-execution-true | 4.11M ops/s | 3.34M ops/s | -18.9% | 0.81x |
-| 250-or-and-in | full-execution-true | 3.82M ops/s | 3.15M ops/s | -17.8% | 0.82x |
-| 250-or-and-in | full-execution-false | 3.79M ops/s | 3.15M ops/s | -16.8% | 0.83x |
-| 249-and-or-eqs | full-execution-true | 2.57M ops/s | 2.15M ops/s | -16.3% | 0.84x |
-| 249-and-or-eqs | full-execution-false | 2.55M ops/s | 2.17M ops/s | -15.1% | 0.85x |
-| 251-or-and-in-mixed-eq-in | full-execution-false | 3.50M ops/s | 2.99M ops/s | -14.5% | 0.85x |
+| 249-and-or-eqs | complete-false | 10.57M ops/s | 6.12M ops/s | -42.1% | 0.58x |
+| 251-or-and-in-mixed-eq-in | partial-true | 7.10M ops/s | 4.47M ops/s | -37.0% | 0.63x |
+| 250-or-and-in | partial-true | 7.08M ops/s | 4.49M ops/s | -36.5% | 0.64x |
+| 250-or-and-in | complete-false | 6.37M ops/s | 4.06M ops/s | -36.2% | 0.64x |
+| 250-or-and-in | complete-true | 7.09M ops/s | 4.54M ops/s | -36.0% | 0.64x |
+| 251-or-and-in-mixed-eq-in | complete-true | 7.05M ops/s | 4.52M ops/s | -35.9% | 0.64x |
+| 251-or-and-in-mixed-eq-in | complete-false | 5.31M ops/s | 3.80M ops/s | -28.4% | 0.72x |
+| 251-or-and-in-mixed-eq-in | full-execution-true | 4.30M ops/s | 3.13M ops/s | -27.3% | 0.73x |
+| 249-and-or-eqs | complete-true | 3.74M ops/s | 2.78M ops/s | -25.7% | 0.74x |
+| 249-and-or-eqs | partial-true | 3.69M ops/s | 2.77M ops/s | -24.8% | 0.75x |
+| 250-or-and-in | full-execution-true | 3.88M ops/s | 3.10M ops/s | -20.0% | 0.80x |
+| 250-or-and-in | full-execution-false | 3.84M ops/s | 3.08M ops/s | -19.8% | 0.80x |
+| 251-or-and-in-mixed-eq-in | full-execution-false | 3.57M ops/s | 2.89M ops/s | -18.9% | 0.81x |
+| 249-and-or-eqs | full-execution-true | 2.61M ops/s | 2.19M ops/s | -15.9% | 0.84x |
+| 249-and-or-eqs | full-execution-false | 2.54M ops/s | 2.18M ops/s | -14.0% | 0.86x |
 
