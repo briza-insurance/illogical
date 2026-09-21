@@ -32,20 +32,20 @@ export declare class BatchEngine {
      *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
      *     "depend on" Q1's result — it depends on the context key `Q1`.
      *
-     * Mode 1 — No changedKeys: full re-evaluation of all expressions.
+     * Mode 1 — No previous results: full evaluation of all expressions.
      *   Context is merged into stored context, all expressions run.
      *
-     * Mode 2 — With changedKeys: incremental evaluation.
-     *   Context is merged, only expressions affected by changedKeys run.
-     *   The caller guarantees that only these keys actually changed.
-     *
-     * Mode 2 — With empty changedKeys []: no-op, returns cached results.
+     * Mode 2 — Subsequent evaluations with changed context: incremental evaluation.
+     *   Only expressions affected by updated context are evaluated. The caller can
+     *   choose to provide only the changed context. Keys which the value did not
+     *   change are ignored. Sending undefined for a key indicates that the key has
+     *   been removed from the context.
      *
      * @param ctx — Full evaluation context
      * @param changedKeys — Optional list of keys that changed (trusted by caller)
      * @returns Record mapping expression names to their Result values
      */
-    evaluate(ctx: Context, changedKeys?: string[]): Record<string, Result>;
+    evaluate(ctx: Context): Record<string, Result>;
     /**
      * Get the full results of all expressions.
      * @returns Record mapping expression names to their Result values
@@ -61,16 +61,14 @@ export declare class BatchEngine {
      */
     getDependencies(): Map<string, string[]>;
     /**
-     * Reset all results to undefined (for fresh evaluation without recompilation).
+     * Reset all results to undefined (for fresh evaluation without reparsing).
      */
     reset(): void;
     /**
      * Add a new expression to the batch.
      *
-     * This reparses the entire batch (Phase 1–3: ref collection, dependency
-     * graph, evaluable parsing). Cached results for existing expressions are
-     * preserved — only the newly added expression starts as dirty and will be
-     * evaluated on the next `evaluate()` call.
+     * This reparses the entire batch . Cached results for existing expressions
+     * are preserved — The newly added expression will be marked for evaluation.
      *
      * @param name — Expression name (must be unique; throws if already exists)
      * @param expression — Raw expression input
@@ -80,9 +78,9 @@ export declare class BatchEngine {
     /**
      * Remove an expression from the batch.
      *
-     * This reparses the entire batch (Phase 1–3). The removed expression's
-     * cached result is cleared, and the expression is excluded from future
-     * evaluations. Other expressions' cached results are preserved.
+     * This reparses the entire batch. The removed expression's cached result is
+     * cleared, and the expression is excluded from future evaluations. Other
+     * expressions' cached results are preserved.
      *
      * @param name — Expression name to remove
      */

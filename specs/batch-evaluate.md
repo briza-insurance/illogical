@@ -46,7 +46,7 @@ const results = batchEngine.evaluate({
 
 ## Evaluation Modes
 
-The `evaluate(ctx, changedKeys?)` method supports two modes:
+The `evaluate(ctx)` method supports two modes:
 
 ### 1. Full Evaluation
 

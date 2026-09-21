@@ -12,13 +12,13 @@ export declare function evaluateSingle(batch: ParsedBatch, exprName: string, ctx
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions.
- * Mode 2 (incremental): only evaluates expressions in dirtyExpressions set.
+ * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions set is provided.
+ * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
  *
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
- * @param dirtyExpressions — If provided, only evaluate these expressions,
+ * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
  * @returns Record mapping expression names to their Result values
  */
-export declare function evaluateBatch(batch: ParsedBatch, ctx: Context, dirtyExpressions?: Set<string>): Record<string, Result>;
+export declare function evaluateBatch(batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<string>): Record<string, Result>;
