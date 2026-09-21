@@ -98,7 +98,6 @@ Explore the supported expressions and their usage:
 Learn how to use the engine and its methods:
 
 - [Evaluate](./specs/evaluate.md)
-  // TODO: Create file below
 - [Batch Evaluate](./specs/batch-evaluate.md)
 - [Statement](./specs/statement.md)
 - [Parse](./specs/parse.md)
