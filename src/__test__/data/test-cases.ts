@@ -160,17 +160,14 @@ export const testCases: {
     string: '({userTags} overlap ["admin", "moderator"])',
   },
   {
-    // isStaticCollection left + isPureRefCollection right
     expression: ['OVERLAP', ['a', 'b'], ['$c', '$d']],
     string: '(["a", "b"] overlap [{c}, {d}])',
   },
   {
-    // isStaticCollection left + not isPureRefCollection right
     expression: ['OVERLAP', ['a', 'b'], ['$c', 'd']],
     string: '(["a", "b"] overlap [{c}, "d"])',
   },
   {
-    // isStaticCollection right + isPureRefCollection left
     expression: ['OVERLAP', ['$a', '$b'], ['c', 'd']],
     string: '([{a}, {b}] overlap ["c", "d"])',
   },
@@ -179,7 +176,6 @@ export const testCases: {
     string: '([{a}, {b}] == [{c}, {d}])',
   },
   {
-    // Reuse identical dynamic collection to trigger dynamic collection CSE (OP_LOAD_LOCAL)
     expression: ['==', ['$a', '$b'], ['$a', '$b']],
     string: '([{a}, {b}] == [{a}, {b}])',
   },
@@ -250,7 +246,6 @@ export const testCases: {
     string: '(({a} == 1) AND ({b} == 2))',
   },
   {
-    // Reuse identical dynamic collection across operands (OP_LOAD_LOCAL)
     expression: [
       'AND',
       ['==', '$x', ['$ref1', '$ref2']],

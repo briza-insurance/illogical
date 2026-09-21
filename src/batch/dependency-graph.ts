@@ -11,29 +11,6 @@ import { ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import { DependencyEntry, DependencyGraph } from './types.js'
 
-// const referenceMatcher =
-// eslint-disable-next-line max-len
-//   /^(?<id>[a-zA-Z0-9{}\-_]*)(\[(?<index>.+)\])?(\.(?<key>[a-zA-Z{}]+))?(\.\((?<casting>(Number|String))\))?(?<rest>.+)?$/
-
-// const extractIdFromRef = (reference: string) => {
-//   console.log('extractIdFromRef', reference)
-//   if (reference.length > 1000) {
-//     throw new Error(`reference too long: ${reference}`)
-//   }
-
-//   const matches = reference.match(referenceMatcher)
-//   if (!matches) {
-//     throw new Error(`invalid reference: ${reference}`)
-//   }
-
-//   const id = matches.groups?.id
-//   if (!id) {
-//     throw new Error(`could not extract id from reference: ${reference}`)
-//   }
-
-//   return id
-// }
-
 /**
  * Build a dependency graph from a compiled batch.
  *
@@ -42,7 +19,6 @@ import { DependencyEntry, DependencyGraph } from './types.js'
  */
 export function buildDependencyGraph(
   opts: Options,
-  // TODO: Can we get Reference from Evaluables directly?
   expressions: Map<string, ExpressionInput>
 ): DependencyGraph {
   const graph = new Map<string, DependencyEntry[]>()
@@ -76,6 +52,8 @@ function collectRefsFromExpression(
     const reference = new Reference(opts.referenceTransform(expression))
 
     const transformed = reference.getKey()
+
+    // TODO: Add tests for Dynamic refs. Might need to handle them differently in the graph.
 
     let entries = graph.get(transformed)
     if (entries === undefined) {

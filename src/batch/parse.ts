@@ -15,7 +15,14 @@ export const parseBatch = (
   }
 
   for (const [name, expr] of expressionsMap) {
-    parsed.expressions.set(name, engine.parse(expr))
+    try {
+      parsed.expressions.set(name, engine.parse(expr))
+    } catch (error) {
+      if (error instanceof Error && error.message === 'invalid expression') {
+        throw new Error(`invalid expression with name ${name}`)
+      }
+      throw error
+    }
   }
 
   parsed.dependencyGraph = buildDependencyGraph(options, expressionsMap)

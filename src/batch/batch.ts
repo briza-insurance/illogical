@@ -154,7 +154,7 @@ export class BatchEngine {
    */
   dispose(): void {
     this.state.cachedResults = {}
-    this.state.lastContext = Object.create(null)
+    this.state.lastContext = {}
     this.state.originalExpressions.clear()
     this.state.batch.expressions.clear()
     this.state.batch.dependencyGraph.clear()
@@ -262,9 +262,6 @@ export class BatchEngine {
       }
     }
 
-    this.state.lastContext = Object.assign(
-      Object.create(null),
-      Object.fromEntries(map)
-    )
+    this.state.lastContext = Object.assign({}, Object.fromEntries(map))
   }
 }
