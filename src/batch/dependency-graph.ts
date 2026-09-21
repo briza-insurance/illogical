@@ -30,7 +30,7 @@ function collectRefsFromExpression(
   opts: Options
 ): void {
   if (Array.isArray(expression)) {
-    for (let i = 1; i < expression.length; i++) {
+    for (let i = 0; i < expression.length; i++) {
       collectRefsFromExpression(expression[i], exprName, graph, opts)
     }
   } else if (
