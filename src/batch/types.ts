@@ -20,9 +20,10 @@ export type DependencyGraph = Map<string, Set<string>>
 export interface ParsedBatch {
   /** Per-expression compiled data, keyed by expression name */
   expressions: Map<string, Evaluable>
-
   /** Dependency graph: context key → expressions that reference it */
   dependencyGraph: DependencyGraph
+  /** List of expressions with dynamic references that should always be re-evaluated */
+  expressionsWithDynamic: Set<string>
 }
 
 export interface BatchEvaluatorOptions {
@@ -38,7 +39,9 @@ export interface BatchEvaluatorState {
   /** Original expressions map — stored for addExpression/removeExpression */
   originalExpressions: Map<string, ExpressionInput>
   /** Last full context passed to evaluate() */
-  lastContext: Context
+  lastContext: Context | undefined
   /** Cached results from the last evaluation */
   cachedResults: Record<string, Result>
+  /** Expressions marked for evaluation in the next `evaluate()` call */
+  markedForEvaluation: Set<string>
 }

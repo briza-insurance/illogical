@@ -54,7 +54,7 @@ describe('BatchEngine', () => {
           c: true,
         }
       )
-      assert.strictEqual('toRemove' in state.lastContext, false)
+      assert.strictEqual('toRemove' in (state.lastContext ?? {}), false)
     })
   })
 
@@ -84,7 +84,7 @@ describe('BatchEngine', () => {
         expectedResults: { isAdult: true, isActive: true },
       },
       {
-        name: 'evaluates only affected expressions in Mode 2 (with changedKeys)',
+        name: 'evaluates only affected expressions',
         options: {
           expressions: {
             isAdult: ['>=', '$age', 18],
@@ -95,11 +95,10 @@ describe('BatchEngine', () => {
           context: { age: 20, status: 'active' },
         },
         context: { age: 15 },
-        changedKeys: ['age'],
         expectedResults: { isAdult: false, isActive: true },
       },
       {
-        name: 'returns cached results immediately when changedKeys is empty',
+        name: 'returns correctly when reference value changes',
         options: {
           expressions: {
             isAdult: ['>=', '$age', 18],
@@ -109,11 +108,10 @@ describe('BatchEngine', () => {
           context: { age: 20 },
         },
         context: { age: 15 },
-        changedKeys: [],
-        expectedResults: { isAdult: true },
+        expectedResults: { isAdult: false },
       },
       {
-        name: 'returns cached results when changedKeys affect no expressions',
+        name: 'returns cached results when changed context affects no expressions',
         options: {
           expressions: {
             isAdult: ['>=', '$age', 18],
@@ -123,7 +121,6 @@ describe('BatchEngine', () => {
           context: { age: 20 },
         },
         context: { otherKey: 'val' },
-        changedKeys: ['otherKey'],
         expectedResults: { isAdult: true },
       },
       {
@@ -382,21 +379,135 @@ describe('BatchEngine', () => {
       options,
       initial,
       context,
-      changedKeys,
       expectedResults,
     } of testCases) {
       it(name, () => {
         const evaluator = new BatchEngine(options)
 
         if (initial) {
-          evaluator.evaluate(initial.context, initial.changedKeys)
+          evaluator.evaluate(initial.context)
         }
 
-        const results = evaluator.evaluate(context, changedKeys)
+        const results = evaluator.evaluate(context)
         assert.deepEqual(results, expectedResults)
         assert.deepEqual(evaluator.getResults(), expectedResults)
       })
     }
+  })
+
+  describe('evaluate - multiple runs', () => {
+    const contexts = [
+      {
+        description:
+          'runs multiple evaluations correctly providing only updated context',
+        contextInitial: { RefA: 1, RefB: 1 },
+        context2: { RefA: 2 },
+        context3: { RefB: 4 },
+      },
+      {
+        description:
+          'runs multiple evaluations correctly providing full context',
+        contextInitial: { RefA: 1, RefB: 1 },
+        context2: { RefA: 2, RefB: 1 },
+        context3: { RefA: 2, RefB: 4 },
+      },
+    ]
+    for (const {
+      description,
+      contextInitial,
+      context2,
+      context3,
+    } of contexts) {
+      it(description, () => {
+        const evaluator = new BatchEngine({
+          expressions: {
+            exp1: ['==', '$RefA', 1],
+            exp2: ['OVERLAP', ['$RefA', '$RefB'], [2, 3]],
+            exp3: ['==', '$unrelated', 'yes'],
+            exp4: ['==', '$RefB', 4],
+          },
+        })
+
+        const results1 = evaluator.evaluate(contextInitial)
+        assert.deepEqual(
+          results1,
+          { exp1: true, exp2: false, exp3: false, exp4: false },
+          'Initial evaluation results should match expected'
+        )
+
+        const results2 = evaluator.evaluate(context2)
+        assert.deepEqual(
+          results2,
+          { exp1: false, exp2: true, exp3: false, exp4: false },
+          'Second evaluation results should match expected'
+        )
+
+        const results3 = evaluator.evaluate(context3)
+        assert.deepEqual(
+          results3,
+          { exp1: false, exp2: true, exp3: false, exp4: true },
+          'Third evaluation results should match expected'
+        )
+      })
+    }
+
+    it('runs multiple evaluations correctly', () => {
+      const evaluator = new BatchEngine({
+        expressions: {
+          exp1: ['OVERLAP', ['$value1', '$value2'], ['123', '456']],
+          exp2: ['OVERLAP', ['$value1', '$value2'], ['456', '789']],
+          exp3: ['OVERLAP', ['$value1', '$value2'], ['789']],
+        },
+      })
+
+      const context1 = { value1: '123' }
+      const context2 = { value1: '456' }
+      const context3 = { value1: '789' }
+
+      const results1 = evaluator.evaluate(context1)
+      assert.deepEqual(results1, { exp1: true, exp2: false, exp3: false })
+
+      const results2 = evaluator.evaluate(context2)
+      assert.deepEqual(results2, { exp1: true, exp2: true, exp3: false })
+
+      const results3 = evaluator.evaluate(context3)
+      assert.deepEqual(results3, { exp1: false, exp2: true, exp3: true })
+    })
+
+    it('runs multiple evaluations correctly with dynamic', () => {
+      const evaluator = new BatchEngine({
+        expressions: {
+          exp1: ['==', '$index', '1'],
+          exp2: ['==', '$index', '2'],
+          exp3: ['==', '$item{index}value', 10],
+        },
+      })
+
+      const context1 = { index: '1' }
+      const context2 = { item1value: 10 }
+      const context3 = { index: '2' }
+
+      const results1 = evaluator.evaluate(context1)
+      assert.deepEqual(
+        results1,
+        { exp1: true, exp2: false, exp3: false },
+        'Initial context results should match expected'
+      )
+
+      const results2 = evaluator.evaluate(context2)
+      assert.deepEqual(
+        results2,
+        { exp1: true, exp2: false, exp3: true },
+        'Second context results should match expected'
+      )
+
+      const results3 = evaluator.evaluate(context3)
+      assert.deepEqual(
+        results3,
+        { exp1: false, exp2: true, exp3: false },
+        'Third context results should match expected'
+      )
+    })
   })
 
   describe('getDependencies', () => {
@@ -406,6 +517,10 @@ describe('BatchEngine', () => {
           expA: ['AND', ['==', '$status', 'active'], ['>=', '$age', 18]],
           expB: ['==', '$status', 'pending'],
           expC: ['==', '$role', 'admin'],
+          expD: ['==', '$location.state', 'NY'],
+          expE: ['==', '$items[0]', 'chair'],
+          expF: ['==', '$limit.(Number)', 1000],
+          expG: ['==', '$item{index}value', 1000], // Dynamic and not part of graph
         },
       })
 
@@ -414,6 +529,9 @@ describe('BatchEngine', () => {
       assert.deepEqual(deps.get('status')?.sort(), ['expA', 'expB'])
       assert.deepEqual(deps.get('age'), ['expA'])
       assert.deepEqual(deps.get('role'), ['expC'])
+      assert.deepEqual(deps.get('location'), ['expD'])
+      assert.deepEqual(deps.get('items'), ['expE'])
+      assert.deepEqual(deps.get('limit'), ['expF'])
     })
   })
 
@@ -449,10 +567,8 @@ describe('BatchEngine', () => {
       // Existing cached results are preserved
       assert.deepEqual(evaluator.getResults(), { isAdult: true })
 
-      // Evaluating evaluates newly added dirty expression
-      const results = evaluator.evaluate({ age: 25, status: 'active' }, [
-        'status',
-      ])
+      // Forcefully evaluates newly added expression
+      const results = evaluator.evaluate({ age: 25, status: 'active' })
       assert.deepEqual(results, { isAdult: true, isActive: true })
     })
 

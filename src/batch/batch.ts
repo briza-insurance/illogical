@@ -48,8 +48,9 @@ export class BatchEngine {
     this.state = {
       batch,
       originalExpressions: expressionsMap,
-      lastContext: Object.create(null),
+      lastContext: undefined,
       cachedResults: {},
+      markedForEvaluation: new Set(),
     }
   }
 
@@ -70,49 +71,74 @@ export class BatchEngine {
    *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
    *     "depend on" Q1's result — it depends on the context key `Q1`.
    *
-   * Mode 1 — No changedKeys: full re-evaluation of all expressions.
+   * Mode 1 — No previous results: full evaluation of all expressions.
    *   Context is merged into stored context, all expressions run.
    *
-   * Mode 2 — With changedKeys: incremental evaluation.
-   *   Context is merged, only expressions affected by changedKeys run.
-   *   The caller guarantees that only these keys actually changed.
-   *
-   * Mode 2 — With empty changedKeys []: no-op, returns cached results.
+   * Mode 2 — Subsequent evaluations with changed context: incremental evaluation.
+   *   Only expressions affected by updated context are evaluated. The caller can
+   *   choose to provide only the changed context. Keys which the value did not
+   *   change are ignored. Sending undefined for a key indicates that the key has
+   *   been removed from the context.
    *
    * @param ctx — Full evaluation context
    * @param changedKeys — Optional list of keys that changed (trusted by caller)
    * @returns Record mapping expression names to their Result values
    */
-  evaluate(ctx: Context, changedKeys?: string[]): Record<string, Result> {
-    // Merge caller's context into stored context
-    this.mergeContext(ctx)
+  evaluate(ctx: Context): Record<string, Result> {
+    const inputKeys = Object.keys(ctx)
 
-    // Mode 2: empty changedKeys — no-op, return cached results
-    if (changedKeys !== undefined && changedKeys.length === 0) {
+    const isFirstEvaluation = this.state.lastContext === undefined
+
+    // No-op if no context was provided and it is not the first evaluation.
+    if (inputKeys.length === 0 && !isFirstEvaluation) {
       return { ...this.state.cachedResults }
     }
 
-    let dirtyExpressions: Set<string> | undefined
+    // Start with undefined, meaning all expressions will be evaluated if no
+    // affected expressions are found.
+    let affectedExpressions: Set<string> | undefined
 
-    if (changedKeys === undefined) {
-      // Mode 1: full re-evaluation
-      dirtyExpressions = undefined
-    } else {
-      // Mode 2: incremental — find affected expressions from dependency graph
-      dirtyExpressions = findAffectedExpressions(
-        this.state.batch.dependencyGraph,
-        changedKeys
+    if (inputKeys.length > 0 && !isFirstEvaluation) {
+      affectedExpressions = findAffectedExpressions(
+        this.state.lastContext,
+        ctx,
+        this.state.batch.dependencyGraph
       )
+    }
 
-      if (dirtyExpressions.size === 0) {
-        return { ...this.state.cachedResults }
+    if (
+      // If affectedExpressions is undefined, full evaluation will already occur.
+      // Otherwise, add expressions with dynamic refs to always be processed.
+      affectedExpressions !== undefined &&
+      this.state.batch.expressionsWithDynamic.size > 0
+    ) {
+      for (const exprName of this.state.batch.expressionsWithDynamic) {
+        affectedExpressions.add(exprName)
       }
     }
+
+    // If there are expressions marked for evaluation, add them to the affected
+    // expressions set and clear the state.
+    if (this.state.markedForEvaluation.size > 0) {
+      if (affectedExpressions === undefined) {
+        affectedExpressions = new Set()
+      }
+      for (const exprName of this.state.markedForEvaluation) {
+        affectedExpressions.add(exprName)
+      }
+      this.state.markedForEvaluation.clear()
+    }
+
+    if (affectedExpressions !== undefined && affectedExpressions.size === 0) {
+      return { ...this.state.cachedResults }
+    }
+
+    this.state.lastContext = this.mergeContext(this.state.lastContext, ctx)
 
     const newResults = evaluateBatch(
       this.state.batch,
       this.state.lastContext,
-      dirtyExpressions
+      affectedExpressions
     )
 
     // Merge new results into cached results
@@ -136,10 +162,11 @@ export class BatchEngine {
    */
   dispose(): void {
     this.state.cachedResults = {}
-    this.state.lastContext = {}
+    this.state.lastContext = undefined
     this.state.originalExpressions.clear()
     this.state.batch.expressions.clear()
     this.state.batch.dependencyGraph.clear()
+    this.state.markedForEvaluation.clear()
   }
 
   /**
@@ -155,7 +182,7 @@ export class BatchEngine {
   }
 
   /**
-   * Reset all results to undefined (for fresh evaluation without recompilation).
+   * Reset all results to undefined (for fresh evaluation without reparsing).
    */
   reset(): void {
     this.state.cachedResults = {}
@@ -164,10 +191,8 @@ export class BatchEngine {
   /**
    * Add a new expression to the batch.
    *
-   * This reparses the entire batch (Phase 1–3: ref collection, dependency
-   * graph, evaluable parsing). Cached results for existing expressions are
-   * preserved — only the newly added expression starts as dirty and will be
-   * evaluated on the next `evaluate()` call.
+   * This reparses the entire batch . Cached results for existing expressions
+   * are preserved — The newly added expression will be marked for evaluation.
    *
    * @param name — Expression name (must be unique; throws if already exists)
    * @param expression — Raw expression input
@@ -179,7 +204,9 @@ export class BatchEngine {
         `Duplicate expression name: '${name}'. Expression names must be unique.`
       )
     }
+
     this.state.originalExpressions.set(name, expression)
+    this.state.markedForEvaluation.add(name)
 
     this.reparse()
   }
@@ -187,9 +214,9 @@ export class BatchEngine {
   /**
    * Remove an expression from the batch.
    *
-   * This reparses the entire batch (Phase 1–3). The removed expression's
-   * cached result is cleared, and the expression is excluded from future
-   * evaluations. Other expressions' cached results are preserved.
+   * This reparses the entire batch. The removed expression's cached result is
+   * cleared, and the expression is excluded from future evaluations. Other
+   * expressions' cached results are preserved.
    *
    * @param name — Expression name to remove
    */
@@ -227,10 +254,11 @@ export class BatchEngine {
    * Merge caller's context into stored context. Handles deletion via
    * undefined sentinel.
    */
-  private mergeContext(ctx: Context): void {
-    const map = new Map<string, ContextValue>(
-      Object.entries(this.state.lastContext)
-    )
+  private mergeContext(
+    lastContext: Context | undefined,
+    ctx: Context
+  ): Context {
+    const map = new Map<string, ContextValue>(Object.entries(lastContext ?? {}))
 
     for (const [key, newVal] of Object.entries(ctx)) {
       if (key === '__proto__') {
@@ -243,6 +271,6 @@ export class BatchEngine {
       }
     }
 
-    this.state.lastContext = Object.assign({}, Object.fromEntries(map))
+    return Object.assign({}, Object.fromEntries(map))
   }
 }

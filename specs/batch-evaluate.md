@@ -24,8 +24,16 @@ const results = batchEngine.evaluate({
 // { isAdult: true, canDrive: true, isVip: false }
 
 // Incremental evaluation (only evaluates expressions depending on 'tier')
-const updatedResults = batchEngine.evaluate({ tier: 'gold' }, ['tier'])
+const updatedResults = batchEngine.evaluate({ tier: 'gold' })
 // { isAdult: true, canDrive: true, isVip: true }
+
+// Calling with the full context is equivalent. Only changed values will lead re-evaluation of dependent expressions
+const results = batchEngine.evaluate({
+  age: 20,
+  hasLicense: true,
+  tier: 'bronze',
+})
+// { isAdult: true, canDrive: true, isVip: false }
 ```
 
 ## Dependency Model
@@ -33,31 +41,28 @@ const updatedResults = batchEngine.evaluate({ tier: 'gold' }, ['tier'])
 `BatchEngine` evaluates expressions based on context-key dependencies:
 
 - **No inter-expression dependencies:** Expressions depend only on context keys (such as `$age` or `$tier`), not directly on the output of other expressions.
-- **Evaluation order is independent:** The order of expressions and the order of keys in `changedKeys` do not matter.
+- **Evaluation order is independent:** The order of expressions and the order of keys in the context do not matter.
 - **Single-pass resolution:** All expressions affected by changed keys are resolved together in a single evaluation pass.
 
 ## Evaluation Modes
 
 The `evaluate(ctx, changedKeys?)` method supports two modes:
 
-### 1. Full Evaluation (no `changedKeys`)
+### 1. Full Evaluation
 
-When `changedKeys` is omitted, the provided context is merged into the internal context state, and every expression in the batch is evaluated.
+The first evaluation will always perform a full execution of all expressions.
 
 ```js
 batchEngine.evaluate({ age: 25, tier: 'gold' })
 ```
 
-### 2. Incremental Evaluation (with `changedKeys`)
+### 2. Incremental Evaluation
 
-When an array of `changedKeys` is provided, the engine merges the context and only re-evaluates expressions that reference the changed context keys. The remaining expressions return their cached results.
+On subsequent evaluations, regardless if only changed context is provided or the full object containing the changed context, the engine merges the context and only re-evaluates expressions that reference the changed context keys. The remaining expressions return their cached results.
 
 ```js
 // Only re-evaluates expressions referencing '$tier'
-batchEngine.evaluate({ tier: 'platinum' }, ['tier'])
-
-// Providing an empty array acts as a no-op and returns cached results
-batchEngine.evaluate({}, [])
+batchEngine.evaluate({ tier: 'platinum' })
 ```
 
 ### Context Merging and Key Removal
@@ -66,7 +71,7 @@ Context passed to `evaluate` is merged incrementally into the internal stored co
 
 ```js
 // Removes 'tier' from the stored context
-batchEngine.evaluate({ tier: undefined }, ['tier'])
+batchEngine.evaluate({ tier: undefined })
 ```
 
 ## API Reference
@@ -80,10 +85,10 @@ new BatchEngine(options: BatchEvaluatorOptions)
 - `options.expressions`: A key-value record mapping unique expression names to raw expression inputs. Throws a `TypeError` if duplicate names are provided.
 - `options.options`: Optional parser options (such as custom `operatorMapping`, `referencePredicate`, or `referenceTransform`).
 
-### `evaluate(ctx, changedKeys?)`
+### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context, changedKeys?: string[]): Record<string, Result>
+evaluate(ctx: Context): Record<string, Result>
 ```
 
 Merges the provided context into the stored context and evaluates expressions. Returns a record mapping expression names to their results.

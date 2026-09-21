@@ -12,6 +12,7 @@ export const parseBatch = (
   const parsed: ParsedBatch = {
     expressions: new Map(),
     dependencyGraph: new Map(),
+    expressionsWithDynamic: new Set(),
   }
 
   for (const [name, expr] of expressionsMap) {
@@ -25,7 +26,10 @@ export const parseBatch = (
     }
   }
 
-  parsed.dependencyGraph = buildDependencyGraph(options, expressionsMap)
+  const { graph, dynamicRefs } = buildDependencyGraph(options, expressionsMap)
+
+  parsed.dependencyGraph = graph
+  parsed.expressionsWithDynamic = dynamicRefs
 
   return parsed
 }

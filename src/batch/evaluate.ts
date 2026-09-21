@@ -25,30 +25,30 @@ export function evaluateSingle(
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions.
- * Mode 2 (incremental): only evaluates expressions in dirtyExpressions set.
+ * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions set is provided.
+ * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
  *
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
- * @param dirtyExpressions — If provided, only evaluate these expressions,
+ * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
  * @returns Record mapping expression names to their Result values
  */
 export function evaluateBatch(
   batch: ParsedBatch,
   ctx: Context,
-  dirtyExpressions?: Set<string>
+  affectedExpressions?: Set<string>
 ): Record<string, Result> {
   const results: Record<string, Result> = {}
 
-  if (dirtyExpressions === undefined) {
+  if (affectedExpressions === undefined) {
     // Full evaluation: run all expressions
     for (const exprName of batch.expressions.keys()) {
       results[exprName] = evaluateSingle(batch, exprName, ctx)
     }
   } else {
-    // Incremental evaluation: only run dirty expressions
-    for (const exprName of dirtyExpressions) {
+    // Incremental evaluation: only run affected expressions
+    for (const exprName of affectedExpressions) {
       if (batch.expressions.has(exprName)) {
         results[exprName] = evaluateSingle(batch, exprName, ctx)
       } else {
