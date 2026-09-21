@@ -5,25 +5,7 @@ import { defaultOptions, Options } from '../parser/options.js'
 import { findAffectedExpressions } from './dependency-graph.js'
 import { evaluateBatch } from './evaluate.js'
 import { parseBatch } from './parse.js'
-import { ParsedBatch } from './types.js'
-
-export interface BatchEvaluatorOptions {
-  /** Map of expression name → raw expression input */
-  expressions: Record<string, ExpressionInput>
-  /** Optional parser options shared across all expressions */
-  options?: Partial<Options>
-}
-
-export interface BatchEvaluatorState {
-  /** The map of parsed expressions and their dependencies */
-  batch: ParsedBatch
-  /** Original expressions map — stored for addExpression/removeExpression */
-  originalExpressions: Map<string, ExpressionInput>
-  /** Last full context passed to evaluate() */
-  lastContext: Context
-  /** Cached results from the last evaluation */
-  cachedResults: Record<string, Result>
-}
+import { BatchEvaluatorOptions, BatchEvaluatorState } from './types.js'
 
 export class BatchEngine {
   private engine: Engine
@@ -31,12 +13,12 @@ export class BatchEngine {
   private opts: Options
 
   /**
-   * Create a new BatchEvaluator.
+   * Create a new BatchEngine.
    *
    * Validates that all expression names in the initial expressions map are
    * unique. Throws a `TypeError` if any duplicate names are found.
    *
-   * @param options — Expressions map and optional parser options
+   * @param options — BatchEvaluatorOptions containing expressions and optional parser options
    * @throws TypeError if duplicate expression names are provided
    */
   constructor(options: BatchEvaluatorOptions) {
@@ -182,7 +164,7 @@ export class BatchEngine {
   /**
    * Add a new expression to the batch.
    *
-   * This recompiles the entire batch (Phase 1–3: ref collection, dependency
+   * This reparses the entire batch (Phase 1–3: ref collection, dependency
    * graph, evaluable parsing). Cached results for existing expressions are
    * preserved — only the newly added expression starts as dirty and will be
    * evaluated on the next `evaluate()` call.
@@ -199,13 +181,13 @@ export class BatchEngine {
     }
     this.state.originalExpressions.set(name, expression)
 
-    this.recompile()
+    this.reparse()
   }
 
   /**
    * Remove an expression from the batch.
    *
-   * This recompiles the entire batch (Phase 1–3). The removed expression's
+   * This reparses the entire batch (Phase 1–3). The removed expression's
    * cached result is cleared, and the expression is excluded from future
    * evaluations. Other expressions' cached results are preserved.
    *
@@ -216,13 +198,13 @@ export class BatchEngine {
 
     delete this.state.cachedResults[name]
 
-    this.recompile()
+    this.reparse()
   }
 
   /**
-   * Recompile the batch from stored original expressions.
+   * Reparse the batch from stored original expressions.
    */
-  private recompile(): void {
+  private reparse(): void {
     const batch = parseBatch(
       this.opts,
       this.engine,

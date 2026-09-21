@@ -31,6 +31,7 @@ import { ExpressionInput, Input, Parser } from './parser/index.js'
 import { Options } from './parser/options.js'
 
 export { BatchEngine } from './batch/batch.js'
+export type { BatchEvaluatorOptions } from './batch/types.js'
 export { defaultOptions } from './parser/options.js'
 export {
   isEvaluable,

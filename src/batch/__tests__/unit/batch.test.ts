@@ -2,11 +2,8 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { Context, Result } from '../../../common/evaluable.js'
-import {
-  BatchEngine,
-  BatchEvaluatorOptions,
-  BatchEvaluatorState,
-} from '../../batch.js'
+import { BatchEngine } from '../../batch.js'
+import { BatchEvaluatorOptions, BatchEvaluatorState } from '../../types.js'
 
 describe('BatchEngine', () => {
   it('throws Error for invalid operator', () => {

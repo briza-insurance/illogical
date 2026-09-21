@@ -28,6 +28,8 @@ import { OPERATOR as OPERATOR_OR } from './expression/logical/or.js';
 import { OPERATOR as OPERATOR_XOR } from './expression/logical/xor.js';
 import { ExpressionInput, Input } from './parser/index.js';
 import { Options } from './parser/options.js';
+export { BatchEngine } from './batch/batch.js';
+export type { BatchEvaluatorOptions } from './batch/types.js';
 export { defaultOptions } from './parser/options.js';
 export { isEvaluable, OPERATOR_AND, OPERATOR_DIVIDE, OPERATOR_EQ, OPERATOR_GE, OPERATOR_GT, OPERATOR_IN, OPERATOR_LE, OPERATOR_LT, OPERATOR_MULTIPLY, OPERATOR_NE, OPERATOR_NOR, OPERATOR_NOT, OPERATOR_NOT_IN, OPERATOR_OR, OPERATOR_OVERLAP, OPERATOR_PREFIX, OPERATOR_PRESENT, OPERATOR_SUBTRACT, OPERATOR_SUFFIX, OPERATOR_SUM, OPERATOR_UNDEFINED, OPERATOR_XOR, };
 export type { Context, Evaluable, ExpressionInput, Input };

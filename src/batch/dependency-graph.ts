@@ -1,21 +1,10 @@
-/**
- * Dependency graph for batch evaluation.
- *
- * Maps context keys to the expressions that reference them.
- * Built during compileBatch Phase 1 from the raw expression inputs
- * and the compiled refs table.
- */
-
 import { Reference } from '../operand/reference.js'
 import { ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
 import { DependencyGraph } from './types.js'
 
 /**
- * Build a dependency graph from a compiled batch.
- *
- * Uses the compiled refs table to correctly resolve all ref types,
- * not just simple string refs.
+ * Build a dependency graph from the list of raw expressions.
  */
 export function buildDependencyGraph(
   opts: Options,

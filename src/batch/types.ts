@@ -1,11 +1,6 @@
-/**
- * Types for the batch evaluation module.
- *
- * Defines the compiled batch structures, per-expression metadata,
- * and evaluator state used by the BatchEvaluator class.
- */
-
-import { Evaluable } from '../common/evaluable.js'
+import { Context, Evaluable, Result } from '../common/evaluable.js'
+import { ExpressionInput } from '../index.js'
+import { Options } from '../parser/options.js'
 
 /**
  * Dependency graph: context key → list of expression names.
@@ -28,4 +23,22 @@ export interface ParsedBatch {
 
   /** Dependency graph: context key → expressions that reference it */
   dependencyGraph: DependencyGraph
+}
+
+export interface BatchEvaluatorOptions {
+  /** Map of expression name → raw expression input */
+  expressions: Record<string, ExpressionInput>
+  /** Optional parser options shared across all expressions */
+  options?: Partial<Options>
+}
+
+export interface BatchEvaluatorState {
+  /** The map of parsed expressions and their dependencies */
+  batch: ParsedBatch
+  /** Original expressions map — stored for addExpression/removeExpression */
+  originalExpressions: Map<string, ExpressionInput>
+  /** Last full context passed to evaluate() */
+  lastContext: Context
+  /** Cached results from the last evaluation */
+  cachedResults: Record<string, Result>
 }

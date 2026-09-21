@@ -4,10 +4,7 @@ import { ParsedBatch } from './types.js'
 /**
  * Evaluate a single expression within a batch.
  *
- * Constructs a temporary CompiledExpression-compatible object that maps
- * to the batch's shared resources, then calls the existing interpret().
- *
- * @param batch — The compiled batch
+ * @param batch — The ParsedBatch
  * @param exprName — Name of the expression to evaluate
  * @param ctx — Evaluation context
  * @returns The computed Result
@@ -31,7 +28,7 @@ export function evaluateSingle(
  * Mode 1 (full evaluation): evaluates all expressions.
  * Mode 2 (incremental): only evaluates expressions in dirtyExpressions set.
  *
- * @param batch — The parsed batch
+ * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
  * @param dirtyExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
