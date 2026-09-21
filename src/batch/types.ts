@@ -8,20 +8,10 @@
 import { Evaluable } from '../common/evaluable.js'
 
 /**
- * A single entry in the dependency graph.
- * Maps a context key to the expressions that depend on it.
- */
-// TODO: Do we need an object? Or change to Set<string> ???
-export interface DependencyEntry {
-  /** Name of the expression that depends on this key */
-  exprName: string
-}
-
-/**
- * Dependency graph: context key → list of { exprName, refIdx }.
+ * Dependency graph: context key → list of expression names.
  * Built during compileBatch Phase 1.
  */
-export type DependencyGraph = Map<string, DependencyEntry[]>
+export type DependencyGraph = Map<string, Set<string>>
 
 /**
  * A compiled batch of expressions with shared resources.

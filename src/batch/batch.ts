@@ -138,7 +138,7 @@ export class BatchEngine {
       this.state.cachedResults[name] = value
     }
 
-    return { ...this.state.cachedResults } // TODO: why return with destructuring?
+    return { ...this.state.cachedResults }
   }
 
   /**
@@ -146,7 +146,7 @@ export class BatchEngine {
    * @returns Record mapping expression names to their Result values
    */
   getResults(): Record<string, Result> {
-    return { ...this.state.cachedResults } // TODO: why return with destructuring?
+    return { ...this.state.cachedResults }
   }
 
   /**
@@ -167,8 +167,7 @@ export class BatchEngine {
   getDependencies(): Map<string, string[]> {
     const deps = new Map<string, string[]>()
     for (const [key, entries] of this.state.batch.dependencyGraph) {
-      const exprNames = [...new Set(entries.map((e) => e.exprName))]
-      deps.set(key, exprNames)
+      deps.set(key, [...entries])
     }
     return deps
   }

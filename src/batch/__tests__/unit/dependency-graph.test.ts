@@ -76,8 +76,8 @@ describe('Dependency graph', () => {
   describe('findAffectedExpressions', () => {
     it('returns unique affected expression names and handles missing/empty keys', () => {
       const graph: DependencyGraph = new Map([
-        ['status', [{ exprName: 'expr1' }, { exprName: 'expr2' }]],
-        ['user', [{ exprName: 'expr2' }]],
+        ['status', new Set(['expr1', 'expr2'])],
+        ['user', new Set(['expr2'])],
       ])
 
       // Matches across multiple keys and deduplicates expr2

@@ -290,7 +290,7 @@ describe('BatchEngine', () => {
         expectedResults: { exp1: true },
       },
       {
-        name: 'Static collections overlap (OP_PUSH_CONST)',
+        name: 'Static collections overlap',
         options: {
           expressions: {
             exp1: ['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']],

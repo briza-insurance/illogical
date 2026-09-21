@@ -9,7 +9,7 @@
 import { Reference } from '../operand/reference.js'
 import { ExpressionInput, Input } from '../parser/index.js'
 import { Options } from '../parser/options.js'
-import { DependencyEntry, DependencyGraph } from './types.js'
+import { DependencyGraph } from './types.js'
 
 /**
  * Build a dependency graph from a compiled batch.
@@ -21,7 +21,7 @@ export function buildDependencyGraph(
   opts: Options,
   expressions: Map<string, ExpressionInput>
 ): DependencyGraph {
-  const graph = new Map<string, DependencyEntry[]>()
+  const graph = new Map<string, Set<string>>()
 
   for (const [exprName, raw] of expressions) {
     collectRefsFromExpression(raw, exprName, graph, opts)
@@ -51,18 +51,14 @@ function collectRefsFromExpression(
     // Reuse Reference key logic to handle complex keys, casting, and array indices correctly.
     const reference = new Reference(opts.referenceTransform(expression))
 
-    const transformed = reference.getKey()
+    const key = reference.getKey()
 
-    // TODO: Add tests for Dynamic refs. Might need to handle them differently in the graph.
-
-    let entries = graph.get(transformed)
+    let entries = graph.get(key)
     if (entries === undefined) {
-      entries = []
-      graph.set(transformed, entries)
+      entries = new Set<string>()
+      graph.set(key, entries)
     }
-    if (!entries.some((e) => e.exprName === exprName)) {
-      entries.push({ exprName })
-    }
+    entries.add(exprName)
   }
 }
 
@@ -79,7 +75,7 @@ export function findAffectedExpressions(
     const entries = graph.get(key)
     if (entries) {
       for (const entry of entries) {
-        affected.add(entry.exprName)
+        affected.add(entry)
       }
     }
   }

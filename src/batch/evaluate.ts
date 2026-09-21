@@ -1,16 +1,3 @@
-/**
- * Batch interpreter.
- *
- * Wraps the existing interpret() function from ../bytecode/interpreter.ts
- * but with shared lookup tables (refs, consts, constSets) and per-expression
- * locals offsets.
- *
- * The existing interpret() function's hot path remains unchanged — we
- * use a pre-built CompiledExpression object for each expression that was
- * constructed during compileBatch. This avoids object construction overhead
- * on every evaluation call.
- */
-
 import { Context, Result } from '../common/evaluable.js'
 import { ParsedBatch } from './types.js'
 
