@@ -38,4 +38,12 @@ export abstract class Operand implements Evaluable {
   toString(): string {
     return '[Operand]'
   }
+
+  getReferences(): string[] {
+    throw new Error('should only be called on root Evaluable')
+  }
+
+  setReferences(): void {
+    throw new Error('should only be called on root Evaluable')
+  }
 }

@@ -126,4 +126,18 @@ export abstract class Arithmetic implements Evaluable {
       ...this.operands.map((operand) => operand.serialize(options)),
     ]
   }
+
+  /**
+   * {@link Evaluable.getReferences}
+   */
+  getReferences(): string[] {
+    throw new Error('should only be called on root Evaluable')
+  }
+
+  /**
+   * {@link Evaluable.setReferences}
+   */
+  setReferences(): void {
+    throw new Error('should only be called on root Evaluable')
+  }
 }

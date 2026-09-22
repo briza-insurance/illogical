@@ -26,7 +26,7 @@ export const parseBatch = (
     }
   }
 
-  const { graph, dynamicRefs } = buildDependencyGraph(options, expressionsMap)
+  const { graph, dynamicRefs } = buildDependencyGraph(parsed.expressions)
 
   parsed.dependencyGraph = graph
   parsed.expressionsWithDynamic = dynamicRefs
