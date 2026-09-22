@@ -67,61 +67,47 @@ describe('Operand - Reference', () => {
   }
 
   describe('evaluate', () => {
-    const evaluateData: [string, unknown, string?][] = [
+    const evaluateData: [string, unknown][] = [
       // Existing
-      ['RefA', 1, 'RefA'],
+      ['RefA', 1],
       // Nested
-      ['RefC.subA', 2, 'RefC.subA'],
-      ['RefC.subB.subSubA', 3, 'RefC.subB.subSubA'],
-      ['RefC.`subC.dotKey`.subSubC', 4, 'RefC.`subC.dotKey`.subSubC'],
-      ['RefC.`subD.dotKey`[0].subSubD', 5, 'RefC.`subD.dotKey`[0].subSubD'],
+      ['RefC.subA', 2],
+      ['RefC.subB.subSubA', 3],
+      ['RefC.`subC.dotKey`.subSubC', 4],
+      ['RefC.`subD.dotKey`[0].subSubD', 5],
       // yield an undefined since this is a wrong syntax to access array item for a key that contains a dot
-      [
-        'RefC.`subD.dotKey[0]`.subSubD',
-        undefined,
-        'RefC.`subD.dotKey[0]`.subSubD',
-      ],
-      [
-        'RefC.`subD.dotKey`[0].subSubE[0].subSubSubE',
-        6,
-        'RefC.`subD.dotKey`[0].subSubE[0].subSubSubE',
-      ],
-      ['RefC.`sub`E.dotKey`.subSubE', 7, 'RefC.`sub`E.dotKey`.subSubE'],
-      ['RefC.`sub`E.dotKey``.subSubE', 8, 'RefC.`sub`E.dotKey``.subSubE'],
+      ['RefC.`subD.dotKey[0]`.subSubD', undefined],
+      ['RefC.`subD.dotKey`[0].subSubE[0].subSubSubE', 6],
+      ['RefC.`sub`E.dotKey`.subSubE', 7],
+      ['RefC.`sub`E.dotKey``.subSubE', 8],
       // Missing
-      ['RefB', undefined, 'RefB'],
-      ['RefC.subC', undefined, 'RefC.subC'],
-      ['RefC.subB.subSubB', undefined, 'RefC.subB.subSubB'],
-      ['RefC.subA.subSubA', undefined, 'RefC.subA.subSubA'],
+      ['RefB', undefined],
+      ['RefC.subC', undefined],
+      ['RefC.subB.subSubB', undefined],
+      ['RefC.subA.subSubA', undefined],
       // Array
-      ['RefG[1]', 'Oranges', 'RefG[1]'],
-      ['RefI[0][1]', 'B', 'RefI[0][1]'],
-      ['RefI[0][5]', undefined, 'RefI[0][5]'],
+      ['RefG[1]', 'Oranges'],
+      ['RefI[0][1]', 'B'],
+      ['RefI[0][5]', undefined],
       // Complex
-      ['Ref{Ref{RefE}}', 1, 'Ref{Ref{RefE}}'],
-      ['RefC.{RefF}', 2, 'RefC.{RefF}'],
-      ['RefG[{RefC.sub{RefD}}]', 'Fish', 'RefG[{RefC.sub{RefD}}]'],
-      ['RefH[{RefA}].sub{RefD}', 2, 'RefH[{RefA}].sub{RefD}'],
-      ['RefA{RefA}', undefined, 'RefA{RefA}'],
-      ['RefB.{RefA}', undefined, 'RefB.{RefA}'],
-      ['Ref{RefB}', undefined, 'Ref{RefB}'],
+      ['Ref{Ref{RefE}}', 1],
+      ['RefC.{RefF}', 2],
+      ['RefG[{RefC.sub{RefD}}]', 'Fish'],
+      ['RefH[{RefA}].sub{RefD}', 2],
+      ['RefA{RefA}', undefined],
+      ['RefB.{RefA}', undefined],
+      ['Ref{RefB}', undefined],
       // Data type casting
-      ['RefH[{RefA}].sub{RefD}.(Number)', 2, 'RefH[{RefA}].sub{RefD}'],
-      ['RefA.(String)', '1', 'RefA'],
-      ['RefJ.(String)', '1', 'RefJ'],
-      ['RefJ.(Number)', 1, 'RefJ'],
-      ['RefK.yes.(Number)', undefined, 'RefK.yes'],
-      ['RefK.no.(Number)', undefined, 'RefK.no'],
+      ['RefH[{RefA}].sub{RefD}.(Number)', 2],
+      ['RefA.(String)', '1'],
+      ['RefJ.(String)', '1'],
+      ['RefJ.(Number)', 1],
+      ['RefK.yes.(Number)', undefined],
+      ['RefK.no.(Number)', undefined],
     ]
     for (const [value, expected] of evaluateData) {
       test(`${value} should evaluate as ${expected}`, () => {
         assert.strictEqual(new Reference(value).evaluate(context), expected)
-      })
-    }
-
-    for (const [value, , expectedKey] of evaluateData) {
-      test(`${value} should return key as ${expectedKey}`, () => {
-        assert.strictEqual(new Reference(value).getKey(), expectedKey)
       })
     }
   })

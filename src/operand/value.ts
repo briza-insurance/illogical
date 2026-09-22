@@ -32,6 +32,7 @@ function printValue(value: Result): string {
  */
 export class Value extends Operand {
   private readonly value: Result
+  references: Set<string> = new Set()
 
   /**
    * @constructor
@@ -75,5 +76,9 @@ export class Value extends Operand {
    */
   toString(): string {
     return printValue(this.value)
+  }
+
+  getReferences(): Set<string> {
+    return this.references
   }
 }

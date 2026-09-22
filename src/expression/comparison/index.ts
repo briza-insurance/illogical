@@ -17,7 +17,7 @@ import { isSimplifiedArithmeticExpression } from '../arithmetic/isSimplifiedArit
  */
 export abstract class Comparison implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
-  references?: string[]
+  references: Set<string> = new Set()
 
   /**
    * @constructor
@@ -31,7 +31,12 @@ export abstract class Comparison implements Evaluable {
     protected readonly left: Operand,
     protected readonly right: Operand
   ) {
-    this.references = undefined
+    for (const ref of this.left.getReferences()) {
+      this.references.add(ref)
+    }
+    for (const ref of this.right.getReferences()) {
+      this.references.add(ref)
+    }
   }
 
   /**
@@ -103,14 +108,7 @@ export abstract class Comparison implements Evaluable {
   /**
    * {@link Evaluable.getReferences}
    */
-  getReferences(): string[] {
-    return this.references ?? []
-  }
-
-  /**
-   * {@link Evaluable.setReferences}
-   */
-  setReferences(references: string[]): void {
-    this.references = references
+  getReferences(): Set<string> {
+    return this.references
   }
 }

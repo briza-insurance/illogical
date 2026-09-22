@@ -9,6 +9,7 @@ import { Value } from './value.js';
  */
 export declare class Collection extends Operand {
     private readonly items;
+    references: Set<string>;
     /**
      * Get the items in the collection.
      * @returns {Array<Value | Reference>}
@@ -38,4 +39,5 @@ export declare class Collection extends Operand {
      * @return {string}
      */
     toString(): string;
+    getReferences(): Set<string>;
 }

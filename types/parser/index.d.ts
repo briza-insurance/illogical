@@ -11,7 +11,6 @@ export declare class Parser {
     private readonly expectedRootOperators;
     private readonly unexpectedRootSymbols;
     private readonly referenceCache;
-    private readonly rootEvaluableReferenceKeys;
     /**
      * @constructor
      * @param {Options?} options Parser options.

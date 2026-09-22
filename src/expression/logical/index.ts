@@ -12,7 +12,7 @@ import { Options } from '../../parser/options.js'
  */
 export abstract class Logical implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
-  references?: string[]
+  references: Set<string> = new Set()
 
   /**
    * @constructor
@@ -24,7 +24,12 @@ export abstract class Logical implements Evaluable {
     protected readonly operatorSymbol: symbol,
     protected readonly operands: Evaluable[]
   ) {
-    this.references = undefined
+    const itemsLength = this.operands.length
+    for (let i = 0; i < itemsLength; i++) {
+      for (const ref of this.operands[i].getReferences()) {
+        this.references.add(ref)
+      }
+    }
   }
 
   /**
@@ -70,14 +75,7 @@ export abstract class Logical implements Evaluable {
   /**
    * {@link Evaluable.getReferences}
    */
-  getReferences(): string[] {
-    return this.references ?? []
-  }
-
-  /**
-   * {@link Evaluable.setReferences}
-   */
-  setReferences(references: string[]): void {
-    this.references = references
+  getReferences(): Set<string> {
+    return this.references
   }
 }

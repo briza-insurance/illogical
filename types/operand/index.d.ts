@@ -6,6 +6,7 @@ import { Options } from '../parser/options.js';
  */
 export declare abstract class Operand implements Evaluable {
     type: EvaluableType;
+    abstract references: Set<string>;
     /**
      * {@link Evaluable.evaluate}
      */
@@ -25,9 +26,5 @@ export declare abstract class Operand implements Evaluable {
     /**
      * {@link Evaluable.getReferences}
      */
-    getReferences(): string[];
-    /**
-     * {@link Evaluable.setReferences}
-     */
-    setReferences(_references: string[]): void;
+    abstract getReferences(): Set<string>;
 }

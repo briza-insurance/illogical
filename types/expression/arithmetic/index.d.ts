@@ -11,6 +11,7 @@ export declare abstract class Arithmetic implements Evaluable {
     protected readonly operatorSymbol: symbol;
     protected readonly operands: Operand[];
     type: EvaluableType;
+    references: Set<string>;
     /**
      * @constructor
      * @param {string} operator String representation of the operator.
@@ -54,9 +55,5 @@ export declare abstract class Arithmetic implements Evaluable {
     /**
      * {@link Evaluable.getReferences}
      */
-    getReferences(): string[];
-    /**
-     * {@link Evaluable.setReferences}
-     */
-    setReferences(_references: string[]): void;
+    getReferences(): Set<string>;
 }

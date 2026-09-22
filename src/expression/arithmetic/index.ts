@@ -20,6 +20,7 @@ import { Options } from '../../parser/options.js'
  */
 export abstract class Arithmetic implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
+  references: Set<string> = new Set()
 
   /**
    * @constructor
@@ -31,7 +32,14 @@ export abstract class Arithmetic implements Evaluable {
     protected readonly operator: string,
     protected readonly operatorSymbol: symbol,
     protected readonly operands: Operand[]
-  ) {}
+  ) {
+    const operandsLength = this.operands.length
+    for (let i = 0; i < operandsLength; i++) {
+      for (const ref of this.operands[i].getReferences()) {
+        this.references.add(ref)
+      }
+    }
+  }
 
   /**
    * Helper function to assist with arithmetic evaluation. Ensures that all
@@ -130,14 +138,7 @@ export abstract class Arithmetic implements Evaluable {
   /**
    * {@link Evaluable.getReferences}
    */
-  getReferences(): string[] {
-    throw new Error('should only be called on root Evaluable')
-  }
-
-  /**
-   * {@link Evaluable.setReferences}
-   */
-  setReferences(_references: string[]): void {
-    throw new Error('should only be called on root Evaluable')
+  getReferences(): Set<string> {
+    return this.references
   }
 }

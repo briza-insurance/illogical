@@ -13,6 +13,7 @@ export declare class Reference extends Operand {
     private readonly dataType;
     private readonly valueLookup;
     private readonly getKeys;
+    references: Set<string>;
     /**
      * @constructor
      * @param {string} key Context key.
@@ -38,11 +39,11 @@ export declare class Reference extends Operand {
      * @return {string}
      */
     toString(): string;
-    getKey(): string;
     /**
      * Converts a value to a specified data type
      * Silently returns original value if data type conversion has not been implemented.
      * @param value value to cast as data type
      */
     private toDataType;
+    getReferences(): Set<string>;
 }

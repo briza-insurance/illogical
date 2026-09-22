@@ -44,7 +44,7 @@ export enum EvaluableType {
  */
 export interface Evaluable {
   type: EvaluableType
-  references?: string[]
+  references: Set<string>
 
   /**
    * Evaluate in the given context.
@@ -86,14 +86,7 @@ export interface Evaluable {
   /**
    * Get reference keys used in the evaluable.
    */
-  getReferences(): string[]
-
-  /**
-   * Set reference keys used in the evaluable.
-   *
-   * @param references reference keys to set
-   */
-  setReferences(references: string[]): void
+  getReferences(): Set<string>
 }
 
 export type SimplifyArgs = Parameters<Evaluable['simplify']>

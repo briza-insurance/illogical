@@ -16,6 +16,7 @@ import { Value } from './value.js'
  */
 export class Collection extends Operand {
   private readonly items: Array<Value | Reference>
+  references: Set<string> = new Set()
 
   /**
    * Get the items in the collection.
@@ -32,6 +33,13 @@ export class Collection extends Operand {
   constructor(items: Array<Value | Reference>) {
     super()
     this.items = items
+
+    const itemsLength = items.length
+    for (let i = 0; i < itemsLength; i++) {
+      for (const ref of items[i].getReferences()) {
+        this.references.add(ref)
+      }
+    }
   }
 
   /**
@@ -74,5 +82,9 @@ export class Collection extends Operand {
    */
   toString(): string {
     return '[' + this.items.map((item) => item.toString()).join(', ') + ']'
+  }
+
+  getReferences(): Set<string> {
+    return this.references
   }
 }

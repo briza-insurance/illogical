@@ -9,7 +9,7 @@ export declare abstract class Logical implements Evaluable {
     protected readonly operatorSymbol: symbol;
     protected readonly operands: Evaluable[];
     type: EvaluableType;
-    references?: string[];
+    references: Set<string>;
     /**
      * @constructor
      * @param {string} operator String representation of the operator.
@@ -33,9 +33,5 @@ export declare abstract class Logical implements Evaluable {
     /**
      * {@link Evaluable.getReferences}
      */
-    getReferences(): string[];
-    /**
-     * {@link Evaluable.setReferences}
-     */
-    setReferences(references: string[]): void;
+    getReferences(): Set<string>;
 }
