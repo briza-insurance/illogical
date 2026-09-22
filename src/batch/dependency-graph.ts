@@ -11,8 +11,8 @@ export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
   const graph = new Map<string, Set<string>>()
   const dynamicRefs = new Set<string>()
 
-  for (const [exprName, raw] of expressions) {
-    collectRefsFromExpression(raw, exprName, graph, dynamicRefs)
+  for (const [exprName, evaluable] of expressions) {
+    collectRefsFromExpression(evaluable, exprName, graph, dynamicRefs)
   }
 
   return { graph, dynamicRefs }
@@ -26,12 +26,12 @@ export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
  * This function mutates the list of dynamic references.
  */
 function collectRefsFromExpression(
-  expression: Evaluable,
+  evaluable: Evaluable,
   expressionName: string,
   graph: DependencyGraph,
   expressionsWithDynamic: Set<string>
 ): void {
-  for (const key of expression.getReferences()) {
+  for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
     if (key.includes('{')) {
       expressionsWithDynamic.add(expressionName)

@@ -189,7 +189,9 @@ export class Parser {
     const input = this.parseRawExp(raw as Input)
 
     // Inject the collected references into the root expression.
-    input.setReferences(Array.from(this.rootEvaluableReferenceKeys))
+    if (this.rootEvaluableReferenceKeys.size > 0) {
+      input.setReferences(Array.from(this.rootEvaluableReferenceKeys))
+    }
 
     return input
   }

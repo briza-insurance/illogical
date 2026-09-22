@@ -11,6 +11,7 @@ export declare abstract class Comparison implements Evaluable {
     protected readonly left: Operand;
     protected readonly right: Operand;
     type: EvaluableType;
+    references?: string[];
     /**
      * @constructor
      * @param {string} operator String representation of the operator.
@@ -42,4 +43,12 @@ export declare abstract class Comparison implements Evaluable {
      * {@link Evaluable.serialize}
      */
     serialize(options: Options): ExpressionInput;
+    /**
+     * {@link Evaluable.getReferences}
+     */
+    getReferences(): string[];
+    /**
+     * {@link Evaluable.setReferences}
+     */
+    setReferences(references: string[]): void;
 }

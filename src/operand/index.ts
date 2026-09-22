@@ -39,11 +39,17 @@ export abstract class Operand implements Evaluable {
     return '[Operand]'
   }
 
+  /**
+   * {@link Evaluable.getReferences}
+   */
   getReferences(): string[] {
     throw new Error('should only be called on root Evaluable')
   }
 
-  setReferences(): void {
+  /**
+   * {@link Evaluable.setReferences}
+   */
+  setReferences(_references: string[]): void {
     throw new Error('should only be called on root Evaluable')
   }
 }

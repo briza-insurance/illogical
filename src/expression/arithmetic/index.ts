@@ -137,7 +137,7 @@ export abstract class Arithmetic implements Evaluable {
   /**
    * {@link Evaluable.setReferences}
    */
-  setReferences(): void {
+  setReferences(_references: string[]): void {
     throw new Error('should only be called on root Evaluable')
   }
 }

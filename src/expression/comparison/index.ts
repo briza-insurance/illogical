@@ -104,10 +104,7 @@ export abstract class Comparison implements Evaluable {
    * {@link Evaluable.getReferences}
    */
   getReferences(): string[] {
-    if (this.references === undefined) {
-      throw new Error('should only be called on root Evaluable')
-    }
-    return this.references
+    return this.references ?? []
   }
 
   /**

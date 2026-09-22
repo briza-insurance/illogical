@@ -1,11 +1,9 @@
-import { Context } from '../common/evaluable.js';
-import { ExpressionInput } from '../parser/index.js';
-import { Options } from '../parser/options.js';
+import { Context, Evaluable } from '../common/evaluable.js';
 import { DependencyGraph } from './types.js';
 /**
  * Build a dependency graph from the list of raw expressions.
  */
-export declare function buildDependencyGraph(opts: Options, expressions: Map<string, ExpressionInput>): {
+export declare function buildDependencyGraph(expressions: Map<string, Evaluable>): {
     graph: DependencyGraph;
     dynamicRefs: Set<string>;
 };
