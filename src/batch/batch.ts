@@ -30,6 +30,7 @@ export class BatchEngine {
         }
       }
     }
+    this.opts.collectEvaluableReferences = true
 
     this.engine = new Engine(this.opts)
 
@@ -43,7 +44,7 @@ export class BatchEngine {
       expressionsMap.set(name, expr)
     }
 
-    const batch = parseBatch(this.opts, this.engine, expressionsMap)
+    const batch = parseBatch(this.engine, expressionsMap)
 
     this.state = {
       batch,
@@ -232,11 +233,7 @@ export class BatchEngine {
    * Reparse the batch from stored original expressions.
    */
   private reparse(): void {
-    const batch = parseBatch(
-      this.opts,
-      this.engine,
-      this.state.originalExpressions
-    )
+    const batch = parseBatch(this.engine, this.state.originalExpressions)
 
     // Preserve cached results for expressions that still exist
     const preservedResults: Record<string, Result> = {}

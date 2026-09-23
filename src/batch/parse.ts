@@ -1,11 +1,9 @@
 import Engine from '../index.js'
 import { ExpressionInput } from '../parser/index.js'
-import { Options } from '../parser/options.js'
 import { buildDependencyGraph } from './dependency-graph.js'
 import { ParsedBatch } from './types.js'
 
 export const parseBatch = (
-  options: Options,
   engine: Engine,
   expressionsMap: Map<string, ExpressionInput>
 ): ParsedBatch => {
@@ -26,7 +24,7 @@ export const parseBatch = (
     }
   }
 
-  const { graph, dynamicRefs } = buildDependencyGraph(options, expressionsMap)
+  const { graph, dynamicRefs } = buildDependencyGraph(parsed.expressions)
 
   parsed.dependencyGraph = graph
   parsed.expressionsWithDynamic = dynamicRefs

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { ExpressionInput } from '../../../parser/index.js'
-import { defaultOptions } from '../../../parser/options.js'
+import { Evaluable } from '../../../common/evaluable.js'
+import Engine from '../../../index.js'
 import {
   buildDependencyGraph,
   findAffectedExpressions,
@@ -10,41 +10,40 @@ import {
 import { DependencyGraph } from '../../types.js'
 
 describe('Dependency graph', () => {
+  const engine: Engine = new Engine({ collectEvaluableReferences: true })
+
   describe('buildDependencyGraph', () => {
     it(
       'builds graph covering string, array, token, and dynamic ' +
         'refs while handling dynamic skips and unmatched refs',
       () => {
-        const expressions = new Map<string, ExpressionInput>([
+        const expressions = new Map<string, Evaluable>([
           [
             'expr1',
-            [
+            engine.parse([
               'AND',
               ['==', '$status', 'active'],
               ['==', '$status', 'active'],
               ['==', '$unmatched', 1],
-            ],
+            ]),
           ],
           // multi-key array ref nested in expression
-          ['expr2', ['AND', ['==', '$user.profile', 'admin']]],
+          ['expr2', engine.parse(['AND', ['==', '$user.profile', 'admin']])],
           // token-based ref with key and index
-          ['expr3', ['==', '$items[0]', 'val']],
+          ['expr3', engine.parse(['==', '$items[0]', 'val'])],
           // token-based ref with index only (no key tokens -> __dynamic__)
-          ['expr4', ['==', '$[0]', 'val']],
+          ['expr4', engine.parse(['==', '$[0]', 'val'])],
           // dynamic ref template with static key segment
-          ['expr5', ['==', '${region}.city', 'NY']],
+          ['expr5', engine.parse(['==', '${region}.city', 'NY'])],
           // dynamic ref template without static keys (all dynamic -> __dynamic__)
-          ['expr6', ['==', '${region}', 'all']],
+          ['expr6', engine.parse(['==', '${region}', 'all'])],
           // non-reference values (numbers, non-ref strings)
-          ['expr7', ['==', 42, 42]],
-          ['expr8', ['==', '$profile', 'standard']],
-          ['expr9', ['==', '$limit.(Number)', 1000]],
+          ['expr7', engine.parse(['==', 42, 42])],
+          ['expr8', engine.parse(['==', '$profile', 'standard'])],
+          ['expr9', engine.parse(['==', '$limit.(Number)', 1000])],
         ])
 
-        const { graph, dynamicRefs } = buildDependencyGraph(
-          defaultOptions,
-          expressions
-        )
+        const { graph, dynamicRefs } = buildDependencyGraph(expressions)
 
         // simple string ref: status -> expr1 (deduplicated to 1 entry)
         assert.deepEqual(

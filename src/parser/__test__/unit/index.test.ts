@@ -363,6 +363,41 @@ describe('Condition Engine - Parser', () => {
       })
     }
 
+    test('parsed references are not collected by default', () => {
+      const parser = new Parser()
+
+      const expression: ExpressionInput = [
+        getOp(OPERATOR_AND),
+        [getOp(OPERATOR_EQ), '$RefA', 5],
+        [getOp(OPERATOR_EQ), '$RefB.(Number)', 10],
+        [getOp(OPERATOR_EQ), '$RefC[0]', 10],
+        [getOp(OPERATOR_EQ), '$RefD{index}', 10],
+      ]
+
+      const evaluable = parser.parse(expression)
+      const references = evaluable.getReferences()
+      assert.deepEqual([...references], [])
+    })
+
+    test('parsed references', () => {
+      const parser = new Parser({ collectEvaluableReferences: true })
+
+      const expression: ExpressionInput = [
+        getOp(OPERATOR_AND),
+        [getOp(OPERATOR_EQ), '$RefA', 5],
+        [getOp(OPERATOR_EQ), '$RefB.(Number)', 10],
+        [getOp(OPERATOR_EQ), '$RefC[0]', 10],
+        [getOp(OPERATOR_EQ), '$RefD{index}', 10],
+      ]
+
+      const evaluable = parser.parse(expression)
+      const references = evaluable.getReferences()
+      assert.deepEqual(
+        [...references],
+        ['RefA', 'RefB', 'RefC[0]', 'RefD{index}']
+      )
+    })
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const throwTestCases = [
       // Invalid form

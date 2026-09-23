@@ -12,6 +12,7 @@ import { Options } from '../../parser/options.js'
  */
 export abstract class Logical implements Evaluable {
   type: EvaluableType = EvaluableType.Expression
+  references?: string[]
 
   /**
    * @constructor
@@ -22,7 +23,9 @@ export abstract class Logical implements Evaluable {
     protected readonly operator: string,
     protected readonly operatorSymbol: symbol,
     protected readonly operands: Evaluable[]
-  ) {}
+  ) {
+    this.references = undefined
+  }
 
   /**
    * {@link Evaluable.evaluate}
@@ -62,5 +65,19 @@ export abstract class Logical implements Evaluable {
       operator,
       ...this.operands.map((operand) => operand.serialize(options)),
     ]
+  }
+
+  /**
+   * {@link Evaluable.getReferences}
+   */
+  getReferences(): string[] {
+    return this.references ?? []
+  }
+
+  /**
+   * {@link Evaluable.setReferences}
+   */
+  setReferences(references: string[]): void {
+    this.references = references
   }
 }

@@ -1,21 +1,18 @@
-import { Context } from '../common/evaluable.js'
-import { Reference } from '../operand/reference.js'
-import { ExpressionInput, Input } from '../parser/index.js'
-import { Options } from '../parser/options.js'
+import { Context, Evaluable } from '../common/evaluable.js'
 import { DependencyGraph } from './types.js'
 
 /**
  * Build a dependency graph from the list of raw expressions.
  */
-export function buildDependencyGraph(
-  opts: Options,
-  expressions: Map<string, ExpressionInput>
-): { graph: DependencyGraph; dynamicRefs: Set<string> } {
+export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
+  graph: DependencyGraph
+  dynamicRefs: Set<string>
+} {
   const graph = new Map<string, Set<string>>()
   const dynamicRefs = new Set<string>()
 
-  for (const [exprName, raw] of expressions) {
-    collectRefsFromExpression(raw, exprName, graph, dynamicRefs, opts)
+  for (const [exprName, evaluable] of expressions) {
+    collectRefsFromExpression(evaluable, exprName, graph, dynamicRefs)
   }
 
   return { graph, dynamicRefs }
@@ -29,41 +26,18 @@ export function buildDependencyGraph(
  * This function mutates the list of dynamic references.
  */
 function collectRefsFromExpression(
-  expression: Input,
+  evaluable: Evaluable,
   expressionName: string,
   graph: DependencyGraph,
-  expressionsWithDynamic: Set<string>,
-  opts: Options
+  expressionsWithDynamic: Set<string>
 ): void {
-  if (Array.isArray(expression)) {
-    for (let i = 0; i < expression.length; i++) {
-      collectRefsFromExpression(
-        expression[i],
-        expressionName,
-        graph,
-        expressionsWithDynamic,
-        opts
-      )
-    }
-  } else if (
-    typeof expression === 'string' &&
-    opts.referencePredicate(expression)
-  ) {
-    // Reuse Reference key logic to handle complex keys, casting, and array indices correctly.
-    const reference = new Reference(opts.referenceTransform(expression))
-
-    const key = reference.getKey()
-
-    // Normalize the key extracting the root part before any complex components.
-    // Ideally, Reference operand should provide a method to directly get the
-    // root key, but this is not available yet.
-    const rootKey =
-      key[0] === '[' || key[0] === '.' ? key : key.split(/[.[]/)[0]
-
+  for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
     if (key.includes('{')) {
       expressionsWithDynamic.add(expressionName)
     } else {
+      const rootKey =
+        key[0] === '[' || key[0] === '.' ? key : key.split(/[.[]/)[0]
       let entries = graph.get(rootKey)
       if (entries === undefined) {
         entries = new Set<string>()
