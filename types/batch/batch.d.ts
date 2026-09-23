@@ -1,6 +1,6 @@
 import { Context, Result } from '../common/evaluable.js';
 import { ExpressionInput } from '../parser/index.js';
-import { BatchEvaluatorOptions, DependencyGraph } from './types.js';
+import { BatchEvaluatorOptions } from './types.js';
 export declare class BatchEngine {
     private engine;
     private state;
@@ -55,11 +55,6 @@ export declare class BatchEngine {
      * Dispose the batch evaluator — frees internal caches.
      */
     dispose(): void;
-    /**
-     * Get dependency information.
-     * @returns Map of context key → list of expression names that depend on it
-     */
-    getDependencies(): DependencyGraph;
     /**
      * Reset all results to undefined (for fresh evaluation without reparsing).
      */

@@ -1,15 +1,11 @@
 import { Context, ContextValue, Result } from '../common/evaluable.js'
-import Engine from '../index.js'
+import { Engine } from '../engine/engine.js'
 import { ExpressionInput } from '../parser/index.js'
 import { defaultOptions, Options } from '../parser/options.js'
 import { findAffectedExpressions } from './dependency-graph.js'
 import { evaluateBatch } from './evaluate.js'
 import { parseBatch } from './parse.js'
-import {
-  BatchEvaluatorOptions,
-  BatchEvaluatorState,
-  DependencyGraph,
-} from './types.js'
+import { BatchEvaluatorOptions, BatchEvaluatorState } from './types.js'
 
 export class BatchEngine {
   private engine: Engine
@@ -172,14 +168,6 @@ export class BatchEngine {
     this.state.batch.expressions.clear()
     this.state.batch.dependencyGraph.clear()
     this.state.markedForEvaluation.clear()
-  }
-
-  /**
-   * Get dependency information.
-   * @returns Map of context key → list of expression names that depend on it
-   */
-  getDependencies(): DependencyGraph {
-    return this.state.batch.dependencyGraph
   }
 
   /**

@@ -510,31 +510,6 @@ describe('BatchEngine', () => {
     })
   })
 
-  describe('getDependencies', () => {
-    it('returns a map of context keys to expression names depending on them', () => {
-      const evaluator = new BatchEngine({
-        expressions: {
-          expA: ['AND', ['==', '$status', 'active'], ['>=', '$age', 18]],
-          expB: ['==', '$status', 'pending'],
-          expC: ['==', '$role', 'admin'],
-          expD: ['==', '$location.state', 'NY'],
-          expE: ['==', '$items[0]', 'chair'],
-          expF: ['==', '$limit.(Number)', 1000],
-          expG: ['==', '$item{index}value', 1000], // Dynamic and not part of graph
-        },
-      })
-
-      const deps = evaluator.getDependencies()
-      assert.ok(deps instanceof Map)
-      assert.deepEqual(deps.get('status'), new Set(['expA', 'expB']))
-      assert.deepEqual(deps.get('age'), new Set(['expA']))
-      assert.deepEqual(deps.get('role'), new Set(['expC']))
-      assert.deepEqual(deps.get('location'), new Set(['expD']))
-      assert.deepEqual(deps.get('items'), new Set(['expE']))
-      assert.deepEqual(deps.get('limit'), new Set(['expF']))
-    })
-  })
-
   describe('reset', () => {
     it('clears cached results', () => {
       const evaluator = new BatchEngine({
@@ -608,7 +583,6 @@ describe('BatchEngine', () => {
       evaluator.removeExpression('isActive')
 
       assert.deepEqual(evaluator.getResults(), { isAdult: true })
-      assert.strictEqual(evaluator.getDependencies().has('status'), false)
     })
   })
 })
