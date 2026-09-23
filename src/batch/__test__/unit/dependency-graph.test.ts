@@ -190,6 +190,33 @@ describe('Dependency graph', () => {
       assert.deepEqual([...affected], ['exprUser'])
     })
 
+    it("correctly compares object and early returns if they don't have the same number of keys", () => {
+      const graph: DependencyGraph = new Map([
+        ['config', new Set(['exprConfig'])],
+        ['user', new Set(['exprUser'])],
+        ['meta', new Set(['exprMeta'])],
+      ])
+
+      const currentContext = {
+        config: { theme: 'dark', enabled: true },
+        user: { name: 'Alice', age: 30 },
+        meta: { nested: { count: 1, type: 'a', subtype: 'b' } },
+      }
+
+      const newContext = {
+        config: { enabled: true, theme: 'dark' }, // different key order -> unchanged -> not affected
+        user: { name: 'Alice', age: 30 }, // unchanged -> not affected
+        meta: { nested: { count: 1, type: 'a' } }, // not same keys -> affected
+      }
+
+      const affected = findAffectedExpressions(
+        currentContext,
+        newContext,
+        graph
+      )
+      assert.deepEqual([...affected], ['exprMeta'])
+    })
+
     it('handles type mismatches between current and new context values', () => {
       const graph: DependencyGraph = new Map([
         ['data', new Set(['exprData'])],
