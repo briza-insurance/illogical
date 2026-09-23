@@ -150,7 +150,7 @@ export class Parser {
   private getReference(key: string): Reference {
     const cached = this.referenceCache.get(key)
     if (cached !== undefined) {
-      if (this.opts.collectEvauableReferences) {
+      if (this.opts.collectEvaluableReferences) {
         this.rootEvaluableReferenceKeys.add(cached.getKey())
       }
       return cached
@@ -159,7 +159,7 @@ export class Parser {
     const reference = new Reference(this.opts.referenceTransform(key))
 
     this.referenceCache.set(key, reference)
-    if (this.opts.collectEvauableReferences) {
+    if (this.opts.collectEvaluableReferences) {
       this.rootEvaluableReferenceKeys.add(reference.getKey())
     }
 

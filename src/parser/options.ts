@@ -71,7 +71,7 @@ export interface Options {
    * Whether to collect evaluable references during parsing. For Batch mode,
    * this feature is required and will still be used regardless of the setting.
    */
-  collectEvauableReferences: boolean
+  collectEvaluableReferences: boolean
 }
 
 /**
@@ -138,5 +138,5 @@ export const defaultOptions: Options = {
   referenceTransform: defaultReferenceTransform,
   referenceSerialization: defaultReferenceSerialization,
   operatorMapping: defaultOperatorMapping,
-  collectEvauableReferences: false,
+  collectEvaluableReferences: false,
 }

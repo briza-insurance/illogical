@@ -30,7 +30,7 @@ export class BatchEngine {
         }
       }
     }
-    this.opts.collectEvauableReferences = true
+    this.opts.collectEvaluableReferences = true
 
     this.engine = new Engine(this.opts)
 

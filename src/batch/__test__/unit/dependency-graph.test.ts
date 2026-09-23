@@ -10,9 +10,9 @@ import {
 import { DependencyGraph } from '../../types.js'
 
 describe('Dependency graph', () => {
-  const engine: Engine = new Engine({ collectEvauableReferences: true })
+  const engine: Engine = new Engine({ collectEvaluableReferences: true })
 
-  describe('buildDependencyGraphV2', () => {
+  describe('buildDependencyGraph', () => {
     it(
       'builds graph covering string, array, token, and dynamic ' +
         'refs while handling dynamic skips and unmatched refs',
