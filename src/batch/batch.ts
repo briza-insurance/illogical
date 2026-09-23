@@ -5,7 +5,11 @@ import { defaultOptions, Options } from '../parser/options.js'
 import { findAffectedExpressions } from './dependency-graph.js'
 import { evaluateBatch } from './evaluate.js'
 import { parseBatch } from './parse.js'
-import { BatchEvaluatorOptions, BatchEvaluatorState } from './types.js'
+import {
+  BatchEvaluatorOptions,
+  BatchEvaluatorState,
+  DependencyGraph,
+} from './types.js'
 
 export class BatchEngine {
   private engine: Engine
@@ -174,12 +178,8 @@ export class BatchEngine {
    * Get dependency information.
    * @returns Map of context key → list of expression names that depend on it
    */
-  getDependencies(): Map<string, string[]> {
-    const deps = new Map<string, string[]>()
-    for (const [key, entries] of this.state.batch.dependencyGraph) {
-      deps.set(key, [...entries])
-    }
-    return deps
+  getDependencies(): DependencyGraph {
+    return this.state.batch.dependencyGraph
   }
 
   /**

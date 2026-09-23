@@ -17,7 +17,7 @@ export type DependencyGraph = Map<string, Set<string>>
  * - A single constSets cache (built lazily)
  * - The same opNames map (operator string → opcode)
  */
-export interface ParsedBatch {
+export type ParsedBatch = {
   /** Per-expression compiled data, keyed by expression name */
   expressions: Map<string, Evaluable>
   /** Dependency graph: context key → expressions that reference it */
@@ -26,14 +26,14 @@ export interface ParsedBatch {
   expressionsWithDynamic: Set<string>
 }
 
-export interface BatchEvaluatorOptions {
+export type BatchEvaluatorOptions = {
   /** Map of expression name → raw expression input */
   expressions: Record<string, ExpressionInput>
   /** Optional parser options shared across all expressions */
   options?: Partial<Options>
 }
 
-export interface BatchEvaluatorState {
+export type BatchEvaluatorState = {
   /** The map of parsed expressions and their dependencies */
   batch: ParsedBatch
   /** Original expressions map — stored for addExpression/removeExpression */

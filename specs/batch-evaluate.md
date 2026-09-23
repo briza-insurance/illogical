@@ -104,10 +104,10 @@ Returns a copy of the current cached results for all expressions in the batch.
 ### `getDependencies()`
 
 ```typescript
-getDependencies(): Map<string, string[]>
+getDependencies(): DependencyGraph
 ```
 
-Returns a map where keys are context variable names and values are arrays of expression names that reference them.
+Returns a map where keys are context variable names and values are the Set of expression names that reference them.
 
 ### `addExpression(name, expression)`
 

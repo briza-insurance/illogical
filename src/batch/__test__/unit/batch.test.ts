@@ -526,12 +526,12 @@ describe('BatchEngine', () => {
 
       const deps = evaluator.getDependencies()
       assert.ok(deps instanceof Map)
-      assert.deepEqual(deps.get('status')?.sort(), ['expA', 'expB'])
-      assert.deepEqual(deps.get('age'), ['expA'])
-      assert.deepEqual(deps.get('role'), ['expC'])
-      assert.deepEqual(deps.get('location'), ['expD'])
-      assert.deepEqual(deps.get('items'), ['expE'])
-      assert.deepEqual(deps.get('limit'), ['expF'])
+      assert.deepEqual(deps.get('status'), new Set(['expA', 'expB']))
+      assert.deepEqual(deps.get('age'), new Set(['expA']))
+      assert.deepEqual(deps.get('role'), new Set(['expC']))
+      assert.deepEqual(deps.get('location'), new Set(['expD']))
+      assert.deepEqual(deps.get('items'), new Set(['expE']))
+      assert.deepEqual(deps.get('limit'), new Set(['expF']))
     })
   })
 
