@@ -364,6 +364,8 @@ describe('Condition Engine - Parser', () => {
     }
 
     test('parsed references', () => {
+      const parser = new Parser({ collectEvauableReferences: true })
+
       const expression: ExpressionInput = [
         getOp(OPERATOR_AND),
         [getOp(OPERATOR_EQ), '$RefA', 5],
