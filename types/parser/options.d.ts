@@ -39,7 +39,7 @@ export interface Options {
      * Whether to collect evaluable references during parsing. For Batch mode,
      * this feature is required and will still be used regardless of the setting.
      */
-    collectEvauableReferences: boolean;
+    collectEvaluableReferences: boolean;
 }
 /**
  * Default reference predicate.
