@@ -5,7 +5,7 @@ import { ParsedBatch } from './types.js'
 
 export const parseBatch = (
   engine: Engine,
-  expressionsMap: Map<string, ExpressionInput>
+  expressionsMap: Set<ExpressionInput>
 ): ParsedBatch => {
   const parsed: ParsedBatch = {
     expressions: new Map(),
@@ -13,12 +13,12 @@ export const parseBatch = (
     expressionsWithDynamic: new Set(),
   }
 
-  for (const [name, expr] of expressionsMap) {
+  for (const expr of expressionsMap) {
     try {
-      parsed.expressions.set(name, engine.parse(expr))
+      parsed.expressions.set(expr, engine.parse(expr))
     } catch (error) {
       if (error instanceof Error && error.message === 'invalid expression') {
-        throw new Error(`invalid expression with name ${name}`)
+        throw new Error(`invalid expression: ${JSON.stringify(expr)}`)
       }
       throw error
     }

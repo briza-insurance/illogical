@@ -1,18 +1,21 @@
 import { Context, Evaluable } from '../common/evaluable.js'
+import { ExpressionInput } from '../parser/index.js'
 import { DependencyGraph } from './types.js'
 
 /**
  * Build a dependency graph from the list of raw expressions.
  */
-export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
+export function buildDependencyGraph(
+  expressions: Map<ExpressionInput, Evaluable>
+): {
   graph: DependencyGraph
-  dynamicRefs: Set<string>
+  dynamicRefs: Set<ExpressionInput>
 } {
-  const graph = new Map<string, Set<string>>()
-  const dynamicRefs = new Set<string>()
+  const graph = new Map<string, Set<ExpressionInput>>()
+  const dynamicRefs = new Set<ExpressionInput>()
 
-  for (const [exprName, evaluable] of expressions) {
-    collectRefsFromExpression(evaluable, exprName, graph, dynamicRefs)
+  for (const [expr, evaluable] of expressions) {
+    collectRefsFromExpression(evaluable, expr, graph, dynamicRefs)
   }
 
   return { graph, dynamicRefs }
@@ -27,9 +30,9 @@ export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
  */
 function collectRefsFromExpression(
   evaluable: Evaluable,
-  expressionName: string,
+  expressionName: ExpressionInput,
   graph: DependencyGraph,
-  expressionsWithDynamic: Set<string>
+  expressionsWithDynamic: Set<ExpressionInput>
 ): void {
   for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
@@ -40,7 +43,7 @@ function collectRefsFromExpression(
         key[0] === '[' || key[0] === '.' ? key : key.split(/[.[]/)[0]
       let entries = graph.get(rootKey)
       if (entries === undefined) {
-        entries = new Set<string>()
+        entries = new Set<ExpressionInput>()
         graph.set(rootKey, entries)
       }
       entries.add(expressionName)
@@ -113,8 +116,8 @@ export function findAffectedExpressions(
   currentContext: Context | undefined,
   newContext: Context,
   graph: DependencyGraph
-): Set<string> {
-  const affected = new Set<string>()
+): Set<ExpressionInput> {
+  const affected = new Set<ExpressionInput>()
   const current = currentContext ?? {}
 
   for (const key of Object.keys(newContext)) {

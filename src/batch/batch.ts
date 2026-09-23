@@ -15,11 +15,7 @@ export class BatchEngine {
   /**
    * Create a new BatchEngine.
    *
-   * Validates that all expression names in the initial expressions map are
-   * unique. Throws a `TypeError` if any duplicate names are found.
-   *
    * @param options — BatchEvaluatorOptions containing expressions and optional parser options
-   * @throws TypeError if duplicate expression names are provided
    */
   constructor(options: BatchEvaluatorOptions) {
     this.opts = { ...defaultOptions }
@@ -34,23 +30,13 @@ export class BatchEngine {
 
     this.engine = new Engine(this.opts)
 
-    const expressionsMap = new Map<string, ExpressionInput>()
-    for (const [name, expr] of Object.entries(options.expressions)) {
-      if (expressionsMap.has(name)) {
-        throw new TypeError(
-          `Duplicate expression name: '${name}'. Expression names must be unique.`
-        )
-      }
-      expressionsMap.set(name, expr)
-    }
-
-    const batch = parseBatch(this.engine, expressionsMap)
+    const batch = parseBatch(this.engine, options.expressions)
 
     this.state = {
       batch,
-      originalExpressions: expressionsMap,
+      originalExpressions: new Set(options.expressions),
       lastContext: undefined,
-      cachedResults: {},
+      cachedResults: new Map(),
       markedForEvaluation: new Set(),
     }
   }
@@ -66,7 +52,6 @@ export class BatchEngine {
    *
    * This means:
    *   - The order of expressions in the batch does not matter.
-   *   - The order of keys in `changedKeys` does not matter.
    *   - All affected expressions are re-evaluated in a single pass.
    *   - If Q2's expression references `$Q1` as a context key, changing Q1 will
    *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
@@ -82,10 +67,9 @@ export class BatchEngine {
    *   been removed from the context.
    *
    * @param ctx — Full evaluation context
-   * @param changedKeys — Optional list of keys that changed (trusted by caller)
-   * @returns Record mapping expression names to their Result values
+   * @returns Record mapping expression names (ExpressionInput) to their Result values
    */
-  evaluate(ctx: Context): Record<string, Result> {
+  evaluate(ctx: Context): Map<ExpressionInput, Result> {
     const inputKeys = Object.keys(ctx)
 
     const isFirstEvaluation = this.state.lastContext === undefined
@@ -97,7 +81,7 @@ export class BatchEngine {
 
     // Start with undefined, meaning all expressions will be evaluated if no
     // affected expressions are found.
-    let affectedExpressions: Set<string> | undefined
+    let affectedExpressions: Set<ExpressionInput> | undefined
 
     if (inputKeys.length > 0 && !isFirstEvaluation) {
       affectedExpressions = findAffectedExpressions(
@@ -143,26 +127,26 @@ export class BatchEngine {
     )
 
     // Merge new results into cached results
-    for (const [name, value] of Object.entries(newResults)) {
-      this.state.cachedResults[name] = value
+    for (const [expr, value] of newResults.entries()) {
+      this.state.cachedResults.set(expr, value)
     }
 
-    return { ...this.state.cachedResults }
+    return this.state.cachedResults
   }
 
   /**
    * Get the full results of all expressions.
    * @returns Record mapping expression names to their Result values
    */
-  getResults(): Record<string, Result> {
-    return { ...this.state.cachedResults }
+  getResults(): Map<ExpressionInput, Result> {
+    return this.state.cachedResults
   }
 
   /**
    * Dispose the batch evaluator — frees internal caches.
    */
   dispose(): void {
-    this.state.cachedResults = {}
+    this.state.cachedResults = new Map()
     this.state.lastContext = undefined
     this.state.originalExpressions.clear()
     this.state.batch.expressions.clear()
@@ -174,7 +158,7 @@ export class BatchEngine {
    * Reset all results to undefined (for fresh evaluation without reparsing).
    */
   reset(): void {
-    this.state.cachedResults = {}
+    this.state.cachedResults = new Map()
   }
 
   /**
@@ -187,15 +171,9 @@ export class BatchEngine {
    * @param expression — Raw expression input
    * @throws TypeError if an expression with this name already exists
    */
-  addExpression(name: string, expression: ExpressionInput): void {
-    if (this.state.originalExpressions.has(name)) {
-      throw new TypeError(
-        `Duplicate expression name: '${name}'. Expression names must be unique.`
-      )
-    }
-
-    this.state.originalExpressions.set(name, expression)
-    this.state.markedForEvaluation.add(name)
+  addExpression(expression: ExpressionInput): void {
+    this.state.originalExpressions.add(expression)
+    this.state.markedForEvaluation.add(expression)
 
     this.reparse()
   }
@@ -207,12 +185,11 @@ export class BatchEngine {
    * cleared, and the expression is excluded from future evaluations. Other
    * expressions' cached results are preserved.
    *
-   * @param name — Expression name to remove
+   * @param expression — Expression to remove
    */
-  removeExpression(name: string): void {
-    this.state.originalExpressions.delete(name)
-
-    delete this.state.cachedResults[name]
+  removeExpression(expression: ExpressionInput): void {
+    this.state.originalExpressions.delete(expression)
+    this.state.cachedResults.delete(expression)
 
     this.reparse()
   }
@@ -224,10 +201,10 @@ export class BatchEngine {
     const batch = parseBatch(this.engine, this.state.originalExpressions)
 
     // Preserve cached results for expressions that still exist
-    const preservedResults: Record<string, Result> = {}
+    const preservedResults: Map<ExpressionInput, Result> = new Map()
     for (const name of batch.expressions.keys()) {
-      if (name in this.state.cachedResults) {
-        preservedResults[name] = this.state.cachedResults[name]
+      if (this.state.cachedResults.has(name)) {
+        preservedResults.set(name, this.state.cachedResults.get(name)!)
       }
     }
 

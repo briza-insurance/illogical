@@ -88,31 +88,36 @@ new BatchEngine(options: BatchEvaluatorOptions)
 ### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context): Record<string, Result>
+evaluate(ctx: Context): Map<ExpressionInput, Result>
 ```
 
-Merges the provided context into the stored context and evaluates expressions. Returns a record mapping expression names to their results.
+Merges the provided context into the stored context and evaluates expressions. Returns a Map indexed by the expressions mapping to their results. The Map is a direct reference for the internal evaluation state.
+
+```typescript
+const results = evaluate(context1)
+evaluate(context2) // results are changed after this.
+```
 
 ### `getResults()`
 
 ```typescript
-getResults(): Record<string, Result>
+getResults(): Map<ExpressionInput, Result>
 ```
 
 Returns a copy of the current cached results for all expressions in the batch.
 
-### `addExpression(name, expression)`
+### `addExpression(expression)`
 
 ```typescript
-addExpression(name: string, expression: ExpressionInput): void
+addExpression(expression: ExpressionInput): void
 ```
 
 Adds a new expression and rebuilds the dependency graph. Preserves existing cached results. Throws a `TypeError` if the expression name already exists.
 
-### `removeExpression(name)`
+### `removeExpression(expression)`
 
 ```typescript
-removeExpression(name: string): void
+removeExpression(expression: ExpressionInput): void
 ```
 
 Removes an expression from the batch, clears its cached result, and updates the dependency graph.
