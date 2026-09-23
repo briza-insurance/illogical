@@ -126,7 +126,6 @@ export class Reference extends Operand {
   private readonly dataType: DataType | undefined
   private readonly valueLookup: (context: Context) => Result
   private readonly getKeys: (context: Context) => Keys | undefined
-  references: Set<string>
 
   /**
    * @constructor
@@ -156,8 +155,6 @@ export class Reference extends Operand {
       this.valueLookup = simpleValueLookup(keys)
       this.getKeys = () => keys
     }
-
-    this.references = new Set([this.key])
   }
 
   /**
@@ -223,6 +220,10 @@ export class Reference extends Operand {
     return `{${this.key}}`
   }
 
+  getKey(): string {
+    return this.key
+  }
+
   /**
    * Converts a value to a specified data type
    * Silently returns original value if data type conversion has not been implemented.
@@ -242,9 +243,5 @@ export class Reference extends Operand {
       console.warn(`Casting ${value} to ${this.dataType} resulted in ${result}`)
     }
     return result
-  }
-
-  getReferences(): Set<string> {
-    return this.references
   }
 }

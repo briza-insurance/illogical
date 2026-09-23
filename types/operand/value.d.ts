@@ -6,7 +6,6 @@ import { Operand } from './index.js';
  */
 export declare class Value extends Operand {
     private readonly value;
-    references: Set<string>;
     /**
      * @constructor
      * @param {Result} value Constant value.
@@ -29,5 +28,4 @@ export declare class Value extends Operand {
      * @return {string}
      */
     toString(): string;
-    getReferences(): Set<string>;
 }

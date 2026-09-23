@@ -12,7 +12,6 @@ import { Options } from '../parser/options.js'
  */
 export abstract class Operand implements Evaluable {
   type: EvaluableType = EvaluableType.Operand
-  abstract references: Set<string>
 
   /**
    * {@link Evaluable.evaluate}
@@ -43,5 +42,14 @@ export abstract class Operand implements Evaluable {
   /**
    * {@link Evaluable.getReferences}
    */
-  abstract getReferences(): Set<string>
+  getReferences(): string[] {
+    throw new Error('should only be called on root Evaluable')
+  }
+
+  /**
+   * {@link Evaluable.setReferences}
+   */
+  setReferences(_references: string[]): void {
+    throw new Error('should only be called on root Evaluable')
+  }
 }

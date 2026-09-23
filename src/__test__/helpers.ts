@@ -33,7 +33,6 @@ export function permutation(
 
 class TestOperand extends Operand {
   type: EvaluableType = EvaluableType.Operand
-  references: Set<string> = new Set()
   constructor(private readonly value: operandValue) {
     super()
   }
@@ -49,9 +48,6 @@ class TestOperand extends Operand {
   toString() {
     return `Operand(${JSON.stringify(this.value)})`
   }
-  getReferences(): Set<string> {
-    return this.references
-  }
 }
 
 /**
@@ -62,7 +58,6 @@ export const operand = (value: operandValue): Operand => new TestOperand(value)
 
 class NotSimplifiedOperand extends Operand {
   type: EvaluableType = EvaluableType.Operand
-  references: Set<string> = new Set()
   constructor() {
     super()
   }
@@ -77,9 +72,6 @@ class NotSimplifiedOperand extends Operand {
   }
   toString() {
     return 'NotSimplified'
-  }
-  getReferences(): Set<string> {
-    return this.references
   }
 }
 
