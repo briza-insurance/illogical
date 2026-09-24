@@ -13,12 +13,12 @@ import { ParsedBatch } from './types.js'
  */
 export const parseBatch = (
   engine: Engine,
-  expressions: Set<ExpressionInput>
+  expressions: ExpressionInput[]
 ): ParsedBatch => {
   const parsed: ParsedBatch = {
     expressions: new WeakMap(),
     dependencyGraph: new Map(),
-    expressionsWithDynamic: new Set(),
+    expressionsWithDynamic: [],
   }
 
   for (const expr of expressions) {

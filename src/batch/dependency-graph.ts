@@ -12,14 +12,14 @@ import { DependencyGraph } from './types.js'
  *   with dynamic references
  */
 export function buildDependencyGraph(
-  expressions: Set<ExpressionInput>,
+  expressions: ExpressionInput[],
   evaluablesMap: WeakMap<ExpressionInput, Evaluable>
 ): {
   graph: DependencyGraph
-  dynamicRefs: Set<ExpressionInput>
+  dynamicRefs: ExpressionInput[]
 } {
-  const graph: DependencyGraph = new Map<string, Set<ExpressionInput>>()
-  const dynamicRefs = new Set<ExpressionInput>()
+  const graph: DependencyGraph = new Map<string, ExpressionInput[]>()
+  const dynamicRefs: ExpressionInput[] = []
 
   for (const expr of expressions) {
     const evaluable = evaluablesMap.get(expr)
@@ -43,23 +43,23 @@ export function buildDependencyGraph(
  */
 function collectRefsFromExpression(
   evaluable: Evaluable,
-  expressionName: ExpressionInput,
+  expression: ExpressionInput,
   graph: DependencyGraph,
-  expressionsWithDynamic: Set<ExpressionInput>
+  expressionsWithDynamic: ExpressionInput[]
 ): void {
   for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
     if (key.includes('{')) {
-      expressionsWithDynamic.add(expressionName)
+      expressionsWithDynamic.push(expression)
     } else {
       const rootKey =
         key[0] === '[' || key[0] === '.' ? key : key.split(/[.[]/)[0]
       let entries = graph.get(rootKey)
       if (entries === undefined) {
-        entries = new Set<ExpressionInput>()
+        entries = []
         graph.set(rootKey, entries)
       }
-      entries.add(expressionName)
+      entries.push(expression)
     }
   }
 }
@@ -134,8 +134,8 @@ export function findAffectedExpressions(
   currentContext: Context | undefined,
   newContext: Context,
   graph: DependencyGraph
-): Set<ExpressionInput> {
-  const affected = new Set<ExpressionInput>()
+): ExpressionInput[] {
+  const affected: ExpressionInput[] = []
   const current = currentContext ?? {}
 
   for (const key of Object.keys(newContext)) {
@@ -147,7 +147,7 @@ export function findAffectedExpressions(
     const entries = graph.get(key)
     if (entries) {
       for (const entry of entries) {
-        affected.add(entry)
+        affected.push(entry)
       }
     }
   }

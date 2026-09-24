@@ -14,7 +14,7 @@ describe('BatchEngine', () => {
     assert.throws(
       () =>
         new BatchEngine({
-          expressions: new Set([['$eq', '$a', 10]]),
+          expressions: [['$eq', '$a', 10]],
         }),
       new Error('invalid expression: ["$eq","$a",10]')
     )
@@ -27,7 +27,7 @@ describe('BatchEngine', () => {
       const expr3: ExpressionInput = ['==', '$c', true]
 
       const evaluator = new BatchEngine({
-        expressions: new Set([expr1, expr2, expr3]),
+        expressions: [expr1, expr2, expr3],
       })
 
       // Initial evaluation with a few keys
@@ -262,9 +262,7 @@ describe('BatchEngine', () => {
     for (const { name, initial, context, expectedResults } of testCases) {
       it(name, () => {
         const options = {
-          expressions: new Set(
-            expectedResults.map(([expression]) => expression)
-          ),
+          expressions: expectedResults.map(([expression]) => expression),
         }
         const evaluator = new BatchEngine(options)
 
@@ -310,7 +308,7 @@ describe('BatchEngine', () => {
         const expr4: ExpressionInput = ['==', '$RefB', 4]
 
         const evaluator = new BatchEngine({
-          expressions: new Set([expr1, expr2, expr3, expr4]),
+          expressions: [expr1, expr2, expr3, expr4],
         })
 
         const results1 = evaluator.evaluate(contextInitial)
@@ -354,7 +352,7 @@ describe('BatchEngine', () => {
       ]
 
       const evaluator = new BatchEngine({
-        expressions: new Set([expr1, expr2, expr3]),
+        expressions: [expr1, expr2, expr3],
       })
 
       const context1 = { value1: '123' }
@@ -384,7 +382,7 @@ describe('BatchEngine', () => {
       const expr2: ExpressionInput = ['==', '$index', '2']
       const expr3: ExpressionInput = ['==', '$item{index}value', 10]
       const evaluator = new BatchEngine({
-        expressions: new Set([expr1, expr2, expr3]),
+        expressions: [expr1, expr2, expr3],
       })
 
       const context1 = { index: '1' }
@@ -414,7 +412,7 @@ describe('BatchEngine', () => {
   describe('reset', () => {
     it('clears cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([isAdult]),
+        expressions: [isAdult],
       })
 
       evaluator.evaluate({ age: 25 })
@@ -428,7 +426,7 @@ describe('BatchEngine', () => {
   describe('addExpression', () => {
     it('adds an expression and preserves existing cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([isAdult]),
+        expressions: [isAdult],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
@@ -450,7 +448,7 @@ describe('BatchEngine', () => {
   describe('removeExpression', () => {
     it('removes an expression and purges its cached result', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([isAdult, isActive]),
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
@@ -467,7 +465,7 @@ describe('BatchEngine', () => {
   describe('dispose', () => {
     it('clears all expressions and cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([isAdult, isActive]),
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
@@ -493,7 +491,7 @@ describe('BatchEngine', () => {
   describe('getResultForExpression', () => {
     it('retrieves the cached result for a specific expression', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([isAdult, isActive]),
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'inactive' })

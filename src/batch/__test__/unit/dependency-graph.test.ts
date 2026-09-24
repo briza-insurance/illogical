@@ -32,7 +32,7 @@ describe('Dependency graph', () => {
         const expr8: ExpressionInput = ['==', '$profile', 'standard']
         const expr9: ExpressionInput = ['==', '$limit.(Number)', 1000]
 
-        const expressions = new Set([
+        const expressions = [
           expr1,
           expr2,
           expr3,
@@ -42,7 +42,7 @@ describe('Dependency graph', () => {
           expr7,
           expr8,
           expr9,
-        ])
+        ]
 
         const evaluablesMap = [...expressions].reduce((map, expr) => {
           map.set(expr, engine.parse(expr))
@@ -57,45 +57,45 @@ describe('Dependency graph', () => {
         // simple string ref: status -> expr1 (deduplicated to 1 entry)
         assert.deepEqual(
           graph.get('status'),
-          new Set([expr1]),
+          [expr1],
           'mismatch expressions for status'
         )
         assert.deepEqual(
           graph.get('unmatched'),
-          new Set([expr1]),
+          [expr1],
           'mismatch expressions for unmatched'
         )
 
         // multi-key ref produces entries for all segment keys
         assert.deepEqual(
           graph.get('user'),
-          new Set([expr2]),
+          [expr2],
           'mismatch expressions for user'
         )
 
         // token-based ref extracts key token
         assert.deepEqual(
           graph.get('items'),
-          new Set([expr3]),
+          [expr3],
           'mismatch expressions for items'
         )
 
         // Edge case of non-array reference
         assert.deepEqual(
           graph.get('[0]'),
-          new Set([expr4]),
+          [expr4],
           'mismatch expressions for [0]'
         )
 
         assert.deepEqual(
           graph.get('profile'),
-          new Set([expr8]),
+          [expr8],
           'mismatch expressions for profile'
         )
         // with data casting
         assert.deepEqual(
           graph.get('limit'),
-          new Set([expr9]),
+          [expr9],
           'mismatch expressions for limit'
         )
 
@@ -113,7 +113,7 @@ describe('Dependency graph', () => {
 
         assert.deepEqual(
           dynamicRefs,
-          new Set([expr5, expr6]),
+          [expr5, expr6],
           'mismatch dynamic expressions'
         )
       }
@@ -121,12 +121,12 @@ describe('Dependency graph', () => {
   })
 
   describe('findAffectedExpressions', () => {
-    it('returns unique affected expression names and handles missing/empty keys', () => {
+    it('returns affected expression names and handles missing/empty keys', () => {
       const isAdmin: ExpressionInput = ['AND', ['==', '$user.profile', 'admin']]
       const graph: DependencyGraph = new Map([
         [
           'status',
-          new Set([
+          [
             [
               'AND',
               ['==', '$status', 'active'],
@@ -134,9 +134,9 @@ describe('Dependency graph', () => {
               ['==', '$unmatched', 1],
             ],
             isAdmin,
-          ]),
+          ],
         ],
-        ['user', new Set([isAdmin])],
+        ['user', [isAdmin]],
       ])
 
       // Matches across multiple keys and deduplicates expr2
@@ -160,24 +160,28 @@ describe('Dependency graph', () => {
             ['==', '$unmatched', 1],
           ],
           isAdmin,
+          isAdmin,
         ]
       )
 
       // Unknown keys return empty set
       assert.strictEqual(
-        findAffectedExpressions(undefined, { missing: 'value' }, graph).size,
+        findAffectedExpressions(undefined, { missing: 'value' }, graph).length,
         0
       )
 
       // Empty changed keys return empty set
-      assert.strictEqual(findAffectedExpressions(undefined, {}, graph).size, 0)
+      assert.strictEqual(
+        findAffectedExpressions(undefined, {}, graph).length,
+        0
+      )
     })
 
     it('correctly compares array values (order sensitive)', () => {
       const graph: DependencyGraph = new Map([
-        ['items', new Set([['==', '$items', [1, 2, 3]] as ExpressionInput])],
-        ['tags', new Set([['==', '$tags', ['a', 'b']]])],
-        ['unchanged', new Set([['==', '$unchanged', ['x', 'y']]])],
+        ['items', [['==', '$items', [1, 2, 3]] as ExpressionInput]],
+        ['tags', [['==', '$tags', ['a', 'b']]]],
+        ['unchanged', [['==', '$unchanged', ['x', 'y']]]],
       ])
 
       const currentContext = {
@@ -197,13 +201,10 @@ describe('Dependency graph', () => {
         newContext,
         graph
       )
-      assert.deepEqual(
-        affected,
-        new Set([
-          ['==', '$items', [1, 2, 3]],
-          ['==', '$tags', ['a', 'b']],
-        ])
-      )
+      assert.deepEqual(affected, [
+        ['==', '$items', [1, 2, 3]],
+        ['==', '$tags', ['a', 'b']],
+      ])
     })
 
     it('correctly compares object values (order insensitive)', () => {
@@ -211,9 +212,9 @@ describe('Dependency graph', () => {
       const exprUser: ExpressionInput = ['==', '$user', 'user1']
       const exprMeta: ExpressionInput = ['==', '$meta', 'meta1']
       const graph: DependencyGraph = new Map([
-        ['config', new Set([exprConfig])],
-        ['user', new Set([exprUser])],
-        ['meta', new Set([exprMeta])],
+        ['config', [exprConfig]],
+        ['user', [exprUser]],
+        ['meta', [exprMeta]],
       ])
 
       const currentContext = {
@@ -241,9 +242,9 @@ describe('Dependency graph', () => {
       const exprUser: ExpressionInput = ['==', '$user', 'user1']
       const exprMeta: ExpressionInput = ['==', '$meta', 'meta1']
       const graph: DependencyGraph = new Map([
-        ['config', new Set([exprConfig])],
-        ['user', new Set([exprUser])],
-        ['meta', new Set([exprMeta])],
+        ['config', [exprConfig]],
+        ['user', [exprUser]],
+        ['meta', [exprMeta]],
       ])
 
       const currentContext = {
@@ -270,8 +271,8 @@ describe('Dependency graph', () => {
       const exprData: ExpressionInput = ['==', '$data', 'data1']
       const exprList: ExpressionInput = ['==', '$list', 'list1']
       const graph: DependencyGraph = new Map([
-        ['data', new Set([exprData])],
-        ['list', new Set([exprList])],
+        ['data', [exprData]],
+        ['list', [exprList]],
       ])
 
       const currentContext = {

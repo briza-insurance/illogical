@@ -34,10 +34,10 @@ export class BatchEngine {
 
     this.state = {
       batch,
-      expressions: new Set(options.expressions),
+      expressions: options.expressions,
       lastContext: undefined,
       cachedResults: new WeakMap(),
-      markedForEvaluation: new Set(),
+      markedForEvaluation: [],
     }
   }
 
@@ -81,7 +81,7 @@ export class BatchEngine {
 
     // Start with undefined, meaning all expressions will be evaluated if no
     // affected expressions are found.
-    let affectedExpressions: Set<ExpressionInput> | undefined
+    let affectedExpressions: ExpressionInput[] | undefined
 
     if (inputKeys.length > 0 && !isFirstEvaluation) {
       affectedExpressions = findAffectedExpressions(
@@ -95,26 +95,26 @@ export class BatchEngine {
       // If affectedExpressions is undefined, full evaluation will already occur.
       // Otherwise, add expressions with dynamic refs to always be processed.
       affectedExpressions !== undefined &&
-      this.state.batch.expressionsWithDynamic.size > 0
+      this.state.batch.expressionsWithDynamic.length > 0
     ) {
       for (const expr of this.state.batch.expressionsWithDynamic) {
-        affectedExpressions.add(expr)
+        affectedExpressions.push(expr)
       }
     }
 
     // If there are expressions marked for evaluation, add them to the affected
     // expressions set and clear the state.
-    if (this.state.markedForEvaluation.size > 0) {
+    if (this.state.markedForEvaluation.length > 0) {
       if (affectedExpressions === undefined) {
-        affectedExpressions = new Set()
+        affectedExpressions = []
       }
       for (const expr of this.state.markedForEvaluation) {
-        affectedExpressions.add(expr)
+        affectedExpressions.push(expr)
       }
-      this.state.markedForEvaluation.clear()
+      this.state.markedForEvaluation = []
     }
 
-    if (affectedExpressions !== undefined && affectedExpressions.size === 0) {
+    if (affectedExpressions !== undefined && affectedExpressions.length === 0) {
       return this.state.cachedResults
     }
 
@@ -157,10 +157,10 @@ export class BatchEngine {
   dispose(): void {
     this.state.cachedResults = new WeakMap()
     this.state.lastContext = undefined
-    this.state.expressions.clear()
+    this.state.expressions = []
     this.state.batch.expressions = new WeakMap()
     this.state.batch.dependencyGraph.clear()
-    this.state.markedForEvaluation.clear()
+    this.state.markedForEvaluation = []
   }
 
   /**
@@ -181,8 +181,8 @@ export class BatchEngine {
    * @throws TypeError if an expression with this name already exists
    */
   addExpression(expression: ExpressionInput): void {
-    this.state.expressions.add(expression)
-    this.state.markedForEvaluation.add(expression)
+    this.state.expressions.push(expression)
+    this.state.markedForEvaluation.push(expression)
 
     this.reparse()
   }
@@ -197,7 +197,9 @@ export class BatchEngine {
    * @param expression — Expression to remove
    */
   removeExpression(expression: ExpressionInput): void {
-    this.state.expressions.delete(expression)
+    this.state.expressions = this.state.expressions.filter(
+      (expr) => expr !== expression
+    )
     this.state.cachedResults.delete(expression)
 
     this.reparse()

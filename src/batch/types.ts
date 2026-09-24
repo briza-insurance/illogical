@@ -6,7 +6,7 @@ import { Options } from '../parser/options.js'
  * Dependency graph: context key → list of expressions.
  * Built during compileBatch Phase 1.
  */
-export type DependencyGraph = Map<string, Set<ExpressionInput>>
+export type DependencyGraph = Map<string, ExpressionInput[]>
 
 /**
  * A compiled batch of expressions with shared resources.
@@ -23,12 +23,12 @@ export type ParsedBatch = {
   /** Dependency graph: context key → expressions that reference it */
   dependencyGraph: DependencyGraph
   /** List of expressions with dynamic references that should always be re-evaluated */
-  expressionsWithDynamic: Set<ExpressionInput>
+  expressionsWithDynamic: ExpressionInput[]
 }
 
 export type BatchEvaluatorOptions = {
   /** List of raw expressions */
-  expressions: Set<ExpressionInput>
+  expressions: ExpressionInput[]
   /** Optional parser options shared across all expressions */
   options?: Partial<Options>
 }
@@ -37,11 +37,11 @@ export type BatchEvaluatorState = {
   /** The map of parsed expressions and their dependencies */
   batch: ParsedBatch
   /** All expressions contained in the batch — stored for addExpression/removeExpression */
-  expressions: Set<ExpressionInput>
+  expressions: ExpressionInput[]
   /** Last full context passed to evaluate() */
   lastContext: Context | undefined
   /** Cached results from the last evaluation */
   cachedResults: WeakMap<ExpressionInput, boolean>
   /** Expressions marked for evaluation in the next `evaluate()` call */
-  markedForEvaluation: Set<ExpressionInput>
+  markedForEvaluation: ExpressionInput[]
 }

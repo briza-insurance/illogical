@@ -47,10 +47,10 @@ export function evaluateSingle(
  * @returns A generator yielding tuples of expression input and its boolean result
  */
 export function* evaluateBatch(
-  expressions: Set<ExpressionInput>,
+  expressions: ExpressionInput[],
   batch: ParsedBatch,
   ctx: Context,
-  affectedExpressions?: Set<ExpressionInput>
+  affectedExpressions?: ExpressionInput[]
 ): Generator<[ExpressionInput, boolean], void, unknown> {
   const target = affectedExpressions ?? expressions
 
