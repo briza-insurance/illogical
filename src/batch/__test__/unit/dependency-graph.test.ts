@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { Evaluable } from '../../../common/evaluable.js'
-import Engine from '../../../index.js'
+import Engine, { ExpressionInput } from '../../../index.js'
 import {
   buildDependencyGraph,
   findAffectedExpressions,
@@ -17,9 +17,14 @@ describe('Dependency graph', () => {
       'builds graph covering string, array, token, and dynamic ' +
         'refs while handling dynamic skips and unmatched refs',
       () => {
-        const expressions = new Map<string, Evaluable>([
+        const expressions = new Map<ExpressionInput, Evaluable>([
           [
-            'expr1',
+            [
+              'AND',
+              ['==', '$status', 'active'],
+              ['==', '$status', 'active'],
+              ['==', '$unmatched', 1],
+            ],
             engine.parse([
               'AND',
               ['==', '$status', 'active'],
@@ -28,19 +33,37 @@ describe('Dependency graph', () => {
             ]),
           ],
           // multi-key array ref nested in expression
-          ['expr2', engine.parse(['AND', ['==', '$user.profile', 'admin']])],
+          [
+            ['AND', ['==', '$user.profile', 'admin']],
+            engine.parse(['AND', ['==', '$user.profile', 'admin']]),
+          ],
           // token-based ref with key and index
-          ['expr3', engine.parse(['==', '$items[0]', 'val'])],
+          [
+            ['==', '$items[0]', 'val'],
+            engine.parse(['==', '$items[0]', 'val']),
+          ],
           // token-based ref with index only (no key tokens -> __dynamic__)
-          ['expr4', engine.parse(['==', '$[0]', 'val'])],
+          [['==', '$[0]', 'val'], engine.parse(['==', '$[0]', 'val'])],
           // dynamic ref template with static key segment
-          ['expr5', engine.parse(['==', '${region}.city', 'NY'])],
+          [
+            ['==', '${region}.city', 'NY'],
+            engine.parse(['==', '${region}.city', 'NY']),
+          ],
           // dynamic ref template without static keys (all dynamic -> __dynamic__)
-          ['expr6', engine.parse(['==', '${region}', 'all'])],
+          [
+            ['==', '${region}', 'all'],
+            engine.parse(['==', '${region}', 'all']),
+          ],
           // non-reference values (numbers, non-ref strings)
-          ['expr7', engine.parse(['==', 42, 42])],
-          ['expr8', engine.parse(['==', '$profile', 'standard'])],
-          ['expr9', engine.parse(['==', '$limit.(Number)', 1000])],
+          [['==', 42, 42], engine.parse(['==', 42, 42])],
+          [
+            ['==', '$profile', 'standard'],
+            engine.parse(['==', '$profile', 'standard']),
+          ],
+          [
+            ['==', '$limit.(Number)', 1000],
+            engine.parse(['==', '$limit.(Number)', 1000]),
+          ],
         ])
 
         const { graph, dynamicRefs } = buildDependencyGraph(expressions)
@@ -48,45 +71,59 @@ describe('Dependency graph', () => {
         // simple string ref: status -> expr1 (deduplicated to 1 entry)
         assert.deepEqual(
           graph.get('status'),
-          new Set(['expr1']),
+          new Set([
+            [
+              'AND',
+              ['==', '$status', 'active'],
+              ['==', '$status', 'active'],
+              ['==', '$unmatched', 1],
+            ],
+          ]),
           'mismatch expressions for status'
         )
         assert.deepEqual(
           graph.get('unmatched'),
-          new Set(['expr1']),
+          new Set([
+            [
+              'AND',
+              ['==', '$status', 'active'],
+              ['==', '$status', 'active'],
+              ['==', '$unmatched', 1],
+            ],
+          ]),
           'mismatch expressions for unmatched'
         )
 
         // multi-key ref produces entries for all segment keys
         assert.deepEqual(
           graph.get('user'),
-          new Set(['expr2']),
+          new Set([['AND', ['==', '$user.profile', 'admin']]]),
           'mismatch expressions for user'
         )
 
         // token-based ref extracts key token
         assert.deepEqual(
           graph.get('items'),
-          new Set(['expr3']),
+          new Set([['==', '$items[0]', 'val']]),
           'mismatch expressions for items'
         )
 
         // Edge case of non-array reference
         assert.deepEqual(
           graph.get('[0]'),
-          new Set(['expr4']),
+          new Set([['==', '$[0]', 'val']]),
           'mismatch expressions for [0]'
         )
 
         assert.deepEqual(
           graph.get('profile'),
-          new Set(['expr8']),
+          new Set([['==', '$profile', 'standard']]),
           'mismatch expressions for profile'
         )
         // with data casting
         assert.deepEqual(
           graph.get('limit'),
-          new Set(['expr9']),
+          new Set([['==', '$limit.(Number)', 1000]]),
           'mismatch expressions for limit'
         )
 
@@ -99,7 +136,10 @@ describe('Dependency graph', () => {
 
         assert.deepEqual(
           dynamicRefs,
-          new Set(['expr5', 'expr6']),
+          new Set([
+            ['==', '${region}.city', 'NY'],
+            ['==', '${region}', 'all'],
+          ]),
           'mismatch dynamic expressions'
         )
       }
@@ -108,9 +148,21 @@ describe('Dependency graph', () => {
 
   describe('findAffectedExpressions', () => {
     it('returns unique affected expression names and handles missing/empty keys', () => {
+      const isAdmin: ExpressionInput = ['AND', ['==', '$user.profile', 'admin']]
       const graph: DependencyGraph = new Map([
-        ['status', new Set(['expr1', 'expr2'])],
-        ['user', new Set(['expr2'])],
+        [
+          'status',
+          new Set([
+            [
+              'AND',
+              ['==', '$status', 'active'],
+              ['==', '$status', 'active'],
+              ['==', '$unmatched', 1],
+            ],
+            isAdmin,
+          ]),
+        ],
+        ['user', new Set([isAdmin])],
       ])
 
       // Matches across multiple keys and deduplicates expr2
@@ -124,7 +176,18 @@ describe('Dependency graph', () => {
         graph
       )
 
-      assert.deepEqual([...affected].sort(), ['expr1', 'expr2'])
+      assert.deepEqual(
+        [...affected],
+        [
+          [
+            'AND',
+            ['==', '$status', 'active'],
+            ['==', '$status', 'active'],
+            ['==', '$unmatched', 1],
+          ],
+          isAdmin,
+        ]
+      )
 
       // Unknown keys return empty set
       assert.strictEqual(
@@ -138,9 +201,9 @@ describe('Dependency graph', () => {
 
     it('correctly compares array values (order sensitive)', () => {
       const graph: DependencyGraph = new Map([
-        ['items', new Set(['exprItems'])],
-        ['tags', new Set(['exprTags'])],
-        ['unchanged', new Set(['exprUnchanged'])],
+        ['items', new Set([['==', '$items', [1, 2, 3]] as ExpressionInput])],
+        ['tags', new Set([['==', '$tags', ['a', 'b']]])],
+        ['unchanged', new Set([['==', '$unchanged', ['x', 'y']]])],
       ])
 
       const currentContext = {
@@ -160,14 +223,23 @@ describe('Dependency graph', () => {
         newContext,
         graph
       )
-      assert.deepEqual([...affected].sort(), ['exprItems', 'exprTags'])
+      assert.deepEqual(
+        affected,
+        new Set([
+          ['==', '$items', [1, 2, 3]],
+          ['==', '$tags', ['a', 'b']],
+        ])
+      )
     })
 
     it('correctly compares object values (order insensitive)', () => {
+      const exprConfig: ExpressionInput = ['==', '$config', 'config1']
+      const exprUser: ExpressionInput = ['==', '$user', 'user1']
+      const exprMeta: ExpressionInput = ['==', '$meta', 'meta1']
       const graph: DependencyGraph = new Map([
-        ['config', new Set(['exprConfig'])],
-        ['user', new Set(['exprUser'])],
-        ['meta', new Set(['exprMeta'])],
+        ['config', new Set([exprConfig])],
+        ['user', new Set([exprUser])],
+        ['meta', new Set([exprMeta])],
       ])
 
       const currentContext = {
@@ -187,14 +259,17 @@ describe('Dependency graph', () => {
         newContext,
         graph
       )
-      assert.deepEqual([...affected], ['exprUser'])
+      assert.deepEqual([...affected], [exprUser])
     })
 
     it("correctly compares object and early returns if they don't have the same number of keys", () => {
+      const exprConfig: ExpressionInput = ['==', '$config', 'config1']
+      const exprUser: ExpressionInput = ['==', '$user', 'user1']
+      const exprMeta: ExpressionInput = ['==', '$meta', 'meta1']
       const graph: DependencyGraph = new Map([
-        ['config', new Set(['exprConfig'])],
-        ['user', new Set(['exprUser'])],
-        ['meta', new Set(['exprMeta'])],
+        ['config', new Set([exprConfig])],
+        ['user', new Set([exprUser])],
+        ['meta', new Set([exprMeta])],
       ])
 
       const currentContext = {
@@ -214,13 +289,15 @@ describe('Dependency graph', () => {
         newContext,
         graph
       )
-      assert.deepEqual([...affected], ['exprMeta'])
+      assert.deepEqual([...affected], [exprMeta])
     })
 
     it('handles type mismatches between current and new context values', () => {
+      const exprData: ExpressionInput = ['==', '$data', 'data1']
+      const exprList: ExpressionInput = ['==', '$list', 'list1']
       const graph: DependencyGraph = new Map([
-        ['data', new Set(['exprData'])],
-        ['list', new Set(['exprList'])],
+        ['data', new Set([exprData])],
+        ['list', new Set([exprList])],
       ])
 
       const currentContext = {
@@ -238,7 +315,7 @@ describe('Dependency graph', () => {
         newContext,
         graph
       )
-      assert.deepEqual([...affected].sort(), ['exprData', 'exprList'])
+      assert.deepEqual([...affected].sort(), [exprData, exprList])
     })
   })
 })
