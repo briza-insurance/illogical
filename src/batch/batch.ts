@@ -66,7 +66,6 @@ export class BatchEngine {
    *
    * This means:
    *   - The order of expressions in the batch does not matter.
-   *   - The order of keys in `changedKeys` does not matter.
    *   - All affected expressions are re-evaluated in a single pass.
    *   - If Q2's expression references `$Q1` as a context key, changing Q1 will
    *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
@@ -82,7 +81,6 @@ export class BatchEngine {
    *   been removed from the context.
    *
    * @param ctx — Full evaluation context
-   * @param changedKeys — Optional list of keys that changed (trusted by caller)
    * @returns Record mapping expression names to their Result values
    */
   evaluate(ctx: Context): Record<string, boolean> {

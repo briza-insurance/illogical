@@ -71,7 +71,7 @@ describe('BatchEngine', () => {
 
     const testCases: EvaluateTestCase[] = [
       {
-        name: 'evaluates all expressions in Mode 1 (no changedKeys)',
+        name: 'evaluates all expressions in Mode 1',
         options: {
           expressions: {
             isAdult: ['>=', '$age', 18],
