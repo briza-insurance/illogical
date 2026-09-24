@@ -22,14 +22,7 @@ export const parseBatch = (
   }
 
   for (const expr of expressions) {
-    try {
-      parsed.expressions.set(expr, engine.parse(expr))
-    } catch (error) {
-      if (error instanceof Error && error.message === 'invalid expression') {
-        throw new Error(`invalid expression: ${JSON.stringify(expr)}`)
-      }
-      throw error
-    }
+    parsed.expressions.set(expr, engine.parse(expr))
   }
 
   const { graph, dynamicRefs } = buildDependencyGraph(
