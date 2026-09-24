@@ -207,18 +207,7 @@ export class BatchEngine {
    * Reparse the batch from stored original expressions.
    */
   private reparse(): void {
-    const batch = parseBatch(this.engine, this.state.expressions)
-
-    // // Preserve cached results for expressions that still exist
-    // const preservedResults: WeakMap<ExpressionInput, boolean> = new WeakMap()
-    // for (const expr of this.state.expressions) {
-    //   if (this.state.cachedResults.has(expr)) {
-    //     preservedResults.set(expr, this.state.cachedResults.get(expr)!)
-    //   }
-    // }
-
-    this.state.batch = batch
-    // this.state.cachedResults = preservedResults
+    this.state.batch = parseBatch(this.engine, this.state.expressions)
   }
 
   /**
