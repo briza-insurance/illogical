@@ -115,7 +115,7 @@ export class BatchEngine {
     }
 
     if (affectedExpressions !== undefined && affectedExpressions.size === 0) {
-      return { ...this.state.cachedResults }
+      return new Map(this.state.cachedResults)
     }
 
     this.state.lastContext = this.mergeContext(this.state.lastContext, ctx)

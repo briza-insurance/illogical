@@ -2,30 +2,32 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { Context } from '../../../common/evaluable.js'
+import { ExpressionInput } from '../../../parser/index.js'
 import { BatchEngine } from '../../batch.js'
 import { BatchEvaluatorOptions, BatchEvaluatorState } from '../../types.js'
 
 describe('BatchEngine', () => {
+  const isActive: ExpressionInput = ['==', '$status', 'active']
+  const isAdult: ExpressionInput = ['>=', '$age', 18]
+
   it('throws Error for invalid operator', () => {
     assert.throws(
       () =>
         new BatchEngine({
-          expressions: {
-            expr1: ['$eq', '$a', 10],
-          },
+          expressions: new Set([['$eq', '$a', 10]]),
         }),
-      new Error('invalid expression with name expr1')
+      new Error('invalid expression: ["$eq","$a",10]')
     )
   })
 
   describe('mergeContext', () => {
     it('properly merges context after evaluation with updated, new, and removed keys', () => {
+      const expr1: ExpressionInput = ['==', '$a', 10]
+      const expr2: ExpressionInput = ['==', '$b', 'val-b']
+      const expr3: ExpressionInput = ['==', '$c', true]
+
       const evaluator = new BatchEngine({
-        expressions: {
-          expr1: ['==', '$a', 10],
-          expr2: ['==', '$b', 'val-b'],
-          expr3: ['==', '$c', true],
-        },
+        expressions: new Set([expr1, expr2, expr3]),
       })
 
       // Initial evaluation with a few keys
@@ -66,309 +68,318 @@ describe('BatchEngine', () => {
         context: Context
       }
       context: Context
-      expectedResults: Record<string, boolean>
+      expectedResults: Map<ExpressionInput, boolean>
     }
 
     const testCases: EvaluateTestCase[] = [
       {
         name: 'evaluates all expressions in Mode 1',
         options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-            isActive: ['==', '$status', 'active'],
-          },
+          expressions: new Set([isAdult, isActive]),
         },
         context: { age: 20, status: 'active' },
-        expectedResults: { isAdult: true, isActive: true },
+        expectedResults: new Map([
+          [isAdult, true],
+          [isActive, true],
+        ]),
       },
       {
         name: 'evaluates only affected expressions',
         options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-            isActive: ['==', '$status', 'active'],
-          },
+          expressions: new Set([isAdult, isActive]),
         },
         initial: {
           context: { age: 20, status: 'active' },
         },
         context: { age: 15 },
-        expectedResults: { isAdult: false, isActive: true },
+        expectedResults: new Map([
+          [isAdult, false],
+          [isActive, true],
+        ]),
       },
       {
         name: 'returns correctly when reference value changes',
         options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-          },
+          expressions: new Set([isAdult]),
         },
         initial: {
           context: { age: 20 },
         },
         context: { age: 15 },
-        expectedResults: { isAdult: false },
+        expectedResults: new Map([[isAdult, false]]),
       },
       {
         name: 'returns cached results when changed context affects no expressions',
         options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-          },
+          expressions: new Set([isAdult]),
         },
         initial: {
           context: { age: 20 },
         },
         context: { otherKey: 'val' },
-        expectedResults: { isAdult: true },
+        expectedResults: new Map([[isAdult, true]]),
       },
       {
         name: 'Expression with casting',
         options: {
-          expressions: {
-            exp1: ['==', '$Limit.(Number)', 1000],
-          },
+          expressions: new Set([['==', '$Limit.(Number)', 1000]]),
         },
         context: { Limit: '1000' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['==', '$Limit.(Number)', 1000], true]]),
       },
       {
         name: 'Ref in both sides of IN expression',
         options: {
-          expressions: {
-            exp1: ['IN', '$role', ['$status1', '$status2']],
-          },
+          expressions: new Set([['IN', '$role', ['$status1', '$status2']]]),
         },
         context: { role: 'status1', status1: 'status1', status2: 'status2' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['IN', '$role', ['$status1', '$status2']], true],
+        ]),
       },
       {
         name: 'Ref in both sides of IN expression - inverted',
         options: {
-          expressions: {
-            exp1: ['IN', ['$status1', '$status2'], '$role'],
-          },
+          expressions: new Set([['IN', ['$status1', '$status2'], '$role']]),
         },
         context: { role: 'status1', status1: 'status1', status2: 'status2' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['IN', ['$status1', '$status2'], '$role'], true],
+        ]),
       },
       {
         name: 'Ref in array side of IN expression',
         options: {
-          expressions: {
-            exp1: ['IN', 'active', ['$status1', '$status2']],
-          },
+          expressions: new Set([['IN', 'active', ['$status1', '$status2']]]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['IN', 'active', ['$status1', '$status2']], true],
+        ]),
       },
       {
         name: 'Ref not in array side of IN expression',
         options: {
-          expressions: {
-            exp1: ['IN', ['active', 'inactive'], '$status'],
-          },
+          expressions: new Set([['IN', ['active', 'inactive'], '$status']]),
         },
         context: { status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['IN', ['active', 'inactive'], '$status'], true],
+        ]),
       },
       {
         name: 'Ref in array side of IN expression - inverted',
         options: {
-          expressions: {
-            exp1: ['IN', ['$status1', '$status2'], 'active'],
-          },
+          expressions: new Set([['IN', ['$status1', '$status2'], 'active']]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['IN', ['$status1', '$status2'], 'active'], true],
+        ]),
       },
       {
         name: 'Ref in array side of NOT IN expression',
         options: {
-          expressions: {
-            exp1: ['NOT IN', 'active', ['$status1', '$status2']],
-          },
+          expressions: new Set([
+            ['NOT IN', 'active', ['$status1', '$status2']],
+          ]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: false },
+        expectedResults: new Map([
+          [['NOT IN', 'active', ['$status1', '$status2']], false],
+        ]),
       },
       {
         name: 'Ref in array side of NOT IN expression - inverted',
         options: {
-          expressions: {
-            exp1: ['NOT IN', ['$status1', '$status2'], 'active'],
-          },
+          expressions: new Set([
+            ['NOT IN', ['$status1', '$status2'], 'active'],
+          ]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: false },
+        expectedResults: new Map([
+          [['NOT IN', ['$status1', '$status2'], 'active'], false],
+        ]),
       },
       {
         name: 'OVERLAP expression',
         options: {
-          expressions: {
-            exp1: ['OVERLAP', ['$status1', '$status2'], ['active', 'inactive']],
-          },
+          expressions: new Set([
+            ['OVERLAP', ['$status1', '$status2'], ['active', 'inactive']],
+          ]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['OVERLAP', ['$status1', '$status2'], ['active', 'inactive']], true],
+        ]),
       },
       {
         name: 'OVERLAP expression - inverted',
         options: {
-          expressions: {
-            exp1: ['OVERLAP', ['active', 'inactive'], ['$status1', '$status2']],
-          },
+          expressions: new Set([
+            ['OVERLAP', ['active', 'inactive'], ['$status1', '$status2']],
+          ]),
         },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['OVERLAP', ['active', 'inactive'], ['$status1', '$status2']], true],
+        ]),
       },
       {
         name: 'Multi select Ref OVERLAP expression',
         options: {
-          expressions: {
-            exp1: ['OVERLAP', '$statuses', ['active', 'inactive']],
-          },
+          expressions: new Set([
+            ['OVERLAP', '$statuses', ['active', 'inactive']],
+          ]),
         },
         context: { statuses: ['active'] },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['OVERLAP', '$statuses', ['active', 'inactive']], true],
+        ]),
       },
       {
         name: 'Multi select Ref OVERLAP expression - inverted',
         options: {
-          expressions: {
-            exp1: ['OVERLAP', ['active', 'inactive'], '$statuses'],
-          },
+          expressions: new Set([
+            ['OVERLAP', ['active', 'inactive'], '$statuses'],
+          ]),
         },
         context: { statuses: ['active'] },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['OVERLAP', ['active', 'inactive'], '$statuses'], true],
+        ]),
       },
       {
         name: 'UNDEFINED expression',
         options: {
-          expressions: {
-            exp1: ['UNDEFINED', '$status'],
-          },
+          expressions: new Set([['UNDEFINED', '$status']]),
         },
         context: {},
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['UNDEFINED', '$status'], true]]),
       },
       {
         name: 'Ref with property expression',
         options: {
-          expressions: {
-            exp1: ['==', '$address.state', 'NY'],
-          },
+          expressions: new Set([['==', '$address.state', 'NY']]),
         },
         context: { address: { state: 'NY' } },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['==', '$address.state', 'NY'], true]]),
       },
       {
         name: 'Dynamic reference expression',
         options: {
-          expressions: {
-            exp1: ['==', '${key}', 'active'],
-          },
+          expressions: new Set([['==', '${key}', 'active']]),
         },
         context: { key: 'status', status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['==', '${key}', 'active'], true]]),
       },
       {
         name: 'Duplicate reference',
         options: {
-          expressions: {
-            exp1: ['==', '$status', '$status'],
-          },
+          expressions: new Set([['==', '$status', '$status']]),
         },
         context: { status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['==', '$status', '$status'], true]]),
       },
       {
         name: 'Static collections overlap',
         options: {
-          expressions: {
-            exp1: ['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']],
-          },
+          expressions: new Set([
+            ['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']],
+          ]),
         },
         context: {},
-        expectedResults: { exp1: true },
+        expectedResults: new Map([
+          [['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']], true],
+        ]),
       },
       {
         name: 'NOR expression',
         options: {
-          expressions: {
-            expTrue: ['NOR', ['==', '$a', 1], ['==', '$b', 2]],
-            expFalse: ['NOR', ['==', '$a', 1], ['==', '$c', 3]],
-          },
+          expressions: new Set([
+            ['NOR', ['==', '$a', 1], ['==', '$b', 2]],
+            ['NOR', ['==', '$a', 1], ['==', '$c', 3]],
+          ]),
         },
         context: { a: 10, b: 20, c: 3 },
-        expectedResults: { expTrue: true, expFalse: false },
+        expectedResults: new Map([
+          [['NOR', ['==', '$a', 1], ['==', '$b', 2]], true],
+          [['NOR', ['==', '$a', 1], ['==', '$c', 3]], false],
+        ]),
       },
       {
         name: 'NOT expression',
         options: {
-          expressions: {
-            isNotActive: ['NOT', ['==', '$status', 'active']],
-          },
+          expressions: new Set([['NOT', ['==', '$status', 'active']]]),
         },
         context: { status: 'pending' },
-        expectedResults: { isNotActive: true },
+        expectedResults: new Map([
+          [['NOT', ['==', '$status', 'active']], true],
+        ]),
       },
       {
         name: 'XOR expression',
         options: {
-          expressions: {
-            expTrue: ['XOR', ['==', '$a', 1], ['==', '$b', 2]],
-            expFalseBothTrue: ['XOR', ['==', '$a', 1], ['==', '$c', 3]],
-            expFalseBothFalse: ['XOR', ['==', '$a', 99], ['==', '$b', 99]],
-          },
+          expressions: new Set([
+            ['XOR', ['==', '$a', 1], ['==', '$b', 2]],
+            ['XOR', ['==', '$a', 1], ['==', '$c', 3]],
+            ['XOR', ['==', '$a', 99], ['==', '$b', 99]],
+          ]),
         },
         context: { a: 1, b: 20, c: 3 },
-        expectedResults: {
-          expTrue: true,
-          expFalseBothTrue: false,
-          expFalseBothFalse: false,
-        },
+        expectedResults: new Map([
+          [['XOR', ['==', '$a', 1], ['==', '$b', 2]], true],
+          [['XOR', ['==', '$a', 1], ['==', '$c', 3]], false],
+          [['XOR', ['==', '$a', 99], ['==', '$b', 99]], false],
+        ]),
       },
       {
         name: 'nested property and reference with same name',
         options: {
-          expressions: {
-            exp1: ['==', '$address.state', 'NY'],
-            exp2: ['==', '$state', 'NJ'],
-          },
+          expressions: new Set([
+            ['==', '$address.state', 'NY'],
+            ['==', '$state', 'NJ'],
+          ]),
         },
         context: { address: { state: 'NY' }, state: 'NJ' },
-        expectedResults: { exp1: true, exp2: true },
+        expectedResults: new Map([
+          [['==', '$address.state', 'NY'], true],
+          [['==', '$state', 'NJ'], true],
+        ]),
       },
       {
         name: 'constructor reserved property does not work',
         options: {
-          expressions: {
-            exp1: ['==', '$constructor', 'yes'],
-          },
+          expressions: new Set([['==', '$constructor', 'yes']]),
         },
         context: { constructor: 'yes' },
-        expectedResults: { exp1: false },
+        expectedResults: new Map([[['==', '$constructor', 'yes'], false]]),
       },
       {
         name: 'prototype reserved property does work',
         options: {
-          expressions: {
-            exp1: ['==', '$prototype', 'yes'],
-          },
+          expressions: new Set([['==', '$prototype', 'yes']]),
         },
         context: { prototype: 'yes' },
-        expectedResults: { exp1: true },
+        expectedResults: new Map([[['==', '$prototype', 'yes'], true]]),
       },
       {
         name: 'Dynamic references',
         options: {
-          expressions: {
-            exp1: ['==', '$location{index}covered', 'yes'],
-            exp2: ['==', '$location{index}covered', 'no'],
-          },
+          expressions: new Set([
+            ['==', '$location{index}covered', 'yes'],
+            ['==', '$location{index}covered', 'no'],
+          ]),
         },
-        context: { index: 1, location1covered: 'yes', location2covered: 'no' },
-        expectedResults: { exp1: true, exp2: false },
+        context: {
+          index: 1,
+          location1covered: 'yes',
+          location2covered: 'no',
+        },
+        expectedResults: new Map([
+          [['==', '$location{index}covered', 'yes'], true],
+          [['==', '$location{index}covered', 'no'], false],
+        ]),
       },
     ]
 
@@ -418,32 +429,47 @@ describe('BatchEngine', () => {
     } of contexts) {
       it(description, () => {
         const evaluator = new BatchEngine({
-          expressions: {
-            exp1: ['==', '$RefA', 1],
-            exp2: ['OVERLAP', ['$RefA', '$RefB'], [2, 3]],
-            exp3: ['==', '$unrelated', 'yes'],
-            exp4: ['==', '$RefB', 4],
-          },
+          expressions: new Set([
+            ['==', '$RefA', 1],
+            ['OVERLAP', ['$RefA', '$RefB'], [2, 3]],
+            ['==', '$unrelated', 'yes'],
+            ['==', '$RefB', 4],
+          ]),
         })
 
         const results1 = evaluator.evaluate(contextInitial)
         assert.deepEqual(
           results1,
-          { exp1: true, exp2: false, exp3: false, exp4: false },
+          new Map([
+            [['==', '$RefA', 1], true],
+            [['OVERLAP', ['$RefA', '$RefB'], [2, 3]], false],
+            [['==', '$unrelated', 'yes'], false],
+            [['==', '$RefB', 4], false],
+          ]),
           'Initial evaluation results should match expected'
         )
 
         const results2 = evaluator.evaluate(context2)
         assert.deepEqual(
           results2,
-          { exp1: false, exp2: true, exp3: false, exp4: false },
+          new Map([
+            [['==', '$RefA', 1], false],
+            [['OVERLAP', ['$RefA', '$RefB'], [2, 3]], true],
+            [['==', '$unrelated', 'yes'], false],
+            [['==', '$RefB', 4], false],
+          ]),
           'Second evaluation results should match expected'
         )
 
         const results3 = evaluator.evaluate(context3)
         assert.deepEqual(
           results3,
-          { exp1: false, exp2: true, exp3: false, exp4: true },
+          new Map([
+            [['==', '$RefA', 1], false],
+            [['OVERLAP', ['$RefA', '$RefB'], [2, 3]], true],
+            [['==', '$unrelated', 'yes'], false],
+            [['==', '$RefB', 4], true],
+          ]),
           'Third evaluation results should match expected'
         )
       })
@@ -451,11 +477,11 @@ describe('BatchEngine', () => {
 
     it('runs multiple evaluations correctly', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          exp1: ['OVERLAP', ['$value1', '$value2'], ['123', '456']],
-          exp2: ['OVERLAP', ['$value1', '$value2'], ['456', '789']],
-          exp3: ['OVERLAP', ['$value1', '$value2'], ['789']],
-        },
+        expressions: new Set([
+          ['OVERLAP', ['$value1', '$value2'], ['123', '456']],
+          ['OVERLAP', ['$value1', '$value2'], ['456', '789']],
+          ['OVERLAP', ['$value1', '$value2'], ['789']],
+        ]),
       })
 
       const context1 = { value1: '123' }
@@ -463,22 +489,43 @@ describe('BatchEngine', () => {
       const context3 = { value1: '789' }
 
       const results1 = evaluator.evaluate(context1)
-      assert.deepEqual(results1, { exp1: true, exp2: false, exp3: false })
+      assert.deepEqual(
+        results1,
+        new Map([
+          [['OVERLAP', ['$value1', '$value2'], ['123', '456']], true],
+          [['OVERLAP', ['$value1', '$value2'], ['456', '789']], false],
+          [['OVERLAP', ['$value1', '$value2'], ['789']], false],
+        ])
+      )
 
       const results2 = evaluator.evaluate(context2)
-      assert.deepEqual(results2, { exp1: true, exp2: true, exp3: false })
+      assert.deepEqual(
+        results2,
+        new Map([
+          [['OVERLAP', ['$value1', '$value2'], ['123', '456']], true],
+          [['OVERLAP', ['$value1', '$value2'], ['456', '789']], true],
+          [['OVERLAP', ['$value1', '$value2'], ['789']], false],
+        ])
+      )
 
       const results3 = evaluator.evaluate(context3)
-      assert.deepEqual(results3, { exp1: false, exp2: true, exp3: true })
+      assert.deepEqual(
+        results3,
+        new Map([
+          [['OVERLAP', ['$value1', '$value2'], ['123', '456']], false],
+          [['OVERLAP', ['$value1', '$value2'], ['456', '789']], true],
+          [['OVERLAP', ['$value1', '$value2'], ['789']], true],
+        ])
+      )
     })
 
     it('runs multiple evaluations correctly with dynamic', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          exp1: ['==', '$index', '1'],
-          exp2: ['==', '$index', '2'],
-          exp3: ['==', '$item{index}value', 10],
-        },
+        expressions: new Set([
+          ['==', '$index', '1'],
+          ['==', '$index', '2'],
+          ['==', '$item{index}value', 10],
+        ]),
       })
 
       const context1 = { index: '1' }
@@ -488,21 +535,33 @@ describe('BatchEngine', () => {
       const results1 = evaluator.evaluate(context1)
       assert.deepEqual(
         results1,
-        { exp1: true, exp2: false, exp3: false },
+        new Map([
+          [['==', '$index', '1'], true],
+          [['==', '$index', '2'], false],
+          [['==', '$item{index}value', 10], false],
+        ]),
         'Initial context results should match expected'
       )
 
       const results2 = evaluator.evaluate(context2)
       assert.deepEqual(
         results2,
-        { exp1: true, exp2: false, exp3: true },
+        new Map([
+          [['==', '$index', '1'], true],
+          [['==', '$index', '2'], false],
+          [['==', '$item{index}value', 10], true],
+        ]),
         'Second context results should match expected'
       )
 
       const results3 = evaluator.evaluate(context3)
       assert.deepEqual(
         results3,
-        { exp1: false, exp2: true, exp3: false },
+        new Map([
+          [['==', '$index', '1'], false],
+          [['==', '$index', '2'], true],
+          [['==', '$item{index}value', 10], false],
+        ]),
         'Third context results should match expected'
       )
     })
@@ -511,54 +570,39 @@ describe('BatchEngine', () => {
   describe('reset', () => {
     it('clears cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
+        expressions: new Set([isAdult]),
       })
 
       evaluator.evaluate({ age: 25 })
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
 
       evaluator.reset()
-      assert.deepEqual(evaluator.getResults(), {})
+      assert.deepEqual(evaluator.getResults(), new Map())
     })
   })
 
   describe('addExpression', () => {
     it('adds an expression and preserves existing cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
+        expressions: new Set([isAdult]),
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
 
-      evaluator.addExpression('isActive', ['==', '$status', 'active'])
+      evaluator.addExpression(isActive)
 
       // Existing cached results are preserved
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
 
       // Forcefully evaluates newly added expression
       const results = evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(results, { isAdult: true, isActive: true })
-    })
-
-    it('throws TypeError when adding a duplicate expression name', () => {
-      const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
-      })
-
-      assert.throws(
-        () => evaluator.addExpression('isAdult', ['>=', '$age', 21]),
-        {
-          name: 'TypeError',
-          message:
-            "Duplicate expression name: 'isAdult'. Expression names must be unique.",
-        }
+      assert.deepEqual(
+        results,
+        new Map([
+          [isAdult, true],
+          [isActive, true],
+        ])
       )
     })
   })
@@ -566,60 +610,57 @@ describe('BatchEngine', () => {
   describe('removeExpression', () => {
     it('removes an expression and purges its cached result', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: new Set([['>=', '$age', 18], isActive]),
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), {
-        isAdult: true,
-        isActive: true,
-      })
+      assert.deepEqual(
+        evaluator.getResults(),
+        new Map([
+          [isAdult, true],
+          [isActive, true],
+        ])
+      )
 
-      evaluator.removeExpression('isActive')
+      evaluator.removeExpression(isActive)
 
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
     })
   })
 
   describe('dispose', () => {
     it('clears all expressions and cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: new Set([isAdult, isActive]),
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), {
-        isAdult: true,
-        isActive: true,
-      })
+      assert.deepEqual(
+        evaluator.getResults(),
+        new Map([
+          [isAdult, true],
+          [isActive, true],
+        ])
+      )
 
       evaluator.dispose()
 
-      assert.deepEqual(evaluator.getResults(), {})
+      assert.deepEqual(evaluator.getResults(), new Map())
     })
   })
 
   describe('getResultForExpression', () => {
     it('retrieves the cached result for a specific expression', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: new Set([isAdult, isActive]),
       })
 
       evaluator.evaluate({ age: 25, status: 'inactive' })
 
-      assert.strictEqual(evaluator.getResultForExpression('isAdult'), true)
-      assert.strictEqual(evaluator.getResultForExpression('isActive'), false)
+      assert.strictEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.strictEqual(evaluator.getResultForExpression(isActive), false)
       assert.strictEqual(
-        evaluator.getResultForExpression('nonExistent'),
+        evaluator.getResultForExpression(['nonExistent']),
         undefined
       )
     })
