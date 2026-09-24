@@ -574,10 +574,10 @@ describe('BatchEngine', () => {
       })
 
       evaluator.evaluate({ age: 25 })
-      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
 
       evaluator.reset()
-      assert.deepEqual(evaluator.getResults(), new Map())
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), undefined)
     })
   })
 
@@ -588,43 +588,35 @@ describe('BatchEngine', () => {
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
 
       evaluator.addExpression(isActive)
 
       // Existing cached results are preserved
-      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), undefined)
 
       // Forcefully evaluates newly added expression
-      const results = evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(
-        results,
-        new Map([
-          [isAdult, true],
-          [isActive, true],
-        ])
-      )
+      evaluator.evaluate({ age: 25, status: 'active' })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), true)
     })
   })
 
   describe('removeExpression', () => {
     it('removes an expression and purges its cached result', () => {
       const evaluator = new BatchEngine({
-        expressions: new Set([['>=', '$age', 18], isActive]),
+        expressions: new Set([isAdult, isActive]),
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(
-        evaluator.getResults(),
-        new Map([
-          [isAdult, true],
-          [isActive, true],
-        ])
-      )
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), true)
 
       evaluator.removeExpression(isActive)
 
-      assert.deepEqual(evaluator.getResults(), new Map([[isAdult, true]]))
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), undefined)
     })
   })
 
@@ -635,17 +627,22 @@ describe('BatchEngine', () => {
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(
-        evaluator.getResults(),
-        new Map([
-          [isAdult, true],
-          [isActive, true],
-        ])
-      )
+      const results = evaluator.getResults()
+      assert.deepStrictEqual(results.get(isAdult), true)
+      assert.deepStrictEqual(results.get(isActive), true)
 
       evaluator.dispose()
 
-      assert.deepEqual(evaluator.getResults(), new Map())
+      const newResults = evaluator.getResults()
+
+      // New returned WeakMap is clean
+      assert.deepStrictEqual(newResults.get(isAdult), undefined)
+      assert.deepStrictEqual(newResults.get(isActive), undefined)
+
+      // But the previous reference still holds the old cached results until
+      // GC collects the expression references.
+      assert.deepStrictEqual(results.get(isAdult), true)
+      assert.deepStrictEqual(results.get(isActive), true)
     })
   })
 

@@ -17,129 +17,103 @@ describe('Dependency graph', () => {
       'builds graph covering string, array, token, and dynamic ' +
         'refs while handling dynamic skips and unmatched refs',
       () => {
-        const expressions = new Map<ExpressionInput, Evaluable>([
-          [
-            [
-              'AND',
-              ['==', '$status', 'active'],
-              ['==', '$status', 'active'],
-              ['==', '$unmatched', 1],
-            ],
-            engine.parse([
-              'AND',
-              ['==', '$status', 'active'],
-              ['==', '$status', 'active'],
-              ['==', '$unmatched', 1],
-            ]),
-          ],
-          // multi-key array ref nested in expression
-          [
-            ['AND', ['==', '$user.profile', 'admin']],
-            engine.parse(['AND', ['==', '$user.profile', 'admin']]),
-          ],
-          // token-based ref with key and index
-          [
-            ['==', '$items[0]', 'val'],
-            engine.parse(['==', '$items[0]', 'val']),
-          ],
-          // token-based ref with index only (no key tokens -> __dynamic__)
-          [['==', '$[0]', 'val'], engine.parse(['==', '$[0]', 'val'])],
-          // dynamic ref template with static key segment
-          [
-            ['==', '${region}.city', 'NY'],
-            engine.parse(['==', '${region}.city', 'NY']),
-          ],
-          // dynamic ref template without static keys (all dynamic -> __dynamic__)
-          [
-            ['==', '${region}', 'all'],
-            engine.parse(['==', '${region}', 'all']),
-          ],
-          // non-reference values (numbers, non-ref strings)
-          [['==', 42, 42], engine.parse(['==', 42, 42])],
-          [
-            ['==', '$profile', 'standard'],
-            engine.parse(['==', '$profile', 'standard']),
-          ],
-          [
-            ['==', '$limit.(Number)', 1000],
-            engine.parse(['==', '$limit.(Number)', 1000]),
-          ],
+        const expr1: ExpressionInput = [
+          'AND',
+          ['==', '$status', 'active'],
+          ['==', '$status', 'active'],
+          ['==', '$unmatched', 1],
+        ]
+        const expr2: ExpressionInput = ['AND', ['==', '$user.profile', 'admin']]
+        const expr3: ExpressionInput = ['==', '$items[0]', 'val']
+        const expr4: ExpressionInput = ['==', '$[0]', 'val']
+        const expr5: ExpressionInput = ['==', '${region}.city', 'NY']
+        const expr6: ExpressionInput = ['==', '${region}', 'all']
+        const expr7: ExpressionInput = ['==', 42, 42]
+        const expr8: ExpressionInput = ['==', '$profile', 'standard']
+        const expr9: ExpressionInput = ['==', '$limit.(Number)', 1000]
+
+        const expressions = new Set([
+          expr1,
+          expr2,
+          expr3,
+          expr4,
+          expr5,
+          expr6,
+          expr7,
+          expr8,
+          expr9,
         ])
 
-        const { graph, dynamicRefs } = buildDependencyGraph(expressions)
+        const evaluablesMap = [...expressions].reduce((map, expr) => {
+          map.set(expr, engine.parse(expr))
+          return map
+        }, new Map<ExpressionInput, Evaluable>())
+
+        const { graph, dynamicRefs } = buildDependencyGraph(
+          expressions,
+          evaluablesMap
+        )
 
         // simple string ref: status -> expr1 (deduplicated to 1 entry)
         assert.deepEqual(
           graph.get('status'),
-          new Set([
-            [
-              'AND',
-              ['==', '$status', 'active'],
-              ['==', '$status', 'active'],
-              ['==', '$unmatched', 1],
-            ],
-          ]),
+          new Set([expr1]),
           'mismatch expressions for status'
         )
         assert.deepEqual(
           graph.get('unmatched'),
-          new Set([
-            [
-              'AND',
-              ['==', '$status', 'active'],
-              ['==', '$status', 'active'],
-              ['==', '$unmatched', 1],
-            ],
-          ]),
+          new Set([expr1]),
           'mismatch expressions for unmatched'
         )
 
         // multi-key ref produces entries for all segment keys
         assert.deepEqual(
           graph.get('user'),
-          new Set([['AND', ['==', '$user.profile', 'admin']]]),
+          new Set([expr2]),
           'mismatch expressions for user'
         )
 
         // token-based ref extracts key token
         assert.deepEqual(
           graph.get('items'),
-          new Set([['==', '$items[0]', 'val']]),
+          new Set([expr3]),
           'mismatch expressions for items'
         )
 
         // Edge case of non-array reference
         assert.deepEqual(
           graph.get('[0]'),
-          new Set([['==', '$[0]', 'val']]),
+          new Set([expr4]),
           'mismatch expressions for [0]'
         )
 
         assert.deepEqual(
           graph.get('profile'),
-          new Set([['==', '$profile', 'standard']]),
+          new Set([expr8]),
           'mismatch expressions for profile'
         )
         // with data casting
         assert.deepEqual(
           graph.get('limit'),
-          new Set([['==', '$limit.(Number)', 1000]]),
+          new Set([expr9]),
           'mismatch expressions for limit'
         )
 
         // __dynamic__ entries and unmatched refs are not stored
         assert.strictEqual(
-          graph.has('__dynamic__'),
+          graph.has('{region}'),
           false,
-          'graph should not have __dynamic__ key'
+          'graph should not have {region} key'
+        )
+        assert.strictEqual(
+          graph.has('region'),
+          false,
+          'graph should not have region key'
         )
 
         assert.deepEqual(
           dynamicRefs,
-          new Set([
-            ['==', '${region}.city', 'NY'],
-            ['==', '${region}', 'all'],
-          ]),
+          new Set([expr5, expr6]),
           'mismatch dynamic expressions'
         )
       }

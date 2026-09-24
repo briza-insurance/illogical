@@ -37,14 +37,14 @@ export declare class BatchEngine {
      *   been removed from the context.
      *
      * @param ctx — Full evaluation context
-     * @returns Record mapping expression inputs (ExpressionInput) to their result values
+     * @returns WeakMap mapping expression inputs (ExpressionInput) to their result values
      */
-    evaluate(ctx: Context): Map<ExpressionInput, boolean>;
+    evaluate(ctx: Context): WeakMap<ExpressionInput, boolean>;
     /**
      * Get the full results of all expressions.
      * @returns Record mapping expression names to their Result values
      */
-    getResults(): Map<ExpressionInput, boolean>;
+    getResults(): WeakMap<ExpressionInput, boolean>;
     /**
      * Retrieves the cached result for a specific expression.
      *

@@ -34,7 +34,7 @@ export class BatchEngine {
 
     this.state = {
       batch,
-      originalExpressions: new Set(options.expressions),
+      expressions: new Set(options.expressions),
       lastContext: undefined,
       cachedResults: new Map(),
       markedForEvaluation: new Set(),
@@ -67,16 +67,16 @@ export class BatchEngine {
    *   been removed from the context.
    *
    * @param ctx — Full evaluation context
-   * @returns Record mapping expression inputs (ExpressionInput) to their result values
+   * @returns WeakMap mapping expression inputs (ExpressionInput) to their result values
    */
-  evaluate(ctx: Context): Map<ExpressionInput, boolean> {
+  evaluate(ctx: Context): WeakMap<ExpressionInput, boolean> {
     const inputKeys = Object.keys(ctx)
 
     const isFirstEvaluation = this.state.lastContext === undefined
 
     // No-op if no context was provided and it is not the first evaluation.
     if (inputKeys.length === 0 && !isFirstEvaluation) {
-      return new Map(this.state.cachedResults)
+      return this.state.cachedResults
     }
 
     // Start with undefined, meaning all expressions will be evaluated if no
@@ -97,8 +97,8 @@ export class BatchEngine {
       affectedExpressions !== undefined &&
       this.state.batch.expressionsWithDynamic.size > 0
     ) {
-      for (const exprName of this.state.batch.expressionsWithDynamic) {
-        affectedExpressions.add(exprName)
+      for (const expr of this.state.batch.expressionsWithDynamic) {
+        affectedExpressions.add(expr)
       }
     }
 
@@ -108,19 +108,20 @@ export class BatchEngine {
       if (affectedExpressions === undefined) {
         affectedExpressions = new Set()
       }
-      for (const exprName of this.state.markedForEvaluation) {
-        affectedExpressions.add(exprName)
+      for (const expr of this.state.markedForEvaluation) {
+        affectedExpressions.add(expr)
       }
       this.state.markedForEvaluation.clear()
     }
 
     if (affectedExpressions !== undefined && affectedExpressions.size === 0) {
-      return new Map(this.state.cachedResults)
+      return this.state.cachedResults
     }
 
     this.state.lastContext = this.mergeContext(this.state.lastContext, ctx)
 
     const newResults = evaluateBatch(
+      this.state.expressions,
       this.state.batch,
       this.state.lastContext,
       affectedExpressions
@@ -138,7 +139,7 @@ export class BatchEngine {
    * Get the full results of all expressions.
    * @returns Record mapping expression names to their Result values
    */
-  getResults(): Map<ExpressionInput, boolean> {
+  getResults(): WeakMap<ExpressionInput, boolean> {
     return this.state.cachedResults
   }
 
@@ -156,10 +157,10 @@ export class BatchEngine {
    * Dispose the batch evaluator — frees internal caches.
    */
   dispose(): void {
-    this.state.cachedResults = new Map()
+    this.state.cachedResults = new WeakMap()
     this.state.lastContext = undefined
-    this.state.originalExpressions.clear()
-    this.state.batch.expressions.clear()
+    this.state.expressions.clear()
+    this.state.batch.expressions = new WeakMap()
     this.state.batch.dependencyGraph.clear()
     this.state.markedForEvaluation.clear()
   }
@@ -168,7 +169,7 @@ export class BatchEngine {
    * Reset all results to undefined (for fresh evaluation without reparsing).
    */
   reset(): void {
-    this.state.cachedResults = new Map()
+    this.state.cachedResults = new WeakMap()
   }
 
   /**
@@ -182,7 +183,7 @@ export class BatchEngine {
    * @throws TypeError if an expression with this name already exists
    */
   addExpression(expression: ExpressionInput): void {
-    this.state.originalExpressions.add(expression)
+    this.state.expressions.add(expression)
     this.state.markedForEvaluation.add(expression)
 
     this.reparse()
@@ -198,7 +199,7 @@ export class BatchEngine {
    * @param expression — Expression to remove
    */
   removeExpression(expression: ExpressionInput): void {
-    this.state.originalExpressions.delete(expression)
+    this.state.expressions.delete(expression)
     this.state.cachedResults.delete(expression)
 
     this.reparse()
@@ -208,13 +209,13 @@ export class BatchEngine {
    * Reparse the batch from stored original expressions.
    */
   private reparse(): void {
-    const batch = parseBatch(this.engine, this.state.originalExpressions)
+    const batch = parseBatch(this.engine, this.state.expressions)
 
     // Preserve cached results for expressions that still exist
-    const preservedResults: Map<ExpressionInput, boolean> = new Map()
-    for (const name of batch.expressions.keys()) {
-      if (this.state.cachedResults.has(name)) {
-        preservedResults.set(name, this.state.cachedResults.get(name)!)
+    const preservedResults: WeakMap<ExpressionInput, boolean> = new WeakMap()
+    for (const expr of this.state.expressions) {
+      if (this.state.cachedResults.has(expr)) {
+        preservedResults.set(expr, this.state.cachedResults.get(expr)!)
       }
     }
 

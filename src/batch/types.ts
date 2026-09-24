@@ -19,7 +19,7 @@ export type DependencyGraph = Map<string, Set<ExpressionInput>>
  */
 export type ParsedBatch = {
   /** Per-expression compiled data, keyed by the expression reference */
-  expressions: Map<ExpressionInput, Evaluable>
+  expressions: WeakMap<ExpressionInput, Evaluable>
   /** Dependency graph: context key → expressions that reference it */
   dependencyGraph: DependencyGraph
   /** List of expressions with dynamic references that should always be re-evaluated */
@@ -36,12 +36,12 @@ export type BatchEvaluatorOptions = {
 export type BatchEvaluatorState = {
   /** The map of parsed expressions and their dependencies */
   batch: ParsedBatch
-  /** Original expressions set — stored for addExpression/removeExpression */
-  originalExpressions: Set<ExpressionInput>
+  /** All expressions contained in the batch — stored for addExpression/removeExpression */
+  expressions: Set<ExpressionInput>
   /** Last full context passed to evaluate() */
   lastContext: Context | undefined
   /** Cached results from the last evaluation */
-  cachedResults: Map<ExpressionInput, boolean>
+  cachedResults: WeakMap<ExpressionInput, boolean>
   /** Expressions marked for evaluation in the next `evaluate()` call */
   markedForEvaluation: Set<ExpressionInput>
 }

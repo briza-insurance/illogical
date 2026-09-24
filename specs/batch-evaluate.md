@@ -82,16 +82,16 @@ batchEngine.evaluate({ tier: undefined })
 new BatchEngine(options: BatchEvaluatorOptions)
 ```
 
-- `options.expressions`: A key-value record mapping unique expression names to raw expression inputs. Throws a `TypeError` if duplicate names are provided.
+- `options.expressions`: A set of raw expressions (ExpressionInput).
 - `options.options`: Optional parser options (such as custom `operatorMapping`, `referencePredicate`, or `referenceTransform`).
 
 ### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context): Map<ExpressionInput, boolean>
+evaluate(ctx: Context): WeakMap<ExpressionInput, boolean>
 ```
 
-Merges the provided context into the stored context and evaluates expressions. Returns a Map indexed by the expressions mapping to their results. The Map is a direct reference for the internal evaluation state.
+Merges the provided context into the stored context and evaluates expressions. Returns a WeakMap indexed by the expressions mapping to their results. The Map is a direct reference for the internal evaluation state.
 
 ```typescript
 const results = evaluate(context1)
@@ -101,17 +101,17 @@ evaluate(context2) // results are changed after this.
 ### `getResults()`
 
 ```typescript
-getResults(): Map<ExpressionInput, boolean>
+getResults(): WeakMap<ExpressionInput, boolean>
 ```
 
-Returns a copy of the current cached results for all expressions in the batch.
+Returns the current cached results for all expressions in the batch.
 
-### `getResultForExpression(name)`
+### `getResultForExpression(expression)`
 
-Retrieves the cached ressult for given expression.
+Retrieves the cached result for the given expression.
 
 ```typescript
-getResultForExpression(name): boolean | undefined
+getResultForExpression(expression): boolean | undefined
 ```
 
 ### `addExpression(expression)`
@@ -120,7 +120,7 @@ getResultForExpression(name): boolean | undefined
 addExpression(expression: ExpressionInput): void
 ```
 
-Adds a new expression and rebuilds the dependency graph. Preserves existing cached results. Throws a `TypeError` if the expression name already exists.
+Adds a new expression and rebuilds the dependency graph. Preserves existing cached results.
 
 ### `removeExpression(expression)`
 

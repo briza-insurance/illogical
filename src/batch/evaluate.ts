@@ -17,7 +17,7 @@ export function evaluateSingle(
   ctx: Context
 ): boolean {
   const evaluable = batch.expressions.get(expr)
-  if (!evaluable) {
+  if (evaluable === undefined) {
     throw new Error(`Expression '${JSON.stringify(expr)}' not found in batch`)
   }
 
@@ -35,16 +35,19 @@ export function evaluateSingle(
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions set is provided.
+ * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions
+ *   set is provided.
  * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
  *
+ * @param expressions — Set of all expression inputs in the batch
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
- * @returns Record mapping expression names to their Result values
+ * @returns Map mapping expression inputs to their boolean result values
  */
 export function evaluateBatch(
+  expressions: Set<ExpressionInput>,
   batch: ParsedBatch,
   ctx: Context,
   affectedExpressions?: Set<ExpressionInput>
@@ -53,7 +56,7 @@ export function evaluateBatch(
 
   if (affectedExpressions === undefined) {
     // Full evaluation: run all expressions
-    for (const expr of batch.expressions.keys()) {
+    for (const expr of expressions) {
       results.set(expr, evaluateSingle(batch, expr, ctx))
     }
   } else {

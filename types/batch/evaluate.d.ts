@@ -13,13 +13,15 @@ export declare function evaluateSingle(batch: ParsedBatch, expr: ExpressionInput
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions set is provided.
+ * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions
+ *   set is provided.
  * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
  *
+ * @param expressions — Set of all expression inputs in the batch
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
- * @returns Record mapping expression names to their Result values
+ * @returns Map mapping expression inputs to their boolean result values
  */
-export declare function evaluateBatch(batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<ExpressionInput>): Map<ExpressionInput, boolean>;
+export declare function evaluateBatch(expressions: Set<ExpressionInput>, batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<ExpressionInput>): Map<ExpressionInput, boolean>;

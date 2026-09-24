@@ -4,17 +4,30 @@ import { DependencyGraph } from './types.js'
 
 /**
  * Build a dependency graph from the list of raw expressions.
+ *
+ * @param expressions — Set of expression inputs
+ * @param evaluablesMap — WeakMap mapping expression inputs to their evaluable
+ *   representations
+ * @returns An object containing the dependency graph and the set of expressions
+ *   with dynamic references
  */
 export function buildDependencyGraph(
-  expressions: Map<ExpressionInput, Evaluable>
+  expressions: Set<ExpressionInput>,
+  evaluablesMap: WeakMap<ExpressionInput, Evaluable>
 ): {
   graph: DependencyGraph
   dynamicRefs: Set<ExpressionInput>
 } {
-  const graph = new Map<string, Set<ExpressionInput>>()
+  const graph: DependencyGraph = new Map<string, Set<ExpressionInput>>()
   const dynamicRefs = new Set<ExpressionInput>()
 
-  for (const [expr, evaluable] of expressions) {
+  for (const expr of expressions) {
+    const evaluable = evaluablesMap.get(expr)
+    if (evaluable === undefined) {
+      throw new Error(
+        `Evaluable for expression '${JSON.stringify(expr)}' not found`
+      )
+    }
     collectRefsFromExpression(evaluable, expr, graph, dynamicRefs)
   }
 
@@ -110,7 +123,12 @@ function isEqual(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Find all expression names affected by the context diff.
+ * Find all expressions affected by the context diff.
+ *
+ * @param currentContext — The current evaluation context
+ * @param newContext — The new evaluation context with potential changes
+ * @param graph — The dependency graph mapping context keys to expressions
+ * @returns A set of expression inputs that are affected by the changes in the context
  */
 export function findAffectedExpressions(
   currentContext: Context | undefined,
