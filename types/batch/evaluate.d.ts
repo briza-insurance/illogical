@@ -22,6 +22,6 @@ export declare function evaluateSingle(batch: ParsedBatch, expr: ExpressionInput
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
- * @returns Map mapping expression inputs to their boolean result values
+ * @returns A generator yielding tuples of expression input and its boolean result
  */
-export declare function evaluateBatch(expressions: Set<ExpressionInput>, batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<ExpressionInput>): Map<ExpressionInput, boolean>;
+export declare function evaluateBatch(expressions: Set<ExpressionInput>, batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<ExpressionInput>): Generator<[ExpressionInput, boolean], void, unknown>;

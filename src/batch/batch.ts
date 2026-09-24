@@ -36,7 +36,7 @@ export class BatchEngine {
       batch,
       expressions: new Set(options.expressions),
       lastContext: undefined,
-      cachedResults: new Map(),
+      cachedResults: new WeakMap(),
       markedForEvaluation: new Set(),
     }
   }
@@ -120,15 +120,13 @@ export class BatchEngine {
 
     this.state.lastContext = this.mergeContext(this.state.lastContext, ctx)
 
-    const newResults = evaluateBatch(
+    // Merge new results into cached results
+    for (const [expr, value] of evaluateBatch(
       this.state.expressions,
       this.state.batch,
       this.state.lastContext,
       affectedExpressions
-    )
-
-    // Merge new results into cached results
-    for (const [expr, value] of newResults.entries()) {
+    )) {
       this.state.cachedResults.set(expr, value)
     }
 
@@ -211,16 +209,16 @@ export class BatchEngine {
   private reparse(): void {
     const batch = parseBatch(this.engine, this.state.expressions)
 
-    // Preserve cached results for expressions that still exist
-    const preservedResults: WeakMap<ExpressionInput, boolean> = new WeakMap()
-    for (const expr of this.state.expressions) {
-      if (this.state.cachedResults.has(expr)) {
-        preservedResults.set(expr, this.state.cachedResults.get(expr)!)
-      }
-    }
+    // // Preserve cached results for expressions that still exist
+    // const preservedResults: WeakMap<ExpressionInput, boolean> = new WeakMap()
+    // for (const expr of this.state.expressions) {
+    //   if (this.state.cachedResults.has(expr)) {
+    //     preservedResults.set(expr, this.state.cachedResults.get(expr)!)
+    //   }
+    // }
 
     this.state.batch = batch
-    this.state.cachedResults = preservedResults
+    // this.state.cachedResults = preservedResults
   }
 
   /**

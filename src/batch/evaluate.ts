@@ -44,33 +44,20 @@ export function evaluateSingle(
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
- * @returns Map mapping expression inputs to their boolean result values
+ * @returns A generator yielding tuples of expression input and its boolean result
  */
-export function evaluateBatch(
+export function* evaluateBatch(
   expressions: Set<ExpressionInput>,
   batch: ParsedBatch,
   ctx: Context,
   affectedExpressions?: Set<ExpressionInput>
-): Map<ExpressionInput, boolean> {
-  const results: Map<ExpressionInput, boolean> = new Map()
+): Generator<[ExpressionInput, boolean], void, unknown> {
+  const target = affectedExpressions ?? expressions
 
-  if (affectedExpressions === undefined) {
-    // Full evaluation: run all expressions
-    for (const expr of expressions) {
-      results.set(expr, evaluateSingle(batch, expr, ctx))
+  for (const expr of target) {
+    if (!batch.expressions.has(expr)) {
+      throw new Error(`Expression '${JSON.stringify(expr)}' not found in batch`)
     }
-  } else {
-    // Incremental evaluation: only run affected expressions
-    for (const expr of affectedExpressions) {
-      if (batch.expressions.has(expr)) {
-        results.set(expr, evaluateSingle(batch, expr, ctx))
-      } else {
-        throw new Error(
-          `Expression '${JSON.stringify(expr)}' not found in batch`
-        )
-      }
-    }
+    yield [expr, evaluateSingle(batch, expr, ctx)]
   }
-
-  return results
 }
