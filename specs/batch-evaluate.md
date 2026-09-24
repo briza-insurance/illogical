@@ -88,7 +88,7 @@ new BatchEngine(options: BatchEvaluatorOptions)
 ### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context): Map<ExpressionInput, Result>
+evaluate(ctx: Context): Map<ExpressionInput, boolean>
 ```
 
 Merges the provided context into the stored context and evaluates expressions. Returns a Map indexed by the expressions mapping to their results. The Map is a direct reference for the internal evaluation state.
@@ -101,10 +101,18 @@ evaluate(context2) // results are changed after this.
 ### `getResults()`
 
 ```typescript
-getResults(): Map<ExpressionInput, Result>
+getResults(): Map<ExpressionInput, boolean>
 ```
 
 Returns a copy of the current cached results for all expressions in the batch.
+
+### `getResultForExpression(name)`
+
+Retrieves the cached ressult for given expression.
+
+```typescript
+getResultForExpression(name): boolean | undefined
+```
 
 ### `addExpression(expression)`
 

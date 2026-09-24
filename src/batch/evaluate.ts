@@ -1,4 +1,5 @@
-import { Context, Result } from '../common/evaluable.js'
+import { Context } from '../common/evaluable.js'
+import { isBoolean } from '../common/type-check.js'
 import { ExpressionInput } from '../parser/index.js'
 import { ParsedBatch } from './types.js'
 
@@ -14,13 +15,21 @@ export function evaluateSingle(
   batch: ParsedBatch,
   expr: ExpressionInput,
   ctx: Context
-): Result {
+): boolean {
   const evaluable = batch.expressions.get(expr)
   if (!evaluable) {
     throw new Error(`Expression '${JSON.stringify(expr)}' not found in batch`)
   }
 
-  return evaluable.evaluate(ctx)
+  const result = evaluable.evaluate(ctx)
+
+  if (!isBoolean(result)) {
+    throw new Error(
+      `Unexpected result type for expression '${JSON.stringify(expr)}'`
+    )
+  }
+
+  return result
 }
 
 /**
@@ -39,8 +48,8 @@ export function evaluateBatch(
   batch: ParsedBatch,
   ctx: Context,
   affectedExpressions?: Set<ExpressionInput>
-): Map<ExpressionInput, Result> {
-  const results: Map<ExpressionInput, Result> = new Map()
+): Map<ExpressionInput, boolean> {
+  const results: Map<ExpressionInput, boolean> = new Map()
 
   if (affectedExpressions === undefined) {
     // Full evaluation: run all expressions

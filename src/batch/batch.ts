@@ -1,4 +1,4 @@
-import { Context, ContextValue, Result } from '../common/evaluable.js'
+import { Context, ContextValue } from '../common/evaluable.js'
 import { Engine } from '../engine/engine.js'
 import { ExpressionInput } from '../parser/index.js'
 import { defaultOptions, Options } from '../parser/options.js'
@@ -67,16 +67,16 @@ export class BatchEngine {
    *   been removed from the context.
    *
    * @param ctx — Full evaluation context
-   * @returns Record mapping expression names (ExpressionInput) to their Result values
+   * @returns Record mapping expression inputs (ExpressionInput) to their result values
    */
-  evaluate(ctx: Context): Map<ExpressionInput, Result> {
+  evaluate(ctx: Context): Map<ExpressionInput, boolean> {
     const inputKeys = Object.keys(ctx)
 
     const isFirstEvaluation = this.state.lastContext === undefined
 
     // No-op if no context was provided and it is not the first evaluation.
     if (inputKeys.length === 0 && !isFirstEvaluation) {
-      return { ...this.state.cachedResults }
+      return new Map(this.state.cachedResults)
     }
 
     // Start with undefined, meaning all expressions will be evaluated if no
@@ -138,8 +138,18 @@ export class BatchEngine {
    * Get the full results of all expressions.
    * @returns Record mapping expression names to their Result values
    */
-  getResults(): Map<ExpressionInput, Result> {
+  getResults(): Map<ExpressionInput, boolean> {
     return this.state.cachedResults
+  }
+
+  /**
+   * Retrieves the cached result for a specific expression.
+   *
+   * @param expression Expression to retrieve the result for
+   * @returns The cached result for the specified expression, or undefined if it doesn't exist
+   */
+  getResultForExpression(expression: ExpressionInput): boolean | undefined {
+    return this.state.cachedResults.get(expression)
   }
 
   /**
@@ -201,7 +211,7 @@ export class BatchEngine {
     const batch = parseBatch(this.engine, this.state.originalExpressions)
 
     // Preserve cached results for expressions that still exist
-    const preservedResults: Map<ExpressionInput, Result> = new Map()
+    const preservedResults: Map<ExpressionInput, boolean> = new Map()
     for (const name of batch.expressions.keys()) {
       if (this.state.cachedResults.has(name)) {
         preservedResults.set(name, this.state.cachedResults.get(name)!)

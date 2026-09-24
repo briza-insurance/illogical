@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { Context, Result } from '../../../common/evaluable.js'
+import { Context } from '../../../common/evaluable.js'
 import { BatchEngine } from '../../batch.js'
 import { BatchEvaluatorOptions, BatchEvaluatorState } from '../../types.js'
 
@@ -64,16 +64,14 @@ describe('BatchEngine', () => {
       options: BatchEvaluatorOptions
       initial?: {
         context: Context
-        changedKeys?: string[]
       }
       context: Context
-      changedKeys?: string[]
-      expectedResults: Record<string, Result>
+      expectedResults: Record<string, boolean>
     }
 
     const testCases: EvaluateTestCase[] = [
       {
-        name: 'evaluates all expressions in Mode 1 (no changedKeys)',
+        name: 'evaluates all expressions in Mode 1',
         options: {
           expressions: {
             isAdult: ['>=', '$age', 18],
@@ -583,6 +581,47 @@ describe('BatchEngine', () => {
       evaluator.removeExpression('isActive')
 
       assert.deepEqual(evaluator.getResults(), { isAdult: true })
+    })
+  })
+
+  describe('dispose', () => {
+    it('clears all expressions and cached results', () => {
+      const evaluator = new BatchEngine({
+        expressions: {
+          isAdult: ['>=', '$age', 18],
+          isActive: ['==', '$status', 'active'],
+        },
+      })
+
+      evaluator.evaluate({ age: 25, status: 'active' })
+      assert.deepEqual(evaluator.getResults(), {
+        isAdult: true,
+        isActive: true,
+      })
+
+      evaluator.dispose()
+
+      assert.deepEqual(evaluator.getResults(), {})
+    })
+  })
+
+  describe('getResultForExpression', () => {
+    it('retrieves the cached result for a specific expression', () => {
+      const evaluator = new BatchEngine({
+        expressions: {
+          isAdult: ['>=', '$age', 18],
+          isActive: ['==', '$status', 'active'],
+        },
+      })
+
+      evaluator.evaluate({ age: 25, status: 'inactive' })
+
+      assert.strictEqual(evaluator.getResultForExpression('isAdult'), true)
+      assert.strictEqual(evaluator.getResultForExpression('isActive'), false)
+      assert.strictEqual(
+        evaluator.getResultForExpression('nonExistent'),
+        undefined
+      )
     })
   })
 })

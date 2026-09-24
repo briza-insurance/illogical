@@ -1,4 +1,4 @@
-import { Context, Result } from '../common/evaluable.js';
+import { Context } from '../common/evaluable.js';
 import { ExpressionInput } from '../parser/index.js';
 import { BatchEvaluatorOptions } from './types.js';
 export declare class BatchEngine {
@@ -26,7 +26,6 @@ export declare class BatchEngine {
      *
      * This means:
      *   - The order of expressions in the batch does not matter.
-     *   - The order of keys in `changedKeys` does not matter.
      *   - All affected expressions are re-evaluated in a single pass.
      *   - If Q2's expression references `$Q1` as a context key, changing Q1 will
      *     trigger re-evaluation of Q2 (via the dependency graph), but Q2 does not
@@ -42,15 +41,21 @@ export declare class BatchEngine {
      *   been removed from the context.
      *
      * @param ctx — Full evaluation context
-     * @param changedKeys — Optional list of keys that changed (trusted by caller)
      * @returns Record mapping expression names to their Result values
      */
-    evaluate(ctx: Context): Record<string, Result>;
+    evaluate(ctx: Context): Record<string, boolean>;
     /**
      * Get the full results of all expressions.
      * @returns Record mapping expression names to their Result values
      */
-    getResults(): Record<string, Result>;
+    getResults(): Record<string, boolean>;
+    /**
+     * Retrieves the cached result for a specific expression.
+     *
+     * @param name Expression name to retrieve the result for
+     * @returns The cached result for the specified expression, or undefined if it doesn't exist
+     */
+    getResultForExpression(name: string): boolean | undefined;
     /**
      * Dispose the batch evaluator — frees internal caches.
      */
