@@ -1,4 +1,4 @@
-import { Context, Result } from '../common/evaluable.js';
+import { Context } from '../common/evaluable.js';
 import { ExpressionInput } from '../parser/index.js';
 import { BatchEvaluatorOptions } from './types.js';
 export declare class BatchEngine {
@@ -45,12 +45,19 @@ export declare class BatchEngine {
      * @param changedKeys — Optional list of keys that changed (trusted by caller)
      * @returns Record mapping expression names to their Result values
      */
-    evaluate(ctx: Context): Record<string, Result>;
+    evaluate(ctx: Context): Record<string, boolean>;
     /**
      * Get the full results of all expressions.
      * @returns Record mapping expression names to their Result values
      */
-    getResults(): Record<string, Result>;
+    getResults(): Record<string, boolean>;
+    /**
+     * Retrieves the cached result for a specific expression.
+     *
+     * @param name Expression name to retrieve the result for
+     * @returns The cached result for the specified expression, or undefined if it doesn't exist
+     */
+    getResultForExpression(name: string): boolean | undefined;
     /**
      * Dispose the batch evaluator — frees internal caches.
      */

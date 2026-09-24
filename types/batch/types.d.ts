@@ -1,4 +1,4 @@
-import { Context, Evaluable, Result } from '../common/evaluable.js';
+import { Context, Evaluable } from '../common/evaluable.js';
 import { ExpressionInput } from '../index.js';
 import { Options } from '../parser/options.js';
 /**
@@ -37,7 +37,7 @@ export type BatchEvaluatorState = {
     /** Last full context passed to evaluate() */
     lastContext: Context | undefined;
     /** Cached results from the last evaluation */
-    cachedResults: Record<string, Result>;
+    cachedResults: Record<string, boolean>;
     /** Expressions marked for evaluation in the next `evaluate()` call */
     markedForEvaluation: Set<string>;
 };

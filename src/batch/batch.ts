@@ -1,4 +1,4 @@
-import { Context, ContextValue, Result } from '../common/evaluable.js'
+import { Context, ContextValue } from '../common/evaluable.js'
 import { Engine } from '../engine/engine.js'
 import { ExpressionInput } from '../parser/index.js'
 import { defaultOptions, Options } from '../parser/options.js'
@@ -85,7 +85,7 @@ export class BatchEngine {
    * @param changedKeys — Optional list of keys that changed (trusted by caller)
    * @returns Record mapping expression names to their Result values
    */
-  evaluate(ctx: Context): Record<string, Result> {
+  evaluate(ctx: Context): Record<string, boolean> {
     const inputKeys = Object.keys(ctx)
 
     const isFirstEvaluation = this.state.lastContext === undefined
@@ -154,8 +154,18 @@ export class BatchEngine {
    * Get the full results of all expressions.
    * @returns Record mapping expression names to their Result values
    */
-  getResults(): Record<string, Result> {
+  getResults(): Record<string, boolean> {
     return { ...this.state.cachedResults }
+  }
+
+  /**
+   * Retrieves the cached result for a specific expression.
+   *
+   * @param name Expression name to retrieve the result for
+   * @returns The cached result for the specified expression, or undefined if it doesn't exist
+   */
+  getResultForExpression(name: string): boolean | undefined {
+    return this.state.cachedResults[name]
   }
 
   /**
@@ -224,7 +234,7 @@ export class BatchEngine {
     const batch = parseBatch(this.engine, this.state.originalExpressions)
 
     // Preserve cached results for expressions that still exist
-    const preservedResults: Record<string, Result> = {}
+    const preservedResults: Record<string, boolean> = {}
     for (const name of batch.expressions.keys()) {
       if (name in this.state.cachedResults) {
         preservedResults[name] = this.state.cachedResults[name]

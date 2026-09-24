@@ -88,7 +88,7 @@ new BatchEngine(options: BatchEvaluatorOptions)
 ### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context): Record<string, Result>
+evaluate(ctx: Context): Record<string, boolean>
 ```
 
 Merges the provided context into the stored context and evaluates expressions. Returns a record mapping expression names to their results.
@@ -96,10 +96,18 @@ Merges the provided context into the stored context and evaluates expressions. R
 ### `getResults()`
 
 ```typescript
-getResults(): Record<string, Result>
+getResults(): Record<string, boolean>
 ```
 
 Returns a copy of the current cached results for all expressions in the batch.
+
+### `getResultForExpression(name)`
+
+Retrieves the cached ressult for given expression.
+
+```typescript
+getResultForExpression(name): boolean | undefined
+```
 
 ### `addExpression(name, expression)`
 

@@ -1,4 +1,4 @@
-import { Context, Result } from '../common/evaluable.js';
+import { Context } from '../common/evaluable.js';
 import { ParsedBatch } from './types.js';
 /**
  * Evaluate a single expression within a batch.
@@ -8,7 +8,7 @@ import { ParsedBatch } from './types.js';
  * @param ctx — Evaluation context
  * @returns The computed Result
  */
-export declare function evaluateSingle(batch: ParsedBatch, exprName: string, ctx: Context): Result;
+export declare function evaluateSingle(batch: ParsedBatch, exprName: string, ctx: Context): boolean;
 /**
  * Evaluate expressions in a batch.
  *
@@ -21,4 +21,4 @@ export declare function evaluateSingle(batch: ParsedBatch, exprName: string, ctx
  *   otherwise evaluate all.
  * @returns Record mapping expression names to their Result values
  */
-export declare function evaluateBatch(batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<string>): Record<string, Result>;
+export declare function evaluateBatch(batch: ParsedBatch, ctx: Context, affectedExpressions?: Set<string>): Record<string, boolean>;
