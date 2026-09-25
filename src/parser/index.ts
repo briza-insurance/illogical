@@ -84,7 +84,8 @@ export type Input =
 export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
-const invalidExpression = 'invalid expression'
+const buildErrorMessage = (expr: ExpressionInput) =>
+  `invalid expression: ${JSON.stringify(expr)}`
 
 const logicalIfValidOperands = (
   operands: Evaluable[],
@@ -97,7 +98,7 @@ const logicalIfValidOperands = (
   ) {
     return logical
   }
-  throw new Error(invalidExpression)
+  throw new Error('invalid expression')
 }
 
 /**
@@ -112,7 +113,10 @@ export class Parser {
     OPERATOR_MULTIPLY,
     OPERATOR_DIVIDE,
   ])
+  // Global cache for any reference parsed by the Engine
   private readonly referenceCache: Map<string, Reference> = new Map()
+  // Local cache for the current evaluable expression being parsed
+  private readonly rootEvaluableReferenceKeys: Set<string> = new Set()
 
   /**
    * @constructor
@@ -147,12 +151,18 @@ export class Parser {
   private getReference(key: string): Reference {
     const cached = this.referenceCache.get(key)
     if (cached !== undefined) {
+      if (this.opts.collectEvaluableReferences) {
+        this.rootEvaluableReferenceKeys.add(cached.getKey())
+      }
       return cached
     }
 
     const reference = new Reference(this.opts.referenceTransform(key))
 
     this.referenceCache.set(key, reference)
+    if (this.opts.collectEvaluableReferences) {
+      this.rootEvaluableReferenceKeys.add(reference.getKey())
+    }
 
     return reference
   }
@@ -169,17 +179,26 @@ export class Parser {
    * @return {Evaluable}
    */
   parse(raw: ExpressionInput): Evaluable {
+    this.rootEvaluableReferenceKeys.clear()
+
     if (raw === undefined || raw === null || Array.isArray(raw) === false) {
-      throw new Error(invalidExpression)
+      throw new Error(buildErrorMessage(raw))
     }
 
     if (
       (raw as ArrayInput).length === 0 ||
       !this.expectedRootOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
-      throw new Error(invalidExpression)
+      throw new Error(buildErrorMessage(raw))
     }
-    return this.parseRawExp(raw as Input)
+    const input = this.parseRawExp(raw as Input)
+
+    // Inject the collected references into the root expression.
+    if (this.rootEvaluableReferenceKeys.size > 0) {
+      input.setReferences(Array.from(this.rootEvaluableReferenceKeys))
+    }
+
+    return input
   }
 
   /**

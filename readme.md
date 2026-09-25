@@ -28,7 +28,7 @@
 
 Get up and running with illogical in just a few steps.
 
-Read the [Background](#background) section to quickly understand what illogical is and why it exists. 
+Read the [Background](#background) section to quickly understand what illogical is and why it exists.
 
 ### Installation
 
@@ -98,6 +98,7 @@ Explore the supported expressions and their usage:
 Learn how to use the engine and its methods:
 
 - [Evaluate](./specs/evaluate.md)
+- [Batch Evaluate](./specs/batch-evaluate.md)
 - [Statement](./specs/statement.md)
 - [Parse](./specs/parse.md)
 - [Simplify](./specs/simplify.md)
@@ -105,13 +106,6 @@ Learn how to use the engine and its methods:
 ### Customization
 
 Customize the [engine options](./specs/engine.md).
-
-### Development Tools
-
-For advanced usage like bytecode evaluation and debugging:
-
-- [Bytecode Evaluator](./specs/bytecode-evaluator.md)
-- [Debugger Tools](./specs/debugger-tools.md)
 
 ## 📖 Changelog
 
