@@ -31,6 +31,7 @@ describe('Dependency graph', () => {
         const expr7: ExpressionInput = ['==', 42, 42]
         const expr8: ExpressionInput = ['==', '$profile', 'standard']
         const expr9: ExpressionInput = ['==', '$limit.(Number)', 1000]
+        const expr10: ExpressionInput = ['==', '$Not{Dynamic', 1000]
 
         const expressions = [
           expr1,
@@ -42,6 +43,7 @@ describe('Dependency graph', () => {
           expr7,
           expr8,
           expr9,
+          expr10,
         ]
 
         const evaluablesMap = [...expressions].reduce((map, expr) => {
@@ -97,6 +99,12 @@ describe('Dependency graph', () => {
           graph.get('limit'),
           [expr9],
           'mismatch expressions for limit'
+        )
+
+        assert.deepEqual(
+          graph.get('Not{Dynamic'),
+          [expr10],
+          'mismatch expressions for Not{Dynamic'
         )
 
         // __dynamic__ entries and unmatched refs are not stored
