@@ -139,7 +139,7 @@ describe('Dependency graph', () => {
         ['user', [isAdmin]],
       ])
 
-      // Matches across multiple keys and deduplicates expr2
+      // Matches across multiple keys
       const affected = findAffectedExpressions(
         undefined,
         {

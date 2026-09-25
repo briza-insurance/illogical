@@ -35,11 +35,11 @@ export function evaluateSingle(
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions
- *   set is provided.
- * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
+ * Mode 1 (full evaluation): evaluates all expressions if affectedExpressions
+ *   not provided.
+ * Mode 2 (incremental): only evaluates expressions in affectedExpressions.
  *
- * @param expressions — Set of all expression inputs in the batch
+ * @param expressions — Array containing all expression inputs in the batch
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,

@@ -128,7 +128,7 @@ function isEqual(a: unknown, b: unknown): boolean {
  * @param currentContext — The current evaluation context
  * @param newContext — The new evaluation context with potential changes
  * @param graph — The dependency graph mapping context keys to expressions
- * @returns A set of expression inputs that are affected by the changes in the context
+ * @returns Expression inputs that are affected by the changes in the context
  */
 export function findAffectedExpressions(
   currentContext: Context | undefined,
