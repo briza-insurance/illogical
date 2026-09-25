@@ -8,11 +8,7 @@ export declare class BatchEngine {
     /**
      * Create a new BatchEngine.
      *
-     * Validates that all expression names in the initial expressions map are
-     * unique. Throws a `TypeError` if any duplicate names are found.
-     *
      * @param options — BatchEvaluatorOptions containing expressions and optional parser options
-     * @throws TypeError if duplicate expression names are provided
      */
     constructor(options: BatchEvaluatorOptions);
     /**
@@ -41,21 +37,21 @@ export declare class BatchEngine {
      *   been removed from the context.
      *
      * @param ctx — Full evaluation context
-     * @returns Record mapping expression names to their Result values
+     * @returns WeakMap mapping expression inputs (ExpressionInput) to their result values
      */
-    evaluate(ctx: Context): Record<string, boolean>;
+    evaluate(ctx: Context): WeakMap<ExpressionInput, boolean>;
     /**
      * Get the full results of all expressions.
      * @returns Record mapping expression names to their Result values
      */
-    getResults(): Record<string, boolean>;
+    getResults(): WeakMap<ExpressionInput, boolean>;
     /**
      * Retrieves the cached result for a specific expression.
      *
-     * @param name Expression name to retrieve the result for
+     * @param expression Expression to retrieve the result for
      * @returns The cached result for the specified expression, or undefined if it doesn't exist
      */
-    getResultForExpression(name: string): boolean | undefined;
+    getResultForExpression(expression: ExpressionInput): boolean | undefined;
     /**
      * Dispose the batch evaluator — frees internal caches.
      */
@@ -74,7 +70,7 @@ export declare class BatchEngine {
      * @param expression — Raw expression input
      * @throws TypeError if an expression with this name already exists
      */
-    addExpression(name: string, expression: ExpressionInput): void;
+    addExpression(expression: ExpressionInput): void;
     /**
      * Remove an expression from the batch.
      *
@@ -82,9 +78,9 @@ export declare class BatchEngine {
      * cleared, and the expression is excluded from future evaluations. Other
      * expressions' cached results are preserved.
      *
-     * @param name — Expression name to remove
+     * @param expression — Expression to remove
      */
-    removeExpression(name: string): void;
+    removeExpression(expression: ExpressionInput): void;
     /**
      * Reparse the batch from stored original expressions.
      */

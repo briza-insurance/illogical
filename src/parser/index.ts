@@ -84,7 +84,8 @@ export type Input =
 export type ArrayInput = Input[]
 export type ExpressionInput = [string, ...Input[]]
 
-const invalidExpression = 'invalid expression'
+const buildErrorMessage = (expr: ExpressionInput) =>
+  `invalid expression: ${JSON.stringify(expr)}`
 
 const logicalIfValidOperands = (
   operands: Evaluable[],
@@ -97,7 +98,7 @@ const logicalIfValidOperands = (
   ) {
     return logical
   }
-  throw new Error(invalidExpression)
+  throw new Error('invalid expression')
 }
 
 /**
@@ -181,14 +182,14 @@ export class Parser {
     this.rootEvaluableReferenceKeys.clear()
 
     if (raw === undefined || raw === null || Array.isArray(raw) === false) {
-      throw new Error(invalidExpression)
+      throw new Error(buildErrorMessage(raw))
     }
 
     if (
       (raw as ArrayInput).length === 0 ||
       !this.expectedRootOperators.has(`${(raw as ArrayInput)[0]}`)
     ) {
-      throw new Error(invalidExpression)
+      throw new Error(buildErrorMessage(raw))
     }
     const input = this.parseRawExp(raw as Input)
 

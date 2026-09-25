@@ -3,28 +3,32 @@ import { ExpressionInput } from '../parser/index.js'
 import { buildDependencyGraph } from './dependency-graph.js'
 import { ParsedBatch } from './types.js'
 
+/**
+ * Parse a batch of expressions and build the corresponding dependency graph.
+ *
+ * @param engine — The engine instance used to parse expressions
+ * @param expressions — Array of expression inputs to be parsed
+ * @returns The parsed batch containing evaluables, dependency graph, and
+ *   expressions with dynamic references
+ */
 export const parseBatch = (
   engine: Engine,
-  expressionsMap: Map<string, ExpressionInput>
+  expressions: ExpressionInput[]
 ): ParsedBatch => {
   const parsed: ParsedBatch = {
-    expressions: new Map(),
+    expressions: new WeakMap(),
     dependencyGraph: new Map(),
-    expressionsWithDynamic: new Set(),
+    expressionsWithDynamic: [],
   }
 
-  for (const [name, expr] of expressionsMap) {
-    try {
-      parsed.expressions.set(name, engine.parse(expr))
-    } catch (error) {
-      if (error instanceof Error && error.message === 'invalid expression') {
-        throw new Error(`invalid expression with name ${name}`)
-      }
-      throw error
-    }
+  for (const expr of expressions) {
+    parsed.expressions.set(expr, engine.parse(expr))
   }
 
-  const { graph, dynamicRefs } = buildDependencyGraph(parsed.expressions)
+  const { graph, dynamicRefs } = buildDependencyGraph(
+    expressions,
+    parsed.expressions
+  )
 
   parsed.dependencyGraph = graph
   parsed.expressionsWithDynamic = dynamicRefs

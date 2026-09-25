@@ -1,18 +1,34 @@
 import { Context, Evaluable } from '../common/evaluable.js'
+import { ExpressionInput } from '../parser/index.js'
 import { DependencyGraph } from './types.js'
 
 /**
  * Build a dependency graph from the list of raw expressions.
+ *
+ * @param expressions — Set of expression inputs
+ * @param evaluablesMap — WeakMap mapping expression inputs to their evaluable
+ *   representations
+ * @returns An object containing the dependency graph and the set of expressions
+ *   with dynamic references
  */
-export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
+export function buildDependencyGraph(
+  expressions: ExpressionInput[],
+  evaluablesMap: WeakMap<ExpressionInput, Evaluable>
+): {
   graph: DependencyGraph
-  dynamicRefs: Set<string>
+  dynamicRefs: ExpressionInput[]
 } {
-  const graph = new Map<string, Set<string>>()
-  const dynamicRefs = new Set<string>()
+  const graph: DependencyGraph = new Map<string, ExpressionInput[]>()
+  const dynamicRefs: ExpressionInput[] = []
 
-  for (const [exprName, evaluable] of expressions) {
-    collectRefsFromExpression(evaluable, exprName, graph, dynamicRefs)
+  for (const expr of expressions) {
+    const evaluable = evaluablesMap.get(expr)
+    if (evaluable === undefined) {
+      throw new Error(
+        `Evaluable for expression '${JSON.stringify(expr)}' not found`
+      )
+    }
+    collectRefsFromExpression(evaluable, expr, graph, dynamicRefs)
   }
 
   return { graph, dynamicRefs }
@@ -27,23 +43,23 @@ export function buildDependencyGraph(expressions: Map<string, Evaluable>): {
  */
 function collectRefsFromExpression(
   evaluable: Evaluable,
-  expressionName: string,
+  expression: ExpressionInput,
   graph: DependencyGraph,
-  expressionsWithDynamic: Set<string>
+  expressionsWithDynamic: ExpressionInput[]
 ): void {
   for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
     if (key.includes('{')) {
-      expressionsWithDynamic.add(expressionName)
+      expressionsWithDynamic.push(expression)
     } else {
       const rootKey =
         key[0] === '[' || key[0] === '.' ? key : key.split(/[.[]/)[0]
       let entries = graph.get(rootKey)
       if (entries === undefined) {
-        entries = new Set<string>()
+        entries = []
         graph.set(rootKey, entries)
       }
-      entries.add(expressionName)
+      entries.push(expression)
     }
   }
 }
@@ -107,14 +123,19 @@ function isEqual(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Find all expression names affected by the context diff.
+ * Find all expressions affected by the context diff.
+ *
+ * @param currentContext — The current evaluation context
+ * @param newContext — The new evaluation context with potential changes
+ * @param graph — The dependency graph mapping context keys to expressions
+ * @returns Expression inputs that are affected by the changes in the context
  */
 export function findAffectedExpressions(
   currentContext: Context | undefined,
   newContext: Context,
   graph: DependencyGraph
-): Set<string> {
-  const affected = new Set<string>()
+): ExpressionInput[] {
+  const affected: ExpressionInput[] = []
   const current = currentContext ?? {}
 
   for (const key of Object.keys(newContext)) {
@@ -126,7 +147,7 @@ export function findAffectedExpressions(
     const entries = graph.get(key)
     if (entries) {
       for (const entry of entries) {
-        affected.add(entry)
+        affected.push(entry)
       }
     }
   }

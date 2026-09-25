@@ -1,29 +1,32 @@
 import { Context } from '../common/evaluable.js'
 import { isBoolean } from '../common/type-check.js'
+import { ExpressionInput } from '../parser/index.js'
 import { ParsedBatch } from './types.js'
 
 /**
  * Evaluate a single expression within a batch.
  *
  * @param batch — The ParsedBatch
- * @param exprName — Name of the expression to evaluate
+ * @param expr — Name of the expression to evaluate
  * @param ctx — Evaluation context
  * @returns The computed Result
  */
 export function evaluateSingle(
   batch: ParsedBatch,
-  exprName: string,
+  expr: ExpressionInput,
   ctx: Context
 ): boolean {
-  const evaluable = batch.expressions.get(exprName)
-  if (!evaluable) {
-    throw new Error(`Expression '${exprName}' not found in batch`)
+  const evaluable = batch.expressions.get(expr)
+  if (evaluable === undefined) {
+    throw new Error(`Expression '${JSON.stringify(expr)}' not found in batch`)
   }
 
   const result = evaluable.evaluate(ctx)
 
   if (!isBoolean(result)) {
-    throw new Error(`Unexpected result type for expression '${exprName}'`)
+    throw new Error(
+      `Unexpected result type for expression '${JSON.stringify(expr)}'`
+    )
   }
 
   return result
@@ -32,37 +35,29 @@ export function evaluateSingle(
 /**
  * Evaluate expressions in a batch.
  *
- * Mode 1 (full evaluation): evaluates all expressions if no affectedExpressions set is provided.
- * Mode 2 (incremental): only evaluates expressions in affectedExpressions set.
+ * Mode 1 (full evaluation): evaluates all expressions if affectedExpressions
+ *   not provided.
+ * Mode 2 (incremental): only evaluates expressions in affectedExpressions.
  *
+ * @param expressions — Array containing all expression inputs in the batch
  * @param batch — The ParsedBatch
  * @param ctx — Evaluation context
  * @param affectedExpressions — If provided, only evaluate these expressions,
  *   otherwise evaluate all.
- * @returns Record mapping expression names to their Result values
+ * @returns A generator yielding tuples of expression input and its boolean result
  */
-export function evaluateBatch(
+export function* evaluateBatch(
+  expressions: ExpressionInput[],
   batch: ParsedBatch,
   ctx: Context,
-  affectedExpressions?: Set<string>
-): Record<string, boolean> {
-  const results: Record<string, boolean> = {}
+  affectedExpressions?: ExpressionInput[]
+): Generator<[ExpressionInput, boolean], void, unknown> {
+  const target = affectedExpressions ?? expressions
 
-  if (affectedExpressions === undefined) {
-    // Full evaluation: run all expressions
-    for (const exprName of batch.expressions.keys()) {
-      results[exprName] = evaluateSingle(batch, exprName, ctx)
+  for (const expr of target) {
+    if (!batch.expressions.has(expr)) {
+      throw new Error(`Expression '${JSON.stringify(expr)}' not found in batch`)
     }
-  } else {
-    // Incremental evaluation: only run affected expressions
-    for (const exprName of affectedExpressions) {
-      if (batch.expressions.has(exprName)) {
-        results[exprName] = evaluateSingle(batch, exprName, ctx)
-      } else {
-        throw new Error(`Expression '${exprName}' not found in batch`)
-      }
-    }
+    yield [expr, evaluateSingle(batch, expr, ctx)]
   }
-
-  return results
 }

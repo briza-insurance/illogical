@@ -82,45 +82,50 @@ batchEngine.evaluate({ tier: undefined })
 new BatchEngine(options: BatchEvaluatorOptions)
 ```
 
-- `options.expressions`: A key-value record mapping unique expression names to raw expression inputs. Throws a `TypeError` if duplicate names are provided.
+- `options.expressions`: A set of raw expressions (ExpressionInput).
 - `options.options`: Optional parser options (such as custom `operatorMapping`, `referencePredicate`, or `referenceTransform`).
 
 ### `evaluate(ctx)`
 
 ```typescript
-evaluate(ctx: Context): Record<string, boolean>
+evaluate(ctx: Context): WeakMap<ExpressionInput, boolean>
 ```
 
-Merges the provided context into the stored context and evaluates expressions. Returns a record mapping expression names to their results.
+Merges the provided context into the stored context and evaluates expressions. Returns a WeakMap indexed by the expressions mapping to their results. The Map is a direct reference for the internal evaluation state.
+
+```typescript
+const results = evaluate(context1)
+evaluate(context2) // results are changed after this.
+```
 
 ### `getResults()`
 
 ```typescript
-getResults(): Record<string, boolean>
+getResults(): WeakMap<ExpressionInput, boolean>
 ```
 
-Returns a copy of the current cached results for all expressions in the batch.
+Returns the current cached results for all expressions in the batch.
 
-### `getResultForExpression(name)`
+### `getResultForExpression(expression)`
 
-Retrieves the cached ressult for given expression.
+Retrieves the cached result for the given expression.
 
 ```typescript
-getResultForExpression(name): boolean | undefined
+getResultForExpression(expression): boolean | undefined
 ```
 
-### `addExpression(name, expression)`
+### `addExpression(expression)`
 
 ```typescript
-addExpression(name: string, expression: ExpressionInput): void
+addExpression(expression: ExpressionInput): void
 ```
 
-Adds a new expression and rebuilds the dependency graph. Preserves existing cached results. Throws a `TypeError` if the expression name already exists.
+Adds a new expression and rebuilds the dependency graph. Preserves existing cached results.
 
-### `removeExpression(name)`
+### `removeExpression(expression)`
 
 ```typescript
-removeExpression(name: string): void
+removeExpression(expression: ExpressionInput): void
 ```
 
 Removes an expression from the batch, clears its cached result, and updates the dependency graph.

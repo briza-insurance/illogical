@@ -2,10 +2,10 @@ import { Context, Evaluable } from '../common/evaluable.js';
 import { ExpressionInput } from '../index.js';
 import { Options } from '../parser/options.js';
 /**
- * Dependency graph: context key → list of expression names.
+ * Dependency graph: context key → list of expressions.
  * Built during compileBatch Phase 1.
  */
-export type DependencyGraph = Map<string, Set<string>>;
+export type DependencyGraph = Map<string, ExpressionInput[]>;
 /**
  * A compiled batch of expressions with shared resources.
  *
@@ -16,28 +16,28 @@ export type DependencyGraph = Map<string, Set<string>>;
  * - The same opNames map (operator string → opcode)
  */
 export type ParsedBatch = {
-    /** Per-expression compiled data, keyed by expression name */
-    expressions: Map<string, Evaluable>;
+    /** Per-expression compiled data, keyed by the expression reference */
+    expressions: WeakMap<ExpressionInput, Evaluable>;
     /** Dependency graph: context key → expressions that reference it */
     dependencyGraph: DependencyGraph;
     /** List of expressions with dynamic references that should always be re-evaluated */
-    expressionsWithDynamic: Set<string>;
+    expressionsWithDynamic: ExpressionInput[];
 };
 export type BatchEvaluatorOptions = {
-    /** Map of expression name → raw expression input */
-    expressions: Record<string, ExpressionInput>;
+    /** List of raw expressions */
+    expressions: ExpressionInput[];
     /** Optional parser options shared across all expressions */
     options?: Partial<Options>;
 };
 export type BatchEvaluatorState = {
     /** The map of parsed expressions and their dependencies */
     batch: ParsedBatch;
-    /** Original expressions map — stored for addExpression/removeExpression */
-    originalExpressions: Map<string, ExpressionInput>;
+    /** All expressions contained in the batch — stored for addExpression/removeExpression */
+    expressions: ExpressionInput[];
     /** Last full context passed to evaluate() */
     lastContext: Context | undefined;
     /** Cached results from the last evaluation */
-    cachedResults: Record<string, boolean>;
+    cachedResults: WeakMap<ExpressionInput, boolean>;
     /** Expressions marked for evaluation in the next `evaluate()` call */
-    markedForEvaluation: Set<string>;
+    markedForEvaluation: ExpressionInput[];
 };

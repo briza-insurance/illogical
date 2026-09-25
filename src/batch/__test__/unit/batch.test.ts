@@ -2,30 +2,32 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { Context } from '../../../common/evaluable.js'
+import { ExpressionInput } from '../../../parser/index.js'
 import { BatchEngine } from '../../batch.js'
-import { BatchEvaluatorOptions, BatchEvaluatorState } from '../../types.js'
+import { BatchEvaluatorState } from '../../types.js'
 
 describe('BatchEngine', () => {
+  const isActive: ExpressionInput = ['==', '$status', 'active']
+  const isAdult: ExpressionInput = ['>=', '$age', 18]
+
   it('throws Error for invalid operator', () => {
     assert.throws(
       () =>
         new BatchEngine({
-          expressions: {
-            expr1: ['$eq', '$a', 10],
-          },
+          expressions: [['$eq', '$a', 10]],
         }),
-      new Error('invalid expression with name expr1')
+      new Error('invalid expression: ["$eq","$a",10]')
     )
   })
 
   describe('mergeContext', () => {
     it('properly merges context after evaluation with updated, new, and removed keys', () => {
+      const expr1: ExpressionInput = ['==', '$a', 10]
+      const expr2: ExpressionInput = ['==', '$b', 'val-b']
+      const expr3: ExpressionInput = ['==', '$c', true]
+
       const evaluator = new BatchEngine({
-        expressions: {
-          expr1: ['==', '$a', 10],
-          expr2: ['==', '$b', 'val-b'],
-          expr3: ['==', '$c', true],
-        },
+        expressions: [expr1, expr2, expr3],
       })
 
       // Initial evaluation with a few keys
@@ -61,325 +63,207 @@ describe('BatchEngine', () => {
   describe('evaluate', () => {
     interface EvaluateTestCase {
       name: string
-      options: BatchEvaluatorOptions
       initial?: {
         context: Context
       }
       context: Context
-      expectedResults: Record<string, boolean>
+      expectedResults: [ExpressionInput, boolean][]
     }
 
     const testCases: EvaluateTestCase[] = [
       {
         name: 'evaluates all expressions in Mode 1',
-        options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-            isActive: ['==', '$status', 'active'],
-          },
-        },
         context: { age: 20, status: 'active' },
-        expectedResults: { isAdult: true, isActive: true },
+        expectedResults: [
+          [isAdult, true],
+          [isActive, true],
+        ],
       },
       {
         name: 'evaluates only affected expressions',
-        options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-            isActive: ['==', '$status', 'active'],
-          },
-        },
         initial: {
           context: { age: 20, status: 'active' },
         },
         context: { age: 15 },
-        expectedResults: { isAdult: false, isActive: true },
+        expectedResults: [
+          [isAdult, false],
+          [isActive, true],
+        ],
       },
       {
         name: 'returns correctly when reference value changes',
-        options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-          },
-        },
         initial: {
           context: { age: 20 },
         },
         context: { age: 15 },
-        expectedResults: { isAdult: false },
+        expectedResults: [[isAdult, false]],
       },
       {
         name: 'returns cached results when changed context affects no expressions',
-        options: {
-          expressions: {
-            isAdult: ['>=', '$age', 18],
-          },
-        },
         initial: {
           context: { age: 20 },
         },
         context: { otherKey: 'val' },
-        expectedResults: { isAdult: true },
+        expectedResults: [[isAdult, true]],
       },
       {
         name: 'Expression with casting',
-        options: {
-          expressions: {
-            exp1: ['==', '$Limit.(Number)', 1000],
-          },
-        },
         context: { Limit: '1000' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['==', '$Limit.(Number)', 1000], true]],
       },
       {
         name: 'Ref in both sides of IN expression',
-        options: {
-          expressions: {
-            exp1: ['IN', '$role', ['$status1', '$status2']],
-          },
-        },
         context: { role: 'status1', status1: 'status1', status2: 'status2' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['IN', '$role', ['$status1', '$status2']], true]],
       },
       {
         name: 'Ref in both sides of IN expression - inverted',
-        options: {
-          expressions: {
-            exp1: ['IN', ['$status1', '$status2'], '$role'],
-          },
-        },
         context: { role: 'status1', status1: 'status1', status2: 'status2' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['IN', ['$status1', '$status2'], '$role'], true]],
       },
       {
         name: 'Ref in array side of IN expression',
-        options: {
-          expressions: {
-            exp1: ['IN', 'active', ['$status1', '$status2']],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['IN', 'active', ['$status1', '$status2']], true]],
       },
       {
         name: 'Ref not in array side of IN expression',
-        options: {
-          expressions: {
-            exp1: ['IN', ['active', 'inactive'], '$status'],
-          },
-        },
         context: { status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['IN', ['active', 'inactive'], '$status'], true]],
       },
       {
         name: 'Ref in array side of IN expression - inverted',
-        options: {
-          expressions: {
-            exp1: ['IN', ['$status1', '$status2'], 'active'],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['IN', ['$status1', '$status2'], 'active'], true]],
       },
       {
         name: 'Ref in array side of NOT IN expression',
-        options: {
-          expressions: {
-            exp1: ['NOT IN', 'active', ['$status1', '$status2']],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: false },
+        expectedResults: [
+          [['NOT IN', 'active', ['$status1', '$status2']], false],
+        ],
       },
       {
         name: 'Ref in array side of NOT IN expression - inverted',
-        options: {
-          expressions: {
-            exp1: ['NOT IN', ['$status1', '$status2'], 'active'],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: false },
+        expectedResults: [
+          [['NOT IN', ['$status1', '$status2'], 'active'], false],
+        ],
       },
       {
         name: 'OVERLAP expression',
-        options: {
-          expressions: {
-            exp1: ['OVERLAP', ['$status1', '$status2'], ['active', 'inactive']],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: [
+          [['OVERLAP', ['$status1', '$status2'], ['active', 'inactive']], true],
+        ],
       },
       {
         name: 'OVERLAP expression - inverted',
-        options: {
-          expressions: {
-            exp1: ['OVERLAP', ['active', 'inactive'], ['$status1', '$status2']],
-          },
-        },
         context: { status1: 'active', status2: 'inactive' },
-        expectedResults: { exp1: true },
+        expectedResults: [
+          [['OVERLAP', ['active', 'inactive'], ['$status1', '$status2']], true],
+        ],
       },
       {
         name: 'Multi select Ref OVERLAP expression',
-        options: {
-          expressions: {
-            exp1: ['OVERLAP', '$statuses', ['active', 'inactive']],
-          },
-        },
         context: { statuses: ['active'] },
-        expectedResults: { exp1: true },
+        expectedResults: [
+          [['OVERLAP', '$statuses', ['active', 'inactive']], true],
+        ],
       },
       {
         name: 'Multi select Ref OVERLAP expression - inverted',
-        options: {
-          expressions: {
-            exp1: ['OVERLAP', ['active', 'inactive'], '$statuses'],
-          },
-        },
         context: { statuses: ['active'] },
-        expectedResults: { exp1: true },
+        expectedResults: [
+          [['OVERLAP', ['active', 'inactive'], '$statuses'], true],
+        ],
       },
       {
         name: 'UNDEFINED expression',
-        options: {
-          expressions: {
-            exp1: ['UNDEFINED', '$status'],
-          },
-        },
         context: {},
-        expectedResults: { exp1: true },
+        expectedResults: [[['UNDEFINED', '$status'], true]],
       },
       {
         name: 'Ref with property expression',
-        options: {
-          expressions: {
-            exp1: ['==', '$address.state', 'NY'],
-          },
-        },
         context: { address: { state: 'NY' } },
-        expectedResults: { exp1: true },
+        expectedResults: [[['==', '$address.state', 'NY'], true]],
       },
       {
         name: 'Dynamic reference expression',
-        options: {
-          expressions: {
-            exp1: ['==', '${key}', 'active'],
-          },
-        },
         context: { key: 'status', status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['==', '${key}', 'active'], true]],
       },
       {
         name: 'Duplicate reference',
-        options: {
-          expressions: {
-            exp1: ['==', '$status', '$status'],
-          },
-        },
         context: { status: 'active' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['==', '$status', '$status'], true]],
       },
       {
         name: 'Static collections overlap',
-        options: {
-          expressions: {
-            exp1: ['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']],
-          },
-        },
         context: {},
-        expectedResults: { exp1: true },
+        expectedResults: [
+          [['OVERLAP', ['admin', 'editor'], ['editor', 'viewer']], true],
+        ],
       },
       {
         name: 'NOR expression',
-        options: {
-          expressions: {
-            expTrue: ['NOR', ['==', '$a', 1], ['==', '$b', 2]],
-            expFalse: ['NOR', ['==', '$a', 1], ['==', '$c', 3]],
-          },
-        },
         context: { a: 10, b: 20, c: 3 },
-        expectedResults: { expTrue: true, expFalse: false },
+        expectedResults: [
+          [['NOR', ['==', '$a', 1], ['==', '$b', 2]], true],
+          [['NOR', ['==', '$a', 1], ['==', '$c', 3]], false],
+        ],
       },
       {
         name: 'NOT expression',
-        options: {
-          expressions: {
-            isNotActive: ['NOT', ['==', '$status', 'active']],
-          },
-        },
         context: { status: 'pending' },
-        expectedResults: { isNotActive: true },
+        expectedResults: [[['NOT', ['==', '$status', 'active']], true]],
       },
       {
         name: 'XOR expression',
-        options: {
-          expressions: {
-            expTrue: ['XOR', ['==', '$a', 1], ['==', '$b', 2]],
-            expFalseBothTrue: ['XOR', ['==', '$a', 1], ['==', '$c', 3]],
-            expFalseBothFalse: ['XOR', ['==', '$a', 99], ['==', '$b', 99]],
-          },
-        },
         context: { a: 1, b: 20, c: 3 },
-        expectedResults: {
-          expTrue: true,
-          expFalseBothTrue: false,
-          expFalseBothFalse: false,
-        },
+        expectedResults: [
+          [['XOR', ['==', '$a', 1], ['==', '$b', 2]], true],
+          [['XOR', ['==', '$a', 1], ['==', '$c', 3]], false],
+          [['XOR', ['==', '$a', 99], ['==', '$b', 99]], false],
+        ],
       },
       {
         name: 'nested property and reference with same name',
-        options: {
-          expressions: {
-            exp1: ['==', '$address.state', 'NY'],
-            exp2: ['==', '$state', 'NJ'],
-          },
-        },
         context: { address: { state: 'NY' }, state: 'NJ' },
-        expectedResults: { exp1: true, exp2: true },
+        expectedResults: [
+          [['==', '$address.state', 'NY'], true],
+          [['==', '$state', 'NJ'], true],
+        ],
       },
       {
         name: 'constructor reserved property does not work',
-        options: {
-          expressions: {
-            exp1: ['==', '$constructor', 'yes'],
-          },
-        },
         context: { constructor: 'yes' },
-        expectedResults: { exp1: false },
+        expectedResults: [[['==', '$constructor', 'yes'], false]],
       },
       {
         name: 'prototype reserved property does work',
-        options: {
-          expressions: {
-            exp1: ['==', '$prototype', 'yes'],
-          },
-        },
         context: { prototype: 'yes' },
-        expectedResults: { exp1: true },
+        expectedResults: [[['==', '$prototype', 'yes'], true]],
       },
       {
         name: 'Dynamic references',
-        options: {
-          expressions: {
-            exp1: ['==', '$location{index}covered', 'yes'],
-            exp2: ['==', '$location{index}covered', 'no'],
-          },
+        context: {
+          index: 1,
+          location1covered: 'yes',
+          location2covered: 'no',
         },
-        context: { index: 1, location1covered: 'yes', location2covered: 'no' },
-        expectedResults: { exp1: true, exp2: false },
+        expectedResults: [
+          [['==', '$location{index}covered', 'yes'], true],
+          [['==', '$location{index}covered', 'no'], false],
+        ],
       },
     ]
 
-    for (const {
-      name,
-      options,
-      initial,
-      context,
-      expectedResults,
-    } of testCases) {
+    for (const { name, initial, context, expectedResults } of testCases) {
       it(name, () => {
+        const options = {
+          expressions: expectedResults.map(([expression]) => expression),
+        }
         const evaluator = new BatchEngine(options)
 
         if (initial) {
@@ -387,8 +271,9 @@ describe('BatchEngine', () => {
         }
 
         const results = evaluator.evaluate(context)
-        assert.deepEqual(results, expectedResults)
-        assert.deepEqual(evaluator.getResults(), expectedResults)
+        for (const [expression, expectedResult] of expectedResults) {
+          assert.deepEqual(results.get(expression), expectedResult)
+        }
       })
     }
   })
@@ -417,45 +302,57 @@ describe('BatchEngine', () => {
       context3,
     } of contexts) {
       it(description, () => {
+        const expr1: ExpressionInput = ['==', '$RefA', 1]
+        const expr2: ExpressionInput = ['OVERLAP', ['$RefA', '$RefB'], [2, 3]]
+        const expr3: ExpressionInput = ['==', '$unrelated', 'yes']
+        const expr4: ExpressionInput = ['==', '$RefB', 4]
+
         const evaluator = new BatchEngine({
-          expressions: {
-            exp1: ['==', '$RefA', 1],
-            exp2: ['OVERLAP', ['$RefA', '$RefB'], [2, 3]],
-            exp3: ['==', '$unrelated', 'yes'],
-            exp4: ['==', '$RefB', 4],
-          },
+          expressions: [expr1, expr2, expr3, expr4],
         })
 
         const results1 = evaluator.evaluate(contextInitial)
-        assert.deepEqual(
-          results1,
-          { exp1: true, exp2: false, exp3: false, exp4: false },
-          'Initial evaluation results should match expected'
-        )
+
+        assert.deepEqual(results1.get(expr1), true)
+        assert.deepEqual(results1.get(expr2), false)
+        assert.deepEqual(results1.get(expr3), false)
+        assert.deepEqual(results1.get(expr4), false)
 
         const results2 = evaluator.evaluate(context2)
-        assert.deepEqual(
-          results2,
-          { exp1: false, exp2: true, exp3: false, exp4: false },
-          'Second evaluation results should match expected'
-        )
+
+        assert.deepEqual(results2.get(expr1), false)
+        assert.deepEqual(results2.get(expr2), true)
+        assert.deepEqual(results2.get(expr3), false)
+        assert.deepEqual(results2.get(expr4), false)
 
         const results3 = evaluator.evaluate(context3)
-        assert.deepEqual(
-          results3,
-          { exp1: false, exp2: true, exp3: false, exp4: true },
-          'Third evaluation results should match expected'
-        )
+
+        assert.deepEqual(results3.get(expr1), false)
+        assert.deepEqual(results3.get(expr2), true)
+        assert.deepEqual(results3.get(expr3), false)
+        assert.deepEqual(results3.get(expr4), true)
       })
     }
 
     it('runs multiple evaluations correctly', () => {
+      const expr1: ExpressionInput = [
+        'OVERLAP',
+        ['$value1', '$value2'],
+        ['123', '456'],
+      ]
+      const expr2: ExpressionInput = [
+        'OVERLAP',
+        ['$value1', '$value2'],
+        ['456', '789'],
+      ]
+      const expr3: ExpressionInput = [
+        'OVERLAP',
+        ['$value1', '$value2'],
+        ['789'],
+      ]
+
       const evaluator = new BatchEngine({
-        expressions: {
-          exp1: ['OVERLAP', ['$value1', '$value2'], ['123', '456']],
-          exp2: ['OVERLAP', ['$value1', '$value2'], ['456', '789']],
-          exp3: ['OVERLAP', ['$value1', '$value2'], ['789']],
-        },
+        expressions: [expr1, expr2, expr3],
       })
 
       const context1 = { value1: '123' }
@@ -463,22 +360,29 @@ describe('BatchEngine', () => {
       const context3 = { value1: '789' }
 
       const results1 = evaluator.evaluate(context1)
-      assert.deepEqual(results1, { exp1: true, exp2: false, exp3: false })
+
+      assert.deepEqual(results1.get(expr1), true)
+      assert.deepEqual(results1.get(expr2), false)
+      assert.deepEqual(results1.get(expr3), false)
 
       const results2 = evaluator.evaluate(context2)
-      assert.deepEqual(results2, { exp1: true, exp2: true, exp3: false })
 
+      assert.deepEqual(results2.get(expr1), true)
+      assert.deepEqual(results2.get(expr2), true)
+      assert.deepEqual(results2.get(expr3), false)
       const results3 = evaluator.evaluate(context3)
-      assert.deepEqual(results3, { exp1: false, exp2: true, exp3: true })
+
+      assert.deepEqual(results3.get(expr1), false)
+      assert.deepEqual(results3.get(expr2), true)
+      assert.deepEqual(results3.get(expr3), true)
     })
 
     it('runs multiple evaluations correctly with dynamic', () => {
+      const expr1: ExpressionInput = ['==', '$index', '1']
+      const expr2: ExpressionInput = ['==', '$index', '2']
+      const expr3: ExpressionInput = ['==', '$item{index}value', 10]
       const evaluator = new BatchEngine({
-        expressions: {
-          exp1: ['==', '$index', '1'],
-          exp2: ['==', '$index', '2'],
-          exp3: ['==', '$item{index}value', 10],
-        },
+        expressions: [expr1, expr2, expr3],
       })
 
       const context1 = { index: '1' }
@@ -486,140 +390,116 @@ describe('BatchEngine', () => {
       const context3 = { index: '2' }
 
       const results1 = evaluator.evaluate(context1)
-      assert.deepEqual(
-        results1,
-        { exp1: true, exp2: false, exp3: false },
-        'Initial context results should match expected'
-      )
+
+      assert.deepEqual(results1.get(expr1), true)
+      assert.deepEqual(results1.get(expr2), false)
+      assert.deepEqual(results1.get(expr3), false)
 
       const results2 = evaluator.evaluate(context2)
-      assert.deepEqual(
-        results2,
-        { exp1: true, exp2: false, exp3: true },
-        'Second context results should match expected'
-      )
+
+      assert.deepEqual(results2.get(expr1), true)
+      assert.deepEqual(results2.get(expr2), false)
+      assert.deepEqual(results2.get(expr3), true)
 
       const results3 = evaluator.evaluate(context3)
-      assert.deepEqual(
-        results3,
-        { exp1: false, exp2: true, exp3: false },
-        'Third context results should match expected'
-      )
+
+      assert.deepEqual(results3.get(expr1), false)
+      assert.deepEqual(results3.get(expr2), true)
+      assert.deepEqual(results3.get(expr3), false)
     })
   })
 
   describe('reset', () => {
     it('clears cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
+        expressions: [isAdult],
       })
 
       evaluator.evaluate({ age: 25 })
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
 
       evaluator.reset()
-      assert.deepEqual(evaluator.getResults(), {})
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), undefined)
     })
   })
 
   describe('addExpression', () => {
     it('adds an expression and preserves existing cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
+        expressions: [isAdult],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
 
-      evaluator.addExpression('isActive', ['==', '$status', 'active'])
+      evaluator.addExpression(isActive)
 
       // Existing cached results are preserved
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), undefined)
 
       // Forcefully evaluates newly added expression
-      const results = evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(results, { isAdult: true, isActive: true })
-    })
-
-    it('throws TypeError when adding a duplicate expression name', () => {
-      const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-        },
-      })
-
-      assert.throws(
-        () => evaluator.addExpression('isAdult', ['>=', '$age', 21]),
-        {
-          name: 'TypeError',
-          message:
-            "Duplicate expression name: 'isAdult'. Expression names must be unique.",
-        }
-      )
+      evaluator.evaluate({ age: 25, status: 'active' })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), true)
     })
   })
 
   describe('removeExpression', () => {
     it('removes an expression and purges its cached result', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), {
-        isAdult: true,
-        isActive: true,
-      })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), true)
 
-      evaluator.removeExpression('isActive')
+      evaluator.removeExpression(isActive)
 
-      assert.deepEqual(evaluator.getResults(), { isAdult: true })
+      assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.deepEqual(evaluator.getResultForExpression(isActive), undefined)
     })
   })
 
   describe('dispose', () => {
     it('clears all expressions and cached results', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'active' })
-      assert.deepEqual(evaluator.getResults(), {
-        isAdult: true,
-        isActive: true,
-      })
+      const results = evaluator.getResults()
+      assert.deepStrictEqual(results.get(isAdult), true)
+      assert.deepStrictEqual(results.get(isActive), true)
 
       evaluator.dispose()
 
-      assert.deepEqual(evaluator.getResults(), {})
+      const newResults = evaluator.getResults()
+
+      // New returned WeakMap is clean
+      assert.deepStrictEqual(newResults.get(isAdult), undefined)
+      assert.deepStrictEqual(newResults.get(isActive), undefined)
+
+      // But the previous reference still holds the old cached results until
+      // GC collects the expression references.
+      assert.deepStrictEqual(results.get(isAdult), true)
+      assert.deepStrictEqual(results.get(isActive), true)
     })
   })
 
   describe('getResultForExpression', () => {
     it('retrieves the cached result for a specific expression', () => {
       const evaluator = new BatchEngine({
-        expressions: {
-          isAdult: ['>=', '$age', 18],
-          isActive: ['==', '$status', 'active'],
-        },
+        expressions: [isAdult, isActive],
       })
 
       evaluator.evaluate({ age: 25, status: 'inactive' })
 
-      assert.strictEqual(evaluator.getResultForExpression('isAdult'), true)
-      assert.strictEqual(evaluator.getResultForExpression('isActive'), false)
+      assert.strictEqual(evaluator.getResultForExpression(isAdult), true)
+      assert.strictEqual(evaluator.getResultForExpression(isActive), false)
       assert.strictEqual(
-        evaluator.getResultForExpression('nonExistent'),
+        evaluator.getResultForExpression(['nonExistent']),
         undefined
       )
     })

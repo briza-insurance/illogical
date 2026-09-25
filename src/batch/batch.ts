@@ -15,11 +15,7 @@ export class BatchEngine {
   /**
    * Create a new BatchEngine.
    *
-   * Validates that all expression names in the initial expressions map are
-   * unique. Throws a `TypeError` if any duplicate names are found.
-   *
    * @param options — BatchEvaluatorOptions containing expressions and optional parser options
-   * @throws TypeError if duplicate expression names are provided
    */
   constructor(options: BatchEvaluatorOptions) {
     this.opts = { ...defaultOptions }
@@ -34,24 +30,14 @@ export class BatchEngine {
 
     this.engine = new Engine(this.opts)
 
-    const expressionsMap = new Map<string, ExpressionInput>()
-    for (const [name, expr] of Object.entries(options.expressions)) {
-      if (expressionsMap.has(name)) {
-        throw new TypeError(
-          `Duplicate expression name: '${name}'. Expression names must be unique.`
-        )
-      }
-      expressionsMap.set(name, expr)
-    }
-
-    const batch = parseBatch(this.engine, expressionsMap)
+    const batch = parseBatch(this.engine, options.expressions)
 
     this.state = {
       batch,
-      originalExpressions: expressionsMap,
+      expressions: options.expressions,
       lastContext: undefined,
-      cachedResults: {},
-      markedForEvaluation: new Set(),
+      cachedResults: new WeakMap(),
+      markedForEvaluation: [],
     }
   }
 
@@ -81,21 +67,21 @@ export class BatchEngine {
    *   been removed from the context.
    *
    * @param ctx — Full evaluation context
-   * @returns Record mapping expression names to their Result values
+   * @returns WeakMap mapping expression inputs (ExpressionInput) to their result values
    */
-  evaluate(ctx: Context): Record<string, boolean> {
+  evaluate(ctx: Context): WeakMap<ExpressionInput, boolean> {
     const inputKeys = Object.keys(ctx)
 
     const isFirstEvaluation = this.state.lastContext === undefined
 
     // No-op if no context was provided and it is not the first evaluation.
     if (inputKeys.length === 0 && !isFirstEvaluation) {
-      return { ...this.state.cachedResults }
+      return this.state.cachedResults
     }
 
     // Start with undefined, meaning all expressions will be evaluated if no
     // affected expressions are found.
-    let affectedExpressions: Set<string> | undefined
+    let affectedExpressions: ExpressionInput[] | undefined
 
     if (inputKeys.length > 0 && !isFirstEvaluation) {
       affectedExpressions = findAffectedExpressions(
@@ -109,80 +95,79 @@ export class BatchEngine {
       // If affectedExpressions is undefined, full evaluation will already occur.
       // Otherwise, add expressions with dynamic refs to always be processed.
       affectedExpressions !== undefined &&
-      this.state.batch.expressionsWithDynamic.size > 0
+      this.state.batch.expressionsWithDynamic.length > 0
     ) {
-      for (const exprName of this.state.batch.expressionsWithDynamic) {
-        affectedExpressions.add(exprName)
+      for (const expr of this.state.batch.expressionsWithDynamic) {
+        affectedExpressions.push(expr)
       }
     }
 
     // If there are expressions marked for evaluation, add them to the affected
     // expressions set and clear the state.
-    if (this.state.markedForEvaluation.size > 0) {
+    if (this.state.markedForEvaluation.length > 0) {
       if (affectedExpressions === undefined) {
-        affectedExpressions = new Set()
+        affectedExpressions = []
       }
-      for (const exprName of this.state.markedForEvaluation) {
-        affectedExpressions.add(exprName)
+      for (const expr of this.state.markedForEvaluation) {
+        affectedExpressions.push(expr)
       }
-      this.state.markedForEvaluation.clear()
+      this.state.markedForEvaluation = []
     }
 
-    if (affectedExpressions !== undefined && affectedExpressions.size === 0) {
-      return { ...this.state.cachedResults }
+    if (affectedExpressions !== undefined && affectedExpressions.length === 0) {
+      return this.state.cachedResults
     }
 
     this.state.lastContext = this.mergeContext(this.state.lastContext, ctx)
 
-    const newResults = evaluateBatch(
+    // Merge new results into cached results
+    for (const [expr, value] of evaluateBatch(
+      this.state.expressions,
       this.state.batch,
       this.state.lastContext,
       affectedExpressions
-    )
-
-    // Merge new results into cached results
-    for (const [name, value] of Object.entries(newResults)) {
-      this.state.cachedResults[name] = value
+    )) {
+      this.state.cachedResults.set(expr, value)
     }
 
-    return { ...this.state.cachedResults }
+    return this.state.cachedResults
   }
 
   /**
    * Get the full results of all expressions.
    * @returns Record mapping expression names to their Result values
    */
-  getResults(): Record<string, boolean> {
-    return { ...this.state.cachedResults }
+  getResults(): WeakMap<ExpressionInput, boolean> {
+    return this.state.cachedResults
   }
 
   /**
    * Retrieves the cached result for a specific expression.
    *
-   * @param name Expression name to retrieve the result for
+   * @param expression Expression to retrieve the result for
    * @returns The cached result for the specified expression, or undefined if it doesn't exist
    */
-  getResultForExpression(name: string): boolean | undefined {
-    return this.state.cachedResults[name]
+  getResultForExpression(expression: ExpressionInput): boolean | undefined {
+    return this.state.cachedResults.get(expression)
   }
 
   /**
    * Dispose the batch evaluator — frees internal caches.
    */
   dispose(): void {
-    this.state.cachedResults = {}
+    this.state.cachedResults = new WeakMap()
     this.state.lastContext = undefined
-    this.state.originalExpressions.clear()
-    this.state.batch.expressions.clear()
+    this.state.expressions = []
+    this.state.batch.expressions = new WeakMap()
     this.state.batch.dependencyGraph.clear()
-    this.state.markedForEvaluation.clear()
+    this.state.markedForEvaluation = []
   }
 
   /**
    * Reset all results to undefined (for fresh evaluation without reparsing).
    */
   reset(): void {
-    this.state.cachedResults = {}
+    this.state.cachedResults = new WeakMap()
   }
 
   /**
@@ -195,15 +180,9 @@ export class BatchEngine {
    * @param expression — Raw expression input
    * @throws TypeError if an expression with this name already exists
    */
-  addExpression(name: string, expression: ExpressionInput): void {
-    if (this.state.originalExpressions.has(name)) {
-      throw new TypeError(
-        `Duplicate expression name: '${name}'. Expression names must be unique.`
-      )
-    }
-
-    this.state.originalExpressions.set(name, expression)
-    this.state.markedForEvaluation.add(name)
+  addExpression(expression: ExpressionInput): void {
+    this.state.expressions.push(expression)
+    this.state.markedForEvaluation.push(expression)
 
     this.reparse()
   }
@@ -215,12 +194,13 @@ export class BatchEngine {
    * cleared, and the expression is excluded from future evaluations. Other
    * expressions' cached results are preserved.
    *
-   * @param name — Expression name to remove
+   * @param expression — Expression to remove
    */
-  removeExpression(name: string): void {
-    this.state.originalExpressions.delete(name)
-
-    delete this.state.cachedResults[name]
+  removeExpression(expression: ExpressionInput): void {
+    this.state.expressions = this.state.expressions.filter(
+      (expr) => expr !== expression
+    )
+    this.state.cachedResults.delete(expression)
 
     this.reparse()
   }
@@ -229,18 +209,7 @@ export class BatchEngine {
    * Reparse the batch from stored original expressions.
    */
   private reparse(): void {
-    const batch = parseBatch(this.engine, this.state.originalExpressions)
-
-    // Preserve cached results for expressions that still exist
-    const preservedResults: Record<string, boolean> = {}
-    for (const name of batch.expressions.keys()) {
-      if (name in this.state.cachedResults) {
-        preservedResults[name] = this.state.cachedResults[name]
-      }
-    }
-
-    this.state.batch = batch
-    this.state.cachedResults = preservedResults
+    this.state.batch = parseBatch(this.engine, this.state.expressions)
   }
 
   /**
