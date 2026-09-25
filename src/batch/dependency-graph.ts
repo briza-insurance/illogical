@@ -49,7 +49,7 @@ function collectRefsFromExpression(
 ): void {
   for (const key of evaluable.getReferences()) {
     // if the key is dynamic (contains '{' and '}'), add it to the dynamicRefs set
-    if (key.includes('{')) {
+    if (key.includes('{') && key.includes('}')) {
       expressionsWithDynamic.push(expression)
     } else {
       const rootKey =
