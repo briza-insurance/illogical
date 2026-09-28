@@ -1,5 +1,10 @@
 # illogical changelog
 
+## 2.2.6
+
+- Remove bytecode implementation
+- Add a new Batch feature. See [documentation](./specs/batch-evaluate.md)
+
 ## 2.2.5
 
 - Further improvements to Bytecode implementation
