@@ -7,11 +7,15 @@ The `BatchEngine` allows you to evaluate multiple expressions simultaneously, ma
 ```js
 import { BatchEngine } from '@briza/illogical'
 
-const expressions = {
-  isAdult: ['>=', '$age', 18],
-  canDrive: ['AND', ['>=', '$age', 16], ['==', '$hasLicense', true]],
-  isVip: ['==', '$tier', 'gold'],
-}
+const isAdult: ExpressionInput = ['>=', '$age', 18]
+const canDrive: ExpressionInput = ['AND', ['>=', '$age', 16], ['==', '$hasLicense', true]]
+const isVip: ExpressionInput = ['==', '$tier', 'gold']
+
+const expressions = [
+  isAdult,
+  canDrive,
+  isVip,
+]
 
 const batchEngine = new BatchEngine({ expressions })
 
@@ -21,19 +25,25 @@ const results = batchEngine.evaluate({
   hasLicense: true,
   tier: 'silver',
 })
-// { isAdult: true, canDrive: true, isVip: false }
+results.get(isAdult) // = true
+results.get(canDrive) // = true
+results.get(isVip) // = false
 
 // Incremental evaluation (only evaluates expressions depending on 'tier')
-const updatedResults = batchEngine.evaluate({ tier: 'gold' })
-// { isAdult: true, canDrive: true, isVip: true }
+batchEngine.evaluate({ tier: 'gold' })
+results.get(isAdult) // = true
+results.get(canDrive) // = true
+results.get(isVip) // = true
 
 // Calling with the full context is equivalent. Only changed values will lead re-evaluation of dependent expressions
-const results = batchEngine.evaluate({
+batchEngine.evaluate({
   age: 20,
   hasLicense: true,
   tier: 'bronze',
 })
-// { isAdult: true, canDrive: true, isVip: false }
+results.get(isAdult) // = true
+results.get(canDrive) // = true
+results.get(isVip) // = true
 ```
 
 ## Dependency Model
