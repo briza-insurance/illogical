@@ -11,7 +11,7 @@ import { ParsedBatch } from './types.js'
  * @param ctx — Evaluation context
  * @returns The computed Result
  */
-export function evaluateSingle(
+function evaluateSingle(
   batch: ParsedBatch,
   expr: ExpressionInput,
   ctx: Context

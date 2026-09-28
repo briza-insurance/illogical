@@ -3,6 +3,7 @@ import { describe, it } from 'node:test'
 
 import { Context } from '../../../common/evaluable.js'
 import { ExpressionInput } from '../../../parser/index.js'
+import { Options } from '../../../parser/options.js'
 import { BatchEngine } from '../../batch.js'
 import { BatchEvaluatorState } from '../../types.js'
 
@@ -18,6 +19,28 @@ describe('BatchEngine', () => {
         }),
       new Error('invalid expression: ["$eq","$a",10]')
     )
+  })
+
+  it('supports custom parser options', () => {
+    const customOptions: Partial<Options> = {
+      referencePredicate: (key: unknown) =>
+        typeof key === 'string' && key.startsWith('#'),
+      referenceTransform: (key: string) => key.slice(1),
+      referenceSerialization: (key: string) => `#${key}`,
+    }
+
+    const expr1: ExpressionInput = ['==', '#status', 'active']
+    const expr2: ExpressionInput = ['>=', '#age', 18]
+
+    const evaluator = new BatchEngine({
+      expressions: [expr1, expr2],
+      options: customOptions,
+    })
+
+    const results = evaluator.evaluate({ status: 'active', age: 20 })
+
+    assert.strictEqual(results.get(expr1), true)
+    assert.strictEqual(results.get(expr2), true)
   })
 
   describe('mergeContext', () => {
@@ -57,6 +80,35 @@ describe('BatchEngine', () => {
         }
       )
       assert.strictEqual('toRemove' in (state.lastContext ?? {}), false)
+    })
+
+    it('ignores __proto__ to prevent prototype pollution', () => {
+      const expr: ExpressionInput = ['==', '$__proto__.polluted', 'yes']
+      const evaluator = new BatchEngine({
+        expressions: [expr],
+      })
+
+      // Use JSON.parse to ensure an own __proto__ key is passed
+      const maliciousContext = JSON.parse(
+        '{"__proto__": {"polluted": "yes"}, "status": "active"}'
+      )
+
+      evaluator.evaluate(maliciousContext)
+
+      // Object prototype remains unpolluted
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any
+      assert.strictEqual(({} as any).polluted, undefined)
+
+      // Expression referencing the injected property does not evaluate to true
+      assert.strictEqual(evaluator.getResultForExpression(expr), false)
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const state = (evaluator as unknown as { state: BatchEvaluatorState })
+        .state
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(state.lastContext, '__proto__'),
+        false
+      )
     })
   })
 
@@ -407,6 +459,28 @@ describe('BatchEngine', () => {
       assert.deepEqual(results3.get(expr2), true)
       assert.deepEqual(results3.get(expr3), false)
     })
+
+    it('returns no-op if no context is provided in second evaluation', () => {
+      const expr1: ExpressionInput = [
+        'OVERLAP',
+        ['$value1', '$value2'],
+        ['123', '456'],
+      ]
+
+      const evaluator = new BatchEngine({
+        expressions: [expr1],
+      })
+
+      const context1 = { value1: '123' }
+
+      const results1 = evaluator.evaluate(context1)
+
+      assert.deepEqual(results1.get(expr1), true)
+
+      const results2 = evaluator.evaluate({})
+
+      assert.deepEqual(results1, results2)
+    })
   })
 
   describe('reset', () => {
@@ -442,6 +516,19 @@ describe('BatchEngine', () => {
       evaluator.evaluate({ age: 25, status: 'active' })
       assert.deepEqual(evaluator.getResultForExpression(isAdult), true)
       assert.deepEqual(evaluator.getResultForExpression(isActive), true)
+    })
+
+    it('evaluates marked expressions when added before the initial evaluation', () => {
+      const evaluator = new BatchEngine({
+        expressions: [isAdult],
+      })
+
+      evaluator.addExpression(isActive)
+
+      evaluator.evaluate({ age: 25, status: 'active' })
+
+      assert.strictEqual(evaluator.getResultForExpression(isActive), true)
+      assert.strictEqual(evaluator.getResultForExpression(isAdult), true)
     })
   })
 

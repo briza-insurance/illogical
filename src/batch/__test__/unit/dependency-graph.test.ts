@@ -126,6 +126,18 @@ describe('Dependency graph', () => {
         )
       }
     )
+
+    it('throws error when evaluable for expression is not found', () => {
+      const expr: ExpressionInput = ['==', '$status', 'active']
+      const evaluablesMap = new WeakMap<ExpressionInput, Evaluable>()
+
+      assert.throws(
+        () => buildDependencyGraph([expr], evaluablesMap),
+        new Error(
+          `Evaluable for expression '${JSON.stringify(expr)}' not found`
+        )
+      )
+    })
   })
 
   describe('findAffectedExpressions', () => {

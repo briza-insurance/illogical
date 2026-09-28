@@ -103,13 +103,13 @@ export class BatchEngine {
     }
 
     // If there are expressions marked for evaluation, add them to the affected
-    // expressions set and clear the state.
+    // expressions set (only during incremental evaluation; full evaluation
+    // will already evaluate all expressions) and clear the state.
     if (this.state.markedForEvaluation.length > 0) {
-      if (affectedExpressions === undefined) {
-        affectedExpressions = []
-      }
-      for (const expr of this.state.markedForEvaluation) {
-        affectedExpressions.push(expr)
+      if (affectedExpressions !== undefined) {
+        for (const expr of this.state.markedForEvaluation) {
+          affectedExpressions.push(expr)
+        }
       }
       this.state.markedForEvaluation = []
     }
