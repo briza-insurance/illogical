@@ -4,7 +4,7 @@
 
 - Remove bytecode implementation
 - Add a new Batch feature. See [documentation](./specs/batch-evaluate.md)
-- Root Evaluables can now return a list of references inside the expression with `getReferences`. This is available when the new Engine option `collectEvaluableReferences` is provided.
+- Root Evaluables can now return a list of references inside the expression with `getReferences`
 
 ## 2.2.5
 
