@@ -1,5 +1,11 @@
 # illogical changelog
 
+## 3.0.0
+
+- Remove bytecode implementation
+- Add a new Batch feature. See [documentation](./specs/batch-evaluate.md)
+- Root Evaluables can now return a list of references inside the expression with `getReferences`
+
 ## 2.2.5
 
 - Further improvements to Bytecode implementation
