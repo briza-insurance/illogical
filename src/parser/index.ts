@@ -151,18 +151,15 @@ export class Parser {
   private getReference(key: string): Reference {
     const cached = this.referenceCache.get(key)
     if (cached !== undefined) {
-      if (this.opts.collectEvaluableReferences) {
-        this.rootEvaluableReferenceKeys.add(cached.getKey())
-      }
+      this.rootEvaluableReferenceKeys.add(cached.getKey())
+
       return cached
     }
 
     const reference = new Reference(this.opts.referenceTransform(key))
 
     this.referenceCache.set(key, reference)
-    if (this.opts.collectEvaluableReferences) {
-      this.rootEvaluableReferenceKeys.add(reference.getKey())
-    }
+    this.rootEvaluableReferenceKeys.add(reference.getKey())
 
     return reference
   }
