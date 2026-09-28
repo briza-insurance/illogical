@@ -222,12 +222,12 @@ describe(`Condition Engine`, () => {
       [
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         [null] as unknown as ExpressionInput,
-        'invalid expression',
+        'invalid expression: [null]',
       ],
       [
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         ['NOT_VALID_OPERATOR'] as unknown as ExpressionInput,
-        'invalid expression',
+        'invalid expression: ["NOT_VALID_OPERATOR"]',
       ],
       [
         [defaultOperatorMapping.get(OPERATOR_EQ)!],
@@ -277,12 +277,18 @@ describe(`Condition Engine`, () => {
         [defaultOperatorMapping.get(OPERATOR_SUFFIX)!],
         'comparison expression expects left and right operands',
       ],
-      [[defaultOperatorMapping.get(OPERATOR_SUM)!], 'invalid expression'],
-      [[defaultOperatorMapping.get(OPERATOR_SUM)!, 5], 'invalid expression'],
+      [
+        [defaultOperatorMapping.get(OPERATOR_SUM)!],
+        'invalid expression: ["+"]',
+      ],
+      [
+        [defaultOperatorMapping.get(OPERATOR_SUM)!, 5],
+        'invalid expression: ["+",5]',
+      ],
       [
         // Arithmetic can't be a top level expression
         [defaultOperatorMapping.get(OPERATOR_SUM)!, 5, 5],
-        'invalid expression',
+        'invalid expression: ["+",5,5]',
       ],
       [
         // Arithmetic can't be a top level expression

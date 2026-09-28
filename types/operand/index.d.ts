@@ -22,4 +22,12 @@ export declare abstract class Operand implements Evaluable {
      * Get the strict representation.
      */
     toString(): string;
+    /**
+     * {@link Evaluable.getReferences}
+     */
+    getReferences(): string[];
+    /**
+     * {@link Evaluable.setReferences}
+     */
+    setReferences(_references: string[]): void;
 }

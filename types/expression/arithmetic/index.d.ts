@@ -51,4 +51,12 @@ export declare abstract class Arithmetic implements Evaluable {
      * {@link Evaluable.serialize}
      */
     serialize(options: Options): ExpressionInput;
+    /**
+     * {@link Evaluable.getReferences}
+     */
+    getReferences(): string[];
+    /**
+     * {@link Evaluable.setReferences}
+     */
+    setReferences(_references: string[]): void;
 }

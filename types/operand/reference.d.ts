@@ -38,6 +38,7 @@ export declare class Reference extends Operand {
      * @return {string}
      */
     toString(): string;
+    getKey(): string;
     /**
      * Converts a value to a specified data type
      * Silently returns original value if data type conversion has not been implemented.

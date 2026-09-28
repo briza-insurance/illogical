@@ -1,0 +1,6 @@
+{
+  "description": "Not an array reference",
+  "expression": ["==", "$[0]", "val"],
+  "context": { "[0]": "val" },
+  "expected": true
+}

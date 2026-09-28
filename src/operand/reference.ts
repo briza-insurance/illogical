@@ -220,6 +220,10 @@ export class Reference extends Operand {
     return `{${this.key}}`
   }
 
+  getKey(): string {
+    return this.key
+  }
+
   /**
    * Converts a value to a specified data type
    * Silently returns original value if data type conversion has not been implemented.

@@ -35,6 +35,11 @@ export interface Options {
      * is the key used to represent the  given operator in the raw expression.
      */
     operatorMapping: Map<symbol, string>;
+    /**
+     * Whether to collect evaluable references during parsing. For Batch mode,
+     * this feature is required and will still be used regardless of the setting.
+     */
+    collectEvaluableReferences: boolean;
 }
 /**
  * Default reference predicate.
